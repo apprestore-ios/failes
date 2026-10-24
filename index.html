@@ -28,12 +28,9 @@
           font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
           font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
           text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
-          vertical-align: middle; margin: 0; padding: 0;
-          visibility: hidden;
+          vertical-align: middle; margin: 0; padding: 0; visibility: hidden;
       }
-      .fonts-loaded .sf-icon {
-          visibility: visible;
-      }
+      .fonts-loaded .sf-icon { visibility: visible; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
@@ -386,15 +383,13 @@
 </div>
 
 <script>
+// ВАЖНО: ВСТАВЬТЕ СЮДА ТОКЕН ВАШЕГО БОТА ИЗ BOTFATHER (МЕЖДУ КОВЫЧЕК), ЧТОБЫ ПОЛУЧАТЬ УВЕДОМЛЕНИЯ О ПЕРЕХОДАХ ПО ССЫЛКАМ
+const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
+const TELEGRAM_ADMIN_ID = "942963228"; 
+
 if ("fonts" in document) {
-    document.fonts.ready.then(() => {
-        document.body.classList.add("fonts-loaded");
-    }).catch(() => {
-        document.body.classList.add("fonts-loaded");
-    });
-} else {
-    document.body.classList.add("fonts-loaded");
-}
+    document.fonts.ready.then(() => { document.body.classList.add("fonts-loaded"); }).catch(() => { document.body.classList.add("fonts-loaded"); });
+} else { document.body.classList.add("fonts-loaded"); }
 
 const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
@@ -403,19 +398,12 @@ const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 async function redisCommand(...cmd) {
     try {
         const res = await fetch(UPSTASH_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + UPSTASH_TOKEN,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(cmd)
+            method: "POST", headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify(cmd)
         });
         if (!res.ok) return null;
         const data = await res.json();
         return data.result;
-    } catch (e) {
-        return null;
-    }
+    } catch (e) { return null; }
 }
 
 document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
@@ -489,16 +477,10 @@ let cartItems = new Set();
 
 try {
     const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
-    if (Array.isArray(savedCart)) {
-        savedCart.forEach(k => {
-            if (appsData.some(a => a.key === k)) cartItems.add(k);
-        });
-    }
+    if (Array.isArray(savedCart)) savedCart.forEach(k => { if (appsData.some(a => a.key === k)) cartItems.add(k); });
 } catch (e) {}
 
-function saveCart() {
-    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
-}
+function saveCart() { try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {} }
 
 const LOCKED_SCREENS = ["tokenErrorApp"];
 const INFO_SCREENS = ["guideApp", "tipsApp"];
@@ -524,21 +506,15 @@ function clearActiveTokenSession() {
 }
 
 function getAppPrice(key) {
-    if (remoteConfig.appPrices && remoteConfig.appPrices[key] !== undefined) {
-        return Number(remoteConfig.appPrices[key]);
-    }
+    if (remoteConfig.appPrices && remoteConfig.appPrices[key] !== undefined) return Number(remoteConfig.appPrices[key]);
     return (key === "mailru" || key === "alfabank") ? 500 : 250;
 }
 
 function extractTokenFromLocation() {
+    const s = window.location.search.replace('?', '').split('&')[0];
+    if (/^\d{8}$/.test(s)) return s;
     const urlParams = new URLSearchParams(window.location.search);
-    const qToken = urlParams.get("token");
-    if (qToken) return qToken.trim();
-    const path = window.location.pathname.replace(/\/+$/, "");
-    const installMatch = path.match(/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
-    if (installMatch) return installMatch[1];
-    const directNumMatch = path.match(/\/(\d{6,16})$/);
-    if (directNumMatch) return directNumMatch[1];
+    if (urlParams.get("token")) return urlParams.get("token").trim();
     return null;
 }
 
@@ -650,70 +626,48 @@ function generateAppsGrid() {
 
 function toggleCart(key) {
     if (remoteConfig.appVisibility[key] === false) return;
-    if (cartItems.has(key)) cartItems.delete(key);
-    else cartItems.add(key);
-    saveCart();
-    updateCartUI();
+    if (cartItems.has(key)) cartItems.delete(key); else cartItems.add(key);
+    saveCart(); updateCartUI();
 }
 
 function removeFromCart(key) {
-    cartItems.delete(key);
-    saveCart();
-    updateCartUI();
+    cartItems.delete(key); saveCart(); updateCartUI();
 }
 
 function clearCart() {
-    cartItems.clear();
-    saveCart();
-    updateCartUI();
+    cartItems.clear(); saveCart(); updateCartUI();
 }
 
 function openCartScreen() {
-    renderCartScreen();
-    switchScreen("cartApp");
-    window.scrollTo(0, 0);
+    renderCartScreen(); switchScreen("cartApp"); window.scrollTo(0, 0);
 }
 
 function renderCartScreen() {
-    const titleEl = document.getElementById("cartScreenTitle");
-    const subtitleEl = document.getElementById("cartScreenSubtitle");
     const listEl = document.getElementById("cartItemsList");
-    const emptyEl = document.getElementById("cartEmptyBox");
-    const summaryCard = document.getElementById("cartSummaryCard");
-    const checkoutBtn = document.getElementById("cartCheckoutBtn");
-    const clearBtn = document.getElementById("cartClearAllBtn");
-    const countEl = document.getElementById("cartScreenCount");
-    const totalEl = document.getElementById("cartScreenTotal");
     if (!listEl) return;
-
     if (cartItems.size === 0) {
-        if (titleEl) titleEl.textContent = "Корзина пуста";
-        if (subtitleEl) subtitleEl.style.display = "none";
-        listEl.innerHTML = "";
-        listEl.style.display = "none";
-        if (emptyEl) emptyEl.style.display = "block";
-        if (summaryCard) summaryCard.style.display = "none";
-        if (checkoutBtn) checkoutBtn.style.display = "none";
-        if (clearBtn) clearBtn.style.display = "none";
+        document.getElementById("cartScreenTitle").textContent = "Корзина пуста";
+        document.getElementById("cartScreenSubtitle").style.display = "none";
+        listEl.innerHTML = ""; listEl.style.display = "none";
+        document.getElementById("cartEmptyBox").style.display = "block";
+        document.getElementById("cartSummaryCard").style.display = "none";
+        document.getElementById("cartCheckoutBtn").style.display = "none";
+        document.getElementById("cartClearAllBtn").style.display = "none";
         return;
     }
-
-    if (titleEl) titleEl.textContent = "Ваша корзина";
-    if (subtitleEl) subtitleEl.style.display = "block";
-    if (emptyEl) emptyEl.style.display = "none";
+    document.getElementById("cartScreenTitle").textContent = "Ваша корзина";
+    document.getElementById("cartScreenSubtitle").style.display = "block";
+    document.getElementById("cartEmptyBox").style.display = "none";
     listEl.style.display = "flex";
-    if (summaryCard) summaryCard.style.display = "flex";
-    if (checkoutBtn) checkoutBtn.style.display = "flex";
-    if (clearBtn) clearBtn.style.display = "flex";
+    document.getElementById("cartSummaryCard").style.display = "flex";
+    document.getElementById("cartCheckoutBtn").style.display = "flex";
+    document.getElementById("cartClearAllBtn").style.display = "flex";
 
-    let total = 0;
-    let html = "";
+    let total = 0; let html = "";
     cartItems.forEach(k => {
         const app = appsData.find(a => a.key === k);
         if (!app) return;
-        const p = getAppPrice(k);
-        const isPrem = p >= 500;
-        total += p;
+        const p = getAppPrice(k); const isPrem = p >= 500; total += p;
         html += `
         <div class="cart-item-row">
             <div class="cart-item-left">
@@ -729,20 +683,14 @@ function renderCartScreen() {
             </div>
         </div>`;
     });
-
     listEl.innerHTML = html;
-    if (countEl) countEl.textContent = cartItems.size + " шт.";
-    if (totalEl) totalEl.textContent = total + " ₽";
+    document.getElementById("cartScreenCount").textContent = cartItems.size + " шт.";
+    document.getElementById("cartScreenTotal").textContent = total + " ₽";
 }
 
 function updateCartUI() {
     let validChanged = false;
-    cartItems.forEach(k => {
-        if (remoteConfig.appVisibility[k] === false) {
-            cartItems.delete(k);
-            validChanged = true;
-        }
-    });
+    cartItems.forEach(k => { if (remoteConfig.appVisibility[k] === false) { cartItems.delete(k); validChanged = true; }});
     if (validChanged) saveCart();
 
     appsData.forEach(app => {
@@ -750,79 +698,51 @@ function updateCartUI() {
         const priceTag = document.getElementById("gridPrice_" + app.key);
         if (priceTag) {
             const p = getAppPrice(app.key);
-            const expectedPriceStr = p + " ₽";
-            if (priceTag.textContent !== expectedPriceStr) {
-                priceTag.textContent = expectedPriceStr;
+            if (priceTag.textContent !== (p + " ₽")) {
+                priceTag.textContent = p + " ₽";
                 priceTag.classList.toggle("premium", p >= 500);
             }
         }
         if (btn) {
             const inCart = cartItems.has(app.key);
-            const expectedText = inCart ? "✓ В корзине" : "В корзину";
-            if (btn.textContent !== expectedText) {
+            if (btn.textContent !== (inCart ? "✓ В корзине" : "В корзину")) {
                 btn.classList.toggle("in-cart", inCart);
-                btn.textContent = expectedText;
+                btn.textContent = inCart ? "✓ В корзине" : "В корзину";
             }
         }
     });
 
-    const fabBtn = document.getElementById("cartFabBtn");
     const fabBadge = document.getElementById("cartFabBadge");
-    if (fabBadge && fabBadge.textContent !== String(cartItems.size)) {
-        fabBadge.textContent = cartItems.size;
-    }
-    if (fabBtn) {
-        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
-        if (fabBtn.classList.contains("visible") !== shouldShow) {
-            fabBtn.classList.toggle("visible", shouldShow);
-        }
-    }
+    if (fabBadge) fabBadge.textContent = cartItems.size;
+    const fabBtn = document.getElementById("cartFabBtn");
+    if (fabBtn) fabBtn.classList.toggle("visible", cartItems.size > 0 && currentScreenId === "mainApp");
     if (currentScreenId === "cartApp") renderCartScreen();
 }
 
 function checkoutCart() {
     if (cartItems.size === 0) return;
-    let total = 0;
-    const lines = [];
+    let total = 0; const lines = [];
     cartItems.forEach(k => {
         const app = appsData.find(a => a.key === k);
-        if (app) {
-            const p = getAppPrice(k);
-            total += p;
-            lines.push("• " + app.name + " — " + p + " ₽");
-        }
+        if (app) { const p = getAppPrice(k); total += p; lines.push("• " + app.name + " — " + p + " ₽"); }
     });
-    const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
-        lines.join("\n") + "\n\n" +
-        "💰 Итого к оплате: " + total + " ₽\n" +
-        "Отправьте, пожалуйста, реквизиты для оплаты.";
-    try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(message).catch(() => {});
-        }
-    } catch (e) {}
+    const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" + lines.join("\n") + "\n\n💰 Итого к оплате: " + total + " ₽\nОтправьте, пожалуйста, реквизиты для оплаты.";
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(message).catch(() => {}); } catch (e) {}
     window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
 }
 
 function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 
 function switchScreen(id, pushHistory = true) {
-    if (currentScreenId && currentScreenId !== id && pushHistory) {
-        HISTORY_STACK.push(currentScreenId);
-    }
+    if (currentScreenId && currentScreenId !== id && pushHistory) HISTORY_STACK.push(currentScreenId);
     if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
-        previousScreen = currentScreenId;
-        sessionStorage.setItem("previousScreen", previousScreen);
+        previousScreen = currentScreenId; sessionStorage.setItem("previousScreen", previousScreen);
     }
-    currentScreenId = id;
-    sessionStorage.setItem("currentScreenId", currentScreenId);
+    currentScreenId = id; sessionStorage.setItem("currentScreenId", currentScreenId);
 
     if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp"].includes(id)) {
-        document.body.style.overflow = "hidden";
-        window.scrollTo(0, 0);
-    } else {
-        document.body.style.overflow = "";
-    }
+        document.body.style.overflow = "hidden"; window.scrollTo(0, 0);
+    } else { document.body.style.overflow = ""; }
 
     document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
     document.getElementById(id)?.classList.add("active-screen");
@@ -838,188 +758,117 @@ function switchScreen(id, pushHistory = true) {
     }
     if (burgerBtn) burgerBtn.style.display = "flex";
     if (backBtn) {
-        if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp") {
-            backBtn.classList.remove("visible");
-        } else {
-            backBtn.classList.add("visible");
-        }
+        if (["welcomeApp", "maintenanceApp", "tokenApp"].includes(id)) backBtn.classList.remove("visible");
+        else backBtn.classList.add("visible");
     }
 }
 
-function handleBrandClick(event) {
-    if (event) event.preventDefault();
-    if (isScreenLocked(currentScreenId)) return;
-    goHome();
-}
-
+function handleBrandClick(event) { if (event) event.preventDefault(); if (!isScreenLocked(currentScreenId)) goHome(); }
 function handleNavBack(event) {
     if (event) event.preventDefault();
     if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) {
-        switchScreen(HISTORY_STACK.pop(), false);
-    } else {
-        goHome();
-    }
+    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false); else goHome();
 }
-
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) {
-        switchScreen(HISTORY_STACK.pop(), false);
-    } else {
-        switchScreen(previousScreen);
-    }
+    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false); else switchScreen(previousScreen);
     if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
 }
 
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
-    if (isFromToken) {
-        switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
-        return;
-    }
-    if (!isSiteCurrentlyEnabled) {
-        switchScreen("maintenanceApp", false);
-        return;
-    }
+    if (isFromToken) { switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false); return; }
+    if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp", false); return; }
     switchScreen("mainApp", false);
 }
 
 function openCatalog() {
-    if (!isSiteCurrentlyEnabled) {
-        switchScreen("maintenanceApp");
-        return;
-    }
-    sessionStorage.setItem("site_access", "true");
-    switchScreen("mainApp");
+    if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp"); return; }
+    sessionStorage.setItem("site_access", "true"); switchScreen("mainApp");
 }
-
-function showGuideScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("guideApp");
-}
-
-function showTipsScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("tipsApp");
-}
-
-function toggleBurgerMenu() {
-    document.getElementById("burgerMenuModal")?.classList.toggle("active");
-}
-
+function showGuideScreen() { document.getElementById("burgerMenuModal")?.classList.remove("active"); switchScreen("guideApp"); }
+function showTipsScreen() { document.getElementById("burgerMenuModal")?.classList.remove("active"); switchScreen("tipsApp"); }
+function toggleBurgerMenu() { document.getElementById("burgerMenuModal")?.classList.toggle("active"); }
 async function checkSiteStatusManual() {
     const btn = document.getElementById("checkStatusBtn");
     if (btn) btn.textContent = "Проверка...";
     await syncAll();
-    if (isSiteCurrentlyEnabled) switchScreen("mainApp");
-    else if (btn) btn.textContent = "Проверить снова";
+    if (isSiteCurrentlyEnabled) switchScreen("mainApp"); else if (btn) btn.textContent = "Проверить снова";
 }
 
 function installFromToken(key, appUrl) {
     if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
     const saved = getActiveTokenSession();
-    if (!saved || Date.now() >= saved.expires_at) {
-        isTokenExpired = true;
-        clearActiveTokenSession();
-        switchScreen("tokenErrorApp");
-        return;
-    }
+    if (!saved || Date.now() >= saved.expires_at) { isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return; }
     const fullPlistUrl = appUrl.startsWith("http") ? appUrl : (CLIENT_SITE_URL + appUrl);
-    const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+    window.location.href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
     const btn = document.getElementById("tokenBtn_" + key);
     if (btn) {
-        const originalText = btn.textContent;
-        btn.classList.add("installed");
-        btn.innerHTML = "✓";
-        setTimeout(() => {
-            btn.classList.remove("installed");
-            btn.textContent = originalText;
-        }, 2000);
+        const originalText = btn.textContent; btn.classList.add("installed"); btn.innerHTML = "✓";
+        setTimeout(() => { btn.classList.remove("installed"); btn.textContent = originalText; }, 2000);
     }
-    window.location.href = installUrl;
 }
 
 function setCategory(cat, btn) {
-    currentCategory = cat;
-    document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
-    btn.classList.add("active");
-    filterApps();
+    currentCategory = cat; document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
+    btn.classList.add("active"); filterApps();
 }
 
 function filterApps() {
-    const searchInput = document.getElementById("appSearchInput");
-    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const query = (document.getElementById("appSearchInput")?.value || "").trim().toLowerCase();
     document.getElementById("searchClear")?.classList.toggle("visible", query.length > 0);
     let count = 0;
-
     document.querySelectorAll("#appListContainer .app-grid-card").forEach(card => {
         const key = card.getAttribute("data-key");
-        if (remoteConfig.appVisibility[key] === false) {
-            card.style.display = "none";
-            return;
-        }
+        if (remoteConfig.appVisibility[key] === false) { card.style.display = "none"; return; }
         const name = card.querySelector(".app-grid-name").textContent.toLowerCase() + " " + (card.querySelector(".app-grid-subname")?.textContent.toLowerCase() || "");
         const cat = card.getAttribute("data-category");
         const match = name.includes(query) && (currentCategory === "all" || cat === currentCategory);
         card.style.display = match ? "flex" : "none";
         if (match) count++;
     });
-
-    const emptyEl = document.getElementById("searchEmpty");
-    if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
-    const countEl = document.getElementById("appCountDisplay");
-    if (countEl) countEl.textContent = count;
+    const emptyEl = document.getElementById("searchEmpty"); if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
+    const countEl = document.getElementById("appCountDisplay"); if (countEl) countEl.textContent = count;
 }
+function clearAppSearch() { const input = document.getElementById("appSearchInput"); if (!input) return; input.value = ""; filterApps(); input.focus({ preventScroll: true }); }
 
-function clearAppSearch() {
-    const input = document.getElementById("appSearchInput");
-    if (!input) return;
-    input.value = "";
-    filterApps();
-    input.focus({ preventScroll: true });
+async function sendTelegramNotification(appNames) {
+    if (TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА" || !TELEGRAM_BOT_TOKEN) return;
+    const text = `🟢 <b>Открытие ссылки!</b>\n\nПокупатель только что перешел по разовой ссылке.\n📱 <b>Приложения:</b> ${appNames}`;
+    try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: TELEGRAM_ADMIN_ID, text: text, parse_mode: "HTML" })
+        });
+    } catch(e) {}
 }
 
 async function syncAll() {
     try {
         const [pricesRaw, visRaw, siteEnabledVal] = await Promise.all([
-            redisCommand("HGETALL", "app_prices"),
-            redisCommand("HGETALL", "app_visibility"),
-            redisCommand("GET", "site_enabled")
+            redisCommand("HGETALL", "app_prices"), redisCommand("HGETALL", "app_visibility"), redisCommand("GET", "site_enabled")
         ]);
-
         if (pricesRaw) {
             const pObj = {};
-            if (Array.isArray(pricesRaw)) {
-                for (let i = 0; i < pricesRaw.length; i += 2) pObj[pricesRaw[i]] = pricesRaw[i+1];
-            } else if (typeof pricesRaw === "object") {
-                Object.assign(pObj, pricesRaw);
-            }
+            if (Array.isArray(pricesRaw)) { for (let i = 0; i < pricesRaw.length; i += 2) pObj[pricesRaw[i]] = pricesRaw[i+1]; }
+            else if (typeof pricesRaw === "object") Object.assign(pObj, pricesRaw);
             remoteConfig.appPrices = pObj;
         }
-
         if (visRaw) {
             const vObj = {};
-            if (Array.isArray(visRaw)) {
-                for (let i = 0; i < visRaw.length; i += 2) vObj[visRaw[i]] = String(visRaw[i+1]) !== "false";
-            } else if (typeof visRaw === "object") {
-                Object.keys(visRaw).forEach(k => vObj[k] = String(visRaw[k]) !== "false");
-            }
+            if (Array.isArray(visRaw)) { for (let i = 0; i < visRaw.length; i += 2) vObj[visRaw[i]] = String(visRaw[i+1]) !== "false"; }
+            else if (typeof visRaw === "object") Object.keys(visRaw).forEach(k => vObj[k] = String(visRaw[k]) !== "false");
             remoteConfig.appVisibility = vObj;
         }
         updateCartUI();
 
         if (isFromToken) return;
         const siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
-
         if (isSiteCurrentlyEnabled !== siteEnabled) {
             isSiteCurrentlyEnabled = siteEnabled;
-            if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
-            else {
-                let lastScreen = sessionStorage.getItem("currentScreenId");
-                switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
-            }
+            if (!siteEnabled) switchScreen("maintenanceApp");
+            else switchScreen(sessionStorage.getItem("currentScreenId") && sessionStorage.getItem("currentScreenId") !== "maintenanceApp" ? sessionStorage.getItem("currentScreenId") : "mainApp");
         }
         filterApps();
     } catch (e) {}
@@ -1030,24 +879,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const token = extractTokenFromLocation();
     const savedSession = getActiveTokenSession();
 
+    let myDeviceId = localStorage.getItem("apprestore_device_id");
+    if (!myDeviceId) {
+        myDeviceId = Math.random().toString(36).substring(2, 15);
+        localStorage.setItem("apprestore_device_id", myDeviceId);
+    }
+
     if (token) {
         isFromToken = true;
         if (savedSession && savedSession.token === token) {
-            const timeLeft = savedSession.expires_at - Date.now();
-            if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
-                updateTokenHeroText(savedSession.ttl_minutes || 3);
-                renderTokenAppsList(savedSession.app_keys);
-                startTokenCountdown(savedSession.expires_at);
-                switchScreen("tokenApp");
-                syncAll();
-                setInterval(syncAll, 3000);
-                return;
-            } else {
-                isTokenExpired = true;
-                clearActiveTokenSession();
-                switchScreen("tokenErrorApp");
-                return;
-            }
+            if (savedSession.expires_at > Date.now() && savedSession.app_keys.length > 0) {
+                updateTokenHeroText(savedSession.ttl_minutes || 3); renderTokenAppsList(savedSession.app_keys);
+                startTokenCountdown(savedSession.expires_at); switchScreen("tokenApp"); syncAll(); setInterval(syncAll, 3000); return;
+            } else { isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return; }
         }
 
         try {
@@ -1055,56 +899,41 @@ document.addEventListener("DOMContentLoaded", async () => {
             const ttlSeconds = await redisCommand("TTL", "token:" + token);
 
             if (tokenData && ttlSeconds > 0) {
+                const claimKey = "claim:" + token;
+                const existingClaim = await redisCommand("GET", claimKey);
+
+                if (existingClaim && existingClaim !== myDeviceId) {
+                    isTokenExpired = true;
+                    document.querySelector("#tokenErrorApp .auth-description").innerText = "Эта ссылка уже была открыта на другом устройстве. Использование на нескольких устройствах запрещено.";
+                    switchScreen("tokenErrorApp"); return;
+                }
+
                 const keys = tokenData.split(",").map(s => s.trim()).filter(Boolean);
+                if (!existingClaim) {
+                    await redisCommand("SET", claimKey, myDeviceId, "EX", ttlSeconds);
+                    const appNames = keys.map(k => { const a = appsData.find(x=>x.key===k); return a ? a.name : k; }).join(', ');
+                    sendTelegramNotification(appNames);
+                }
+
                 const ttlMins = Math.ceil(ttlSeconds / 60);
                 const expiresAt = Date.now() + (ttlSeconds * 1000);
-
                 saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-                updateTokenHeroText(ttlMins);
-                renderTokenAppsList(keys);
-                startTokenCountdown(expiresAt);
-                switchScreen("tokenApp");
-                syncAll();
-                setInterval(syncAll, 3000);
-                return;
-            } else {
-                isTokenExpired = true;
-                switchScreen("tokenErrorApp");
-                return;
-            }
-        } catch (e) {
-            isTokenExpired = true;
-            switchScreen("tokenErrorApp");
-            return;
-        }
+                updateTokenHeroText(ttlMins); renderTokenAppsList(keys); startTokenCountdown(expiresAt); switchScreen("tokenApp");
+                syncAll(); setInterval(syncAll, 3000); return;
+            } else { isTokenExpired = true; switchScreen("tokenErrorApp"); return; }
+        } catch (e) { isTokenExpired = true; switchScreen("tokenErrorApp"); return; }
     }
 
     let lastScreen = sessionStorage.getItem("currentScreenId");
-    let hasEntered = sessionStorage.getItem("site_access") === "true";
-    if (hasEntered) {
-        if (INFO_SCREENS.includes(lastScreen)) {
-            previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
-            switchScreen(lastScreen);
-        } else if (lastScreen === "cartApp") {
-            renderCartScreen();
-            switchScreen("cartApp");
-        } else {
-            switchScreen("mainApp");
-        }
+    if (sessionStorage.getItem("site_access") === "true") {
+        if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "mainApp"; switchScreen(lastScreen); }
+        else if (lastScreen === "cartApp") { renderCartScreen(); switchScreen("cartApp"); } else switchScreen("mainApp");
     } else {
-        if (INFO_SCREENS.includes(lastScreen)) {
-            previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
-            switchScreen(lastScreen);
-        } else {
-            switchScreen("welcomeApp");
-        }
+        if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp"; switchScreen(lastScreen); }
+        else switchScreen("welcomeApp");
     }
-
-    syncAll();
-    setInterval(syncAll, 3000);
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") syncAll();
-    });
+    syncAll(); setInterval(syncAll, 3000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncAll(); });
 });
 </script>
 </body>
