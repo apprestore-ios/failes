@@ -7,478 +7,115 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #090d16;
-            --surface: rgba(18, 24, 38, 0.72);
-            --surface-hover: rgba(25, 33, 52, 0.85);
-            --surface-border: rgba(255, 255, 255, 0.08);
-            --surface-border-focus: rgba(99, 102, 241, 0.45);
-            --primary: #4f46e5;
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-            --accent-glow: rgba(99, 102, 241, 0.28);
-            --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
-            --danger: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.12);
-            --success: #10b981;
-            --success-bg: rgba(16, 185, 129, 0.14);
-            --radius-outer: 24px;
-            --radius-inner: 16px;
+            --bg: #090d16; --surface: rgba(18, 24, 38, 0.78); --surface-hover: rgba(28, 37, 58, 0.9);
+            --surface-border: rgba(255, 255, 255, 0.1); --surface-border-focus: rgba(99, 102, 241, 0.55);
+            --primary: #4f46e5; --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            --accent-glow: rgba(99, 102, 241, 0.35); --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --danger: #ef4444; --danger-bg: rgba(239, 68, 68, 0.14); --success: #10b981; --success-bg: rgba(16, 185, 129, 0.16);
+            --radius-outer: 26px; --radius-inner: 18px;
         }
-
-        * {
-            box-sizing: border-box;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100dvh;
-            background-color: var(--bg);
-            color: var(--text-main);
+            margin: 0; padding: 0; width: 100%; height: 100%; min-height: 100dvh;
+            background-color: var(--bg); color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
-            overflow-x: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow-x: hidden; display: flex; align-items: center; justify-content: center;
         }
-
         .bg-mesh {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100dvh;
-            background: 
-                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
-                linear-gradient(180deg, #090d16 0%, #05070c 100%);
-            z-index: -10;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+            background: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.22) 0%, transparent 50%),
+                        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
+                        linear-gradient(180deg, #090d16 0%, #05070c 100%);
+            z-index: -10; pointer-events: none;
         }
-
         .view-container {
-            width: 100%;
-            min-height: 100dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 16px;
+            width: 100%; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+            padding: max(14px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
         }
-
-        .view {
-            display: none;
-            width: 100%;
-            max-width: 380px;
-            animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .view.active {
-            display: block;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.96) translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
+        .view { display: none; width: 100%; max-width: 460px; animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .view.active { display: block; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.97) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .card {
-            background: var(--surface);
-            border: 1px solid var(--surface-border);
-            border-radius: var(--radius-outer);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            padding: 22px 20px;
-            overflow: hidden;
-            position: relative;
+            background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius-outer);
+            box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); padding: 24px 20px; overflow: hidden; position: relative; width: 100%;
         }
-
-        .card-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        .card-header { text-align: center; margin-bottom: 20px; }
         .card-header .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 5px 12px;
+            font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px;
         }
-
-        .card-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
-            color: #fff;
-            letter-spacing: -0.4px;
-        }
-
-        .card-header p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin: 4px 0 0 0;
-        }
-
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        .card-header h2 { font-size: 22px; font-weight: 750; margin: 0; color: #fff; letter-spacing: -0.4px; }
+        .card-header p { font-size: 13.5px; color: var(--text-secondary); margin: 5px 0 0 0; }
+        .menu-list { display: flex; flex-direction: column; gap: 10px; }
         .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-inner);
-            padding: 14px 14px;
-            cursor: pointer;
-            transition: all 0.18s ease;
+            display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: var(--radius-inner); padding: 16px 16px; cursor: pointer; transition: all 0.18s ease;
         }
-
-        .menu-item:hover, .menu-item:active {
-            background: var(--surface-hover);
-            border-color: var(--surface-border-focus);
-            transform: translateY(-1px);
-        }
-
-        .menu-item-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .menu-item:hover, .menu-item:active { background: var(--surface-hover); border-color: var(--surface-border-focus); transform: translateY(-1px); }
+        .menu-item-left { display: flex; align-items: center; gap: 14px; }
         .menu-icon-box {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            background: rgba(255, 255, 255, 0.06);
-            flex-shrink: 0;
+            width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; background: rgba(255, 255, 255, 0.07); flex-shrink: 0;
         }
-
-        .menu-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .menu-info .title {
-            font-size: 14.5px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .menu-info .subtitle {
-            font-size: 11.5px;
-            color: var(--text-secondary);
-            margin-top: 1px;
-        }
-
-        .menu-arrow {
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 18px;
-            font-weight: 600;
-        }
-
+        .menu-info { display: flex; flex-direction: column; }
+        .menu-info .title { font-size: 15.5px; font-weight: 650; color: #fff; }
+        .menu-info .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .menu-arrow { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 600; }
         .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 13px 16px;
-            border-radius: var(--radius-inner);
-            font-size: 14.5px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            box-shadow: 0 4px 16px var(--accent-glow);
+            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+            padding: 15px 18px; border-radius: var(--radius-inner); font-size: 15.5px; font-weight: 650;
+            border: none; cursor: pointer; transition: all 0.18s ease; box-shadow: 0 4px 18px var(--accent-glow);
         }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            color: var(--text-main);
-            box-shadow: none;
-        }
-
-        .btn-secondary:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-danger {
-            background: var(--danger-bg);
-            color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            box-shadow: none;
-        }
-
-        .btn-success {
-            background: var(--success-bg);
-            color: #6ee7b7;
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            box-shadow: none;
-        }
-
-        .input-group {
-            width: 100%;
-            margin-bottom: 12px;
-            position: relative;
-        }
-
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary-gradient); color: #fff; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.11); color: var(--text-main); box-shadow: none; }
+        .btn-danger { background: var(--danger-bg); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); box-shadow: none; }
+        .btn-success { background: var(--success-bg); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: none; }
+        .input-group { width: 100%; margin-bottom: 12px; position: relative; }
         .search-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--surface-border);
-            border-radius: 12px;
-            padding: 11px 14px;
-            font-size: 13.5px;
-            color: #fff;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--surface-border);
+            border-radius: 14px; padding: 12px 16px; font-size: 14.5px; color: #fff; outline: none; transition: border-color 0.2s;
         }
-
-        .search-input:focus {
-            border-color: #6366f1;
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .ttl-container {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin-bottom: 14px;
-        }
-
+        .search-input:focus { border-color: #6366f1; }
+        .ttl-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
         .ttl-chip {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 10px;
-            padding: 7px 0;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s ease;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 650;
+            color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease;
         }
-
-        .ttl-chip.active {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: #6366f1;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-        }
-
-        .scroll-list {
-            max-height: 44dvh;
-            overflow-y: auto;
-            margin-top: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            padding-right: 2px;
-        }
-
-        .scroll-list::-webkit-scrollbar {
-            width: 3px;
-        }
-        .scroll-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 4px;
-        }
-
+        .ttl-chip.active { background: rgba(99, 102, 241, 0.25); border-color: #6366f1; color: #fff; box-shadow: 0 0 12px rgba(99, 102, 241, 0.35); }
+        .scroll-list { max-height: 50dvh; overflow-y: auto; margin-top: 6px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+        .scroll-list::-webkit-scrollbar { width: 4px; }
+        .scroll-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 4px; }
         .app-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 9px 12px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 11px 14px; cursor: pointer; transition: all 0.15s ease;
         }
-
-        .app-row:active {
-            background: rgba(255, 255, 255, 0.07);
-        }
-
-        .app-row.disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-
-        .app-row-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
-        }
-
-        .app-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 9px;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            flex-shrink: 0;
-        }
-
-        .app-meta {
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-title {
-            font-size: 13.5px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #fff;
-        }
-
-        .app-desc {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 1px;
-        }
-
-        .checkbox {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 2px;
-            flex-shrink: 0;
-            transition: all 0.15s ease;
-        }
-
-        .checkbox.checked {
-            background: #6366f1;
-            border-color: #6366f1;
-            box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
-        }
-
-        .checkbox.checked::after {
-            content: '✓';
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            transition: 0.25s ease;
-            flex-shrink: 0;
-        }
-
-        .switch.on {
-            background: #10b981;
-        }
-
-        .switch::after {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #fff;
-            top: 3px;
-            left: 3px;
-            transition: 0.25s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .switch.on::after {
-            transform: translateX(20px);
-        }
-
-        .price-tag {
-            font-size: 12.5px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 8px;
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #c7d2fe;
-            margin-right: 6px;
-        }
-
-        .price-tag.premium {
-            background: rgba(168, 85, 247, 0.16);
-            border-color: rgba(168, 85, 247, 0.4);
-            color: #e9d5ff;
-        }
-
+        .app-row:active { background: rgba(255, 255, 255, 0.09); }
+        .app-row.disabled { opacity: 0.45; cursor: not-allowed; border-color: rgba(239, 68, 68, 0.2); }
+        .app-row-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .app-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.09); flex-shrink: 0; }
+        .app-meta { min-width: 0; display: flex; flex-direction: column; }
+        .app-title { font-size: 14.5px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .app-desc { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+        .checkbox { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center; margin-right: 2px; flex-shrink: 0; }
+        .checkbox.checked { background: #6366f1; border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.45); }
+        .checkbox.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: bold; }
+        .switch { position: relative; width: 48px; height: 26px; background: rgba(255, 255, 255, 0.14); border-radius: 13px; transition: 0.25s ease; flex-shrink: 0; }
+        .switch.on { background: #10b981; }
+        .switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: 0.25s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35); }
+        .switch.on::after { transform: translateX(22px); }
+        .price-tag { font-size: 13px; font-weight: 750; padding: 4px 10px; border-radius: 9px; background: rgba(99, 102, 241, 0.16); border: 1px solid rgba(99, 102, 241, 0.35); color: #c7d2fe; margin-right: 8px; }
+        .price-tag.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
         #toast {
-            position: fixed;
-            top: 18px;
-            left: 50%;
-            transform: translate(-50%, -80px);
-            background: rgba(15, 23, 42, 0.95);
-            color: #fff;
-            padding: 9px 18px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-            z-index: 9999;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            opacity: 0;
-            pointer-events: none;
+            position: fixed; top: max(18px, env(safe-area-inset-top)); left: 50%; transform: translate(-50%, -80px);
+            background: rgba(15, 23, 42, 0.96); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13.5px;
+            font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+            z-index: 9999; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; pointer-events: none; white-space: nowrap;
         }
-
-        #toast.show {
-            transform: translate(-50%, 0);
-            opacity: 1;
-        }
+        #toast.show { transform: translate(-50%, 0); opacity: 1; }
     </style>
 </head>
 <body>
@@ -486,12 +123,11 @@
     <div id="toast"></div>
 
     <div class="view-container">
-
         <!-- ГЛАВНОЕ МЕНЮ -->
         <div id="view-menu" class="view active">
             <div class="card">
                 <div class="card-header">
-                    <div class="badge">AppRestore Cloud v2.5</div>
+                    <div class="badge">AppRestore Control</div>
                     <h2>Панель управления</h2>
                     <p>Администрирование каталога и ссылок</p>
                 </div>
@@ -550,7 +186,6 @@
                     <h2>Генерация ссылки</h2>
                     <p>Выберите срок действия и приложения</p>
                 </div>
-
                 <div class="ttl-container">
                     <div class="ttl-chip active" onclick="selectTtl(3, this)">3м</div>
                     <div class="ttl-chip" onclick="selectTtl(5, this)">5м</div>
@@ -558,15 +193,12 @@
                     <div class="ttl-chip" onclick="selectTtl(15, this)">15м</div>
                     <div class="ttl-chip" onclick="selectTtl(30, this)">30м</div>
                 </div>
-
                 <div class="input-group">
                     <input type="search" id="create-link-search" class="search-input" placeholder="Поиск в списке..." oninput="renderCreateLinkList()">
                 </div>
-
-                <button class="btn btn-secondary" id="btn-generate-main" style="margin-bottom: 10px;" onclick="createLink()">
+                <button class="btn btn-secondary" id="btn-generate-main" style="margin-bottom: 12px;" onclick="createLink()">
                     Сгенерировать ссылку (0)
                 </button>
-
                 <div id="list-create-link" class="scroll-list"></div>
             </div>
         </div>
@@ -574,20 +206,13 @@
         <!-- РЕЗУЛЬТАТ СОЗДАНИЯ ССЫЛКИ -->
         <div id="view-link-result" class="view">
             <div class="card" style="text-align: center;">
-                <div style="font-size: 42px; margin-bottom: 6px;">✨</div>
-                <h2 style="font-size: 20px; margin: 0 0 6px 0;">Ссылка готова!</h2>
-                <p id="result-ttl-desc" style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4;"></p>
-
-                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 140px; overflow-y: auto; padding: 2px;"></div>
-
+                <div style="font-size: 46px; margin-bottom: 6px;">✨</div>
+                <h2 style="font-size: 21px; margin: 0 0 6px 0;">Ссылка готова!</h2>
+                <p id="result-ttl-desc" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;"></p>
+                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; padding: 2px;"></div>
                 <input type="text" id="generated-link-input" class="search-input" readonly style="text-align: center; color: #818cf8; font-weight: 600; margin-bottom: 12px;" onclick="copyLink()">
-
-                <button class="btn btn-primary" id="btn-forward" style="margin-bottom: 8px;">
-                    📤 Переслать клиенту
-                </button>
-                <button class="btn btn-secondary" onclick="copyLink()">
-                    📋 Скопировать
-                </button>
+                <button class="btn btn-primary" id="btn-forward" style="margin-bottom: 10px;">📤 Переслать клиенту</button>
+                <button class="btn btn-secondary" onclick="copyLink()">📋 Скопировать ссылку</button>
             </div>
         </div>
 
@@ -608,17 +233,13 @@
         <!-- ДЕТАЛИ ЦЕНЫ -->
         <div id="view-price-detail" class="view">
             <div class="card" style="text-align: center;">
-                <img id="detail-price-icon" src="" style="width: 64px; height: 64px; border-radius: 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                <h2 id="detail-price-name" style="margin: 0 0 6px 0; font-size: 18px;"></h2>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Укажите новую цену установки (₽)</p>
-
+                <img id="detail-price-icon" src="" style="width: 70px; height: 70px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.12);">
+                <h2 id="detail-price-name" style="margin: 0 0 6px 0; font-size: 19px;"></h2>
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 18px;">Укажите новую цену установки (₽)</p>
                 <div class="input-group">
-                    <input type="tel" inputmode="numeric" id="detail-price-input" class="search-input" style="text-align: center; font-size: 18px; font-weight: 700; color: #fff;">
+                    <input type="tel" inputmode="numeric" id="detail-price-input" class="search-input" style="text-align: center; font-size: 20px; font-weight: 750; color: #fff;">
                 </div>
-
-                <button class="btn btn-primary" id="btn-save-price">
-                    Сохранить изменения
-                </button>
+                <button class="btn btn-primary" id="btn-save-price">Сохранить изменения</button>
             </div>
         </div>
 
@@ -643,21 +264,33 @@
                     <h2>Статус сайта</h2>
                     <p>Глобальный доступ к клиентскому каталогу</p>
                 </div>
-
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-inner); padding: 18px 14px; margin-bottom: 16px;">
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 6px;">Текущий режим:</div>
-                    <div id="site-status-indicator" style="font-size: 16px; font-weight: 700;"></div>
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-inner); padding: 20px 16px; margin-bottom: 18px;">
+                    <div style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 6px;">Текущий режим:</div>
+                    <div id="site-status-indicator" style="font-size: 17px; font-weight: 750;"></div>
                 </div>
-
                 <button class="btn" id="btn-toggle-site"></button>
             </div>
         </div>
-
     </div>
 
     <script>
-        const API_BASE = "https://quiet-field-6867.apprestore-ios.workers.dev";
+        const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
+        const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
+
+        async function redisCommand(...cmd) {
+            const res = await fetch(UPSTASH_URL, {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + UPSTASH_TOKEN,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cmd)
+            });
+            if (!res.ok) throw new Error("Redis error");
+            const data = await res.json();
+            return data.result;
+        }
 
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
         document.addEventListener('gesturestart', e => e.preventDefault());
@@ -665,10 +298,17 @@
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
-            tg.expand();
-            if (typeof tg.requestFullscreen === "function") {
-                try { tg.requestFullscreen(); } catch (e) {}
-            }
+            const forceFullSize = () => {
+                try {
+                    tg.expand();
+                    if (typeof tg.requestFullscreen === "function") tg.requestFullscreen();
+                    if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+                    tg.isVerticalSwipesEnabled = false;
+                } catch (e) {}
+            };
+            forceFullSize();
+            setTimeout(forceFullSize, 100);
+            setTimeout(forceFullSize, 300);
             try {
                 tg.setHeaderColor('#090d16');
                 tg.setBackgroundColor('#090d16');
@@ -676,59 +316,56 @@
         }
 
         const appsData = [
-          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-          { key: "max", name: "MAX", category: "social", url: "/manifests/max", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
         ];
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const adminToken = urlParams.get('token');
-
-        let globalData = { state: null, siteEnabled: true };
+        let state = { prices: {}, visibility: {}, siteEnabled: true };
         let selectedAppsForLink = new Set();
         let selectedTtlMinutes = 3;
         let selectedAppKey = "";
@@ -778,38 +415,43 @@
         }
 
         function getAdminAppPrice(key) {
-            if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
-                return Number(globalData.state.prices[key]);
+            if (state.prices && state.prices[key] !== undefined) {
+                return Number(state.prices[key]);
             }
-            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;[cite: 1, 2]
         }
 
         async function loadData() {
             try {
-                const res = await fetch(API_BASE + '/api/admin/data?token=' + adminToken);
-                if (!res.ok) {
-                    document.body.innerHTML = '<div style="text-align:center;padding:30px;color:#ef4444;font-size:16px;">Ошибка авторизации.<br>Введите /start в боте.</div>';
-                    return;
+                const [pricesRaw, visRaw, siteEnabledVal] = await Promise.all([
+                    redisCommand("HGETALL", "app_prices"),
+                    redisCommand("HGETALL", "app_visibility"),
+                    redisCommand("GET", "site_enabled")
+                ]);
+
+                state.prices = {};
+                if (pricesRaw) {
+                    if (Array.isArray(pricesRaw)) {
+                        for (let i = 0; i < pricesRaw.length; i += 2) state.prices[pricesRaw[i]] = pricesRaw[i+1];
+                    } else if (typeof pricesRaw === "object") {
+                        Object.assign(state.prices, pricesRaw);
+                    }
                 }
-                const data = await res.json();
-                globalData.state = data.state;
-                globalData.siteEnabled = data.siteEnabled;
+
+                state.visibility = {};
+                if (visRaw) {
+                    if (Array.isArray(visRaw)) {
+                        for (let i = 0; i < visRaw.length; i += 2) state.visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
+                    } else if (typeof visRaw === "object") {
+                        Object.keys(visRaw).forEach(k => state.visibility[k] = String(visRaw[k]) !== "false");
+                    }
+                }
+
+                state.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
                 renderAllViews();
             } catch (e) {
-                if (tg?.showAlert) tg.showAlert("Ошибка соединения с базой");
+                if (tg?.showAlert) tg.showAlert("Ошибка соединения с Upstash");
             }
-        }
-
-        async function doAction(action, payload = {}) {
-            const res = await fetch(API_BASE + '/api/admin/action?token=' + adminToken, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, ...payload })
-            });
-            const out = await res.json();
-            if (!res.ok) throw new Error(out.error || 'Действие отклонено');
-            await loadData();
-            return out;
         }
 
         function openView(id) {
@@ -828,7 +470,6 @@
         }
 
         function renderAllViews() {
-            if (!globalData.state) return;
             renderCreateLinkList();
             renderPricesList();
             renderVisibilityList();
@@ -840,7 +481,7 @@
             const list = document.getElementById('list-create-link');
             const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
             list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const isVisible = globalData.state.visibility[app.key] !== false;
+                const isVisible = state.visibility[app.key] !== false;
                 const isChecked = selectedAppsForLink.has(app.key);
                 return `
                 <div class="app-row ${isVisible ? '' : 'disabled'}" onclick="${isVisible ? `toggleAppForLink('${app.key}')` : ''}">
@@ -857,7 +498,7 @@
         }
 
         function toggleAppForLink(key) {
-            if (globalData.state.visibility[key] === false) return;
+            if (state.visibility[key] === false) return;
             if (selectedAppsForLink.has(key)) selectedAppsForLink.delete(key);
             else selectedAppsForLink.add(key);
             document.getElementById('check-' + key)?.classList.toggle('checked', selectedAppsForLink.has(key));
@@ -870,28 +511,28 @@
             if (!btn) return;
             const count = selectedAppsForLink.size;
             btn.innerText = `Сгенерировать ссылку (${count})`;
-            if (count > 0) {
-                btn.className = "btn btn-primary";
-            } else {
-                btn.className = "btn btn-secondary";
-            }
+            btn.className = count > 0 ? "btn btn-primary" : "btn btn-secondary";
         }
 
+        // Генерация ссылки со сроком жизни через Redis SET EX
         async function createLink() {
             if (selectedAppsForLink.size === 0) {
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
-            const res = await doAction('create_link', {
-                app_keys: Array.from(selectedAppsForLink),
-                ttl_minutes: selectedTtlMinutes
-            });
-            
-            const linkUrl = CLIENT_SITE_URL + "/?token=" + res.token;
-            const ttlText = formatMinWord(res.ttl_minutes || selectedTtlMinutes);
+
+            const token = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+            const appKeysStr = Array.from(selectedAppsForLink).join(',');
+            const ttlSeconds = selectedTtlMinutes * 60;
+
+            // Запись в Redis с автоудалением через EX
+            await redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
+
+            const linkUrl = CLIENT_SITE_URL + "/?token=" + token;
+            const ttlText = formatMinWord(selectedTtlMinutes);
 
             document.getElementById('generated-link-input').value = linkUrl;
-            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента открытия на одном устройстве.`;
+            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента создания на одном устройстве.`;
 
             const container = document.getElementById('result-selected-apps');
             const appNamesList = [];
@@ -899,9 +540,9 @@
                 const app = appsData.find(a => a.key === key);
                 if (!app) return '';
                 appNamesList.push(app.name);
-                return `<div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:10px;">
-                    <img src="${app.icon}" style="width:22px; height:22px; border-radius:6px;">
-                    <span style="font-size:12.5px; font-weight:600; color:var(--text-main); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
+                return `<div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:12px;">
+                    <img src="${app.icon}" style="width:26px; height:26px; border-radius:7px;">
+                    <span style="font-size:13.5px; font-weight:650; color:var(--text-main); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
                 </div>`;
             }).join('');
 
@@ -934,7 +575,7 @@
                     </div>
                     <div style="display:flex; align-items:center;">
                         <span class="price-tag ${isPrem ? 'premium' : ''}">${price} ₽</span>
-                        <span style="color:rgba(255,255,255,0.25); font-size:16px;">›</span>
+                        <span style="color:rgba(255,255,255,0.3); font-size:18px;">›</span>
                     </div>
                 </div>`;
             }).join('');
@@ -947,8 +588,9 @@
             document.getElementById('detail-price-icon').src = app.icon;
             const priceInput = document.getElementById('detail-price-input');
             priceInput.value = getAdminAppPrice(key);
-            document.getElementById('btn-save-price').onclick = () => {
-                doAction('set_price', { key, price: priceInput.value });
+            document.getElementById('btn-save-price').onclick = async () => {
+                await redisCommand("HSET", "app_prices", key, String(priceInput.value));
+                state.prices[key] = priceInput.value;
                 showToast('Цена сохранена');
                 setTimeout(() => openView('view-prices'), 200);
             };
@@ -960,7 +602,7 @@
             if (!list) return;
             const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
             list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const isVis = globalData.state.visibility[app.key] !== false;
+                const isVis = state.visibility[app.key] !== false;
                 return `
                 <div class="app-row" onclick="toggleVisibility('${app.key}', ${!isVis})">
                     <div class="app-row-left">
@@ -975,19 +617,21 @@
             }).join('');
         }
 
-        function toggleVisibility(key, makeVisible) {
+        async function toggleVisibility(key, makeVisible) {
+            await redisCommand("HSET", "app_visibility", key, String(makeVisible));
+            state.visibility[key] = makeVisible;
             if (!makeVisible && selectedAppsForLink.has(key)) {
                 selectedAppsForLink.delete(key);
                 updateGenerateButton();
             }
-            doAction('toggle_vis', { key, visible: makeVisible });
+            renderVisibilityList();
             showToast(makeVisible ? "Приложение включено" : "Приложение скрыто");
         }
 
         function renderSettings() {
             const btnToggle = document.getElementById('btn-toggle-site');
             const indicator = document.getElementById('site-status-indicator');
-            if (globalData.siteEnabled) {
+            if (state.siteEnabled) {
                 indicator.innerText = "🟢 Активен (доступен пользователям)";
                 indicator.style.color = "#4ade80";
                 btnToggle.innerText = "⛔ Приостановить работу каталога";
@@ -998,9 +642,11 @@
                 btnToggle.innerText = "✅ Запустить каталог";
                 btnToggle.className = "btn btn-success";
             }
-            btnToggle.onclick = () => {
-                const newState = !globalData.siteEnabled;
-                doAction('toggle_site', { enabled: newState });
+            btnToggle.onclick = async () => {
+                const newState = !state.siteEnabled;
+                await redisCommand("SET", "site_enabled", String(newState));
+                state.siteEnabled = newState;
+                renderSettings();
                 showToast(newState ? "Сайт запущен" : "Сайт остановлен");
             };
         }
