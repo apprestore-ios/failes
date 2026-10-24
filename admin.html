@@ -717,7 +717,7 @@
         // Фоновая обработка нажатия кнопки "Удалить уведомление" в боте
         let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
         async function pollBotCallbacks() {
-            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
+            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c") return;
             try {
                 const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateOffset}&timeout=0`);
                 const data = await res.json();
