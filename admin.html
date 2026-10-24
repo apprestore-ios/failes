@@ -279,17 +279,21 @@
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
         async function redisCommand(...cmd) {
-            const res = await fetch(UPSTASH_URL, {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + UPSTASH_TOKEN,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(cmd)
-            });
-            if (!res.ok) throw new Error("Redis error");
-            const data = await res.json();
-            return data.result;
+            try {
+                const res = await fetch(UPSTASH_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + UPSTASH_TOKEN,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(cmd)
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.result;
+            } catch (e) {
+                return null;
+            }
         }
 
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
@@ -418,7 +422,7 @@
             if (state.prices && state.prices[key] !== undefined) {
                 return Number(state.prices[key]);
             }
-            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;[cite: 1, 2]
+            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
         }
 
         async function loadData() {
@@ -514,7 +518,6 @@
             btn.className = count > 0 ? "btn btn-primary" : "btn btn-secondary";
         }
 
-        // Генерация ссылки со сроком жизни через Redis SET EX
         async function createLink() {
             if (selectedAppsForLink.size === 0) {
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
@@ -525,7 +528,6 @@
             const appKeysStr = Array.from(selectedAppsForLink).join(',');
             const ttlSeconds = selectedTtlMinutes * 60;
 
-            // Запись в Redis с автоудалением через EX
             await redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
 
             const linkUrl = CLIENT_SITE_URL + "/?token=" + token;
