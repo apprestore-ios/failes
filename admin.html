@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>АДМИН ПАНЕЛЬ</title>
+    <title>Админ-панель</title>
+    <link rel="preload" as="image" href="https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         (function() {
@@ -13,6 +14,9 @@
                 try {
                     tg.ready();
                     tg.expand();
+                    if (typeof tg.requestFullscreen === "function") {
+                        try { tg.requestFullscreen(); } catch (e) {}
+                    }
                     if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
                     tg.isVerticalSwipesEnabled = false;
                     tg.setHeaderColor('#0f131a');
@@ -25,15 +29,15 @@
             let count = 0;
             const timer = setInterval(() => {
                 forceExpand();
-                if (++count > 25) clearInterval(timer);
-            }, 60);
+                if (++count > 30) clearInterval(timer);
+            }, 50);
         })();
     </script>
     <style>
         :root {
             --bg: #0f131a;
-            --card-bg: rgba(30, 35, 48, 0.72);
-            --card-border: rgba(255, 255, 255, 0.11);
+            --card-bg: rgba(30, 35, 48, 0.75);
+            --card-border: rgba(255, 255, 255, 0.12);
             --row-hover: rgba(255, 255, 255, 0.06);
             --divider: rgba(255, 255, 255, 0.07);
             --text-main: #ffffff;
@@ -52,25 +56,51 @@
         }
         .bg-wallpaper {
             position: fixed; inset: -30px; z-index: -1;
-            background-image: linear-gradient(180deg, rgba(15, 19, 26, 0.55) 0%, rgba(15, 19, 26, 0.78) 100%),
-                              url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg");
-            background-size: cover; background-position: center;
-            filter: blur(4px);
+            background-color: #0f131a;
+            background-image: linear-gradient(180deg, rgba(15, 19, 26, 0.45) 0%, rgba(15, 19, 26, 0.72) 100%),
+                              url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            filter: blur(3px);
+            transform: translate3d(0,0,0);
         }
+
+        /* Верхняя панель с кнопкой Назад слева от Админ-панель */
+        .admin-topbar {
+            width: 100%; max-width: 420px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-bottom: 18px; min-height: 40px;
+        }
+        .header-back-btn {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            display: inline-flex; align-items: center; gap: 5px;
+            height: 36px; padding: 0 12px; border-radius: 11px;
+            background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.12s ease, background 0.15s ease;
+        }
+        .header-back-btn:active { transform: translateY(-50%) scale(0.95); background: rgba(255, 255, 255, 0.15); }
+        .topbar-title {
+            font-size: 20px; font-weight: 700; color: #ffffff;
+            letter-spacing: -0.3px; text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+            margin: 0; text-align: center;
+        }
+
         .screen-wrapper {
             width: 100%; height: 100dvh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 16px 16px max(20px, env(safe-area-inset-bottom));
+            padding: max(16px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
             overflow-y: auto;
         }
         .view { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; animation: fadeIn 0.18s ease-out; }
         .view.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        .page-title {
-            font-size: 23px; font-weight: 700; color: #ffffff; text-align: center;
-            margin: 0 0 22px 0; letter-spacing: -0.3px; text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+        .section-subtitle {
+            font-size: 15px; font-weight: 650; color: #cbd5e1; text-align: center;
+            margin: -6px 0 14px 0;
         }
+
         .glass-panel {
             width: 100%; background: var(--card-bg);
             border: 1px solid var(--card-border); border-radius: 22px;
@@ -95,7 +125,6 @@
             font-size: 21px; flex-shrink: 0;
         }
         .icon-blue { background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .icon-purple { background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.3); }
         .icon-amber { background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.3); }
         .icon-green { background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.3); }
         .icon-pink { background: rgba(236, 72, 153, 0.18); border: 1px solid rgba(236, 72, 153, 0.3); }
@@ -131,7 +160,7 @@
         .btn-danger { background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
         .btn-success { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; }
 
-        .scroll-area { max-height: 46dvh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; margin-top: 4px; }
+        .scroll-area { max-height: 52dvh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; margin-top: 4px; }
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
@@ -178,9 +207,16 @@
     <div id="toast"></div>
 
     <div class="screen-wrapper">
-        <!-- ГЛАВНОЕ МЕНЮ (КАК НА ФОТО) -->
+        <!-- ЕДИНАЯ ШАПКА С КНОПКОЙ НАЗАД СЛЕВА ОТ "Админ-панель" -->
+        <div class="admin-topbar">
+            <button type="button" class="header-back-btn" id="top-back-btn" onclick="handleTopBack()">
+                <span>‹</span> Назад
+            </button>
+            <h1 class="topbar-title">Админ-панель</h1>
+        </div>
+
+        <!-- ГЛАВНОЕ МЕНЮ (БЕЗ АКТИВНЫХ ССЫЛОК) -->
         <div id="view-menu" class="view active">
-            <h1 class="page-title">Панель управления</h1>
             <div class="glass-panel">
                 <div class="nav-list">
                     <div class="nav-row" onclick="openView('view-create-link')">
@@ -189,17 +225,6 @@
                             <div class="nav-text">
                                 <span class="nav-title">Создать разовую ссылку</span>
                                 <span class="nav-sub">Выбор приложений для установки</span>
-                            </div>
-                        </div>
-                        <span class="nav-chevron">›</span>
-                    </div>
-
-                    <div class="nav-row" onclick="openView('view-active-links')">
-                        <div class="nav-left">
-                            <div class="nav-icon icon-purple">📋</div>
-                            <div class="nav-text">
-                                <span class="nav-title">Активные ссылки</span>
-                                <span class="nav-sub">Просмотр и удаление сгенерированных</span>
                             </div>
                         </div>
                         <span class="nav-chevron">›</span>
@@ -243,7 +268,7 @@
 
         <!-- СОЗДАТЬ РАЗОВУЮ ССЫЛКУ -->
         <div id="view-create-link" class="view">
-            <h1 class="page-title">Создать разовую ссылку</h1>
+            <div class="section-subtitle">Создание разовой ссылки</div>
             <div class="glass-panel padded">
                 <div class="ttl-bar">
                     <div class="ttl-btn active" onclick="selectTtl(3, this)">3м</div>
@@ -257,82 +282,67 @@
                     Сгенерировать ссылку (0)
                 </button>
                 <div id="list-create-link" class="scroll-area"></div>
-                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
         <!-- ГОТОВАЯ ССЫЛКА -->
         <div id="view-link-result" class="view">
-            <h1 class="page-title">Ссылка готова!</h1>
+            <div class="section-subtitle">Ссылка готова!</div>
             <div class="glass-panel padded" style="text-align: center;">
                 <p id="result-ttl-desc" style="font-size: 13.5px; color: var(--text-sub); margin: 0 0 14px 0;"></p>
-                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 150px; overflow-y: auto;"></div>
+                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 160px; overflow-y: auto;"></div>
                 <input type="text" id="generated-link-input" class="search-box" readonly style="text-align: center; color: #60a5fa; font-weight: 700;" onclick="copyLink()">
-                <button class="btn btn-primary" id="btn-forward" style="margin-bottom: 10px;">📤 Переслать покупателю</button>
-                <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="copyLink()">📋 Скопировать ссылку</button>
-                <button class="btn btn-secondary" onclick="openView('view-menu')">← В главное меню</button>
-            </div>
-        </div>
-
-        <!-- АКТИВНЫЕ ССЫЛКИ -->
-        <div id="view-active-links" class="view">
-            <h1 class="page-title">Активные ссылки</h1>
-            <div class="glass-panel padded">
-                <div id="list-active-links" class="scroll-area" style="max-height: 55dvh;"></div>
-                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
+                <button class="btn btn-primary" id="btn-forward" style="margin-bottom: 10px;">📤 Отправить покупателю</button>
+                <button class="btn btn-secondary" onclick="copyLink()">📋 Скопировать ссылку</button>
             </div>
         </div>
 
         <!-- СТОИМОСТЬ ПРИЛОЖЕНИЙ -->
         <div id="view-prices" class="view">
-            <h1 class="page-title">Стоимость приложений</h1>
+            <div class="section-subtitle">Стоимость приложений</div>
             <div class="glass-panel padded">
                 <input type="search" id="prices-search" class="search-box" placeholder="Поиск по названию..." oninput="renderPricesList()">
                 <div id="list-prices" class="scroll-area"></div>
-                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
         <!-- ИЗМЕНЕНИЕ ЦЕНЫ -->
         <div id="view-price-detail" class="view">
-            <h1 class="page-title">Изменение цены</h1>
+            <div class="section-subtitle">Изменение цены</div>
             <div class="glass-panel padded" style="text-align: center;">
                 <img id="detail-price-icon" src="" style="width: 68px; height: 68px; border-radius: 16px; margin-bottom: 10px;">
                 <h3 id="detail-price-name" style="margin: 0 0 6px 0; font-size: 18px;"></h3>
                 <p style="font-size: 13px; color: var(--text-sub); margin: 0 0 14px 0;">Укажите стоимость установки (₽)</p>
                 <input type="tel" inputmode="numeric" id="detail-price-input" class="search-box" style="text-align: center; font-size: 20px; font-weight: 700;">
-                <button class="btn btn-primary" id="btn-save-price" style="margin-bottom: 10px;">Сохранить изменения</button>
-                <button class="btn btn-secondary" onclick="openView('view-prices')">← Назад к списку</button>
+                <button class="btn btn-primary" id="btn-save-price">Сохранить изменения</button>
             </div>
         </div>
 
         <!-- ВИДИМОСТЬ ПРИЛОЖЕНИЙ -->
         <div id="view-visibility" class="view">
-            <h1 class="page-title">Видимость приложений</h1>
+            <div class="section-subtitle">Видимость приложений</div>
             <div class="glass-panel padded">
                 <input type="search" id="vis-search" class="search-box" placeholder="Поиск по названию..." oninput="renderVisibilityList()">
                 <div id="list-visibility" class="scroll-area"></div>
-                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
         <!-- НАСТРОЙКИ СИСТЕМЫ -->
         <div id="view-settings" class="view">
-            <h1 class="page-title">Настройки системы</h1>
+            <div class="section-subtitle">Настройки системы</div>
             <div class="glass-panel padded" style="text-align: center;">
                 <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; margin-bottom: 16px;">
                     <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 6px;">Текущий статус каталога:</div>
                     <div id="site-status-indicator" style="font-size: 17px; font-weight: 700;"></div>
                 </div>
-                <button class="btn" id="btn-toggle-site" style="margin-bottom: 10px;"></button>
-                <button class="btn btn-secondary" onclick="openView('view-menu')">← Назад в меню</button>
+                <button class="btn" id="btn-toggle-site"></button>
             </div>
         </div>
     </div>
 
     <script>
-        // ВСТАВЬТЕ СЮДА ТОКЕН ВАШЕГО БОТА (ДЛЯ ОБРАБОТКИ КНОПКИ "УДАЛИТЬ УВЕДОМЛЕНИЕ")
-        const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
+        const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
+        const TELEGRAM_ADMIN_ID = 942963228;
 
         const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
         const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
@@ -366,55 +376,56 @@
         }
 
         const tg = window.Telegram?.WebApp;
+        const LOGOS_BASE = "https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/";
 
         const appsData = [
-          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: LOGOS_BASE + "vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: LOGOS_BASE + "max.png", ios: "iOS 15.5+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: LOGOS_BASE + "vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: LOGOS_BASE + "vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: LOGOS_BASE + "vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: LOGOS_BASE + "vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: LOGOS_BASE + "mailru.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: LOGOS_BASE + "sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: LOGOS_BASE + "alfabank.png", ios: "iOS 14.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: LOGOS_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: LOGOS_BASE + "avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: LOGOS_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: LOGOS_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: LOGOS_BASE + "tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: LOGOS_BASE + "lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: LOGOS_BASE + "yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: LOGOS_BASE + "2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: LOGOS_BASE + "youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: LOGOS_BASE + "psb.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: LOGOS_BASE + "kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: LOGOS_BASE + "rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: LOGOS_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: LOGOS_BASE + "tmobile.png", ios: "iOS 16.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: LOGOS_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: LOGOS_BASE + "sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: LOGOS_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: LOGOS_BASE + "avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: LOGOS_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: LOGOS_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: LOGOS_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: LOGOS_BASE + "happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: LOGOS_BASE + "chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: LOGOS_BASE + "gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: LOGOS_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: LOGOS_BASE + "sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: LOGOS_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: LOGOS_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: LOGOS_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: LOGOS_BASE + "sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: LOGOS_BASE + "yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: LOGOS_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: LOGOS_BASE + "novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: LOGOS_BASE + "rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: LOGOS_BASE + "mtsbank.png", ios: "iOS 14.0+" }
         ];
 
         let state = { prices: {}, visibility: {}, siteEnabled: true };
@@ -423,11 +434,20 @@
         let currentView = 'view-menu';
         let toastTimeout;
 
+        // Обработка нажатия на кнопку Назад (слева от Админ-панель и системная кнопка Telegram)
+        function handleTopBack() {
+            if (currentView === 'view-price-detail') {
+                openView('view-prices');
+            } else if (currentView !== 'view-menu') {
+                openView('view-menu');
+            } else if (tg && typeof tg.close === 'function') {
+                tg.close();
+            }
+        }
+
         if (tg?.BackButton) {
-            tg.BackButton.onClick(() => {
-                if (currentView === 'view-price-detail') openView('view-prices');
-                else openView('view-menu');
-            });
+            tg.BackButton.show();
+            tg.BackButton.onClick(handleTopBack);
         }
 
         function showToast(msg) {
@@ -460,18 +480,14 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             currentView = id;
+            if (tg?.BackButton) tg.BackButton.show();
             if (id === 'view-menu') {
-                if (tg?.BackButton) tg.BackButton.hide();
                 selectedAppsForLink.clear();
                 updateGenerateButton();
-            } else {
-                if (tg?.BackButton) tg.BackButton.show();
-                if (id === 'view-active-links') loadActiveLinks();
             }
         }
 
         async function loadData() {
-            // Мгновенно рендерим дефолтные списки, чтобы не ждать сеть
             renderAllViews();
             const res = await redisPipeline([
                 ["HGETALL", "app_prices"],
@@ -561,19 +577,17 @@
 
             openView('view-link-result');
 
-            // Сохраняем в базу в фоне
-            redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
+            await redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
 
-            const shareText = `🔗 Ваша персональная ссылка для установки приложений:\n\n📱 Приложения:\n${appNamesList.map(n => '• ' + n).join('\n')}\n\n⏳ Действует: ${ttlText} (на 1 устройство)`;
+            const shareText = `\n📱 Приложения:\n${appNamesList.map(n => '• ' + n).join('\n')}\n\n⏳ Ссылка действует: ${ttlText} (на 1 устройство)`;
 
+            // Открытие списка чатов в Telegram для выбора покупателя
             document.getElementById('btn-forward').onclick = () => {
-                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
+                const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
                 if (tg && typeof tg.openTelegramLink === 'function') {
-                    tg.openTelegramLink(shareUrl);
-                } else if (navigator.share) {
-                    navigator.share({ title: 'AppRestore IOS', text: shareText, url: linkUrl }).catch(() => {});
+                    tg.openTelegramLink(telegramShareUrl);
                 } else {
-                    window.open(shareUrl, '_blank');
+                    window.location.href = telegramShareUrl;
                 }
             };
         }
@@ -584,42 +598,6 @@
             navigator.clipboard.writeText(input.value).then(() => showToast("Ссылка скопирована!")).catch(() => {
                 input.select(); document.execCommand('copy'); showToast("Ссылка скопирована!");
             });
-        }
-
-        async function loadActiveLinks() {
-            const box = document.getElementById('list-active-links');
-            box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Загрузка...</div>`;
-            const keys = await redisCommand("KEYS", "token:*");
-            if (!keys || keys.length === 0) {
-                box.innerHTML = `<div style="text-align:center; padding:25px; color:var(--text-sub);">Активных ссылок нет</div>`;
-                return;
-            }
-            const cmds = [];
-            keys.forEach(k => { cmds.push(["GET", k]); cmds.push(["TTL", k]); });
-            const res = await redisPipeline(cmds);
-            let html = "";
-            for (let i = 0; i < keys.length; i++) {
-                const token = keys[i].replace("token:", "");
-                const val = res[i*2]?.result || "";
-                const ttl = res[i*2+1]?.result || 0;
-                const minsLeft = Math.max(1, Math.ceil(ttl / 60));
-                const names = val.split(",").map(k => appsData.find(a => a.key === k)?.name || k).join(", ");
-                html += `
-                <div class="app-item" id="act-token-${token}">
-                    <div style="min-width:0; flex:1; padding-right:10px;">
-                        <div class="app-name" style="color:#60a5fa;">/?${token} (${minsLeft} мин)</div>
-                        <div class="app-sub" style="white-space:normal;">${names}</div>
-                    </div>
-                    <button class="btn btn-danger" style="width:auto; min-height:36px; padding:0 12px; font-size:13px;" onclick="deleteToken('${token}')">Удалить</button>
-                </div>`;
-            }
-            box.innerHTML = html;
-        }
-
-        function deleteToken(token) {
-            document.getElementById('act-token-' + token)?.remove();
-            showToast("Ссылка удалена");
-            redisPipeline([["DEL", "token:" + token], ["DEL", "claim:" + token]]);
         }
 
         function renderPricesList() {
@@ -714,31 +692,234 @@
             };
         }
 
-        // Фоновая обработка нажатия кнопки "Удалить уведомление" в боте
+        // =========================================================================
+        // ПОЛНОЦЕННЫЙ КНОПОЧНЫЙ БОТ В ОДНОМ СООБЩЕНИИ + УДАЛЕНИЕ УВЕДОМЛЕНИЙ
+        // =========================================================================
         let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
-        async function pollBotCallbacks() {
-            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c") return;
+        let webhookCleared = false;
+        let botSelectedApps = new Set();
+        let botTtl = 3;
+        let botCat = "all";
+        let botPage = 0;
+
+        async function tgApi(method, body) {
             try {
+                const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+                return await res.json();
+            } catch (e) { return null; }
+        }
+
+        function getBotMainMenuKeyboard() {
+            return {
+                inline_keyboard: [
+                    [{ text: "🔗 Создать разовую ссылку", callback_data: "b_create" }],
+                    [{ text: "🔑 Стоимость приложений", callback_data: "b_prices:0" }],
+                    [{ text: "👁 Видимость приложений", callback_data: "b_vis:0" }],
+                    [{ text: state.siteEnabled ? "🟢 Сайт включен (Настройки)" : "🔴 Сайт отключен (Настройки)", callback_data: "b_settings" }]
+                ]
+            };
+        }
+
+        function buildCreateLinkKeyboard() {
+            const filtered = appsData.filter(a => (botCat === "all" || a.category === botCat) && state.visibility[a.key] !== false);
+            const perPage = 8;
+            const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+            if (botPage >= totalPages) botPage = 0;
+            const slice = filtered.slice(botPage * perPage, (botPage + 1) * perPage);
+
+            const rows = [];
+            // Выбор времени
+            rows.push([3, 5, 10, 15, 30].map(m => ({
+                text: (botTtl === m ? "🔵 " : "") + m + "м",
+                callback_data: "b_ttl:" + m
+            })));
+            // Категории
+            rows.push([
+                { text: (botCat === "all" ? "• Все •" : "Все"), callback_data: "b_cat:all" },
+                { text: (botCat === "banks" ? "• Банки •" : "Банки"), callback_data: "b_cat:banks" },
+                { text: (botCat === "social" ? "• Соц •" : "Соц"), callback_data: "b_cat:social" },
+                { text: (botCat === "other" ? "• Др •" : "Др"), callback_data: "b_cat:other" }
+            ]);
+            // Приложения по 2 в ряд
+            for (let i = 0; i < slice.length; i += 2) {
+                const r = [];
+                [slice[i], slice[i+1]].forEach(app => {
+                    if (!app) return;
+                    const sel = botSelectedApps.has(app.key);
+                    r.push({ text: (sel ? "✅ " : "⬜️ ") + app.name.substring(0, 18), callback_data: "b_tog:" + app.key });
+                });
+                rows.push(r);
+            }
+            // Навигация по страницам
+            if (totalPages > 1) {
+                rows.push([
+                    { text: "⬅️", callback_data: "b_page:" + ((botPage - 1 + totalPages) % totalPages) },
+                    { text: `${botPage + 1} / ${totalPages}`, callback_data: "b_noop" },
+                    { text: "➡️", callback_data: "b_page:" + ((botPage + 1) % totalPages) }
+                ]);
+            }
+            // Генерация и Назад
+            if (botSelectedApps.size > 0) {
+                rows.push([{ text: `🚀 Сгенерировать ссылку (${botSelectedApps.size})`, callback_data: "b_gen" }]);
+            }
+            rows.push([{ text: "← Назад в меню", callback_data: "b_menu" }]);
+            return { inline_keyboard: rows };
+        }
+
+        async function pollBotUpdates() {
+            if (!TELEGRAM_BOT_TOKEN) return;
+            try {
+                // Сбрасываем старый вебхук, который выдавал ошибку "пожалуйста используйте миниапп..."
+                if (!webhookCleared) {
+                    await tgApi("deleteWebhook", { drop_pending_updates: false });
+                    webhookCleared = true;
+                }
+
                 const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateOffset}&timeout=0`);
                 const data = await res.json();
-                if (data.ok && Array.isArray(data.result)) {
-                    for (const upd of data.result) {
-                        lastUpdateOffset = upd.update_id + 1;
-                        localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
-                        if (upd.callback_query && upd.callback_query.data === "del_msg") {
-                            const chatId = upd.callback_query.message.chat.id;
-                            const msgId = upd.callback_query.message.message_id;
-                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
-                                method: "POST", headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ chat_id: chatId, message_id: msgId })
+                if (!data.ok || !Array.isArray(data.result)) return;
+
+                for (const upd of data.result) {
+                    lastUpdateOffset = upd.update_id + 1;
+                    localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
+
+                    // Команда /start или /admin открывает админ-панель прямо в одном сообщении
+                    if (upd.message && upd.message.chat.id === TELEGRAM_ADMIN_ID) {
+                        const txt = (upd.message.text || "").trim();
+                        if (txt === "/start" || txt === "/admin") {
+                            await tgApi("sendMessage", {
+                                chat_id: TELEGRAM_ADMIN_ID,
+                                text: "🎛 <b>Админ-панель AppRestore IOS</b>\nВыберите нужный раздел (все действия происходят в этом сообщении):",
+                                parse_mode: "HTML",
+                                reply_markup: getBotMainMenuKeyboard()
                             });
                         }
+                    }
+
+                    // Обработка всех инлайн-кнопок
+                    if (upd.callback_query) {
+                        const cb = upd.callback_query;
+                        const chatId = cb.message?.chat?.id;
+                        const msgId = cb.message?.message_id;
+                        const d = cb.data || "";
+
+                        // 1. Кнопка "Удалить уведомление"
+                        if (d === "del_msg") {
+                            await tgApi("answerCallbackQuery", { callback_query_id: cb.id, text: "Уведомление удалено" });
+                            await tgApi("deleteMessage", { chat_id: chatId, message_id: msgId });
+                            continue;
+                        }
+
+                        // 2. Кнопки единого сообщения бота
+                        if (d === "b_menu") {
+                            botSelectedApps.clear();
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: "🎛 <b>Админ-панель AppRestore IOS</b>\nВыберите нужный раздел:",
+                                parse_mode: "HTML",
+                                reply_markup: getBotMainMenuKeyboard()
+                            });
+                        } else if (d === "b_create") {
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `🔗 <b>Создание разовой ссылки</b>\nСрок: <b>${botTtl} мин.</b> | Выбрано: <b>${botSelectedApps.size}</b>`,
+                                parse_mode: "HTML",
+                                reply_markup: buildCreateLinkKeyboard()
+                            });
+                        } else if (d.startsWith("b_ttl:")) {
+                            botTtl = Number(d.split(":")[1]);
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `🔗 <b>Создание разовой ссылки</b>\nСрок: <b>${botTtl} мин.</b> | Выбрано: <b>${botSelectedApps.size}</b>`,
+                                parse_mode: "HTML",
+                                reply_markup: buildCreateLinkKeyboard()
+                            });
+                        } else if (d.startsWith("b_cat:")) {
+                            botCat = d.split(":")[1];
+                            botPage = 0;
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `🔗 <b>Создание разовой ссылки</b>\nСрок: <b>${botTtl} мин.</b> | Выбрано: <b>${botSelectedApps.size}</b>`,
+                                parse_mode: "HTML",
+                                reply_markup: buildCreateLinkKeyboard()
+                            });
+                        } else if (d.startsWith("b_page:")) {
+                            botPage = Number(d.split(":")[1]);
+                            await tgApi("editMessageReplyMarkup", {
+                                chat_id: chatId, message_id: msgId,
+                                reply_markup: buildCreateLinkKeyboard()
+                            });
+                        } else if (d.startsWith("b_tog:")) {
+                            const k = d.split(":")[1];
+                            if (botSelectedApps.has(k)) botSelectedApps.delete(k); else botSelectedApps.add(k);
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `🔗 <b>Создание разовой ссылки</b>\nСрок: <b>${botTtl} мин.</b> | Выбрано: <b>${botSelectedApps.size}</b>`,
+                                parse_mode: "HTML",
+                                reply_markup: buildCreateLinkKeyboard()
+                            });
+                        } else if (d === "b_gen") {
+                            if (botSelectedApps.size > 0) {
+                                const token = Math.floor(10000000 + Math.random() * 90000000).toString();
+                                const appKeysStr = Array.from(botSelectedApps).join(',');
+                                await redisCommand("SET", "token:" + token, appKeysStr, "EX", botTtl * 60);
+                                const linkUrl = CLIENT_SITE_URL + "/?" + token;
+                                const names = Array.from(botSelectedApps).map(k => appsData.find(a => a.key === k)?.name || k);
+                                const shareText = `\n📱 Приложения:\n${names.map(n => '• ' + n).join('\n')}\n\n⏳ Ссылка действует: ${formatMinWord(botTtl)} (на 1 устройство)`;
+                                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
+                                botSelectedApps.clear();
+                                await tgApi("editMessageText", {
+                                    chat_id: chatId, message_id: msgId,
+                                    text: `✅ <b>Ссылка готова!</b>\n\n🔗 <code>${linkUrl}</code>\n\n📱 <b>Приложения:</b> ${names.join(", ")}\n⏳ <b>Срок:</b> ${formatMinWord(botTtl)}`,
+                                    parse_mode: "HTML",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [{ text: "📤 Отправить покупателю", url: shareUrl }],
+                                            [{ text: "← В главное меню", callback_data: "b_menu" }]
+                                        ]
+                                    }
+                                });
+                            }
+                        } else if (d === "b_settings") {
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `⚙️ <b>Настройки системы</b>\n\nСтатус каталога: ${state.siteEnabled ? "🟢 Активен" : "🔴 Отключен"}`,
+                                parse_mode: "HTML",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [{ text: state.siteEnabled ? "⛔ Приостановить каталог" : "✅ Запустить каталог", callback_data: "b_tog_site" }],
+                                        [{ text: "← Назад", callback_data: "b_menu" }]
+                                    ]
+                                }
+                            });
+                        } else if (d === "b_tog_site") {
+                            state.siteEnabled = !state.siteEnabled;
+                            renderSettings();
+                            await redisCommand("SET", "site_enabled", String(state.siteEnabled));
+                            await tgApi("editMessageText", {
+                                chat_id: chatId, message_id: msgId,
+                                text: `⚙️ <b>Настройки системы</b>\n\nСтатус каталога: ${state.siteEnabled ? "🟢 Активен" : "🔴 Отключен"}`,
+                                parse_mode: "HTML",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [{ text: state.siteEnabled ? "⛔ Приостановить каталог" : "✅ Запустить каталог", callback_data: "b_tog_site" }],
+                                        [{ text: "← Назад", callback_data: "b_menu" }]
+                                    ]
+                                }
+                            });
+                        }
+                        await tgApi("answerCallbackQuery", { callback_query_id: cb.id });
                     }
                 }
             } catch (e) {}
         }
-        setInterval(pollBotCallbacks, 2500);
-        pollBotCallbacks();
+
+        setInterval(pollBotUpdates, 1800);
+        pollBotUpdates();
 
         loadData();
     </script>
