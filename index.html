@@ -89,9 +89,8 @@
       .container {
           width: 100%; max-width: 430px; padding: 0 16px; z-index: 2; display: none;
           flex-direction: column; justify-content: flex-start; flex: 1;
-          opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.3s var(--spring), transform 0.3s var(--spring);
       }
-      .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
+      .container.active-screen { display: flex; }
       #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp, #guideApp, #tipsApp { justify-content: flex-start; align-items: center; text-align: center; }
 
@@ -128,8 +127,6 @@
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
 
       .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 2px; }
-      .cart-items-list::-webkit-scrollbar { width: 4px; }
-      .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
       .cart-empty-alert {
           display: none; width: 100%; padding: 18px 16px; border-radius: 16px;
           background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.55);
@@ -153,8 +150,7 @@
       .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100%; box-shadow: var(--box-shadow); display: flex; flex-direction: column; gap: 14px; }
       .auth-title { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
       .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; }
-      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
-      .btn:active { transform: scale(.975); }
+      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
       .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
       .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text); box-shadow: none; }
       .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; }
@@ -163,8 +159,8 @@
 
       .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
       .categories-bar::-webkit-scrollbar { display: none; }
-      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
-      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
       .filter-chip .sf-icon { font-size: 18px; }
 
       .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
@@ -182,13 +178,12 @@
       .menu-modal.active { display: flex; }
       .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 22px 18px max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
       .menu-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-      .menu-item { padding: 15px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; transition: transform 0.2s ease; }
-      .menu-item:active { transform: scale(0.98); }
+      .menu-item { padding: 15px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; }
       .menu-item-left { display: flex; align-items: center; gap: 12px; }
       .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; }
+      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; }
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
     </style>
@@ -295,13 +290,8 @@
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="auth-title" id="cartScreenTitle" style="text-align: center; font-size: 20px; margin-bottom: 0;">Ваша корзина</div>
         <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>
-
-        <div id="cartEmptyBox" class="cart-empty-alert">
-            Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
-        </div>
-
+        <div id="cartEmptyBox" class="cart-empty-alert">Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!</div>
         <div class="cart-items-list" id="cartItemsList"></div>
-
         <div class="cart-summary-card" id="cartSummaryCard">
             <div class="cart-summary-row">
                 <span>Выбрано приложений:</span>
@@ -312,7 +302,6 @@
                 <span id="cartScreenTotal">0 ₽</span>
             </div>
         </div>
-
         <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
             <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF9E8;</span> Заказать установку в Telegram
         </button>
@@ -325,7 +314,7 @@
     <div class="hero-section">
         <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
         <div class="hero-desc-box" style="margin-bottom: 14px; margin-top: 10px;">
-            <p class="hero-desc" id="tokenHeroDesc">Персональная ссылка активирована. Данная ссылка действует ограниченное время и только на одном устройстве! Установите приложения и обратитесь к продавцу.</p>
+            <p class="hero-desc" id="tokenHeroDesc">Проверка персональной ссылки...</p>
         </div>
     </div>
     <div class="catalog-notice" style="margin-top: 0;">
@@ -383,12 +372,12 @@
 </div>
 
 <script>
-
-const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
-const TELEGRAM_ADMIN_ID = "942963228"; 
+// ВСТАВЬТЕ СЮДА ТОКЕН ВАШЕГО БОТА ОТ @BotFather
+const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
+const TELEGRAM_ADMIN_ID = "942963228";
 
 if ("fonts" in document) {
-    document.fonts.ready.then(() => { document.body.classList.add("fonts-loaded"); }).catch(() => { document.body.classList.add("fonts-loaded"); });
+    document.fonts.ready.then(() => document.body.classList.add("fonts-loaded")).catch(() => document.body.classList.add("fonts-loaded"));
 } else { document.body.classList.add("fonts-loaded"); }
 
 const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
@@ -398,7 +387,10 @@ const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 async function redisCommand(...cmd) {
     try {
         const res = await fetch(UPSTASH_URL, {
-            method: "POST", headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify(cmd)
+            method: "POST",
+            headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
+            body: JSON.stringify(cmd),
+            cache: "no-store"
         });
         if (!res.ok) return null;
         const data = await res.json();
@@ -406,14 +398,18 @@ async function redisCommand(...cmd) {
     } catch (e) { return null; }
 }
 
-document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
-document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
-let lastTouchEnd = 0;
-document.addEventListener("touchend", function(e) {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) { e.preventDefault(); }
-    lastTouchEnd = now;
-}, { passive: false });
+async function redisPipeline(commands) {
+    try {
+        const res = await fetch(UPSTASH_URL + "/pipeline", {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
+            body: JSON.stringify(commands),
+            cache: "no-store"
+        });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (e) { return null; }
+}
 
 const appsData = [
   { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
@@ -518,6 +514,57 @@ function extractTokenFromLocation() {
     return null;
 }
 
+function detectDeviceModel() {
+    const ua = navigator.userAgent;
+    if (/iPhone/.test(ua)) {
+        const iosMatch = ua.match(/OS (\d+[_\d]*)/);
+        const ver = iosMatch ? iosMatch[1].replace(/_/g, '.') : '';
+        return `iPhone (iOS ${ver})`;
+    }
+    if (/iPad/.test(ua)) return "iPad";
+    if (/Macintosh/.test(ua)) return "Mac";
+    if (/Android/.test(ua)) return "Android";
+    if (/Windows/.test(ua)) return "Windows PC";
+    return "Устройство (" + navigator.platform + ")";
+}
+
+function getYekaterinburgTime() {
+    try {
+        return new Date().toLocaleString("ru-RU", {
+            timeZone: "Asia/Yekaterinburg",
+            day: "2-digit", month: "2-digit", year: "numeric",
+            hour: "2-digit", minute: "2-digit", second: "2-digit"
+        }) + " (ЕКБ)";
+    } catch (e) {
+        return new Date().toLocaleTimeString("ru-RU") + " (ЕКБ)";
+    }
+}
+
+async function sendTelegramNotification(token, appNames) {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
+    const device = detectDeviceModel();
+    const timeStr = getYekaterinburgTime();
+    const text = `🔔 <b>Активирована разовая ссылка!</b>\n\n` +
+                 `🔑 <b>Токен:</b> <code>${token}</code>\n` +
+                 `📱 <b>Приложения:</b> ${appNames}\n` +
+                 `📲 <b>Устройство:</b> ${device}\n` +
+                 `🕒 <b>Время:</b> ${timeStr}`;
+    try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_ADMIN_ID,
+                text: text,
+                parse_mode: "HTML",
+                reply_markup: {
+                    inline_keyboard: [[{ text: "🗑 Удалить уведомление", callback_data: "del_msg" }]]
+                }
+            })
+        });
+    } catch(e) {}
+}
+
 function updateTokenHeroText(ttlMinutes) {
     const descEl = document.getElementById("tokenHeroDesc");
     if (!descEl) return;
@@ -544,7 +591,7 @@ function renderTokenAppsList(appKeys) {
             container.innerHTML += `
             <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
                 <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                    <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                    <img src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                     <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1;">
                         <div class="app-grid-name">${mainName}</div>
                         ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
@@ -629,18 +676,9 @@ function toggleCart(key) {
     if (cartItems.has(key)) cartItems.delete(key); else cartItems.add(key);
     saveCart(); updateCartUI();
 }
-
-function removeFromCart(key) {
-    cartItems.delete(key); saveCart(); updateCartUI();
-}
-
-function clearCart() {
-    cartItems.clear(); saveCart(); updateCartUI();
-}
-
-function openCartScreen() {
-    renderCartScreen(); switchScreen("cartApp"); window.scrollTo(0, 0);
-}
+function removeFromCart(key) { cartItems.delete(key); saveCart(); updateCartUI(); }
+function clearCart() { cartItems.clear(); saveCart(); updateCartUI(); }
+function openCartScreen() { renderCartScreen(); switchScreen("cartApp"); window.scrollTo(0, 0); }
 
 function renderCartScreen() {
     const listEl = document.getElementById("cartItemsList");
@@ -774,7 +812,6 @@ function goBackFromInfo(openMenu = false) {
     if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false); else switchScreen(previousScreen);
     if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
 }
-
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
@@ -782,7 +819,6 @@ function goHome() {
     if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp", false); return; }
     switchScreen("mainApp", false);
 }
-
 function openCatalog() {
     if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp"); return; }
     sessionStorage.setItem("site_access", "true"); switchScreen("mainApp");
@@ -833,32 +869,27 @@ function filterApps() {
 }
 function clearAppSearch() { const input = document.getElementById("appSearchInput"); if (!input) return; input.value = ""; filterApps(); input.focus({ preventScroll: true }); }
 
-async function sendTelegramNotification(appNames) {
-    if (TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА" || !TELEGRAM_BOT_TOKEN) return;
-    const text = `🟢 <b>Открытие ссылки!</b>\n\nПокупатель только что перешел по разовой ссылке.\n📱 <b>Приложения:</b> ${appNames}`;
-    try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: TELEGRAM_ADMIN_ID, text: text, parse_mode: "HTML" })
-        });
-    } catch(e) {}
-}
-
+// Единый быстрый запрос без кэша каждые 1.5 секунды
 async function syncAll() {
     try {
-        const [pricesRaw, visRaw, siteEnabledVal] = await Promise.all([
-            redisCommand("HGETALL", "app_prices"), redisCommand("HGETALL", "app_visibility"), redisCommand("GET", "site_enabled")
+        const res = await redisPipeline([
+            ["HGETALL", "app_prices"],
+            ["HGETALL", "app_visibility"],
+            ["GET", "site_enabled"]
         ]);
-        if (pricesRaw) {
+        if (!res) return;
+        const pricesRaw = res[0]?.result;
+        const visRaw = res[1]?.result;
+        const siteEnabledVal = res[2]?.result;
+
+        if (Array.isArray(pricesRaw)) {
             const pObj = {};
-            if (Array.isArray(pricesRaw)) { for (let i = 0; i < pricesRaw.length; i += 2) pObj[pricesRaw[i]] = pricesRaw[i+1]; }
-            else if (typeof pricesRaw === "object") Object.assign(pObj, pricesRaw);
+            for (let i = 0; i < pricesRaw.length; i += 2) pObj[pricesRaw[i]] = pricesRaw[i+1];
             remoteConfig.appPrices = pObj;
         }
-        if (visRaw) {
+        if (Array.isArray(visRaw)) {
             const vObj = {};
-            if (Array.isArray(visRaw)) { for (let i = 0; i < visRaw.length; i += 2) vObj[visRaw[i]] = String(visRaw[i+1]) !== "false"; }
-            else if (typeof visRaw === "object") Object.keys(visRaw).forEach(k => vObj[k] = String(visRaw[k]) !== "false");
+            for (let i = 0; i < visRaw.length; i += 2) vObj[visRaw[i]] = String(visRaw[i+1]) !== "false";
             remoteConfig.appVisibility = vObj;
         }
         updateCartUI();
@@ -875,7 +906,6 @@ async function syncAll() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    generateAppsGrid();
     const token = extractTokenFromLocation();
     const savedSession = getActiveTokenSession();
 
@@ -887,43 +917,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (token) {
         isFromToken = true;
+        // Мгновенно открываем экран токена без ожидания сети
+        switchScreen("tokenApp");
+
         if (savedSession && savedSession.token === token) {
             if (savedSession.expires_at > Date.now() && savedSession.app_keys.length > 0) {
-                updateTokenHeroText(savedSession.ttl_minutes || 3); renderTokenAppsList(savedSession.app_keys);
-                startTokenCountdown(savedSession.expires_at); switchScreen("tokenApp"); syncAll(); setInterval(syncAll, 3000); return;
-            } else { isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return; }
+                updateTokenHeroText(savedSession.ttl_minutes || 3);
+                renderTokenAppsList(savedSession.app_keys);
+                startTokenCountdown(savedSession.expiresAt || savedSession.expires_at);
+                return;
+            } else {
+                isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return;
+            }
         }
 
-        try {
-            const tokenData = await redisCommand("GET", "token:" + token);
-            const ttlSeconds = await redisCommand("TTL", "token:" + token);
+        // Один пакетный запрос для проверки токена, TTL и привязки устройства
+        const res = await redisPipeline([
+            ["GET", "token:" + token],
+            ["TTL", "token:" + token],
+            ["GET", "claim:" + token]
+        ]);
 
-            if (tokenData && ttlSeconds > 0) {
-                const claimKey = "claim:" + token;
-                const existingClaim = await redisCommand("GET", claimKey);
+        const tokenData = res ? res[0]?.result : null;
+        const ttlSeconds = res ? Number(res[1]?.result || 0) : 0;
+        const existingClaim = res ? res[2]?.result : null;
 
-                if (existingClaim && existingClaim !== myDeviceId) {
-                    isTokenExpired = true;
-                    document.querySelector("#tokenErrorApp .auth-description").innerText = "Эта ссылка уже была открыта на другом устройстве. Использование на нескольких устройствах запрещено.";
-                    switchScreen("tokenErrorApp"); return;
-                }
+        if (tokenData && ttlSeconds > 0) {
+            if (existingClaim && existingClaim !== myDeviceId) {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
 
-                const keys = tokenData.split(",").map(s => s.trim()).filter(Boolean);
-                if (!existingClaim) {
-                    await redisCommand("SET", claimKey, myDeviceId, "EX", ttlSeconds);
-                    const appNames = keys.map(k => { const a = appsData.find(x=>x.key===k); return a ? a.name : k; }).join(', ');
-                    sendTelegramNotification(appNames);
-                }
+            const keys = tokenData.split(",").map(s => s.trim()).filter(Boolean);
+            const ttlMins = Math.ceil(ttlSeconds / 60);
+            const expiresAt = Date.now() + (ttlSeconds * 1000);
 
-                const ttlMins = Math.ceil(ttlSeconds / 60);
-                const expiresAt = Date.now() + (ttlSeconds * 1000);
-                saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-                updateTokenHeroText(ttlMins); renderTokenAppsList(keys); startTokenCountdown(expiresAt); switchScreen("tokenApp");
-                syncAll(); setInterval(syncAll, 3000); return;
-            } else { isTokenExpired = true; switchScreen("tokenErrorApp"); return; }
-        } catch (e) { isTokenExpired = true; switchScreen("tokenErrorApp"); return; }
+            saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
+            updateTokenHeroText(ttlMins);
+            renderTokenAppsList(keys);
+            startTokenCountdown(expiresAt);
+
+            if (!existingClaim) {
+                redisCommand("SET", "claim:" + token, myDeviceId, "EX", ttlSeconds);
+                const appNames = keys.map(k => appsData.find(x => x.key === k)?.name || k).join(', ');
+                sendTelegramNotification(token, appNames);
+            }
+            return;
+        } else {
+            isTokenExpired = true;
+            switchScreen("tokenErrorApp");
+            return;
+        }
     }
 
+    generateAppsGrid();
     let lastScreen = sessionStorage.getItem("currentScreenId");
     if (sessionStorage.getItem("site_access") === "true") {
         if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "mainApp"; switchScreen(lastScreen); }
@@ -932,7 +980,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp"; switchScreen(lastScreen); }
         else switchScreen("welcomeApp");
     }
-    syncAll(); setInterval(syncAll, 3000);
+    syncAll();
+    setInterval(syncAll, 1500);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncAll(); });
 });
 </script>
