@@ -1,1 +1,499 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AppRestore Admin</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --text: #f8fafc; --muted: rgba(255, 255, 255, 0.55); --card-bg: rgba(17, 24, 39, 0.55); --accent: #3b82f6; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; }
+        body { 
+            color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
+            user-select: none; -webkit-user-select: none;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .aurora-bg {
+            position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10;
+            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg");
+            background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
+        }
+        .view { display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.25s ease-out; }
+        .view.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        h2.page-title, h3.section-title { text-align: center; font-size: 21px; font-weight: 700; margin: 0 0 16px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); width: 100%; }
+        .menu-card { background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; }
+        .menu-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
+        .menu-item:active { background: rgba(0, 0, 0, 0.4); }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 18px; }
+        .menu-text { flex: 1; }
+        .menu-title { font-size: 16px; font-weight: 600; margin-bottom: 3px; letter-spacing: -0.3px; }
+        .menu-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; }
+        .menu-chevron { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 500; padding-left: 10px; }
+        .card { background: var(--card-bg); border-radius: 22px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 100%; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .card:last-child { margin-bottom: 0; }
+        .card h4 { margin: 0 0 12px 0; font-size: 16px; color: var(--text); font-weight: 600; text-align: center; }
+        .admin-scroll-list { width: 100%; max-height: 44dvh; overflow-y: auto; padding-right: 2px; }
+        .admin-scroll-list::-webkit-scrollbar { width: 4px; }
+        .admin-scroll-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .app-item { display: flex; align-items: center; padding: 11px 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.14); transition: 0.2s; cursor: pointer; }
+        .app-item:last-child { margin-bottom: 0; }
+        .app-item:active { background: rgba(255, 255, 255, 0.14); }
+        .app-item.app-unavailable { position: relative; cursor: not-allowed; border: 1.5px solid rgba(239, 68, 68, 0.6); background: rgba(239, 68, 68, 0.05); }
+        .app-item.app-unavailable > * { opacity: .45; }
+        .badge-unavailable { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); display: inline-block; }
+        .app-icon { width: 42px; height: 42px; border-radius: 11px; margin-right: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .app-info { flex: 1; min-width: 0; }
+        .app-name { font-size: 14.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .app-status { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+        .admin-price-badge { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px; flex-shrink: 0; }
+        .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+        .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
+        .ttl-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
+        .ttl-pill {
+            padding: 9px 4px; border-radius: 11px; background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.14); color: var(--muted);
+            font-size: 12.5px; font-weight: 600; text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .ttl-pill.active {
+            background: rgba(59, 130, 246, 0.22); border-color: #3b82f6; color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+        .btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px rgba(59,130,246,0.25); }
+        .btn:active { transform: scale(0.97); }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: none; }
+        .btn-gen { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: none; }
+        .btn-gen-active { background: linear-gradient(135deg, #9333ea, #7e22ce); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3); }
+        .text-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; margin-bottom: 10px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; }
+        .text-input:focus { border-color: var(--accent); }
+        .switch { position: relative; width: 50px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 15px; transition: 0.3s; flex-shrink: 0; }
+        .switch.on { background: #34c759; }
+        .switch::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .switch.on::after { transform: translateX(20px); }
+        .checkbox { width: 24px; height: 24px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+        .checkbox.checked { background: var(--accent); border-color: var(--accent); }
+        .checkbox.checked::after { content: '✓'; color: #fff; font-weight: bold; font-size: 14px; }
+        #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; }
+        #toast.show { transform: translate(-50%, 0); opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"></div>
+    <div id="toast"></div>
 
+    <div id="view-menu" class="view active">
+        <h2 class="page-title">Панель управления</h2>
+        <div class="menu-card">
+            <div class="menu-item" onclick="openView('view-create-link')">
+                <div class="menu-icon">🔗</div>
+                <div class="menu-text">
+                    <div class="menu-title">Создать разовую ссылку</div>
+                    <div class="menu-subtitle">Выбор приложений и времени работы</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+            <div class="menu-item" onclick="openView('view-prices')">
+                <div class="menu-icon" style="background: rgba(168, 85, 247, 0.15);">💰</div>
+                <div class="menu-text">
+                    <div class="menu-title">Управление ценами</div>
+                    <div class="menu-subtitle">Изменение стоимости приложений</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+            <div class="menu-item" onclick="openView('view-visibility')">
+                <div class="menu-icon" style="background: rgba(16, 185, 129, 0.15);">👁️</div>
+                <div class="menu-text">
+                    <div class="menu-title">Видимость приложений</div>
+                    <div class="menu-subtitle">Скрыть или показать в каталоге</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+            <div class="menu-item" onclick="openView('view-settings')">
+                <div class="menu-icon" style="background: rgba(236, 72, 153, 0.15);">⚙️</div>
+                <div class="menu-text">
+                    <div class="menu-title">Настройки системы</div>
+                    <div class="menu-subtitle">Статус работы сайта</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-create-link" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 10px;">Создание разовой ссылки</h3>
+            <div class="ttl-selector-label">Время работы после открытия клиентом:</div>
+            <div class="ttl-pills">
+                <div class="ttl-pill active" onclick="selectTtl(3, this)">3 мин</div>
+                <div class="ttl-pill" onclick="selectTtl(5, this)">5 мин</div>
+                <div class="ttl-pill" onclick="selectTtl(10, this)">10 мин</div>
+                <div class="ttl-pill" onclick="selectTtl(15, this)">15 мин</div>
+                <div class="ttl-pill" onclick="selectTtl(30, this)">30 мин</div>
+            </div>
+            <input type="search" id="create-link-search" class="text-input" style="text-align:left; margin-bottom:10px;" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
+            <button class="btn btn-gen" id="btn-generate-main" style="margin-bottom: 12px;" onclick="createLink()">🔗 Сгенерировать ссылку (0)</button>
+            <div id="list-create-link" class="admin-scroll-list"></div>
+        </div>
+    </div>
+
+    <div id="view-link-result" class="view">
+        <div class="card" style="text-align:center; padding: 28px 20px;">
+            <div style="font-size: 45px; margin-bottom: 12px;">✅</div>
+            <h2 style="margin: 0 0 6px 0; font-size: 20px;">Ссылка создана!</h2>
+            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;">Действует 3 мин. с момента открытия на одном устройстве.</p>
+            <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
+            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">
+            <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📤 Переслать пользователю</button>
+        </div>
+    </div>
+
+    <div id="view-prices" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 12px;">Цены на приложения</h3>
+            <input type="search" id="prices-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderPricesList()">
+            <div id="list-prices" class="admin-scroll-list"></div>
+        </div>
+    </div>
+
+    <div id="view-price-detail" class="view">
+        <div class="card" style="text-align:center; padding-top: 22px;">
+            <img id="detail-price-icon" src="" style="width: 70px; height: 70px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 id="detail-price-name" style="margin: 0 0 18px 0; font-size: 20px;"></h3>
+            <h4 style="margin-bottom: 10px;">Стоимость установки (₽)</h4>
+            <input type="tel" inputmode="numeric" id="detail-price-input" class="text-input" placeholder="Введите цену">
+            <button class="btn" id="btn-save-price">Сохранить цену</button>
+        </div>
+    </div>
+
+    <div id="view-visibility" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 12px;">Видимость в каталоге</h3>
+            <input type="search" id="vis-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderVisibilityList()">
+            <div id="list-visibility" class="admin-scroll-list"></div>
+        </div>
+    </div>
+
+    <div id="view-settings" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 16px;">Глобальные параметры</h3>
+            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <span>Статус сайта</span>
+                <span id="site-status-indicator" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.4);"></span>
+            </h4>
+            <button class="btn" id="btn-toggle-site"></button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://quiet-field-6867.apprestore-ios.workers.dev";
+        const CLIENT_SITE_URL = "https://apprestore-ios.github.io/failes";
+
+        document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturestart', e => e.preventDefault());
+
+        const tg = window.Telegram.WebApp;
+        tg.ready(); tg.expand();
+        tg.setHeaderColor('#0b0f17'); tg.setBackgroundColor('#0b0f17');
+
+        const appsData = [
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
+        ];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminToken = urlParams.get('token');
+
+        let globalData = { state: null, siteEnabled: true };
+        let selectedAppsForLink = new Set();
+        let selectedTtlMinutes = 3;
+        let selectedAppKey = "";
+        let toastTimeout;
+        let currentView = 'view-menu';
+
+        tg.BackButton.onClick(() => {
+            if (currentView === 'view-price-detail') openView('view-prices');
+            else openView('view-menu');
+        });
+
+        function selectTtl(mins, el) {
+            selectedTtlMinutes = mins;
+            document.querySelectorAll('.ttl-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function formatMinWord(mins) {
+            if (mins === 1) return "1 минуту";
+            if (mins >= 2 && mins <= 4) return mins + " минуты";
+            return mins + " минут";
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            tg.HapticFeedback.notificationOccurred('success');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function getAdminAppPrice(key) {
+            if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
+                return Number(globalData.state.prices[key]);
+            }
+            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/data?token=' + adminToken);
+                if (!res.ok) {
+                    document.body.innerHTML = '<h2 style="text-align:center;padding:20px;color:#ef4444;">Ошибка авторизации. Введите /start в боте.</h2>';
+                    return;
+                }
+                const data = await res.json();
+                globalData.state = data.state;
+                globalData.siteEnabled = data.siteEnabled;
+                renderAllViews();
+            } catch (e) {
+                tg.showAlert("Ошибка соединения с базой");
+            }
+        }
+
+        async function doAction(action, payload = {}) {
+            tg.MainButton.showProgress();
+            const res = await fetch(API_BASE + '/api/admin/action?token=' + adminToken, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ...payload })
+            });
+            const out = await res.json();
+            tg.MainButton.hideProgress();
+            if (!res.ok) throw new Error(out.error || 'Action failed');
+            await loadData();
+            return out;
+        }
+
+        function openView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            currentView = id;
+            window.scrollTo(0, 0);
+            if (id === 'view-menu') {
+                tg.BackButton.hide();
+                selectedAppsForLink.clear();
+                updateGenerateButton();
+                renderAllViews();
+            } else {
+                tg.BackButton.show();
+            }
+        }
+
+        function renderAllViews() {
+            if (!globalData.state) return;
+            renderCreateLinkList();
+            renderPricesList();
+            renderVisibilityList();
+            renderSettings();
+            updateGenerateButton();
+        }
+
+        function renderCreateLinkList() {
+            const list = document.getElementById('list-create-link');
+            const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+                const isVisible = globalData.state.visibility[app.key] !== false;
+                const isChecked = selectedAppsForLink.has(app.key);
+                return `
+                <div class="app-item ${isVisible ? '' : 'app-unavailable'}" data-key="${app.key}" onclick="${isVisible ? 'toggleAppForLink(this.dataset.key)' : ''}">
+                    <div class="checkbox ${isChecked ? 'checked' : ''}" id="check-${app.key}" style="${isVisible ? '' : 'display:none;'}"></div>
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-status">${isVisible ? app.ios : '<span class="badge-unavailable">Недоступно</span>'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleAppForLink(key) {
+            if (globalData.state.visibility[key] === false) return;
+            if (selectedAppsForLink.has(key)) selectedAppsForLink.delete(key);
+            else selectedAppsForLink.add(key);
+            document.getElementById('check-' + key)?.classList.toggle('checked', selectedAppsForLink.has(key));
+            updateGenerateButton();
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function updateGenerateButton() {
+            const btn = document.getElementById('btn-generate-main');
+            if (!btn) return;
+            btn.innerText = `🔗 Сгенерировать ссылку (${selectedAppsForLink.size})`;
+            btn.className = selectedAppsForLink.size > 0 ? "btn btn-gen-active" : "btn btn-gen";
+        }
+
+        async function createLink() {
+            if (selectedAppsForLink.size === 0) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+            const res = await doAction('create_link', {
+                app_keys: Array.from(selectedAppsForLink),
+                ttl_minutes: selectedTtlMinutes
+            });
+            const linkUrl = CLIENT_SITE_URL + '/?token=' + res.token;
+            const ttlText = formatMinWord(res.ttl_minutes || selectedTtlMinutes);
+
+            document.getElementById('generated-link-input').value = linkUrl;
+            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента открытия и только на одном устройстве.`;
+
+            const container = document.getElementById('result-selected-apps');
+            const appNamesList = [];
+            container.innerHTML = Array.from(selectedAppsForLink).map(key => {
+                const app = appsData.find(a => a.key === key);
+                if (!app) return '';
+                appNamesList.push(app.name);
+                return `<div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); padding:6px 10px; border-radius:10px;">
+                    <img src="${app.icon}" style="width:24px; height:24px; border-radius:6px;">
+                    <span style="font-size:13px; font-weight:600; color:var(--text); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
+                </div>`;
+            }).join('');
+
+            openView('view-link-result');
+            document.getElementById('btn-forward').onclick = () => {
+                const appsFormatted = appNamesList.map(name => `• ${name}`).join("\n");
+                const text = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Выбранные приложения:\n${appsFormatted}\n\n⏳ После открытия ссылка действует ${ttlText} и предназначена только для одного устройства!`;
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(text)}`;
+                tg.openTelegramLink(shareUrl);
+            };
+        }
+
+        function renderPricesList() {
+            const list = document.getElementById('list-prices');
+            if (!list) return;
+            const query = (document.getElementById('prices-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+                const price = getAdminAppPrice(app.key);
+                const isPrem = price >= 500;
+                return `
+                <div class="app-item" onclick="openPriceDetail('${app.key}')">
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-status">${app.ios}</div>
+                    </div>
+                    <div class="admin-price-badge ${isPrem ? 'premium' : ''}">${price} ₽</div>
+                    <div style="color:var(--muted); font-size: 20px;">›</div>
+                </div>`;
+            }).join('');
+        }
+
+        function openPriceDetail(key) {
+            selectedAppKey = key;
+            const app = appsData.find(a => a.key === key);
+            document.getElementById('detail-price-name').innerText = app.name;
+            document.getElementById('detail-price-icon').src = app.icon;
+            const priceInput = document.getElementById('detail-price-input');
+            priceInput.value = getAdminAppPrice(key);
+            document.getElementById('btn-save-price').onclick = () => {
+                doAction('set_price', { key, price: priceInput.value });
+                showToast('Цена успешно сохранена');
+            };
+            openView('view-price-detail');
+        }
+
+        function renderVisibilityList() {
+            const list = document.getElementById('list-visibility');
+            if (!list) return;
+            const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+                const isVis = globalData.state.visibility[app.key] !== false;
+                return `
+                <div class="app-item" onclick="toggleVisibility('${app.key}', ${!isVis})">
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-status">${isVis ? 'Отображается в каталоге' : 'Скрыто из каталога'}</div>
+                    </div>
+                    <div class="switch ${isVis ? 'on' : ''}" id="vis-switch-${app.key}"></div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleVisibility(key, makeVisible) {
+            if (!makeVisible && selectedAppsForLink.has(key)) {
+                selectedAppsForLink.delete(key);
+                updateGenerateButton();
+            }
+            doAction('toggle_vis', { key, visible: makeVisible });
+            showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
+        }
+
+        function renderSettings() {
+            const btnToggle = document.getElementById('btn-toggle-site');
+            const indicator = document.getElementById('site-status-indicator');
+            if (globalData.siteEnabled) {
+                indicator.innerText = "🟢 Работает"; indicator.style.color = "#4ade80";
+                btnToggle.innerText = "🔴 Выключить сайт"; btnToggle.className = "btn btn-danger"; btnToggle.style.background = "";
+            } else {
+                indicator.innerText = "🔴 Выключен"; indicator.style.color = "#f87171";
+                btnToggle.innerText = "🟢 Включить сайт"; btnToggle.className = "btn"; btnToggle.style.background = "rgba(34, 197, 94, 0.8)";
+            }
+            btnToggle.onclick = () => {
+                const newState = !globalData.siteEnabled;
+                doAction('toggle_site', { enabled: newState });
+                showToast(newState ? "Сайт включен" : "Сайт выключен");
+            };
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
