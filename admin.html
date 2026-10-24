@@ -3,278 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AppRestore Control</title>
+    <title>АДМИН ПАНЕЛЬ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        (function() {
+            function forceExpand() {
+                const tg = window.Telegram?.WebApp;
+                if (!tg) return;
+                try {
+                    tg.ready();
+                    tg.expand();
+                    if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+                    tg.isVerticalSwipesEnabled = false;
+                    tg.setHeaderColor('#0f131a');
+                    tg.setBackgroundColor('#0f131a');
+                } catch (e) {}
+            }
+            forceExpand();
+            window.addEventListener('DOMContentLoaded', forceExpand);
+            window.addEventListener('load', forceExpand);
+            let count = 0;
+            const timer = setInterval(() => {
+                forceExpand();
+                if (++count > 25) clearInterval(timer);
+            }, 60);
+        })();
+    </script>
     <style>
         :root {
-            --bg: #090d16; --surface: rgba(18, 24, 38, 0.78); --surface-hover: rgba(28, 37, 58, 0.9);
-            --surface-border: rgba(255, 255, 255, 0.1); --surface-border-focus: rgba(99, 102, 241, 0.55);
-            --primary: #4f46e5; --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-            --accent-glow: rgba(99, 102, 241, 0.35); --text-main: #f8fafc; --text-secondary: #94a3b8;
-            --danger: #ef4444; --danger-bg: rgba(239, 68, 68, 0.14); --success: #10b981; --success-bg: rgba(16, 185, 129, 0.16);
-            --radius-outer: 26px; --radius-inner: 18px;
+            --bg: #0f131a;
+            --card-bg: rgba(30, 35, 48, 0.72);
+            --card-border: rgba(255, 255, 255, 0.11);
+            --row-hover: rgba(255, 255, 255, 0.06);
+            --divider: rgba(255, 255, 255, 0.07);
+            --text-main: #ffffff;
+            --text-sub: #8b95a5;
+            --primary: #3b82f6;
+            --danger: #ef4444;
+            --success: #10b981;
         }
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+        input { user-select: text; -webkit-user-select: text; }
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%; min-height: 100dvh;
+            margin: 0; padding: 0; width: 100%; height: 100dvh;
             background-color: var(--bg); color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
-            overflow-x: hidden; display: flex; align-items: center; justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Roboto, sans-serif;
+            overflow: hidden;
         }
-        .bg-mesh {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
-            background: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.22) 0%, transparent 50%),
-                        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
-                        linear-gradient(180deg, #090d16 0%, #05070c 100%);
-            z-index: -10; pointer-events: none;
+        .bg-wallpaper {
+            position: fixed; inset: -30px; z-index: -1;
+            background-image: linear-gradient(180deg, rgba(15, 19, 26, 0.55) 0%, rgba(15, 19, 26, 0.78) 100%),
+                              url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg");
+            background-size: cover; background-position: center;
+            filter: blur(4px);
         }
-        .view-container {
-            width: 100%; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
-            padding: max(14px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
+        .screen-wrapper {
+            width: 100%; height: 100dvh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 16px 16px max(20px, env(safe-area-inset-bottom));
+            overflow-y: auto;
         }
-        .view { display: none; width: 100%; max-width: 460px; animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .view.active { display: block; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.97) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .card {
-            background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius-outer);
-            box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-            backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); padding: 24px 20px; overflow: hidden; position: relative; width: 100%;
+        .view { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; animation: fadeIn 0.18s ease-out; }
+        .view.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .page-title {
+            font-size: 23px; font-weight: 700; color: #ffffff; text-align: center;
+            margin: 0 0 22px 0; letter-spacing: -0.3px; text-shadow: 0 2px 12px rgba(0,0,0,0.5);
         }
-        .card-header { text-align: center; margin-bottom: 20px; }
-        .card-header .badge {
-            display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 5px 12px;
-            font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px;
+        .glass-panel {
+            width: 100%; background: var(--card-bg);
+            border: 1px solid var(--card-border); border-radius: 22px;
+            backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+            overflow: hidden;
         }
-        .card-header h2 { font-size: 22px; font-weight: 750; margin: 0; color: #fff; letter-spacing: -0.4px; }
-        .card-header p { font-size: 13.5px; color: var(--text-secondary); margin: 5px 0 0 0; }
-        .menu-list { display: flex; flex-direction: column; gap: 10px; }
-        .menu-item {
-            display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: var(--radius-inner); padding: 16px 16px; cursor: pointer; transition: all 0.18s ease;
+        .glass-panel.padded { padding: 20px 16px; }
+
+        .nav-list { display: flex; flex-direction: column; width: 100%; }
+        .nav-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 18px; cursor: pointer; transition: background 0.15s ease;
+            border-bottom: 1px solid var(--divider);
         }
-        .menu-item:hover, .menu-item:active { background: var(--surface-hover); border-color: var(--surface-border-focus); transform: translateY(-1px); }
-        .menu-item-left { display: flex; align-items: center; gap: 14px; }
-        .menu-icon-box {
-            width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; background: rgba(255, 255, 255, 0.07); flex-shrink: 0;
+        .nav-row:last-child { border-bottom: none; }
+        .nav-row:active { background: var(--row-hover); }
+        .nav-left { display: flex; align-items: center; gap: 15px; min-width: 0; }
+        .nav-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 21px; flex-shrink: 0;
         }
-        .menu-info { display: flex; flex-direction: column; }
-        .menu-info .title { font-size: 15.5px; font-weight: 650; color: #fff; }
-        .menu-info .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .menu-arrow { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 600; }
+        .icon-blue { background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .icon-purple { background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .icon-amber { background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .icon-green { background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .icon-pink { background: rgba(236, 72, 153, 0.18); border: 1px solid rgba(236, 72, 153, 0.3); }
+
+        .nav-text { display: flex; flex-direction: column; text-align: left; }
+        .nav-title { font-size: 16.5px; font-weight: 700; color: #ffffff; line-height: 1.25; }
+        .nav-sub { font-size: 13px; color: var(--text-sub); margin-top: 3px; line-height: 1.25; }
+        .nav-chevron { color: #64748b; font-size: 20px; font-weight: 600; margin-left: 8px; }
+
+        .ttl-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 12px; width: 100%; }
+        .ttl-btn {
+            background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; padding: 10px 0; text-align: center; font-size: 13.5px; font-weight: 700;
+            color: var(--text-sub); cursor: pointer; transition: 0.15s;
+        }
+        .ttl-btn.active { background: rgba(59, 130, 246, 0.28); border-color: #3b82f6; color: #fff; }
+
+        .search-box {
+            width: 100%; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px; padding: 12px 15px; font-size: 15px; color: #fff; outline: none; margin-bottom: 12px;
+        }
+        .search-box:focus { border-color: #3b82f6; }
+
         .btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-            padding: 15px 18px; border-radius: var(--radius-inner); font-size: 15.5px; font-weight: 650;
-            border: none; cursor: pointer; transition: all 0.18s ease; box-shadow: 0 4px 18px var(--accent-glow);
+            width: 100%; min-height: 50px; border-radius: 15px; border: none;
+            font-size: 15.5px; font-weight: 700; color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: transform 0.12s ease, opacity 0.12s ease;
         }
         .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary-gradient); color: #fff; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.11); color: var(--text-main); box-shadow: none; }
-        .btn-danger { background: var(--danger-bg); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); box-shadow: none; }
-        .btn-success { background: var(--success-bg); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: none; }
-        .input-group { width: 100%; margin-bottom: 12px; position: relative; }
-        .search-input {
-            width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--surface-border);
-            border-radius: 14px; padding: 12px 16px; font-size: 14.5px; color: #fff; outline: none; transition: border-color 0.2s;
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; }
+        .btn-danger { background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
+        .btn-success { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; }
+
+        .scroll-area { max-height: 46dvh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; margin-top: 4px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+        .app-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 15px; padding: 11px 14px; cursor: pointer;
         }
-        .search-input:focus { border-color: #6366f1; }
-        .ttl-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
-        .ttl-chip {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 650;
-            color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease;
+        .app-item.disabled { opacity: 0.4; pointer-events: none; }
+        .app-item-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .app-icon { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        .app-name { font-size: 14.5px; font-weight: 650; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .app-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+
+        .check-circle {
+            width: 23px; height: 23px; border-radius: 7px; border: 1.8px solid rgba(255,255,255,0.35);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .ttl-chip.active { background: rgba(99, 102, 241, 0.25); border-color: #6366f1; color: #fff; box-shadow: 0 0 12px rgba(99, 102, 241, 0.35); }
-        .scroll-list { max-height: 50dvh; overflow-y: auto; margin-top: 6px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
-        .scroll-list::-webkit-scrollbar { width: 4px; }
-        .scroll-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 4px; }
-        .app-row {
-            display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 11px 14px; cursor: pointer; transition: all 0.15s ease;
-        }
-        .app-row:active { background: rgba(255, 255, 255, 0.09); }
-        .app-row.disabled { opacity: 0.45; cursor: not-allowed; border-color: rgba(239, 68, 68, 0.2); }
-        .app-row-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .app-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.09); flex-shrink: 0; }
-        .app-meta { min-width: 0; display: flex; flex-direction: column; }
-        .app-title { font-size: 14.5px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .app-desc { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
-        .checkbox { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center; margin-right: 2px; flex-shrink: 0; }
-        .checkbox.checked { background: #6366f1; border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.45); }
-        .checkbox.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: bold; }
-        .switch { position: relative; width: 48px; height: 26px; background: rgba(255, 255, 255, 0.14); border-radius: 13px; transition: 0.25s ease; flex-shrink: 0; }
+        .check-circle.checked { background: #3b82f6; border-color: #3b82f6; }
+        .check-circle.checked::after { content: '✓'; color: #fff; font-size: 14px; font-weight: 800; }
+
+        .switch { position: relative; width: 48px; height: 26px; background: rgba(255,255,255,0.16); border-radius: 13px; transition: 0.2s; flex-shrink: 0; }
         .switch.on { background: #10b981; }
-        .switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: 0.25s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35); }
+        .switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: 0.2s; }
         .switch.on::after { transform: translateX(22px); }
-        .price-tag { font-size: 13px; font-weight: 750; padding: 4px 10px; border-radius: 9px; background: rgba(99, 102, 241, 0.16); border: 1px solid rgba(99, 102, 241, 0.35); color: #c7d2fe; margin-right: 8px; }
-        .price-tag.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
+
+        .price-badge {
+            font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 9px;
+            background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px;
+        }
+        .price-badge.premium { background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+
         #toast {
-            position: fixed; top: max(18px, env(safe-area-inset-top)); left: 50%; transform: translate(-50%, -80px);
-            background: rgba(15, 23, 42, 0.96); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13.5px;
-            font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
-            z-index: 9999; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; pointer-events: none; white-space: nowrap;
+            position: fixed; top: 16px; left: 50%; transform: translate(-50%, -80px);
+            background: rgba(15, 23, 42, 0.95); color: #fff; padding: 10px 20px; border-radius: 25px;
+            font-size: 13.5px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15);
+            z-index: 9999; transition: 0.25s ease; opacity: 0; pointer-events: none;
         }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="bg-mesh"></div>
+    <div class="bg-wallpaper"></div>
     <div id="toast"></div>
 
-    <div class="view-container">
-        <!-- ГЛАВНОЕ МЕНЮ -->
+    <div class="screen-wrapper">
+        <!-- ГЛАВНОЕ МЕНЮ (КАК НА ФОТО) -->
         <div id="view-menu" class="view active">
-            <div class="card">
-                <div class="card-header">
-                    <div class="badge">AppRestore Control</div>
-                    <h2>Панель управления</h2>
-                    <p>Администрирование каталога и ссылок</p>
-                </div>
-                <div class="menu-list">
-                    <div class="menu-item" onclick="openView('view-create-link')">
-                        <div class="menu-item-left">
-                            <div class="menu-icon-box" style="color: #818cf8;">🔗</div>
-                            <div class="menu-info">
-                                <span class="title">Создать разовую ссылку</span>
-                                <span class="subtitle">С ограничением по времени и таймером</span>
+            <h1 class="page-title">Панель управления</h1>
+            <div class="glass-panel">
+                <div class="nav-list">
+                    <div class="nav-row" onclick="openView('view-create-link')">
+                        <div class="nav-left">
+                            <div class="nav-icon icon-blue">🔗</div>
+                            <div class="nav-text">
+                                <span class="nav-title">Создать разовую ссылку</span>
+                                <span class="nav-sub">Выбор приложений для установки</span>
                             </div>
                         </div>
-                        <span class="menu-arrow">›</span>
+                        <span class="nav-chevron">›</span>
                     </div>
 
-                    <div class="menu-item" onclick="openView('view-prices')">
-                        <div class="menu-item-left">
-                            <div class="menu-icon-box" style="color: #c084fc;">💎</div>
-                            <div class="menu-info">
-                                <span class="title">Стоимость приложений</span>
-                                <span class="subtitle">Изменение цен для каталога</span>
+                    <div class="nav-row" onclick="openView('view-active-links')">
+                        <div class="nav-left">
+                            <div class="nav-icon icon-purple">📋</div>
+                            <div class="nav-text">
+                                <span class="nav-title">Активные ссылки</span>
+                                <span class="nav-sub">Просмотр и удаление сгенерированных</span>
                             </div>
                         </div>
-                        <span class="menu-arrow">›</span>
+                        <span class="nav-chevron">›</span>
                     </div>
 
-                    <div class="menu-item" onclick="openView('view-visibility')">
-                        <div class="menu-item-left">
-                            <div class="menu-icon-box" style="color: #34d399;">👁️</div>
-                            <div class="menu-info">
-                                <span class="title">Видимость каталога</span>
-                                <span class="subtitle">Скрытие и публикация позиций</span>
+                    <div class="nav-row" onclick="openView('view-prices')">
+                        <div class="nav-left">
+                            <div class="nav-icon icon-amber">🔑</div>
+                            <div class="nav-text">
+                                <span class="nav-title">Стоимость приложений</span>
+                                <span class="nav-sub">Изменение цен в каталоге</span>
                             </div>
                         </div>
-                        <span class="menu-arrow">›</span>
+                        <span class="nav-chevron">›</span>
                     </div>
 
-                    <div class="menu-item" onclick="openView('view-settings')">
-                        <div class="menu-item-left">
-                            <div class="menu-icon-box" style="color: #f472b6;">⚡</div>
-                            <div class="menu-info">
-                                <span class="title">Состояние системы</span>
-                                <span class="subtitle">Переключатель работы каталога</span>
+                    <div class="nav-row" onclick="openView('view-visibility')">
+                        <div class="nav-left">
+                            <div class="nav-icon icon-green">👁️</div>
+                            <div class="nav-text">
+                                <span class="nav-title">Видимость приложений</span>
+                                <span class="nav-sub">Скрыть или показать в каталоге</span>
                             </div>
                         </div>
-                        <span class="menu-arrow">›</span>
+                        <span class="nav-chevron">›</span>
+                    </div>
+
+                    <div class="nav-row" onclick="openView('view-settings')">
+                        <div class="nav-left">
+                            <div class="nav-icon icon-pink">⚙️</div>
+                            <div class="nav-text">
+                                <span class="nav-title">Настройки системы</span>
+                                <span class="nav-sub">Глобальные параметры сайта</span>
+                            </div>
+                        </div>
+                        <span class="nav-chevron">›</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- СОЗДАНИЕ ССЫЛКИ -->
+        <!-- СОЗДАТЬ РАЗОВУЮ ССЫЛКУ -->
         <div id="view-create-link" class="view">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Генерация ссылки</h2>
-                    <p>Выберите срок действия и приложения</p>
+            <h1 class="page-title">Создать разовую ссылку</h1>
+            <div class="glass-panel padded">
+                <div class="ttl-bar">
+                    <div class="ttl-btn active" onclick="selectTtl(3, this)">3м</div>
+                    <div class="ttl-btn" onclick="selectTtl(5, this)">5м</div>
+                    <div class="ttl-btn" onclick="selectTtl(10, this)">10м</div>
+                    <div class="ttl-btn" onclick="selectTtl(15, this)">15м</div>
+                    <div class="ttl-btn" onclick="selectTtl(30, this)">30м</div>
                 </div>
-                <div class="ttl-container">
-                    <div class="ttl-chip active" onclick="selectTtl(3, this)">3м</div>
-                    <div class="ttl-chip" onclick="selectTtl(5, this)">5м</div>
-                    <div class="ttl-chip" onclick="selectTtl(10, this)">10м</div>
-                    <div class="ttl-chip" onclick="selectTtl(15, this)">15м</div>
-                    <div class="ttl-chip" onclick="selectTtl(30, this)">30м</div>
-                </div>
-                <div class="input-group">
-                    <input type="search" id="create-link-search" class="search-input" placeholder="Поиск в списке..." oninput="renderCreateLinkList()">
-                </div>
-                <button class="btn btn-secondary" id="btn-generate-main" style="margin-bottom: 12px;" onclick="createLink()">
+                <input type="search" id="create-link-search" class="search-box" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
+                <button class="btn btn-secondary" id="btn-generate-main" style="margin-bottom: 10px;" onclick="createLink()">
                     Сгенерировать ссылку (0)
                 </button>
-                <div id="list-create-link" class="scroll-list"></div>
+                <div id="list-create-link" class="scroll-area"></div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
-        <!-- РЕЗУЛЬТАТ СОЗДАНИЯ ССЫЛКИ -->
+        <!-- ГОТОВАЯ ССЫЛКА -->
         <div id="view-link-result" class="view">
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 46px; margin-bottom: 6px;">✨</div>
-                <h2 style="font-size: 21px; margin: 0 0 6px 0;">Ссылка готова!</h2>
-                <p id="result-ttl-desc" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;"></p>
-                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; padding: 2px;"></div>
-                <input type="text" id="generated-link-input" class="search-input" readonly style="text-align: center; color: #818cf8; font-weight: 600; margin-bottom: 12px;" onclick="copyLink()">
+            <h1 class="page-title">Ссылка готова!</h1>
+            <div class="glass-panel padded" style="text-align: center;">
+                <p id="result-ttl-desc" style="font-size: 13.5px; color: var(--text-sub); margin: 0 0 14px 0;"></p>
+                <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 150px; overflow-y: auto;"></div>
+                <input type="text" id="generated-link-input" class="search-box" readonly style="text-align: center; color: #60a5fa; font-weight: 700;" onclick="copyLink()">
                 <button class="btn btn-primary" id="btn-forward" style="margin-bottom: 10px;">📤 Переслать покупателю</button>
-                <button class="btn btn-secondary" onclick="copyLink()">📋 Скопировать ссылку</button>
+                <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="copyLink()">📋 Скопировать ссылку</button>
+                <button class="btn btn-secondary" onclick="openView('view-menu')">← В главное меню</button>
             </div>
         </div>
 
-        <!-- РЕДАКТИРОВАНИЕ ЦЕН -->
+        <!-- АКТИВНЫЕ ССЫЛКИ -->
+        <div id="view-active-links" class="view">
+            <h1 class="page-title">Активные ссылки</h1>
+            <div class="glass-panel padded">
+                <div id="list-active-links" class="scroll-area" style="max-height: 55dvh;"></div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
+            </div>
+        </div>
+
+        <!-- СТОИМОСТЬ ПРИЛОЖЕНИЙ -->
         <div id="view-prices" class="view">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Стоимость приложений</h2>
-                    <p>Нажмите на приложение для смены цены</p>
-                </div>
-                <div class="input-group">
-                    <input type="search" id="prices-search" class="search-input" placeholder="Поиск по названию..." oninput="renderPricesList()">
-                </div>
-                <div id="list-prices" class="scroll-list"></div>
+            <h1 class="page-title">Стоимость приложений</h1>
+            <div class="glass-panel padded">
+                <input type="search" id="prices-search" class="search-box" placeholder="Поиск по названию..." oninput="renderPricesList()">
+                <div id="list-prices" class="scroll-area"></div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
-        <!-- ДЕТАЛИ ЦЕНЫ -->
+        <!-- ИЗМЕНЕНИЕ ЦЕНЫ -->
         <div id="view-price-detail" class="view">
-            <div class="card" style="text-align: center;">
-                <img id="detail-price-icon" src="" style="width: 70px; height: 70px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.12);">
-                <h2 id="detail-price-name" style="margin: 0 0 6px 0; font-size: 19px;"></h2>
-                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 18px;">Укажите новую цену установки (₽)</p>
-                <div class="input-group">
-                    <input type="tel" inputmode="numeric" id="detail-price-input" class="search-input" style="text-align: center; font-size: 20px; font-weight: 750; color: #fff;">
-                </div>
-                <button class="btn btn-primary" id="btn-save-price">Сохранить изменения</button>
-                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openView('view-prices')">← Назад к списку</button>
+            <h1 class="page-title">Изменение цены</h1>
+            <div class="glass-panel padded" style="text-align: center;">
+                <img id="detail-price-icon" src="" style="width: 68px; height: 68px; border-radius: 16px; margin-bottom: 10px;">
+                <h3 id="detail-price-name" style="margin: 0 0 6px 0; font-size: 18px;"></h3>
+                <p style="font-size: 13px; color: var(--text-sub); margin: 0 0 14px 0;">Укажите стоимость установки (₽)</p>
+                <input type="tel" inputmode="numeric" id="detail-price-input" class="search-box" style="text-align: center; font-size: 20px; font-weight: 700;">
+                <button class="btn btn-primary" id="btn-save-price" style="margin-bottom: 10px;">Сохранить изменения</button>
+                <button class="btn btn-secondary" onclick="openView('view-prices')">← Назад к списку</button>
             </div>
         </div>
 
         <!-- ВИДИМОСТЬ ПРИЛОЖЕНИЙ -->
         <div id="view-visibility" class="view">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Видимость в каталоге</h2>
-                    <p>Отключение отображения на сайте</p>
-                </div>
-                <div class="input-group">
-                    <input type="search" id="vis-search" class="search-input" placeholder="Поиск по названию..." oninput="renderVisibilityList()">
-                </div>
-                <div id="list-visibility" class="scroll-list"></div>
+            <h1 class="page-title">Видимость приложений</h1>
+            <div class="glass-panel padded">
+                <input type="search" id="vis-search" class="search-box" placeholder="Поиск по названию..." oninput="renderVisibilityList()">
+                <div id="list-visibility" class="scroll-area"></div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
 
         <!-- НАСТРОЙКИ СИСТЕМЫ -->
         <div id="view-settings" class="view">
-            <div class="card" style="text-align: center;">
-                <div class="card-header">
-                    <h2>Статус сайта</h2>
-                    <p>Глобальный доступ к клиентскому каталогу</p>
+            <h1 class="page-title">Настройки системы</h1>
+            <div class="glass-panel padded" style="text-align: center;">
+                <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; margin-bottom: 16px;">
+                    <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 6px;">Текущий статус каталога:</div>
+                    <div id="site-status-indicator" style="font-size: 17px; font-weight: 700;"></div>
                 </div>
-                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-inner); padding: 20px 16px; margin-bottom: 18px;">
-                    <div style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 6px;">Текущий режим:</div>
-                    <div id="site-status-indicator" style="font-size: 17px; font-weight: 750;"></div>
-                </div>
-                <button class="btn" id="btn-toggle-site"></button>
+                <button class="btn" id="btn-toggle-site" style="margin-bottom: 10px;"></button>
+                <button class="btn btn-secondary" onclick="openView('view-menu')">← Назад в меню</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ВСТАВЬТЕ СЮДА ТОКЕН ВАШЕГО БОТА (ДЛЯ ОБРАБОТКИ КНОПКИ "УДАЛИТЬ УВЕДОМЛЕНИЕ")
+        const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
+
         const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
         const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
@@ -283,42 +342,30 @@
             try {
                 const res = await fetch(UPSTASH_URL, {
                     method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + UPSTASH_TOKEN,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(cmd)
+                    headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
+                    body: JSON.stringify(cmd),
+                    cache: "no-store"
                 });
                 if (!res.ok) return null;
                 const data = await res.json();
                 return data.result;
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
-        document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
-        document.addEventListener('gesturestart', e => e.preventDefault());
+        async function redisPipeline(commands) {
+            try {
+                const res = await fetch(UPSTASH_URL + "/pipeline", {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
+                    body: JSON.stringify(commands),
+                    cache: "no-store"
+                });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) { return null; }
+        }
 
         const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            const forceFullSize = () => {
-                try {
-                    tg.expand();
-                    if (typeof tg.requestFullscreen === "function") tg.requestFullscreen();
-                    if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
-                    tg.isVerticalSwipesEnabled = false;
-                } catch (e) {}
-            };
-            forceFullSize();
-            setTimeout(forceFullSize, 100);
-            setTimeout(forceFullSize, 300);
-            try {
-                tg.setHeaderColor('#090d16');
-                tg.setBackgroundColor('#090d16');
-            } catch (e) {}
-        }
 
         const appsData = [
           { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
@@ -373,9 +420,8 @@
         let state = { prices: {}, visibility: {}, siteEnabled: true };
         let selectedAppsForLink = new Set();
         let selectedTtlMinutes = 3;
-        let selectedAppKey = "";
-        let toastTimeout;
         let currentView = 'view-menu';
+        let toastTimeout;
 
         if (tg?.BackButton) {
             tg.BackButton.onClick(() => {
@@ -384,11 +430,19 @@
             });
         }
 
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
         function selectTtl(mins, el) {
             selectedTtlMinutes = mins;
-            document.querySelectorAll('.ttl-chip').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.ttl-btn').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
-            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         function formatMinWord(mins) {
@@ -397,80 +451,46 @@
             return mins + " минут";
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.add('show');
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
-        }
-
-        function copyLink() {
-            const input = document.getElementById('generated-link-input');
-            if (!input || !input.value) return;
-            navigator.clipboard.writeText(input.value).then(() => {
-                showToast("Ссылка скопирована!");
-            }).catch(() => {
-                input.select();
-                document.execCommand('copy');
-                showToast("Ссылка скопирована!");
-            });
-        }
-
         function getAdminAppPrice(key) {
-            if (state.prices && state.prices[key] !== undefined) {
-                return Number(state.prices[key]);
-            }
+            if (state.prices && state.prices[key] !== undefined) return Number(state.prices[key]);
             return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
-        }
-
-        async function loadData() {
-            try {
-                const [pricesRaw, visRaw, siteEnabledVal] = await Promise.all([
-                    redisCommand("HGETALL", "app_prices"),
-                    redisCommand("HGETALL", "app_visibility"),
-                    redisCommand("GET", "site_enabled")
-                ]);
-
-                state.prices = {};
-                if (pricesRaw) {
-                    if (Array.isArray(pricesRaw)) {
-                        for (let i = 0; i < pricesRaw.length; i += 2) state.prices[pricesRaw[i]] = pricesRaw[i+1];
-                    } else if (typeof pricesRaw === "object") {
-                        Object.assign(state.prices, pricesRaw);
-                    }
-                }
-
-                state.visibility = {};
-                if (visRaw) {
-                    if (Array.isArray(visRaw)) {
-                        for (let i = 0; i < visRaw.length; i += 2) state.visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
-                    } else if (typeof visRaw === "object") {
-                        Object.keys(visRaw).forEach(k => state.visibility[k] = String(visRaw[k]) !== "false");
-                    }
-                }
-
-                state.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
-                renderAllViews();
-            } catch (e) {
-                if (tg?.showAlert) tg.showAlert("Ошибка соединения с базой");
-            }
         }
 
         function openView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             currentView = id;
-            window.scrollTo(0, 0);
             if (id === 'view-menu') {
                 if (tg?.BackButton) tg.BackButton.hide();
                 selectedAppsForLink.clear();
                 updateGenerateButton();
-                renderAllViews();
             } else {
                 if (tg?.BackButton) tg.BackButton.show();
+                if (id === 'view-active-links') loadActiveLinks();
             }
+        }
+
+        async function loadData() {
+            // Мгновенно рендерим дефолтные списки, чтобы не ждать сеть
+            renderAllViews();
+            const res = await redisPipeline([
+                ["HGETALL", "app_prices"],
+                ["HGETALL", "app_visibility"],
+                ["GET", "site_enabled"]
+            ]);
+            if (!res) return;
+            const pricesRaw = res[0]?.result;
+            const visRaw = res[1]?.result;
+            const siteEnabledVal = res[2]?.result;
+
+            if (Array.isArray(pricesRaw)) {
+                for (let i = 0; i < pricesRaw.length; i += 2) state.prices[pricesRaw[i]] = pricesRaw[i+1];
+            }
+            if (Array.isArray(visRaw)) {
+                for (let i = 0; i < visRaw.length; i += 2) state.visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
+            }
+            state.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
+            renderAllViews();
         }
 
         function renderAllViews() {
@@ -483,18 +503,18 @@
 
         function renderCreateLinkList() {
             const list = document.getElementById('list-create-link');
-            const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const isVisible = state.visibility[app.key] !== false;
+            const q = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(a => a.name.toLowerCase().includes(q)).map(app => {
+                const isVis = state.visibility[app.key] !== false;
                 const isChecked = selectedAppsForLink.has(app.key);
                 return `
-                <div class="app-row ${isVisible ? '' : 'disabled'}" onclick="${isVisible ? `toggleAppForLink('${app.key}')` : ''}">
-                    <div class="app-row-left">
-                        <div class="checkbox ${isChecked ? 'checked' : ''}" id="check-${app.key}" style="${isVisible ? '' : 'display:none;'}"></div>
+                <div class="app-item ${isVis ? '' : 'disabled'}" onclick="toggleAppForLink('${app.key}')">
+                    <div class="app-item-left">
+                        <div class="check-circle ${isChecked ? 'checked' : ''}" id="check-${app.key}"></div>
                         <img src="${app.icon}" class="app-icon">
-                        <div class="app-meta">
-                            <span class="app-title">${app.name}</span>
-                            <span class="app-desc">${isVisible ? app.ios : 'Скрыто в каталоге'}</span>
+                        <div>
+                            <div class="app-name">${app.name}</div>
+                            <div class="app-sub">${isVis ? app.ios : 'Скрыто'}</div>
                         </div>
                     </div>
                 </div>`;
@@ -507,115 +527,152 @@
             else selectedAppsForLink.add(key);
             document.getElementById('check-' + key)?.classList.toggle('checked', selectedAppsForLink.has(key));
             updateGenerateButton();
-            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         function updateGenerateButton() {
             const btn = document.getElementById('btn-generate-main');
-            if (!btn) return;
-            const count = selectedAppsForLink.size;
-            btn.innerText = `Сгенерировать ссылку (${count})`;
-            btn.className = count > 0 ? "btn btn-primary" : "btn btn-secondary";
+            const c = selectedAppsForLink.size;
+            btn.innerText = `Сгенерировать ссылку (${c})`;
+            btn.className = c > 0 ? "btn btn-primary" : "btn btn-secondary";
         }
 
-        // Генерирует красивые 8-значные ссылки
         async function createLink() {
-            if (selectedAppsForLink.size === 0) {
-                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
+            if (selectedAppsForLink.size === 0) return;
             const token = Math.floor(10000000 + Math.random() * 90000000).toString();
             const appKeysStr = Array.from(selectedAppsForLink).join(',');
             const ttlSeconds = selectedTtlMinutes * 60;
-
-            await redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
 
             const linkUrl = CLIENT_SITE_URL + "/?" + token;
             const ttlText = formatMinWord(selectedTtlMinutes);
 
             document.getElementById('generated-link-input').value = linkUrl;
-            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента создания на одном устройстве.`;
+            document.getElementById('result-ttl-desc').innerText = `Срок действия: ${ttlText} (только 1 устройство)`;
 
-            const container = document.getElementById('result-selected-apps');
             const appNamesList = [];
-            container.innerHTML = Array.from(selectedAppsForLink).map(key => {
+            document.getElementById('result-selected-apps').innerHTML = Array.from(selectedAppsForLink).map(key => {
                 const app = appsData.find(a => a.key === key);
                 if (!app) return '';
                 appNamesList.push(app.name);
-                return `<div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:12px;">
-                    <img src="${app.icon}" style="width:26px; height:26px; border-radius:7px;">
-                    <span style="font-size:13.5px; font-weight:650; color:var(--text-main); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
+                return `<div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); padding:8px 12px; border-radius:12px;">
+                    <img src="${app.icon}" style="width:28px; height:28px; border-radius:7px;">
+                    <span style="font-size:14px; font-weight:650;">${app.name}</span>
                 </div>`;
             }).join('');
 
             openView('view-link-result');
 
-            const shareText = `🔗 Ваша ссылка для установки приложений готова!\n\n📱 Список:\n${appNamesList.map(n => '• ' + n).join('\n')}\n\n⏳ Срок действия: ${ttlText}`;
-            
+            // Сохраняем в базу в фоне
+            redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
+
+            const shareText = `🔗 Ваша персональная ссылка для установки приложений:\n\n📱 Приложения:\n${appNamesList.map(n => '• ' + n).join('\n')}\n\n⏳ Действует: ${ttlText} (на 1 устройство)`;
+
             document.getElementById('btn-forward').onclick = () => {
-                const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
-                if (tg?.openTelegramLink) tg.openTelegramLink(tgUrl);
-                else window.location.href = tgUrl;
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
+                if (tg && typeof tg.openTelegramLink === 'function') {
+                    tg.openTelegramLink(shareUrl);
+                } else if (navigator.share) {
+                    navigator.share({ title: 'AppRestore IOS', text: shareText, url: linkUrl }).catch(() => {});
+                } else {
+                    window.open(shareUrl, '_blank');
+                }
             };
+        }
+
+        function copyLink() {
+            const input = document.getElementById('generated-link-input');
+            if (!input || !input.value) return;
+            navigator.clipboard.writeText(input.value).then(() => showToast("Ссылка скопирована!")).catch(() => {
+                input.select(); document.execCommand('copy'); showToast("Ссылка скопирована!");
+            });
+        }
+
+        async function loadActiveLinks() {
+            const box = document.getElementById('list-active-links');
+            box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Загрузка...</div>`;
+            const keys = await redisCommand("KEYS", "token:*");
+            if (!keys || keys.length === 0) {
+                box.innerHTML = `<div style="text-align:center; padding:25px; color:var(--text-sub);">Активных ссылок нет</div>`;
+                return;
+            }
+            const cmds = [];
+            keys.forEach(k => { cmds.push(["GET", k]); cmds.push(["TTL", k]); });
+            const res = await redisPipeline(cmds);
+            let html = "";
+            for (let i = 0; i < keys.length; i++) {
+                const token = keys[i].replace("token:", "");
+                const val = res[i*2]?.result || "";
+                const ttl = res[i*2+1]?.result || 0;
+                const minsLeft = Math.max(1, Math.ceil(ttl / 60));
+                const names = val.split(",").map(k => appsData.find(a => a.key === k)?.name || k).join(", ");
+                html += `
+                <div class="app-item" id="act-token-${token}">
+                    <div style="min-width:0; flex:1; padding-right:10px;">
+                        <div class="app-name" style="color:#60a5fa;">/?${token} (${minsLeft} мин)</div>
+                        <div class="app-sub" style="white-space:normal;">${names}</div>
+                    </div>
+                    <button class="btn btn-danger" style="width:auto; min-height:36px; padding:0 12px; font-size:13px;" onclick="deleteToken('${token}')">Удалить</button>
+                </div>`;
+            }
+            box.innerHTML = html;
+        }
+
+        function deleteToken(token) {
+            document.getElementById('act-token-' + token)?.remove();
+            showToast("Ссылка удалена");
+            redisPipeline([["DEL", "token:" + token], ["DEL", "claim:" + token]]);
         }
 
         function renderPricesList() {
             const list = document.getElementById('list-prices');
-            if (!list) return;
-            const query = (document.getElementById('prices-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const price = getAdminAppPrice(app.key);
-                const isPrem = price >= 500;
+            const q = (document.getElementById('prices-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(a => a.name.toLowerCase().includes(q)).map(app => {
+                const p = getAdminAppPrice(app.key);
                 return `
-                <div class="app-row" onclick="openPriceDetail('${app.key}')">
-                    <div class="app-row-left">
+                <div class="app-item" onclick="openPriceDetail('${app.key}')">
+                    <div class="app-item-left">
                         <img src="${app.icon}" class="app-icon">
-                        <div class="app-meta">
-                            <span class="app-title">${app.name}</span>
-                            <span class="app-desc">${app.ios}</span>
+                        <div>
+                            <div class="app-name">${app.name}</div>
+                            <div class="app-sub">${app.ios}</div>
                         </div>
                     </div>
                     <div style="display:flex; align-items:center;">
-                        <span class="price-tag ${isPrem ? 'premium' : ''}">${price} ₽</span>
-                        <span style="color:rgba(255,255,255,0.3); font-size:18px;">›</span>
+                        <span class="price-badge ${p >= 500 ? 'premium' : ''}">${p} ₽</span>
+                        <span class="nav-chevron">›</span>
                     </div>
                 </div>`;
             }).join('');
         }
 
         function openPriceDetail(key) {
-            selectedAppKey = key;
             const app = appsData.find(a => a.key === key);
             document.getElementById('detail-price-name').innerText = app.name;
             document.getElementById('detail-price-icon').src = app.icon;
-            const priceInput = document.getElementById('detail-price-input');
-            priceInput.value = getAdminAppPrice(key);
-            
-            // Мгновенное сохранение
+            const input = document.getElementById('detail-price-input');
+            input.value = getAdminAppPrice(key);
             document.getElementById('btn-save-price').onclick = () => {
-                const newPrice = priceInput.value;
-                state.prices[key] = newPrice;
-                showToast('Цена сохранена');
-                openView('view-prices'); // Мгновенный выход
-                redisCommand("HSET", "app_prices", key, String(newPrice)); // В фоне
+                const val = input.value.trim() || "250";
+                state.prices[key] = val;
+                renderPricesList();
+                showToast("Цена сохранена: " + val + " ₽");
+                openView('view-prices');
+                redisCommand("HSET", "app_prices", key, String(val));
             };
             openView('view-price-detail');
         }
 
         function renderVisibilityList() {
             const list = document.getElementById('list-visibility');
-            if (!list) return;
-            const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+            const q = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(a => a.name.toLowerCase().includes(q)).map(app => {
                 const isVis = state.visibility[app.key] !== false;
                 return `
-                <div class="app-row" onclick="toggleVisibility('${app.key}', ${!isVis}, this)">
-                    <div class="app-row-left">
+                <div class="app-item" onclick="toggleVisibility('${app.key}', this)">
+                    <div class="app-item-left">
                         <img src="${app.icon}" class="app-icon">
-                        <div class="app-meta">
-                            <span class="app-title">${app.name}</span>
-                            <span class="app-desc">${isVis ? 'Показывается' : 'Скрыто'}</span>
+                        <div>
+                            <div class="app-name">${app.name}</div>
+                            <div class="app-sub">${isVis ? 'Показывается' : 'Скрыто'}</div>
                         </div>
                     </div>
                     <div class="switch ${isVis ? 'on' : ''}"></div>
@@ -623,52 +680,65 @@
             }).join('');
         }
 
-        // Мгновенное переключение тумблера
-        function toggleVisibility(key, makeVisible, el) {
-            state.visibility[key] = makeVisible;
-            if (el) {
-                const switchEl = el.querySelector('.switch');
-                const descEl = el.querySelector('.app-desc');
-                if (makeVisible) {
-                    switchEl.classList.add('on');
-                    descEl.innerText = 'Показывается';
-                } else {
-                    switchEl.classList.remove('on');
-                    descEl.innerText = 'Скрыто';
-                }
-                el.onclick = () => toggleVisibility(key, !makeVisible, el);
-            }
-            if (!makeVisible && selectedAppsForLink.has(key)) {
-                selectedAppsForLink.delete(key);
-                updateGenerateButton();
-            }
-            showToast(makeVisible ? "Приложение включено" : "Приложение скрыто");
-            redisCommand("HSET", "app_visibility", key, String(makeVisible)); // В фоне
+        function toggleVisibility(key, rowEl) {
+            const current = state.visibility[key] !== false;
+            const nextState = !current;
+            state.visibility[key] = nextState;
+            const sw = rowEl.querySelector('.switch');
+            const sub = rowEl.querySelector('.app-sub');
+            if (sw) sw.classList.toggle('on', nextState);
+            if (sub) sub.innerText = nextState ? 'Показывается' : 'Скрыто';
+            showToast(nextState ? "Приложение включено" : "Приложение скрыто");
+            redisCommand("HSET", "app_visibility", key, String(nextState));
         }
 
         function renderSettings() {
-            const btnToggle = document.getElementById('btn-toggle-site');
-            const indicator = document.getElementById('site-status-indicator');
+            const btn = document.getElementById('btn-toggle-site');
+            const ind = document.getElementById('site-status-indicator');
             if (state.siteEnabled) {
-                indicator.innerText = "🟢 Активен (доступен пользователям)";
-                indicator.style.color = "#4ade80";
-                btnToggle.innerText = "⛔ Приостановить работу каталога";
-                btnToggle.className = "btn btn-danger";
+                ind.innerText = "🟢 Активен (доступен клиентам)";
+                ind.style.color = "#4ade80";
+                btn.innerText = "⛔ Приостановить работу каталога";
+                btn.className = "btn btn-danger";
             } else {
-                indicator.innerText = "🔴 Отключен (технические работы)";
-                indicator.style.color = "#f87171";
-                btnToggle.innerText = "✅ Запустить каталог";
-                btnToggle.className = "btn btn-success";
+                ind.innerText = "🔴 Отключен (тех. работы)";
+                ind.style.color = "#f87171";
+                btn.innerText = "✅ Запустить каталог";
+                btn.className = "btn btn-success";
             }
-            // Мгновенное переключение
-            btnToggle.onclick = () => {
-                const newState = !state.siteEnabled;
-                state.siteEnabled = newState;
-                renderSettings(); // Мгновенно меняем текст
-                showToast(newState ? "Сайт запущен" : "Сайт остановлен");
-                redisCommand("SET", "site_enabled", String(newState)); // В фоне
+            btn.onclick = () => {
+                state.siteEnabled = !state.siteEnabled;
+                renderSettings();
+                showToast(state.siteEnabled ? "Каталог запущен" : "Каталог остановлен");
+                redisCommand("SET", "site_enabled", String(state.siteEnabled));
             };
         }
+
+        // Фоновая обработка нажатия кнопки "Удалить уведомление" в боте
+        let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
+        async function pollBotCallbacks() {
+            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateOffset}&timeout=0`);
+                const data = await res.json();
+                if (data.ok && Array.isArray(data.result)) {
+                    for (const upd of data.result) {
+                        lastUpdateOffset = upd.update_id + 1;
+                        localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
+                        if (upd.callback_query && upd.callback_query.data === "del_msg") {
+                            const chatId = upd.callback_query.message.chat.id;
+                            const msgId = upd.callback_query.message.message_id;
+                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
+                                method: "POST", headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ chat_id: chatId, message_id: msgId })
+                            });
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        setInterval(pollBotCallbacks, 2500);
+        pollBotCallbacks();
 
         loadData();
     </script>
