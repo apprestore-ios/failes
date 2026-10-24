@@ -22,15 +22,14 @@
                url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff") format("woff"),
                url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.ttf") format("truetype"),
                url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype");
-          font-weight: normal; font-style: normal; font-display: block;
+          font-weight: normal; font-style: normal; font-display: swap;
       }
       .sf-icon {
           font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
           font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
           text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
-          vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
+          vertical-align: middle; margin: 0; padding: 0; opacity: 1;
       }
-      html.fonts-loaded .sf-icon { opacity: 1; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
@@ -192,17 +191,6 @@
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
     </style>
-    <script>
-        if ("fonts" in document) {
-            document.fonts.load('1em "SFSymbols"').then(function() {
-                document.documentElement.classList.add("fonts-loaded");
-            }).catch(function() {
-                document.documentElement.classList.add("fonts-loaded");
-            });
-        } else {
-            document.documentElement.classList.add("fonts-loaded");
-        }
-    </script>
 </head>
 <body>
 
@@ -481,6 +469,23 @@ function saveCart() {
 const LOCKED_SCREENS = ["tokenErrorApp"];
 const INFO_SCREENS = ["guideApp", "tipsApp"];
 const HISTORY_STACK = [];
+
+async function fetchWithTimeout(resource, options = {}) {
+    const { timeout = 2200 } = options;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(resource, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+}
 
 function saveActiveTokenSession(dataObj) {
     const str = JSON.stringify(dataObj);
@@ -961,30 +966,33 @@ function clearAppSearch() {
 
 async function syncAll() {
     try {
-        const cfgRes = await fetch(API_BASE + "/api/settings?_=" + Date.now(), { cache: "no-store" });
-        const cfg = await cfgRes.json();
-        const newVis = {};
-        Object.keys(cfg).forEach(k => {
-            if (k.startsWith("vis_")) newVis[k.replace("vis_", "")] = cfg[k] !== "false";
-        });
-        remoteConfig.appVisibility = newVis;
-        if (cfg.app_prices) remoteConfig.appPrices = cfg.app_prices;
-        updateCartUI();
+        const cfgRes = await fetchWithTimeout(API_BASE + "/api/settings?_=" + Date.now(), { cache: "no-store", timeout: 2500 });
+        if (cfgRes.ok) {
+            const cfg = await cfgRes.json();
+            const newVis = {};
+            Object.keys(cfg).forEach(k => {
+                if (k.startsWith("vis_")) newVis[k.replace("vis_", "")] = cfg[k] !== "false";
+            });
+            remoteConfig.appVisibility = newVis;
+            if (cfg.app_prices) remoteConfig.appPrices = cfg.app_prices;
+            updateCartUI();
+        }
 
         if (isFromToken) return;
-        const sRes = await fetch(API_BASE + "/api/status?_=" + Date.now(), { cache: "no-store" });
-        const sData = await sRes.json();
-        const siteEnabled = Boolean(sData.is_enabled);
+        const sRes = await fetchWithTimeout(API_BASE + "/api/status?_=" + Date.now(), { cache: "no-store", timeout: 2500 });
+        if (sRes.ok) {
+            const sData = await sRes.json();
+            const siteEnabled = Boolean(sData.is_enabled);
 
-        if (isSiteCurrentlyEnabled !== siteEnabled) {
-            isSiteCurrentlyEnabled = siteEnabled;
-            if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
-            else {
-                let lastScreen = sessionStorage.getItem("currentScreenId");
-                switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
+            if (isSiteCurrentlyEnabled !== siteEnabled) {
+                isSiteCurrentlyEnabled = siteEnabled;
+                if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
+                else {
+                    let lastScreen = sessionStorage.getItem("currentScreenId");
+                    switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
+                }
             }
         }
-        if (!siteEnabled) return;
         filterApps();
     } catch (e) {}
 }
@@ -996,7 +1004,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (token) {
         isFromToken = true;
-        syncAll();
         if (savedSession && savedSession.token === token) {
             const timeLeft = savedSession.expires_at - Date.now();
             if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
@@ -1004,13 +1011,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 renderTokenAppsList(savedSession.app_keys);
                 startTokenCountdown(savedSession.expires_at);
                 switchScreen("tokenApp");
-                setInterval(syncAll, 2000);
+                syncAll();
+                setInterval(syncAll, 3000);
                 return;
             } else {
                 isTokenExpired = true;
                 clearActiveTokenSession();
                 switchScreen("tokenErrorApp");
-                setInterval(syncAll, 2000);
                 return;
             }
         }
@@ -1037,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return (known[px] || "iPhone") + " [" + px + "]";
             }
             const deviceModel = estimateAppleDeviceModel();
-            const res = await fetch(API_BASE + "/api/verify-token?token=" + encodeURIComponent(token) + "&device_model=" + encodeURIComponent(deviceModel), { cache: "no-store" });
+            const res = await fetchWithTimeout(API_BASE + "/api/verify-token?token=" + encodeURIComponent(token) + "&device_model=" + encodeURIComponent(deviceModel), { cache: "no-store", timeout: 4000 });
             const data = await res.json();
             if (data.valid && data.app_keys && data.app_keys.length > 0) {
                 const ttlMins = Number(data.ttl_minutes) > 0 ? Number(data.ttl_minutes) : 3;
@@ -1048,49 +1055,47 @@ document.addEventListener("DOMContentLoaded", async () => {
                 renderTokenAppsList(data.app_keys);
                 startTokenCountdown(expiresAt);
                 switchScreen("tokenApp");
-                setInterval(syncAll, 2000);
+                syncAll();
+                setInterval(syncAll, 3000);
                 return;
             } else {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
-                setInterval(syncAll, 2000);
                 return;
             }
         } catch (e) {
             isTokenExpired = true;
             switchScreen("tokenErrorApp");
-            setInterval(syncAll, 2000);
             return;
         }
     }
 
-    await syncAll();
-    if (!isSiteCurrentlyEnabled) {
-        switchScreen("maintenanceApp");
-    } else {
-        let lastScreen = sessionStorage.getItem("currentScreenId");
-        let hasEntered = sessionStorage.getItem("site_access") === "true";
-        if (hasEntered) {
-            if (INFO_SCREENS.includes(lastScreen)) {
-                previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
-                switchScreen(lastScreen);
-            } else if (lastScreen === "cartApp") {
-                renderCartScreen();
-                switchScreen("cartApp");
-            } else {
-                switchScreen("mainApp");
-            }
+    // Сразу открываем экран, не дожидаясь ответа от бэкенда
+    let lastScreen = sessionStorage.getItem("currentScreenId");
+    let hasEntered = sessionStorage.getItem("site_access") === "true";
+    if (hasEntered) {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
+            switchScreen(lastScreen);
+        } else if (lastScreen === "cartApp") {
+            renderCartScreen();
+            switchScreen("cartApp");
         } else {
-            if (INFO_SCREENS.includes(lastScreen)) {
-                previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
-                switchScreen(lastScreen);
-            } else {
-                switchScreen("welcomeApp");
-            }
+            switchScreen("mainApp");
+        }
+    } else {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
+            switchScreen(lastScreen);
+        } else {
+            switchScreen("welcomeApp");
         }
     }
 
-    setInterval(syncAll, 2000);
+    // Фоновая синхронизация настроек
+    syncAll();
+    setInterval(syncAll, 3000);
+
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") syncAll();
     });
