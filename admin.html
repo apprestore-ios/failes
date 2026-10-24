@@ -12,30 +12,30 @@
         body { 
             color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
             user-select: none; -webkit-user-select: none;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
         }
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10;
             background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
-        .view { display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.25s ease-out; }
-        .view.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .view { display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); animation: fadeIn 0.25s ease-out; }
+        .view.active { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        h2.page-title, h3.section-title { text-align: center; font-size: 21px; font-weight: 700; margin: 0 0 16px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); width: 100%; }
-        .menu-card { background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; }
-        .menu-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
+        h2.page-title, h3.section-title { text-align: center; font-size: 21px; font-weight: 700; margin: 12px 0 16px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); width: 100%; }
+        .menu-card { background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; margin-top: 8px; }
+        .menu-item { display: flex; align-items: center; padding: 18px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
         .menu-item:active { background: rgba(0, 0, 0, 0.4); }
         .menu-item:last-child { border-bottom: none; }
-        .menu-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 18px; }
-        .menu-text { flex: 1; }
+        .menu-icon { width: 38px; height: 38px; border-radius: 12px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 20px; flex-shrink: 0; }
+        .menu-text { flex: 1; min-width: 0; }
         .menu-title { font-size: 16px; font-weight: 600; margin-bottom: 3px; letter-spacing: -0.3px; }
         .menu-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; }
-        .menu-chevron { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 500; padding-left: 10px; }
-        .card { background: var(--card-bg); border-radius: 22px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 100%; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .menu-chevron { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 500; padding-left: 10px; flex-shrink: 0; }
+        .card { background: var(--card-bg); border-radius: 22px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 100%; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin-top: 8px; }
         .card:last-child { margin-bottom: 0; }
         .card h4 { margin: 0 0 12px 0; font-size: 16px; color: var(--text); font-weight: 600; text-align: center; }
-        .admin-scroll-list { width: 100%; max-height: 44dvh; overflow-y: auto; padding-right: 2px; }
+        .admin-scroll-list { width: 100%; max-height: 55dvh; overflow-y: auto; padding-right: 2px; }
         .admin-scroll-list::-webkit-scrollbar { width: 4px; }
         .admin-scroll-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
         .app-item { display: flex; align-items: center; padding: 11px 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.14); transition: 0.2s; cursor: pointer; }
@@ -139,13 +139,14 @@
     </div>
 
     <div id="view-link-result" class="view">
-        <div class="card" style="text-align:center; padding: 28px 20px;">
-            <div style="font-size: 45px; margin-bottom: 12px;">✅</div>
+        <div class="card" style="text-align:center; padding: 24px 18px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
             <h2 style="margin: 0 0 6px 0; font-size: 20px;">Ссылка создана!</h2>
-            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;">Действует 3 мин. с момента открытия на одном устройстве.</p>
-            <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
-            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">
-            <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📤 Переслать пользователю</button>
+            <p id="result-ttl-desc" style="color:var(--muted); font-size:13px; margin-bottom: 14px; line-height: 1.4;">Действует 3 мин. с момента открытия на одном устройстве.</p>
+            <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
+            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 600; margin-bottom: 10px;" onclick="copyLink()">
+            <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); margin-bottom: 8px;">📤 Переслать пользователю</button>
+            <button class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); box-shadow: none;" onclick="copyLink()">📋 Скопировать ссылку</button>
         </div>
     </div>
 
@@ -188,63 +189,72 @@
 
     <script>
         const API_BASE = "https://quiet-field-6867.apprestore-ios.workers.dev";
-        const CLIENT_SITE_URL = "https://apprestore-ios.github.io/failes";
+        const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
         document.addEventListener('gesturestart', e => e.preventDefault());
 
-        const tg = window.Telegram.WebApp;
-        tg.ready(); tg.expand();
-        tg.setHeaderColor('#0b0f17'); tg.setBackgroundColor('#0b0f17');
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            if (typeof tg.requestFullscreen === "function") {
+                try { tg.requestFullscreen(); } catch (e) {}
+            }
+            try {
+                tg.setHeaderColor('#0b0f17');
+                tg.setBackgroundColor('#0b0f17');
+            } catch (e) {}
+        }
 
         const appsData = [
-          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-          { key: "max", name: "MAX", category: "social", url: "/manifests/max", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" }[cite: 1, 2],
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" }[cite: 1, 2],
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" }[cite: 1, 2],
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" }[cite: 1, 2],
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" }[cite: 1, 2],
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" }[cite: 1, 2],
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" }[cite: 1, 2],
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" }[cite: 1, 2],
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" }[cite: 1, 2],
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" }[cite: 1, 2],
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" }[cite: 1, 2],
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" }[cite: 1, 2],
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" }[cite: 1, 2],
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" }[cite: 1, 2],
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" }[cite: 1, 2],
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" }[cite: 1, 2],
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" }[cite: 1, 2],
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" }[cite: 1, 2],
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" }[cite: 1, 2],
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" }[cite: 1, 2],
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" }[cite: 1, 2],
+          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }[cite: 1, 2]
         ];
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -256,17 +266,20 @@
         let selectedAppKey = "";
         let toastTimeout;
         let currentView = 'view-menu';
+        let currentShareUrl = "";
 
-        tg.BackButton.onClick(() => {
-            if (currentView === 'view-price-detail') openView('view-prices');
-            else openView('view-menu');
-        });
+        if (tg?.BackButton) {
+            tg.BackButton.onClick(() => {
+                if (currentView === 'view-price-detail') openView('view-prices');
+                else openView('view-menu');
+            });
+        }
 
         function selectTtl(mins, el) {
             selectedTtlMinutes = mins;
             document.querySelectorAll('.ttl-pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
-            tg.HapticFeedback.selectionChanged();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         function formatMinWord(mins) {
@@ -279,16 +292,28 @@
             const t = document.getElementById('toast');
             t.innerText = msg;
             t.classList.add('show');
-            tg.HapticFeedback.notificationOccurred('success');
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function copyLink() {
+            const input = document.getElementById('generated-link-input');
+            if (!input || !input.value) return;
+            navigator.clipboard.writeText(input.value).then(() => {
+                showToast("Ссылка скопирована!");
+            }).catch(() => {
+                input.select();
+                document.execCommand('copy');
+                showToast("Ссылка скопирована!");
+            });
         }
 
         function getAdminAppPrice(key) {
             if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
                 return Number(globalData.state.prices[key]);
             }
-            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+            return (key === 'mailru' || key === 'alfabank') ? 500 : 250[cite: 1, 2];
         }
 
         async function loadData() {
@@ -303,19 +328,19 @@
                 globalData.siteEnabled = data.siteEnabled;
                 renderAllViews();
             } catch (e) {
-                tg.showAlert("Ошибка соединения с базой");
+                if (tg?.showAlert) tg.showAlert("Ошибка соединения с базой");
             }
         }
 
         async function doAction(action, payload = {}) {
-            tg.MainButton.showProgress();
+            if (tg?.MainButton) tg.MainButton.showProgress();
             const res = await fetch(API_BASE + '/api/admin/action?token=' + adminToken, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action, ...payload })
             });
             const out = await res.json();
-            tg.MainButton.hideProgress();
+            if (tg?.MainButton) tg.MainButton.hideProgress();
             if (!res.ok) throw new Error(out.error || 'Action failed');
             await loadData();
             return out;
@@ -327,12 +352,12 @@
             currentView = id;
             window.scrollTo(0, 0);
             if (id === 'view-menu') {
-                tg.BackButton.hide();
+                if (tg?.BackButton) tg.BackButton.hide();
                 selectedAppsForLink.clear();
                 updateGenerateButton();
                 renderAllViews();
             } else {
-                tg.BackButton.show();
+                if (tg?.BackButton) tg.BackButton.show();
             }
         }
 
@@ -369,7 +394,7 @@
             else selectedAppsForLink.add(key);
             document.getElementById('check-' + key)?.classList.toggle('checked', selectedAppsForLink.has(key));
             updateGenerateButton();
-            tg.HapticFeedback.selectionChanged();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         function updateGenerateButton() {
@@ -381,18 +406,20 @@
 
         async function createLink() {
             if (selectedAppsForLink.size === 0) {
-                tg.HapticFeedback.notificationOccurred('error');
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
             const res = await doAction('create_link', {
                 app_keys: Array.from(selectedAppsForLink),
                 ttl_minutes: selectedTtlMinutes
             });
-            const linkUrl = CLIENT_SITE_URL + '/?token=' + res.token;
+            
+            // Формируем чистую ссылку на ваш домен
+            const linkUrl = CLIENT_SITE_URL + "/?token=" + res.token;
             const ttlText = formatMinWord(res.ttl_minutes || selectedTtlMinutes);
 
             document.getElementById('generated-link-input').value = linkUrl;
-            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента открытия и только на одном устройстве.`;
+            document.getElementById('result-ttl-desc').innerText = `Действует ${ttlText} с момента открытия на одном устройстве.`;
 
             const container = document.getElementById('result-selected-apps');
             const appNamesList = [];
@@ -407,11 +434,17 @@
             }).join('');
 
             openView('view-link-result');
+
+            // Подготовка пересылки ссылки
+            const shareText = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Приложения:\n${appNamesList.map(n => '• ' + n).join('\n')}\n\n⏳ Действует ${ttlText} только на одном устройстве!`;
+            currentShareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(shareText)}`;
+
             document.getElementById('btn-forward').onclick = () => {
-                const appsFormatted = appNamesList.map(name => `• ${name}`).join("\n");
-                const text = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Выбранные приложения:\n${appsFormatted}\n\n⏳ После открытия ссылка действует ${ttlText} и предназначена только для одного устройства!`;
-                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(text)}`;
-                tg.openTelegramLink(shareUrl);
+                if (tg?.openTelegramLink) {
+                    tg.openTelegramLink(currentShareUrl);
+                } else {
+                    window.open(currentShareUrl, '_blank');
+                }
             };
         }
 
