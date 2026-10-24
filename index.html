@@ -24,16 +24,15 @@
                url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype");
           font-weight: normal; font-style: normal; font-display: block;
       }
-      /* Скрываем глифы до загрузки шрифта, чтобы не отображались иероглифы */
       .sf-icon {
           font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
           font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
           text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
           vertical-align: middle; margin: 0; padding: 0;
-          visibility: hidden; /* Скрыто по умолчанию до загрузки шрифта */
+          visibility: hidden;
       }
       .fonts-loaded .sf-icon {
-          visibility: visible; /* Проявляется мягко после загрузки шрифтов */
+          visibility: visible;
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
@@ -387,7 +386,6 @@
 </div>
 
 <script>
-// Проверка готовности кастомного шрифта для скрытия иероглифов
 if ("fonts" in document) {
     document.fonts.ready.then(() => {
         document.body.classList.add("fonts-loaded");
@@ -398,9 +396,9 @@ if ("fonts" in document) {
     document.body.classList.add("fonts-loaded");
 }
 
-const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";[cite: 1]
-const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";[cite: 1]
-const CLIENT_SITE_URL = "https://apprestore-ios.ru";[cite: 1]
+const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
+const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
+const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
 async function redisCommand(...cmd) {
     try {
@@ -430,64 +428,64 @@ document.addEventListener("touchend", function(e) {
 }, { passive: false });
 
 const appsData = [
-  { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },[cite: 1]
-  { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },[cite: 1]
-  { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },[cite: 1]
-  { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },[cite: 1]
-  { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },[cite: 1]
-  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },[cite: 1]
-  { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },[cite: 1]
-  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },[cite: 1]
-  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },[cite: 1]
-  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },[cite: 1]
-  { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },[cite: 1]
-  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },[cite: 1]
-  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },[cite: 1]
-  { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },[cite: 1]
-  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },[cite: 1]
-  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },[cite: 1]
-  { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },[cite: 1]
-  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },[cite: 1]
-  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },[cite: 1]
-  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },[cite: 1]
-  { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },[cite: 1]
-  { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }[cite: 1]
+  { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
+  { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
+  { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
+  { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
+  { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
+  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
+  { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
+  { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
+  { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
+  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
+  { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
+  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
+  { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
+  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
+  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
+  { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
+  { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
+  { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
+  { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
+  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
+  { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
+  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
+  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
+  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
+  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
+  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
+  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
+  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
+  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+  { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
+  { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
+  { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
+  { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
+  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
+  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
+  { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
+  { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
+  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
+  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
+  { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
+  { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
 ];
 
-let currentCategory = "all";[cite: 1]
-let isFromToken = false;[cite: 1]
-let isTokenExpired = false;[cite: 1]
-let previousScreen = "welcomeApp";[cite: 1]
-let currentScreenId = "welcomeApp";[cite: 1]
-let remoteConfig = { appVisibility: {}, appPrices: {} };[cite: 1]
-let isSiteCurrentlyEnabled = true;[cite: 1]
-let tokenCountdownInterval = null;[cite: 1]
-let cartItems = new Set();[cite: 1]
+let currentCategory = "all";
+let isFromToken = false;
+let isTokenExpired = false;
+let previousScreen = "welcomeApp";
+let currentScreenId = "welcomeApp";
+let remoteConfig = { appVisibility: {}, appPrices: {} };
+let isSiteCurrentlyEnabled = true;
+let tokenCountdownInterval = null;
+let cartItems = new Set();
 
 try {
     const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
@@ -499,73 +497,73 @@ try {
 } catch (e) {}
 
 function saveCart() {
-    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}[cite: 1]
+    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
 }
 
-const LOCKED_SCREENS = ["tokenErrorApp"];[cite: 1]
-const INFO_SCREENS = ["guideApp", "tipsApp"];[cite: 1]
-const HISTORY_STACK = [];[cite: 1]
+const LOCKED_SCREENS = ["tokenErrorApp"];
+const INFO_SCREENS = ["guideApp", "tipsApp"];
+const HISTORY_STACK = [];
 
 function saveActiveTokenSession(dataObj) {
-    const str = JSON.stringify(dataObj);[cite: 1]
-    try { localStorage.setItem("active_token_data", str); } catch (e) {}[cite: 1]
-    try { sessionStorage.setItem("active_token_data", str); } catch (e) {}[cite: 1]
+    const str = JSON.stringify(dataObj);
+    try { localStorage.setItem("active_token_data", str); } catch (e) {}
+    try { sessionStorage.setItem("active_token_data", str); } catch (e) {}
 }
 
 function getActiveTokenSession() {
-    let raw = null;[cite: 1]
-    try { raw = localStorage.getItem("active_token_data"); } catch (e) {}[cite: 1]
-    if (!raw) { try { raw = sessionStorage.getItem("active_token_data"); } catch (e) {} }[cite: 1]
-    if (!raw) return null;[cite: 1]
-    try { return JSON.parse(raw); } catch (e) { return null; }[cite: 1]
+    let raw = null;
+    try { raw = localStorage.getItem("active_token_data"); } catch (e) {}
+    if (!raw) { try { raw = sessionStorage.getItem("active_token_data"); } catch (e) {} }
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
 }
 
 function clearActiveTokenSession() {
-    try { localStorage.removeItem("active_token_data"); } catch (e) {}[cite: 1]
-    try { sessionStorage.removeItem("active_token_data"); } catch (e) {}[cite: 1]
+    try { localStorage.removeItem("active_token_data"); } catch (e) {}
+    try { sessionStorage.removeItem("active_token_data"); } catch (e) {}
 }
 
 function getAppPrice(key) {
     if (remoteConfig.appPrices && remoteConfig.appPrices[key] !== undefined) {
-        return Number(remoteConfig.appPrices[key]);[cite: 1]
+        return Number(remoteConfig.appPrices[key]);
     }
-    return (key === "mailru" || key === "alfabank") ? 500 : 250;[cite: 1]
+    return (key === "mailru" || key === "alfabank") ? 500 : 250;
 }
 
 function extractTokenFromLocation() {
-    const urlParams = new URLSearchParams(window.location.search);[cite: 1]
-    const qToken = urlParams.get("token");[cite: 1]
-    if (qToken) return qToken.trim();[cite: 1]
-    const path = window.location.pathname.replace(/\/+$/, "");[cite: 1]
-    const installMatch = path.match(/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);[cite: 1]
-    if (installMatch) return installMatch[1];[cite: 1]
-    const directNumMatch = path.match(/\/(\d{6,16})$/);[cite: 1]
-    if (directNumMatch) return directNumMatch[1];[cite: 1]
-    return null;[cite: 1]
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get("token");
+    if (qToken) return qToken.trim();
+    const path = window.location.pathname.replace(/\/+$/, "");
+    const installMatch = path.match(/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
+    if (installMatch) return installMatch[1];
+    const directNumMatch = path.match(/\/(\d{6,16})$/);
+    if (directNumMatch) return directNumMatch[1];
+    return null;
 }
 
 function updateTokenHeroText(ttlMinutes) {
-    const descEl = document.getElementById("tokenHeroDesc");[cite: 1]
-    if (!descEl) return;[cite: 1]
-    const m = Number(ttlMinutes) || 3;[cite: 1]
-    const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");[cite: 1]
-    descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";[cite: 1]
+    const descEl = document.getElementById("tokenHeroDesc");
+    if (!descEl) return;
+    const m = Number(ttlMinutes) || 3;
+    const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
+    descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
 }
 
 function renderTokenAppsList(appKeys) {
-    const container = document.getElementById("singleTokenAppContainer");[cite: 1]
-    if (!container) return;[cite: 1]
-    container.innerHTML = "";[cite: 1]
+    const container = document.getElementById("singleTokenAppContainer");
+    if (!container) return;
+    container.innerHTML = "";
     appKeys.forEach(key => {
-        const cleanKey = key.trim();[cite: 1]
-        const app = appsData.find(a => a.key === cleanKey);[cite: 1]
+        const cleanKey = key.trim();
+        const app = appsData.find(a => a.key === cleanKey);
         if (app) {
-            let mainName = app.name;[cite: 1]
-            let subName = "";[cite: 1]
-            let bracketIdx = app.name.indexOf(" (");[cite: 1]
+            let mainName = app.name;
+            let subName = "";
+            let bracketIdx = app.name.indexOf(" (");
             if (bracketIdx !== -1 && app.name.endsWith(")")) {
-                mainName = app.name.substring(0, bracketIdx);[cite: 1]
-                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);[cite: 1]
+                mainName = app.name.substring(0, bracketIdx);
+                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
             }
             container.innerHTML += `
             <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
@@ -578,59 +576,59 @@ function renderTokenAppsList(appKeys) {
                     </div>
                 </div>
                 <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
-            </div>`;[cite: 1]
+            </div>`;
         }
     });
 }
 
 function startTokenCountdown(expiresAtTimestamp) {
-    const display = document.getElementById("tokenCountdownDisplay");[cite: 1]
-    const box = document.getElementById("tokenTimerBox");[cite: 1]
-    if (!display) return;[cite: 1]
-    if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);[cite: 1]
+    const display = document.getElementById("tokenCountdownDisplay");
+    const box = document.getElementById("tokenTimerBox");
+    if (!display) return;
+    if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
 
     function updateTimer() {
-        const diff = Math.max(0, expiresAtTimestamp - Date.now());[cite: 1]
-        const totalSecs = Math.ceil(diff / 1000);[cite: 1]
-        const mins = Math.floor(totalSecs / 60);[cite: 1]
-        const secs = totalSecs % 60;[cite: 1]
-        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");[cite: 1]
+        const diff = Math.max(0, expiresAtTimestamp - Date.now());
+        const totalSecs = Math.ceil(diff / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
         if (totalSecs <= 60 && totalSecs > 0) {
-            display.style.color = "#f87171";[cite: 1]
-            if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";[cite: 1]
+            display.style.color = "#f87171";
+            if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
         } else {
-            display.style.color = "#3b82f6";[cite: 1]
-            if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";[cite: 1]
+            display.style.color = "#3b82f6";
+            if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
         }
         if (diff <= 0) {
-            clearInterval(tokenCountdownInterval);[cite: 1]
-            isTokenExpired = true;[cite: 1]
-            display.textContent = "ИСТЕКЛО";[cite: 1]
-            display.style.color = "#ef4444";[cite: 1]
-            clearActiveTokenSession();[cite: 1]
-            const container = document.getElementById("singleTokenAppContainer");[cite: 1]
-            if (container) container.innerHTML = "";[cite: 1]
-            switchScreen("tokenErrorApp");[cite: 1]
+            clearInterval(tokenCountdownInterval);
+            isTokenExpired = true;
+            display.textContent = "ИСТЕКЛО";
+            display.style.color = "#ef4444";
+            clearActiveTokenSession();
+            const container = document.getElementById("singleTokenAppContainer");
+            if (container) container.innerHTML = "";
+            switchScreen("tokenErrorApp");
         }
     }
-    updateTimer();[cite: 1]
-    tokenCountdownInterval = setInterval(updateTimer, 1000);[cite: 1]
+    updateTimer();
+    tokenCountdownInterval = setInterval(updateTimer, 1000);
 }
 
 function generateAppsGrid() {
-    const container = document.getElementById("appListContainer");[cite: 1]
-    if (!container) return;[cite: 1]
-    let html = "";[cite: 1]
+    const container = document.getElementById("appListContainer");
+    if (!container) return;
+    let html = "";
     appsData.forEach(app => {
-        const price = getAppPrice(app.key);[cite: 1]
-        const isPrem = price >= 500;[cite: 1]
-        const isInCart = cartItems.has(app.key);[cite: 1]
-        let mainName = app.name;[cite: 1]
-        let subName = "";[cite: 1]
-        let bracketIdx = app.name.indexOf(" (");[cite: 1]
+        const price = getAppPrice(app.key);
+        const isPrem = price >= 500;
+        const isInCart = cartItems.has(app.key);
+        let mainName = app.name;
+        let subName = "";
+        let bracketIdx = app.name.indexOf(" (");
         if (bracketIdx !== -1 && app.name.endsWith(")")) {
-            mainName = app.name.substring(0, bracketIdx);[cite: 1]
-            subName = app.name.substring(bracketIdx + 2, app.name.length - 1);[cite: 1]
+            mainName = app.name.substring(0, bracketIdx);
+            subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
         }
         html += `
         <div class="app-grid-card" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
@@ -644,78 +642,78 @@ function generateAppsGrid() {
                 </div>
             </div>
             <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
-        </div>`;[cite: 1]
+        </div>`;
     });
-    container.innerHTML = html;[cite: 1]
-    filterApps();[cite: 1]
+    container.innerHTML = html;
+    filterApps();
 }
 
 function toggleCart(key) {
-    if (remoteConfig.appVisibility[key] === false) return;[cite: 1]
-    if (cartItems.has(key)) cartItems.delete(key);[cite: 1]
-    else cartItems.add(key);[cite: 1]
-    saveCart();[cite: 1]
-    updateCartUI();[cite: 1]
+    if (remoteConfig.appVisibility[key] === false) return;
+    if (cartItems.has(key)) cartItems.delete(key);
+    else cartItems.add(key);
+    saveCart();
+    updateCartUI();
 }
 
 function removeFromCart(key) {
-    cartItems.delete(key);[cite: 1]
-    saveCart();[cite: 1]
-    updateCartUI();[cite: 1]
+    cartItems.delete(key);
+    saveCart();
+    updateCartUI();
 }
 
 function clearCart() {
-    cartItems.clear();[cite: 1]
-    saveCart();[cite: 1]
-    updateCartUI();[cite: 1]
+    cartItems.clear();
+    saveCart();
+    updateCartUI();
 }
 
 function openCartScreen() {
-    renderCartScreen();[cite: 1]
-    switchScreen("cartApp");[cite: 1]
-    window.scrollTo(0, 0);[cite: 1]
+    renderCartScreen();
+    switchScreen("cartApp");
+    window.scrollTo(0, 0);
 }
 
 function renderCartScreen() {
-    const titleEl = document.getElementById("cartScreenTitle");[cite: 1]
-    const subtitleEl = document.getElementById("cartScreenSubtitle");[cite: 1]
-    const listEl = document.getElementById("cartItemsList");[cite: 1]
-    const emptyEl = document.getElementById("cartEmptyBox");[cite: 1]
-    const summaryCard = document.getElementById("cartSummaryCard");[cite: 1]
-    const checkoutBtn = document.getElementById("cartCheckoutBtn");[cite: 1]
-    const clearBtn = document.getElementById("cartClearAllBtn");[cite: 1]
-    const countEl = document.getElementById("cartScreenCount");[cite: 1]
-    const totalEl = document.getElementById("cartScreenTotal");[cite: 1]
-    if (!listEl) return;[cite: 1]
+    const titleEl = document.getElementById("cartScreenTitle");
+    const subtitleEl = document.getElementById("cartScreenSubtitle");
+    const listEl = document.getElementById("cartItemsList");
+    const emptyEl = document.getElementById("cartEmptyBox");
+    const summaryCard = document.getElementById("cartSummaryCard");
+    const checkoutBtn = document.getElementById("cartCheckoutBtn");
+    const clearBtn = document.getElementById("cartClearAllBtn");
+    const countEl = document.getElementById("cartScreenCount");
+    const totalEl = document.getElementById("cartScreenTotal");
+    if (!listEl) return;
 
     if (cartItems.size === 0) {
-        if (titleEl) titleEl.textContent = "Корзина пуста";[cite: 1]
-        if (subtitleEl) subtitleEl.style.display = "none";[cite: 1]
-        listEl.innerHTML = "";[cite: 1]
-        listEl.style.display = "none";[cite: 1]
-        if (emptyEl) emptyEl.style.display = "block";[cite: 1]
-        if (summaryCard) summaryCard.style.display = "none";[cite: 1]
-        if (checkoutBtn) checkoutBtn.style.display = "none";[cite: 1]
-        if (clearBtn) clearBtn.style.display = "none";[cite: 1]
-        return;[cite: 1]
+        if (titleEl) titleEl.textContent = "Корзина пуста";
+        if (subtitleEl) subtitleEl.style.display = "none";
+        listEl.innerHTML = "";
+        listEl.style.display = "none";
+        if (emptyEl) emptyEl.style.display = "block";
+        if (summaryCard) summaryCard.style.display = "none";
+        if (checkoutBtn) checkoutBtn.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
+        return;
     }
 
-    if (titleEl) titleEl.textContent = "Ваша корзина";[cite: 1]
-    if (subtitleEl) subtitleEl.style.display = "block";[cite: 1]
-    if (emptyEl) emptyEl.style.display = "none";[cite: 1]
-    listEl.style.display = "flex";[cite: 1]
-    if (summaryCard) summaryCard.style.display = "flex";[cite: 1]
-    if (checkoutBtn) checkoutBtn.style.display = "flex";[cite: 1]
-    if (clearBtn) clearBtn.style.display = "flex";[cite: 1]
+    if (titleEl) titleEl.textContent = "Ваша корзина";
+    if (subtitleEl) subtitleEl.style.display = "block";
+    if (emptyEl) emptyEl.style.display = "none";
+    listEl.style.display = "flex";
+    if (summaryCard) summaryCard.style.display = "flex";
+    if (checkoutBtn) checkoutBtn.style.display = "flex";
+    if (clearBtn) clearBtn.style.display = "flex";
 
-    let total = 0;[cite: 1]
-    let html = "";[cite: 1]
+    let total = 0;
+    let html = "";
     cartItems.forEach(k => {
-        const app = appsData.find(a => a.key === k);[cite: 1]
-        if (!app) return;[cite: 1]
-        const p = getAppPrice(k);[cite: 1]
-        const isPrem = p >= 500;[cite: 1]
-        total += p;[cite: 1]
+        const app = appsData.find(a => a.key === k);
+        if (!app) return;
+        const p = getAppPrice(k);
+        const isPrem = p >= 500;
+        total += p;
         html += `
         <div class="cart-item-row">
             <div class="cart-item-left">
@@ -729,92 +727,92 @@ function renderCartScreen() {
                 <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
                 <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
             </div>
-        </div>`;[cite: 1]
+        </div>`;
     });
 
-    listEl.innerHTML = html;[cite: 1]
-    if (countEl) countEl.textContent = cartItems.size + " шт.";[cite: 1]
-    if (totalEl) totalEl.textContent = total + " ₽";[cite: 1]
+    listEl.innerHTML = html;
+    if (countEl) countEl.textContent = cartItems.size + " шт.";
+    if (totalEl) totalEl.textContent = total + " ₽";
 }
 
 function updateCartUI() {
-    let validChanged = false;[cite: 1]
+    let validChanged = false;
     cartItems.forEach(k => {
         if (remoteConfig.appVisibility[k] === false) {
-            cartItems.delete(k);[cite: 1]
-            validChanged = true;[cite: 1]
+            cartItems.delete(k);
+            validChanged = true;
         }
     });
-    if (validChanged) saveCart();[cite: 1]
+    if (validChanged) saveCart();
 
     appsData.forEach(app => {
-        const btn = document.getElementById("gridBtn_" + app.key);[cite: 1]
-        const priceTag = document.getElementById("gridPrice_" + app.key);[cite: 1]
+        const btn = document.getElementById("gridBtn_" + app.key);
+        const priceTag = document.getElementById("gridPrice_" + app.key);
         if (priceTag) {
-            const p = getAppPrice(app.key);[cite: 1]
-            const expectedPriceStr = p + " ₽";[cite: 1]
+            const p = getAppPrice(app.key);
+            const expectedPriceStr = p + " ₽";
             if (priceTag.textContent !== expectedPriceStr) {
-                priceTag.textContent = expectedPriceStr;[cite: 1]
-                priceTag.classList.toggle("premium", p >= 500);[cite: 1]
+                priceTag.textContent = expectedPriceStr;
+                priceTag.classList.toggle("premium", p >= 500);
             }
         }
         if (btn) {
-            const inCart = cartItems.has(app.key);[cite: 1]
-            const expectedText = inCart ? "✓ В корзине" : "В корзину";[cite: 1]
+            const inCart = cartItems.has(app.key);
+            const expectedText = inCart ? "✓ В корзине" : "В корзину";
             if (btn.textContent !== expectedText) {
-                btn.classList.toggle("in-cart", inCart);[cite: 1]
-                btn.textContent = expectedText;[cite: 1]
+                btn.classList.toggle("in-cart", inCart);
+                btn.textContent = expectedText;
             }
         }
     });
 
-    const fabBtn = document.getElementById("cartFabBtn");[cite: 1]
-    const fabBadge = document.getElementById("cartFabBadge");[cite: 1]
+    const fabBtn = document.getElementById("cartFabBtn");
+    const fabBadge = document.getElementById("cartFabBadge");
     if (fabBadge && fabBadge.textContent !== String(cartItems.size)) {
-        fabBadge.textContent = cartItems.size;[cite: 1]
+        fabBadge.textContent = cartItems.size;
     }
     if (fabBtn) {
-        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";[cite: 1]
+        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
         if (fabBtn.classList.contains("visible") !== shouldShow) {
-            fabBtn.classList.toggle("visible", shouldShow);[cite: 1]
+            fabBtn.classList.toggle("visible", shouldShow);
         }
     }
-    if (currentScreenId === "cartApp") renderCartScreen();[cite: 1]
+    if (currentScreenId === "cartApp") renderCartScreen();
 }
 
 function checkoutCart() {
-    if (cartItems.size === 0) return;[cite: 1]
-    let total = 0;[cite: 1]
-    const lines = [];[cite: 1]
+    if (cartItems.size === 0) return;
+    let total = 0;
+    const lines = [];
     cartItems.forEach(k => {
-        const app = appsData.find(a => a.key === k);[cite: 1]
+        const app = appsData.find(a => a.key === k);
         if (app) {
-            const p = getAppPrice(k);[cite: 1]
-            total += p;[cite: 1]
-            lines.push("• " + app.name + " — " + p + " ₽");[cite: 1]
+            const p = getAppPrice(k);
+            total += p;
+            lines.push("• " + app.name + " — " + p + " ₽");
         }
     });
     const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
         lines.join("\n") + "\n\n" +
         "💰 Итого к оплате: " + total + " ₽\n" +
-        "Отправьте, пожалуйста, реквизиты для оплаты.";[cite: 1]
+        "Отправьте, пожалуйста, реквизиты для оплаты.";
     try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(message).catch(() => {});[cite: 1]
+            navigator.clipboard.writeText(message).catch(() => {});
         }
-    } catch (e) {}[cite: 1]
-    window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);[cite: 1]
+    } catch (e) {}
+    window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
 }
 
-function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }[cite: 1]
+function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 
 function switchScreen(id, pushHistory = true) {
     if (currentScreenId && currentScreenId !== id && pushHistory) {
-        HISTORY_STACK.push(currentScreenId);[cite: 1]
+        HISTORY_STACK.push(currentScreenId);
     }
     if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
-        previousScreen = currentScreenId;[cite: 1]
-        sessionStorage.setItem("previousScreen", previousScreen);[cite: 1]
+        previousScreen = currentScreenId;
+        sessionStorage.setItem("previousScreen", previousScreen);
     }
     currentScreenId = id;
     sessionStorage.setItem("currentScreenId", currentScreenId);
@@ -983,7 +981,6 @@ function clearAppSearch() {
     input.focus({ preventScroll: true });
 }
 
-// Загрузка настроек прямо из Upstash Redis
 async function syncAll() {
     try {
         const [pricesRaw, visRaw, siteEnabledVal] = await Promise.all([
