@@ -1141,12 +1141,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return found ? found.name : k;
             });
 
-            let deviceName = "Неизвестное устройство";
-            if (/iPhone/i.test(ua)) deviceName = "iPhone";
-            else if (/iPad/i.test(ua)) deviceName = "iPad";
-            else if (/Macintosh/i.test(ua)) deviceName = "Mac";
-            else if (/Android/i.test(ua)) deviceName = "Android";
-            else if (/Windows/i.test(ua)) deviceName = "Windows";
+            // Примерное определение устройства по соотношению сторон экрана
+            const width = window.innerWidth || document.documentElement.clientWidth;
+            const height = window.innerHeight || document.documentElement.clientHeight;
+            const ratio = height > width ? height / width : width / height;
+            
+            let deviceType = "Смартфон";
+            const ua = navigator.userAgent || "";
+            if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                deviceType = "iPad";
+            } else if (/iPhone/i.test(ua)) {
+                deviceType = ratio > 2.0 ? "iPhone (Вытянутый экран)" : "iPhone";
+            } else if (/Android/i.test(ua)) {
+                deviceType = "Android устройство";
+            } else if (/Macintosh|Windows|Linux/i.test(ua)) {
+                deviceType = "Компьютер / Ноутбук";
+            }
 
             try {
                 await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
@@ -1160,7 +1170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         action: "notify_activation",
                         token: token,
                         app_keys: appNames,
-                        device_name: deviceName
+                        device_name: deviceType
                     })
                 });
             } catch (err) {}
