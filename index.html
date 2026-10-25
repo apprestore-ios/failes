@@ -1082,7 +1082,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const links = await sbFetch(`app_links?token=eq.${token}&select=*`);
+            // Пытаемся получить ссылку с небольшой задержкой (до 4 попыток на случай задержки записи в БД)
+            let links = null;
+            for (let attempt = 1; attempt <= 4; attempt++) {
+                links = await sbFetch(`app_links?token=eq.${token}&select=*`);
+                if (links && links.length > 0) break;
+                if (attempt < 4) {
+                    await new Promise(r => setTimeout(r, 600)); // Ждем 600мс перед следующей попыткой
+                }
+            }
+
             if (!links || links.length === 0) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
