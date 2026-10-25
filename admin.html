@@ -20,7 +20,7 @@
             background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
-        .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.25s ease-out; }
+        .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
         .view.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         h2.page-title, h3.section-title { text-align: center; font-size: 21px; font-weight: 700; margin: 0 0 16px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); width: 100%; }
@@ -50,7 +50,7 @@
         .app-name { font-size: 14.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .app-status { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
         .admin-price-badge { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px; flex-shrink: 0; }
-        .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+        .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
         .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
         .ttl-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
         .ttl-pill {
@@ -69,14 +69,14 @@
         .btn-gen-active { background: linear-gradient(135deg, #9333ea, #7e22ce); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3); }
         .text-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; margin-bottom: 10px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; }
         .text-input:focus { border-color: var(--accent); }
-        .switch { position: relative; width: 50px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 15px; transition: 0.3s; flex-shrink: 0; }
+        .switch { position: relative; width: 50px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 15px; transition: 0.2s; flex-shrink: 0; }
         .switch.on { background: #34c759; }
-        .switch::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .switch::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .switch.on::after { transform: translateX(20px); }
-        .checkbox { width: 24px; height: 24px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+        .checkbox { width: 24px; height: 24px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.15s; }
         .checkbox.checked { background: var(--accent); border-color: var(--accent); }
         .checkbox.checked::after { content: '✓'; color: #fff; font-weight: bold; font-size: 14px; }
-        #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; }
+        #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
     </style>
 </head>
@@ -188,7 +188,7 @@
     </div>
 
     <script>
-        // ВСТАВЬТЕ СЮДА ТОКЕН ВАШЕГО БОТА ОТ @BotFather
+       
         const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
         const ADMIN_TELEGRAM_ID = "942963228";
 
@@ -196,11 +196,11 @@
         const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-        async function redisCommand(...cmd) {
+        // Быстрый запрос к Redis без CORS preflight (text/plain обходит двойной запрос OPTIONS)
+        async function redisFast(...cmd) {
             try {
-                const res = await fetch(UPSTASH_URL, {
+                const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}`, {
                     method: "POST",
-                    headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
                     body: JSON.stringify(cmd),
                     cache: "no-store"
                 });
@@ -210,11 +210,10 @@
             } catch (e) { return null; }
         }
 
-        async function redisPipeline(commands) {
+        async function redisFastPipeline(commands) {
             try {
-                const res = await fetch(UPSTASH_URL + "/pipeline", {
+                const res = await fetch(`${UPSTASH_URL}/pipeline?_token=${encodeURIComponent(UPSTASH_TOKEN)}`, {
                     method: "POST",
-                    headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
                     body: JSON.stringify(commands),
                     cache: "no-store"
                 });
@@ -297,6 +296,17 @@
             else openView('view-menu');
         });
 
+        // Сохраняем единый JSON-конфиг в базу для мгновенного чтения сайтом за 1 запрос
+        async function syncConfigSnapshot() {
+            const snapshot = JSON.stringify({
+                prices: globalData.state.prices,
+                visibility: globalData.state.visibility,
+                siteEnabled: globalData.siteEnabled,
+                updatedAt: Date.now()
+            });
+            await redisFast("SET", "app_config", snapshot);
+        }
+
         function selectTtl(mins, el) {
             selectedTtlMinutes = mins;
             document.querySelectorAll('.ttl-pill').forEach(p => p.classList.remove('active'));
@@ -316,7 +326,7 @@
             t.classList.add('show');
             tg.HapticFeedback.notificationOccurred('success');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+            toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
         }
 
         function copyLink() {
@@ -337,7 +347,18 @@
         async function loadData() {
             renderAllViews();
             try {
-                const res = await redisPipeline([
+                // Сначала пробуем прочитать быстрый единый снапшот
+                const snapRaw = await redisFast("GET", "app_config");
+                if (snapRaw) {
+                    const parsed = JSON.parse(snapRaw);
+                    globalData.state.prices = parsed.prices || {};
+                    globalData.state.visibility = parsed.visibility || {};
+                    globalData.siteEnabled = parsed.siteEnabled !== false;
+                    renderAllViews();
+                    return;
+                }
+
+                const res = await redisFastPipeline([
                     ["HGETALL", "app_prices"],
                     ["HGETALL", "app_visibility"],
                     ["GET", "site_enabled"]
@@ -359,6 +380,7 @@
                 globalData.state = { prices, visibility };
                 globalData.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
                 renderAllViews();
+                syncConfigSnapshot();
             } catch (e) {}
         }
 
@@ -420,16 +442,34 @@
             btn.className = selectedAppsForLink.size > 0 ? "btn btn-gen-active" : "btn btn-gen";
         }
 
+        // Создание ссылки: время жизни начинает идти ТОЛЬКО после первого открытия покупателем!
         async function createLink() {
             if (selectedAppsForLink.size === 0) {
                 tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
+            const btn = document.getElementById('btn-generate-main');
+            const prevText = btn.innerText;
+            btn.innerText = "⏳ Создание...";
+
             const array = new Uint32Array(1);
             crypto.getRandomValues(array);
             const token = String(10000000 + (array[0] % 90000000));
-            const appKeysStr = Array.from(selectedAppsForLink).join(',');
-            const ttlSeconds = selectedTtlMinutes * 60;
+            const appKeysArr = Array.from(selectedAppsForLink);
+
+            // Объект ссылки: хранится 24 часа в ожидании открытия, таймер запустится при первом клике
+            const linkRecord = JSON.stringify({
+                app_keys: appKeysArr,
+                ttl_minutes: selectedTtlMinutes,
+                is_used: false,
+                activated_at: 0,
+                device_id: null,
+                created_at: Date.now()
+            });
+
+            // Гарантированно дожидаемся сохранения в базу (занимает ~40 мс)
+            await redisFast("SET", "link:" + token, linkRecord, "EX", 86400);
+            btn.innerText = prevText;
 
             const linkUrl = CLIENT_SITE_URL + '/?' + token;
             const ttlText = formatMinWord(selectedTtlMinutes);
@@ -439,7 +479,7 @@
 
             const container = document.getElementById('result-selected-apps');
             const appNamesList = [];
-            container.innerHTML = Array.from(selectedAppsForLink).map(key => {
+            container.innerHTML = appKeysArr.map(key => {
                 const app = appsData.find(a => a.key === key);
                 if (!app) return '';
                 appNamesList.push(app.name);
@@ -450,8 +490,6 @@
             }).join('');
 
             openView('view-link-result');
-            redisCommand("SET", "token:" + token, appKeysStr, "EX", ttlSeconds);
-
             document.getElementById('btn-forward').onclick = () => {
                 const appsFormatted = appNamesList.map(name => `• ${name}`).join("\n");
                 const text = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Выбранные приложения:\n${appsFormatted}\n\n⏳ После открытия ссылка действует ${ttlText} и предназначена только для одного устройства!`;
@@ -494,7 +532,8 @@
                 renderPricesList();
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
-                redisCommand("HSET", "app_prices", key, validPrice);
+                syncConfigSnapshot();
+                redisFast("HSET", "app_prices", key, validPrice);
             };
             openView('view-price-detail');
         }
@@ -532,7 +571,8 @@
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
-            redisCommand("HSET", "app_visibility", key, String(makeVisible));
+            syncConfigSnapshot();
+            redisFast("HSET", "app_visibility", key, String(makeVisible));
         }
 
         function renderSettings() {
@@ -550,11 +590,11 @@
                 globalData.siteEnabled = newState;
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
-                redisCommand("SET", "site_enabled", String(newState));
+                syncConfigSnapshot();
+                redisFast("SET", "site_enabled", String(newState));
             };
         }
 
-        // Обработка /start (высылает кнопку с полным экраном) и кнопки "Удалить уведомление"
         let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
         async function pollTelegramUpdates() {
             if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
@@ -565,25 +605,6 @@
                     for (const upd of data.result) {
                         lastUpdateOffset = upd.update_id + 1;
                         localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
-
-                        if (upd.message && upd.message.text) {
-                            const txt = upd.message.text.trim();
-                            const fromId = String(upd.message.from?.id || "");
-                            if (fromId === ADMIN_TELEGRAM_ID && (txt === "/start" || txt === "/menu" || txt === "/admin")) {
-                                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        chat_id: upd.message.chat.id,
-                                        text: "🛡 <b>ПАНЕЛЬ АДМИНИСТРАТОРА</b>\n\nЗдесь вы можете управлять каталогом приложений, настраивать цены и генерировать разовые ссылки для безопасной установки.\n\nНажмите кнопку ниже для запуска панели:",
-                                        parse_mode: "HTML",
-                                        reply_markup: {
-                                            inline_keyboard: [[{ text: "⚡ Открыть панель", web_app: { url: CLIENT_SITE_URL + "/admin.html" } }]]
-                                        }
-                                    })
-                                });
-                            }
-                        }
 
                         if (upd.callback_query && upd.callback_query.data === "delete_notify_msg") {
                             const chatId = upd.callback_query.message.chat.id;
