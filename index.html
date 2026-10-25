@@ -416,18 +416,6 @@ async function redisFast(...cmd) {
     } catch (e) { return null; }
 }
 
-async function redisFastPipeline(commands) {
-    try {
-        const res = await fetch(`${UPSTASH_URL}/pipeline?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
-            method: "POST",
-            body: JSON.stringify(commands),
-            cache: "no-store"
-        });
-        if (!res.ok) return null;
-        return await res.json();
-    } catch (e) { return null; }
-}
-
 document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
 document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
 let lastTouchEnd = 0;
@@ -514,7 +502,6 @@ const LOCKED_SCREENS = ["tokenErrorApp"];
 const INFO_SCREENS = ["guideApp", "tipsApp"];
 const HISTORY_STACK = [];
 
-// Тройное сохранение сессии на первом устройстве (LocalStorage + SessionStorage + Cookie) для поддержки перезагрузки страницы
 function saveActiveTokenSession(dataObj) {
     const str = JSON.stringify(dataObj);
     try { localStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
@@ -608,11 +595,10 @@ function estimateAppleDeviceModel() {
     return known[px] || "iPhone";
 }
 
-// Отправка уведомления строго 1 раз (защищено атомарным ключом notif:<token> NX в Redis)
 async function sendTelegramNotificationOnce(token, appKeys, ttlMinutes) {
     if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
     const notifLock = await redisFast("SET", "notif:" + token, "1", "NX", "EX", 86400);
-    if (notifLock !== "OK") return; // Уведомление по этому токену уже было отправлено!
+    if (notifLock !== "OK") return;
 
     const appNames = appKeys.map(k => appsData.find(a => a.key === k)?.name).filter(Boolean);
     const finalDevice = estimateAppleDeviceModel();
@@ -1089,6 +1075,7 @@ function clearAppSearch() {
     input.focus({ preventScroll: true });
 }
 
+// Фоновая мгновенная синхронизация без задержек и без блокировки интерфейса
 async function syncAll() {
     try {
         const snapRaw = await redisFast("GET", "app_config");
@@ -1111,12 +1098,12 @@ async function syncAll() {
                 if (!siteEnabled) return;
             }
             filterApps();
-            return;
         }
     } catch (e) {}
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Мгновенно отрисовываем карточки из массива без ожидания сети
     generateAppsGrid();
     const token = extractTokenFromLocation();
     const myDeviceId = getOrCreateDeviceId();
@@ -1124,13 +1111,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (token) {
         isFromToken = true;
 
-        // Игнорируем ботов предпросмотра ссылок Telegram/WhatsApp, чтобы они не сжигали ссылку
+        // Отсекаем ботов предпросмотра мессенджеров
         const ua = navigator.userAgent || "";
         if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) {
             return;
         }
 
-        // 1. Проверяем локальную сессию этого устройства (позволяет обновлять страницу на 1 устройстве)
+        // Проверяем сохраненную сессию на первом устройстве
         const savedSession = getActiveTokenSession(token);
         if (savedSession && savedSession.token === token) {
             const timeLeft = savedSession.expires_at - Date.now();
@@ -1150,23 +1137,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // 2. АТОМАРНАЯ ПРОВЕРКА И БЛОКИРОВКА В REDIS НА 1 УСТРОЙСТВО
+        // Атомарный захват в Redis на первое устройство
         try {
-            // Пытаемся атомарно захватить замок на этот токен (SET NX сработает ТОЛЬКО у 1-го устройства в мире!)
             const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", 86400);
 
             if (lockResult !== "OK") {
-                // Замок уже кем-то занят! Проверяем, кем именно:
                 const lockOwner = await redisFast("GET", "lock:" + token);
                 if (lockOwner !== myDeviceId) {
-                    // Это ДРУГОЕ устройство — мгновенно блокируем и НЕ шлем никаких уведомлений!
                     isTokenExpired = true;
                     switchScreen("tokenErrorApp");
                     return;
                 }
             }
 
-            // Читаем данные ссылки и сразу удаляем неактивированный оригинал из базы
             const rawLinkJson = await redisFast("GET", "link:" + token);
             if (!rawLinkJson) {
                 isTokenExpired = true;
@@ -1193,10 +1176,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            // Удаляем ссылку из базы, чтобы ни одно другое устройство больше никогда не смогло её прочитать
+            // Сжигаем оригинал ссылки в базе
             await redisFast("DEL", "link:" + token);
 
-            // Сохраняем сессию в браузере первого устройства (для перезагрузок страницы)
             saveActiveTokenSession({
                 token: token,
                 app_keys: linkObj.app_keys,
@@ -1209,7 +1191,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             startTokenCountdown(expiresAt, token);
             switchScreen("tokenApp");
 
-            // Отправляем уведомление в Telegram строго 1 раз
             sendTelegramNotificationOnce(token, linkObj.app_keys, ttlMins);
             syncAll();
             setInterval(syncAll, 1000);
@@ -1221,32 +1202,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    await syncAll();
-    if (!isSiteCurrentlyEnabled) {
-        switchScreen("maintenanceApp");
-    } else {
-        let lastScreen = sessionStorage.getItem("currentScreenId");
-        let hasEntered = sessionStorage.getItem("site_access") === "true";
-        if (hasEntered) {
-            if (INFO_SCREENS.includes(lastScreen)) {
-                previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
-                switchScreen(lastScreen);
-            } else if (lastScreen === "cartApp") {
-                renderCartScreen();
-                switchScreen("cartApp");
-            } else {
-                switchScreen("mainApp");
-            }
+    // Обычный вход в каталог: открываем экран СРАЗУ же без ожидания ответа базы
+    let lastScreen = sessionStorage.getItem("currentScreenId");
+    let hasEntered = sessionStorage.getItem("site_access") === "true";
+    if (hasEntered) {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
+            switchScreen(lastScreen);
+        } else if (lastScreen === "cartApp") {
+            renderCartScreen();
+            switchScreen("cartApp");
         } else {
-            if (INFO_SCREENS.includes(lastScreen)) {
-                previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
-                switchScreen(lastScreen);
-            } else {
-                switchScreen("welcomeApp");
-            }
+            switchScreen("mainApp");
+        }
+    } else {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
+            switchScreen(lastScreen);
+        } else {
+            switchScreen("welcomeApp");
         }
     }
 
+    // Запускаем фоновую синхронизацию цен и статуса
+    syncAll();
     setInterval(syncAll, 800);
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") syncAll();
