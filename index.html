@@ -404,8 +404,12 @@ const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
 async function redisFast(...cmd) {
     try {
-        const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
+        const res = await fetch(`${UPSTASH_URL}`, {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${UPSTASH_TOKEN}`,
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(cmd),
             cache: "no-store"
         });
@@ -596,7 +600,7 @@ function estimateAppleDeviceModel() {
 
 async function sendTelegramNotificationOnce(token, appKeys, ttlMinutes) {
     if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
-    const notifLock = await redisFast("SET", "notif:" + token, "1", "NX", "EX", 86400);
+    const notifLock = await redisFast("SET", "notif:" + token, "1", "NX", "EX", "86400");
     if (notifLock !== "OK") return;
 
     const appNames = appKeys.map(k => appsData.find(a => a.key === k)?.name).filter(Boolean);
@@ -1133,7 +1137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", 86400);
+            const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", "86400");
 
             if (lockResult !== "OK") {
                 const lockOwner = await redisFast("GET", "lock:" + token);
