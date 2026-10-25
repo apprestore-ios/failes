@@ -1081,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-       try {
+        try {
             const links = await sbFetch(`app_links?token=eq.${token}&select=*`);
             if (!links || links.length === 0) {
                 isTokenExpired = true;
@@ -1093,20 +1093,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             const now = Date.now();
             const createdAt = linkObj.created_at ? new Date(linkObj.created_at).getTime() : now;
 
-            // 1. ПРОВЕРКА ДО АКТИВАЦИИ: Если ссылка еще не использовалась, 
-            // но с момента её создания прошло больше 24 часов (24 * 60 * 60 * 1000 мс)
+            // 1. ПРОВЕРКА ДО АКТИВАЦИИ: 24 часа с момента создания
             const maxWaitBeforeActivation = 24 * 60 * 60 * 1000;
             if (!linkObj.is_used && (now - createdAt > maxWaitBeforeActivation)) {
-                // Удаляем просроченную ссылку из базы
                 await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
 
-            // 2. ЕСЛИ УЖЕ ИСПОЛЬЗОВАНА: Если по ссылке уже заходили ранее
+            // 2. ЕСЛИ УЖЕ ИСПОЛЬЗОВАНА
             if (linkObj.is_used) {
-                // Сразу удаляем из базы на всякий случай и блокируем доступ
                 await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
@@ -1114,7 +1111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             // 3. АКТИВАЦИЯ ССЫЛКИ ПЕРВЫМ ПОЛЬЗОВАТЕЛЕМ
-            const ttlMins = Number(linkObj.ttl_minutes) || 3; // То время, которое вы выбрали
+            const ttlMins = Number(linkObj.ttl_minutes) || 3;
             const ttlMs = ttlMins * 60 * 1000;
 
             await sbFetch(`app_links?token=eq.${token}`, {
@@ -1126,8 +1123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
             });
 
-            // 4. АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ: Сразу удаляем активированную ссылку из базы данных,
-            // чтобы она не висела в таблице (а клиент будет работать по таймеру сессии)
+            // 4. АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ ИЗ БАЗЫ
             await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
 
             // 5. Отправка уведомления в Telegram администратору
@@ -1136,7 +1132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return found ? found.name : k;
             });
 
-            const ua = navigator.userAgent || "";
             let deviceName = "Неизвестное устройство";
             if (/iPhone/i.test(ua)) deviceName = "iPhone";
             else if (/iPad/i.test(ua)) deviceName = "iPad";
@@ -1168,20 +1163,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 expires_at: expiresAt,
                 ttl_minutes: ttlMins
             });
-
-            updateTokenHeroText(ttlMins);
-            renderTokenAppsList(linkObj.app_keys);
-            startTokenCountdown(expiresAt, token);
-            switchScreen("tokenApp");
-
-            syncAll();
-            setInterval(syncAll, 1000);
-            return;
-        } catch (e) {
-            isTokenExpired = true;
-            switchScreen("tokenErrorApp");
-            return;
-        }
 
             updateTokenHeroText(ttlMins);
             renderTokenAppsList(linkObj.app_keys);
