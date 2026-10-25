@@ -17,7 +17,7 @@
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: 0;
             background-color: #0b0f17;
-            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
+            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D8%B8%D0%BF%D1%8B/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
         .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
@@ -188,7 +188,7 @@
     </div>
 
     <script>
-       
+        
         const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
         const ADMIN_TELEGRAM_ID = "942963228";
 
@@ -196,10 +196,9 @@
         const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-        // Быстрый запрос к Redis без CORS preflight (text/plain обходит двойной запрос OPTIONS)
         async function redisFast(...cmd) {
             try {
-                const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}`, {
+                const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
                     method: "POST",
                     body: JSON.stringify(cmd),
                     cache: "no-store"
@@ -207,18 +206,6 @@
                 if (!res.ok) return null;
                 const data = await res.json();
                 return data.result;
-            } catch (e) { return null; }
-        }
-
-        async function redisFastPipeline(commands) {
-            try {
-                const res = await fetch(`${UPSTASH_URL}/pipeline?_token=${encodeURIComponent(UPSTASH_TOKEN)}`, {
-                    method: "POST",
-                    body: JSON.stringify(commands),
-                    cache: "no-store"
-                });
-                if (!res.ok) return null;
-                return await res.json();
             } catch (e) { return null; }
         }
 
@@ -296,7 +283,6 @@
             else openView('view-menu');
         });
 
-        // Сохраняем единый JSON-конфиг в базу для мгновенного чтения сайтом за 1 запрос
         async function syncConfigSnapshot() {
             const snapshot = JSON.stringify({
                 prices: globalData.state.prices,
@@ -347,7 +333,6 @@
         async function loadData() {
             renderAllViews();
             try {
-                // Сначала пробуем прочитать быстрый единый снапшот
                 const snapRaw = await redisFast("GET", "app_config");
                 if (snapRaw) {
                     const parsed = JSON.parse(snapRaw);
@@ -355,32 +340,7 @@
                     globalData.state.visibility = parsed.visibility || {};
                     globalData.siteEnabled = parsed.siteEnabled !== false;
                     renderAllViews();
-                    return;
                 }
-
-                const res = await redisFastPipeline([
-                    ["HGETALL", "app_prices"],
-                    ["HGETALL", "app_visibility"],
-                    ["GET", "site_enabled"]
-                ]);
-                if (!res) return;
-                const pricesRaw = res[0]?.result;
-                const visRaw = res[1]?.result;
-                const siteEnabledVal = res[2]?.result;
-
-                const prices = {};
-                if (Array.isArray(pricesRaw)) {
-                    for (let i = 0; i < pricesRaw.length; i += 2) prices[pricesRaw[i]] = pricesRaw[i+1];
-                }
-                const visibility = {};
-                if (Array.isArray(visRaw)) {
-                    for (let i = 0; i < visRaw.length; i += 2) visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
-                }
-
-                globalData.state = { prices, visibility };
-                globalData.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
-                renderAllViews();
-                syncConfigSnapshot();
             } catch (e) {}
         }
 
@@ -442,7 +402,6 @@
             btn.className = selectedAppsForLink.size > 0 ? "btn btn-gen-active" : "btn btn-gen";
         }
 
-        // Создание ссылки: время жизни начинает идти ТОЛЬКО после первого открытия покупателем!
         async function createLink() {
             if (selectedAppsForLink.size === 0) {
                 tg.HapticFeedback.notificationOccurred('error');
@@ -457,7 +416,6 @@
             const token = String(10000000 + (array[0] % 90000000));
             const appKeysArr = Array.from(selectedAppsForLink);
 
-            // Объект ссылки: хранится 24 часа в ожидании открытия, таймер запустится при первом клике
             const linkRecord = JSON.stringify({
                 app_keys: appKeysArr,
                 ttl_minutes: selectedTtlMinutes,
@@ -467,7 +425,8 @@
                 created_at: Date.now()
             });
 
-            // Гарантированно дожидаемся сохранения в базу (занимает ~40 мс)
+            // Сбрасываем старые замки (если совпал код) и записываем новую ссылку
+            await redisFast("DEL", "lock:" + token, "notif:" + token);
             await redisFast("SET", "link:" + token, linkRecord, "EX", 86400);
             btn.innerText = prevText;
 
@@ -533,7 +492,6 @@
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
                 syncConfigSnapshot();
-                redisFast("HSET", "app_prices", key, validPrice);
             };
             openView('view-price-detail');
         }
@@ -572,7 +530,6 @@
 
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
             syncConfigSnapshot();
-            redisFast("HSET", "app_visibility", key, String(makeVisible));
         }
 
         function renderSettings() {
@@ -591,14 +548,20 @@
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
                 syncConfigSnapshot();
-                redisFast("SET", "site_enabled", String(newState));
             };
         }
 
+        // Автоматическое отключение старого вебхука Cloudflare и удаление уведомлений по кнопке
+        let webhookCleared = false;
         let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
+
         async function pollTelegramUpdates() {
             if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
             try {
+                if (!webhookCleared) {
+                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=false`);
+                    webhookCleared = true;
+                }
                 const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateOffset}&timeout=0`);
                 const data = await res.json();
                 if (data.ok && Array.isArray(data.result)) {
@@ -606,7 +569,7 @@
                         lastUpdateOffset = upd.update_id + 1;
                         localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
 
-                        if (upd.callback_query && upd.callback_query.data === "delete_notify_msg") {
+                        if (upd.callback_query && (upd.callback_query.data === "delete_notify_msg" || upd.callback_query.data === "del_msg")) {
                             const chatId = upd.callback_query.message.chat.id;
                             const msgId = upd.callback_query.message.message_id;
                             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
@@ -622,7 +585,7 @@
                 }
             } catch (e) {}
         }
-        setInterval(pollTelegramUpdates, 2000);
+        setInterval(pollTelegramUpdates, 1500);
         pollTelegramUpdates();
 
         loadData();
