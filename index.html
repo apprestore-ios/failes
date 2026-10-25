@@ -1090,36 +1090,63 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             const linkObj = links[0];
-            if (linkObj.is_used && linkObj.device_id && linkObj.device_id !== myDeviceId) {
+            const now = Date.now();
+            const createdAt = linkObj.created_at ? new Date(linkObj.created_at).getTime() : now;
+
+            // 1. ПРОВЕРКА ДО АКТИВАЦИИ: Если ссылка еще не использовалась, 
+            // но с момента её создания прошло больше 24 часов (24 * 60 * 60 * 1000 мс)
+            const maxWaitBeforeActivation = 24 * 60 * 60 * 1000;
+            if (!linkObj.is_used && (now - createdAt > maxWaitBeforeActivation)) {
+                // Удаляем просроченную ссылку из базы
+                await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
 
-            const now = Date.now();
-            const ttlMins = Number(linkObj.ttl_minutes) || 3;
-            const ttlMs = ttlMins * 60 * 1000;
-            let activatedAt = linkObj.activated_at > 0 ? Number(linkObj.activated_at) : now;
+            // 2. ЕСЛИ УЖЕ ИСПОЛЬЗОВАНА: Если по ссылке уже заходили ранее
+            if (linkObj.is_used) {
+                // Сразу удаляем из базы на всякий случай и блокируем доступ
+                await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
 
-            if (!linkObj.is_used) {
-                await sbFetch(`app_links?token=eq.${token}`, {
-                    method: "PATCH",
+            // 3. АКТИВАЦИЯ ССЫЛКИ ПЕРВЫМ ПОЛЬЗОВАТЕЛЕМ
+            const ttlMins = Number(linkObj.ttl_minutes) || 3; // То время, которое вы выбрали
+            const ttlMs = ttlMins * 60 * 1000;
+
+            await sbFetch(`app_links?token=eq.${token}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    is_used: true,
+                    activated_at: now,
+                    device_id: myDeviceId
+                })
+            });
+
+            // 4. АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ: Сразу удаляем активированную ссылку из базы данных,
+            // чтобы она не висела в таблице (а клиент будет работать по таймеру сессии)
+            await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
+
+            // 5. Отправка уведомления в Telegram администратору
+            try {
+                await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_KEY
+                    },
                     body: JSON.stringify({
-                        is_used: true,
-                        activated_at: now,
+                        action: "notify_activation",
+                        app_keys: linkObj.app_keys,
                         device_id: myDeviceId
                     })
                 });
-                activatedAt = now;
-            }
+            } catch (err) {}
 
-            const expiresAt = activatedAt + ttlMs;
-            if (now >= expiresAt) {
-                isTokenExpired = true;
-                switchScreen("tokenErrorApp");
-                return;
-            }
-
+            const expiresAt = now + ttlMs;
             saveActiveTokenSession({
                 token: token,
                 app_keys: linkObj.app_keys,
