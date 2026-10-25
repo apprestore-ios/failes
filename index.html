@@ -1081,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        try {
+       try {
             const links = await sbFetch(`app_links?token=eq.${token}&select=*`);
             if (!links || links.length === 0) {
                 isTokenExpired = true;
@@ -1131,17 +1131,32 @@ document.addEventListener("DOMContentLoaded", async () => {
             await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
 
             // 5. Отправка уведомления в Telegram администратору
+            const appNames = (linkObj.app_keys || []).map(k => {
+                const found = appsData.find(a => a.key === k.trim());
+                return found ? found.name : k;
+            });
+
+            const ua = navigator.userAgent || "";
+            let deviceName = "Неизвестное устройство";
+            if (/iPhone/i.test(ua)) deviceName = "iPhone";
+            else if (/iPad/i.test(ua)) deviceName = "iPad";
+            else if (/Macintosh/i.test(ua)) deviceName = "Mac";
+            else if (/Android/i.test(ua)) deviceName = "Android";
+            else if (/Windows/i.test(ua)) deviceName = "Windows";
+
             try {
                 await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "apikey": SUPABASE_KEY
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`
                     },
                     body: JSON.stringify({
                         action: "notify_activation",
-                        app_keys: linkObj.app_keys,
-                        device_id: myDeviceId
+                        token: token,
+                        app_keys: appNames,
+                        device_name: deviceName
                     })
                 });
             } catch (err) {}
@@ -1153,6 +1168,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                 expires_at: expiresAt,
                 ttl_minutes: ttlMins
             });
+
+            updateTokenHeroText(ttlMins);
+            renderTokenAppsList(linkObj.app_keys);
+            startTokenCountdown(expiresAt, token);
+            switchScreen("tokenApp");
+
+            syncAll();
+            setInterval(syncAll, 1000);
+            return;
+        } catch (e) {
+            isTokenExpired = true;
+            switchScreen("tokenErrorApp");
+            return;
+        }
 
             updateTokenHeroText(ttlMins);
             renderTokenAppsList(linkObj.app_keys);
