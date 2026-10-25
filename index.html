@@ -395,27 +395,24 @@
 </div>
 
 <script>
-const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
-const ADMIN_TELEGRAM_ID = "942963228";
-
-const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
-const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
+const SUPABASE_URL = "https://ccghjrzpieyuebiclpqm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_fwlyOR63ASdotUgvlsMxdQ_UwVlqHB5";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-async function redisFast(...cmd) {
+async function sbFetch(path, options = {}) {
     try {
-        const res = await fetch(`${UPSTASH_URL}`, {
-            method: "POST",
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+            ...options,
             headers: {
-                "Authorization": `Bearer ${UPSTASH_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(cmd),
-            cache: "no-store"
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
         });
         if (!res.ok) return null;
-        const data = await res.json();
-        return data.result;
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
     } catch (e) { return null; }
 }
 
@@ -573,68 +570,6 @@ function extractTokenFromLocation() {
     const directNumMatch = path.match(/^\/(\d{6,16})$/);
     if (directNumMatch) return directNumMatch[1];
     return null;
-}
-
-function estimateAppleDeviceModel() {
-    const ua = navigator.userAgent || "";
-    if (/iPad/i.test(ua)) return "iPad";
-    if (!/iPhone/i.test(ua)) return /Android/i.test(ua) ? "Android" : "ПК / Смартфон";
-    const w = Math.min(screen.width, screen.height);
-    const h = Math.max(screen.width, screen.height);
-    const dpr = window.devicePixelRatio || 1;
-    const px = Math.round(w * dpr) + "x" + Math.round(h * dpr);
-    const known = {
-        "1320x2868": "iPhone 16 Pro Max",
-        "1206x2622": "iPhone 16 Pro",
-        "1290x2796": "iPhone 15 Pro Max",
-        "1179x2556": "iPhone 15 Pro",
-        "1284x2778": "iPhone 13 Pro Max / 14 Plus",
-        "1170x2532": "iPhone 13 Pro / 14",
-        "1242x2688": "iPhone 11 Pro Max",
-        "1125x2436": "iPhone 11 Pro / X / XS",
-        "828x1792": "iPhone 11 / XR",
-        "1080x2340": "iPhone 13 mini"
-    };
-    return known[px] || "iPhone";
-}
-
-async function sendTelegramNotificationOnce(token, appKeys, ttlMinutes) {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
-    const notifLock = await redisFast("SET", "notif:" + token, "1", "NX", "EX", "86400");
-    if (notifLock !== "OK") return;
-
-    const appNames = appKeys.map(k => appsData.find(a => a.key === k)?.name).filter(Boolean);
-    const finalDevice = estimateAppleDeviceModel();
-    const timeStr = new Date().toLocaleTimeString("ru-RU", {
-        timeZone: "Asia/Yekaterinburg",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-    });
-
-    const notifyText =
-        `📲 <b>Ссылка для установки была активирована!</b>\n\n` +
-        `📱 <b>Приложения (${appKeys.length}):</b>\n- ${appNames.join("\n- ")}\n\n` +
-        `💻 <b>Устройство:</b> ${finalDevice}\n\n` +
-        `⏳ <b>Срок действия:</b> ${ttlMinutes} мин.\n\n` +
-        `⏰ <b>Время активации:</b> ${timeStr} (ЕКБ)\n\n` +
-        `🔢 <b>Код ссылки:</b> <code>${token}</code>\n\n` +
-        `<i>Ссылка привязана к устройству покупателя.</i>`;
-
-    try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                chat_id: Number(ADMIN_TELEGRAM_ID),
-                text: notifyText,
-                parse_mode: "HTML",
-                reply_markup: {
-                    inline_keyboard: [[{ text: "🗑 Удалить уведомление", callback_data: "delete_notify_msg" }]]
-                }
-            })
-        });
-    } catch (e) {}
 }
 
 function updateTokenHeroText(ttlMinutes) {
@@ -1080,27 +1015,37 @@ function clearAppSearch() {
 
 async function syncAll() {
     try {
-        const snapRaw = await redisFast("GET", "app_config");
-        if (snapRaw) {
-            const parsed = JSON.parse(snapRaw);
-            if (parsed.prices) remoteConfig.appPrices = parsed.prices;
-            if (parsed.visibility) remoteConfig.appVisibility = parsed.visibility;
-            updateCartUI();
+        const [settingsRes, pricesRes, visRes] = await Promise.all([
+            sbFetch("site_settings?select=*"),
+            sbFetch("app_prices?select=*"),
+            sbFetch("app_visibility?select=*")
+        ]);
 
-            if (!isFromToken) {
-                const siteEnabled = parsed.siteEnabled !== false;
-                if (isSiteCurrentlyEnabled !== siteEnabled) {
-                    isSiteCurrentlyEnabled = siteEnabled;
-                    if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
-                    else {
-                        let lastScreen = sessionStorage.getItem("currentScreenId");
-                        switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
-                    }
-                }
-                if (!siteEnabled) return;
-            }
-            filterApps();
+        if (pricesRes && Array.isArray(pricesRes)) {
+            pricesRes.forEach(row => { remoteConfig.appPrices[row.app_key] = row.price; });
         }
+        if (visRes && Array.isArray(visRes)) {
+            visRes.forEach(row => { remoteConfig.appVisibility[row.app_key] = row.is_visible; });
+        }
+        updateCartUI();
+
+        if (!isFromToken) {
+            let siteEnabled = true;
+            if (settingsRes && Array.isArray(settingsRes)) {
+                const s = settingsRes.find(x => x.key === "site_enabled");
+                if (s) siteEnabled = s.value === "true";
+            }
+            if (isSiteCurrentlyEnabled !== siteEnabled) {
+                isSiteCurrentlyEnabled = siteEnabled;
+                if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
+                else {
+                    let lastScreen = sessionStorage.getItem("currentScreenId");
+                    switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
+                }
+            }
+            if (!siteEnabled) return;
+        }
+        filterApps();
     } catch (e) {}
 }
 
@@ -1137,25 +1082,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", "86400");
-
-            if (lockResult !== "OK") {
-                const lockOwner = await redisFast("GET", "lock:" + token);
-                if (lockOwner !== myDeviceId) {
-                    isTokenExpired = true;
-                    switchScreen("tokenErrorApp");
-                    return;
-                }
-            }
-
-            const rawLinkJson = await redisFast("GET", "link:" + token);
-            if (!rawLinkJson) {
+            const links = await sbFetch(`app_links?token=eq.${token}&select=*`);
+            if (!links || links.length === 0) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
 
-            const linkObj = JSON.parse(rawLinkJson);
+            const linkObj = links[0];
             if (linkObj.is_used && linkObj.device_id && linkObj.device_id !== myDeviceId) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
@@ -1165,16 +1099,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             const now = Date.now();
             const ttlMins = Number(linkObj.ttl_minutes) || 3;
             const ttlMs = ttlMins * 60 * 1000;
-            const activatedAt = linkObj.activated_at > 0 ? Number(linkObj.activated_at) : now;
-            const expiresAt = activatedAt + ttlMs;
+            let activatedAt = linkObj.activated_at > 0 ? Number(linkObj.activated_at) : now;
 
+            if (!linkObj.is_used) {
+                await sbFetch(`app_links?token=eq.${token}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        is_used: true,
+                        activated_at: now,
+                        device_id: myDeviceId
+                    })
+                });
+                activatedAt = now;
+            }
+
+            const expiresAt = activatedAt + ttlMs;
             if (now >= expiresAt) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
-
-            await redisFast("DEL", "link:" + token);
 
             saveActiveTokenSession({
                 token: token,
@@ -1188,7 +1132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             startTokenCountdown(expiresAt, token);
             switchScreen("tokenApp");
 
-            sendTelegramNotificationOnce(token, linkObj.app_keys, ttlMins);
             syncAll();
             setInterval(syncAll, 1000);
             return;
