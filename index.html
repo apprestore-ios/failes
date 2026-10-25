@@ -18,19 +18,19 @@
       }
       @font-face {
           font-family: "SFSymbols";
-          src: url("https://github.com/apprestore-ios/failes/releases/download/%D0%A8%D1%80%D0%B8%D1%84%D1%82%D1%8B/SFSYMBOLS.woff2") format("woff2"),
-               url("https://github.com/apprestore-ios/failes/releases/download/%D0%A8%D1%80%D0%B8%D1%84%D1%82%D1%8B/SFSYMBOLS.woff") format("woff"),
-               url("https://github.com/apprestore-ios/failes/releases/download/%D0%A8%D1%80%D0%B8%D1%84%D1%82%D1%8B/SFSYMBOLS.ttf") format("truetype"),
-               url("https://github.com/apprestore-ios/failes/releases/download/%D0%A8%D1%80%D0%B8%D1%84%D1%82%D1%8B/SFSYMBOLS.otf") format("opentype");
+          src: url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff2") format("woff2"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff") format("woff"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.ttf") format("truetype"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype");
           font-weight: normal; font-style: normal; font-display: block;
       }
       .sf-icon {
           font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
           font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
           text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
-          vertical-align: middle; margin: 0; padding: 0; visibility: hidden;
+          vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
       }
-      .fonts-loaded .sf-icon { visibility: visible; }
+      html.fonts-loaded .sf-icon { opacity: 1; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
@@ -44,7 +44,7 @@
       input { user-select: text; -webkit-user-select: text; }
       .aurora-bg {
           position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10;
-          background-image: linear-gradient(135deg, rgba(11,15,23,0.4) 0%, rgba(17,24,39,0.6) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
+          background-image: linear-gradient(135deg, rgba(11,15,23,0.4) 0%, rgba(17,24,39,0.6) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg");
           background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
       }
       .top-navbar {
@@ -89,8 +89,9 @@
       .container {
           width: 100%; max-width: 430px; padding: 0 16px; z-index: 2; display: none;
           flex-direction: column; justify-content: flex-start; flex: 1;
+          opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
-      .container.active-screen { display: flex; }
+      .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
       #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp, #guideApp, #tipsApp { justify-content: flex-start; align-items: center; text-align: center; }
 
@@ -127,6 +128,8 @@
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
 
       .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 2px; }
+      .cart-items-list::-webkit-scrollbar { width: 4px; }
+      .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
       .cart-empty-alert {
           display: none; width: 100%; padding: 18px 16px; border-radius: 16px;
           background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.55);
@@ -150,7 +153,8 @@
       .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100%; box-shadow: var(--box-shadow); display: flex; flex-direction: column; gap: 14px; }
       .auth-title { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
       .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; }
-      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
+      .btn:active { transform: scale(.975); }
       .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
       .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text); box-shadow: none; }
       .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; }
@@ -159,8 +163,8 @@
 
       .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
       .categories-bar::-webkit-scrollbar { display: none; }
-      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
       .filter-chip .sf-icon { font-size: 18px; }
 
       .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
@@ -178,15 +182,28 @@
       .menu-modal.active { display: flex; }
       .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 22px 18px max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
       .menu-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-      .menu-item { padding: 15px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+      .menu-item { padding: 15px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; transition: transform 0.2s ease; }
+      .menu-item:active { transform: scale(0.98); }
       .menu-item-left { display: flex; align-items: center; gap: 12px; }
       .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; }
-      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; }
+      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+    <script>
+        if ("fonts" in document) {
+            document.fonts.load('1em "SFSymbols"').then(function() {
+                document.documentElement.classList.add("fonts-loaded");
+            }).catch(function() {
+                document.documentElement.classList.add("fonts-loaded");
+            });
+        } else {
+            document.documentElement.classList.add("fonts-loaded");
+        }
+    </script>
 </head>
 <body>
 
@@ -194,7 +211,7 @@
 
 <header class="top-navbar">
     <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
-        <img src="https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/logo_site.png" alt="logo" class="nav-logo">
+        <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" alt="logo" class="nav-logo">
         <span class="nav-title">AppRestore IOS</span>
     </a>
     <div class="nav-right-actions">
@@ -250,7 +267,7 @@
         <div class="info-box"><div class="info-box-num">без ПК</div><div class="info-box-label">нужны только iPhone и Safari</div></div>
         <div class="info-box"><div class="info-box-num">на сайте</div><div class="info-box-label">быстрый выбор в корзину</div></div>
         <div class="info-box"><div class="info-box-num">удобно</div><div class="info-box-label">не нужен сертификат разработчика</div></div>
-        <div class="info-box"><div class="info-box-num">100%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от Apple ID</div></div>
+        <div class="info-box"><div class="info-box-num">100%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от учетной записи Apple ID</div></div>
     </div>
 </div>
 
@@ -275,7 +292,7 @@
     <div class="catalog-header">
         <div class="catalog-title">Всего приложений: <span id="appCountDisplay">0</span></div>
     </div>
-    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;">Ничего не найдено</div>
+    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
 </div>
 
@@ -290,8 +307,13 @@
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="auth-title" id="cartScreenTitle" style="text-align: center; font-size: 20px; margin-bottom: 0;">Ваша корзина</div>
         <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>
-        <div id="cartEmptyBox" class="cart-empty-alert">Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!</div>
+
+        <div id="cartEmptyBox" class="cart-empty-alert">
+            Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
+        </div>
+
         <div class="cart-items-list" id="cartItemsList"></div>
+
         <div class="cart-summary-card" id="cartSummaryCard">
             <div class="cart-summary-row">
                 <span>Выбрано приложений:</span>
@@ -302,6 +324,7 @@
                 <span id="cartScreenTotal">0 ₽</span>
             </div>
         </div>
+
         <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
             <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF9E8;</span> Заказать установку в Telegram
         </button>
@@ -314,7 +337,7 @@
     <div class="hero-section">
         <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
         <div class="hero-desc-box" style="margin-bottom: 14px; margin-top: 10px;">
-            <p class="hero-desc" id="tokenHeroDesc">Проверка персональной ссылки...</p>
+            <p class="hero-desc" id="tokenHeroDesc">Персональная ссылка активирована. Данная ссылка действует ограниченное время и только на одном устройстве! Установите приложения и обратитесь к продавцу.</p>
         </div>
     </div>
     <div class="catalog-notice" style="margin-top: 0;">
@@ -372,22 +395,19 @@
 </div>
 
 <script>
-const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
-const TELEGRAM_ADMIN_ID = "942963228";
 
-if ("fonts" in document) {
-    document.fonts.ready.then(() => document.body.classList.add("fonts-loaded")).catch(() => document.body.classList.add("fonts-loaded"));
-} else { document.body.classList.add("fonts-loaded"); }
+const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
+const ADMIN_TELEGRAM_ID = "942963228";
 
 const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-async function redisCommand(...cmd) {
+// Мгновенные запросы без CORS preflight (экономит 150-300мс на каждом обращении)
+async function redisFast(...cmd) {
     try {
-        const res = await fetch(UPSTASH_URL, {
+        const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
             method: "POST",
-            headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
             body: JSON.stringify(cmd),
             cache: "no-store"
         });
@@ -397,11 +417,10 @@ async function redisCommand(...cmd) {
     } catch (e) { return null; }
 }
 
-async function redisPipeline(commands) {
+async function redisFastPipeline(commands) {
     try {
-        const res = await fetch(UPSTASH_URL + "/pipeline", {
+        const res = await fetch(`${UPSTASH_URL}/pipeline?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
             method: "POST",
-            headers: { "Authorization": "Bearer " + UPSTASH_TOKEN, "Content-Type": "application/json" },
             body: JSON.stringify(commands),
             cache: "no-store"
         });
@@ -410,56 +429,63 @@ async function redisPipeline(commands) {
     } catch (e) { return null; }
 }
 
-const LOGOS_BASE = "https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/";
+document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
+let lastTouchEnd = 0;
+document.addEventListener("touchend", function(e) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) { e.preventDefault(); }
+    lastTouchEnd = now;
+}, { passive: false });
 
 const appsData = [
-  { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: LOGOS_BASE + "vk.png", ios: "iOS 17.6+" },
-  { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: LOGOS_BASE + "max.png", ios: "iOS 15.5+" },
-  { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: LOGOS_BASE + "vkvideo.png", ios: "iOS 17.6+" },
-  { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: LOGOS_BASE + "vkclips.png", ios: "iOS 17.6+" },
-  { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: LOGOS_BASE + "vkmessenger.png", ios: "iOS 17.6+" },
-  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: LOGOS_BASE + "vkmusic_tropa.png", ios: "iOS 16.6+" },
-  { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: LOGOS_BASE + "mailru.png", ios: "iOS 16.0+" },
-  { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: LOGOS_BASE + "sber.png", ios: "iOS 15.0+" },
-  { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: LOGOS_BASE + "alfabank.png", ios: "iOS 14.0" },
-  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: LOGOS_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
-  { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: LOGOS_BASE + "avito.png", ios: "iOS 15.2+" },
-  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 16.0+" },
-  { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: LOGOS_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
-  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 17.0+" },
-  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: LOGOS_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
-  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: LOGOS_BASE + "tbank.png", ios: "iOS 16.0+" },
-  { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: LOGOS_BASE + "lenta.png", ios: "iOS 14.4+" },
-  { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: LOGOS_BASE + "yandexpay.png", ios: "iOS 15.0+" },
-  { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: LOGOS_BASE + "2gis.png", ios: "iOS 16.0+" },
-  { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: LOGOS_BASE + "youla.png", ios: "iOS 15.6+" },
-  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: LOGOS_BASE + "psb.png", ios: "iOS 15.0+" },
-  { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: LOGOS_BASE + "kuper.png", ios: "iOS 15.0+" },
-  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: LOGOS_BASE + "rutube.png", ios: "iOS 16.0+" },
-  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: LOGOS_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
-  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: LOGOS_BASE + "tmobile.png", ios: "iOS 16.0+" },
-  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: LOGOS_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
-  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: LOGOS_BASE + "sberkids.png", ios: "iOS 15.0+" },
-  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: LOGOS_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
-  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: LOGOS_BASE + "avito_anero.png", ios: "iOS 16.0+" },
-  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: LOGOS_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
-  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: LOGOS_BASE + "sovkom.png", ios: "iOS 17.0+" },
-  { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: LOGOS_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: LOGOS_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
-  { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: LOGOS_BASE + "happ.png", ios: "iOS 15.0+" },
-  { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: LOGOS_BASE + "chatgpt.png", ios: "iOS 16.0+" },
-  { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: LOGOS_BASE + "gemini.png", ios: "iOS 14.0+" },
-  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: LOGOS_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: LOGOS_BASE + "sberinvest.png", ios: "iOS 16.0+" },
-  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: LOGOS_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
-  { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: LOGOS_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: LOGOS_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
-  { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: LOGOS_BASE + "sbpay.png", ios: "iOS 13.0+" },
-  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: LOGOS_BASE + "yota.png", ios: "iOS 15.0+" },
-  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: LOGOS_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: LOGOS_BASE + "novikombank.png", ios: "iOS 12.0+" },
-  { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: LOGOS_BASE + "rshb.png", ios: "iOS 15.5+" },
-  { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: LOGOS_BASE + "mtsbank.png", ios: "iOS 14.0+" }
+  { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
+  { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
+  { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
+  { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
+  { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
+  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
+  { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
+  { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
+  { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
+  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
+  { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
+  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
+  { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
+  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
+  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
+  { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
+  { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
+  { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
+  { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
+  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
+  { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
+  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
+  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
+  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
+  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
+  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
+  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
+  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
+  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+  { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
+  { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
+  { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
+  { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
+  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
+  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
+  { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
+  { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
+  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
+  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
+  { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
+  { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" }
 ];
 
 let currentCategory = "all";
@@ -474,10 +500,16 @@ let cartItems = new Set();
 
 try {
     const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
-    if (Array.isArray(savedCart)) savedCart.forEach(k => { if (appsData.some(a => a.key === k)) cartItems.add(k); });
+    if (Array.isArray(savedCart)) {
+        savedCart.forEach(k => {
+            if (appsData.some(a => a.key === k)) cartItems.add(k);
+        });
+    }
 } catch (e) {}
 
-function saveCart() { try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {} }
+function saveCart() {
+    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
+}
 
 const LOCKED_SCREENS = ["tokenErrorApp"];
 const INFO_SCREENS = ["guideApp", "tipsApp"];
@@ -503,121 +535,83 @@ function clearActiveTokenSession() {
 }
 
 function getAppPrice(key) {
-    if (remoteConfig.appPrices && remoteConfig.appPrices[key] !== undefined) return Number(remoteConfig.appPrices[key]);
+    if (remoteConfig.appPrices && remoteConfig.appPrices[key] !== undefined) {
+        return Number(remoteConfig.appPrices[key]);
+    }
     return (key === "mailru" || key === "alfabank") ? 500 : 250;
 }
 
 function extractTokenFromLocation() {
-    const s = window.location.search.replace('?', '').split('&')[0];
-    if (/^\d{8}$/.test(s)) return s;
+    const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
+    if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("token")) return urlParams.get("token").trim();
+    const qToken = urlParams.get("token");
+    if (qToken) return qToken.trim();
+    const path = window.location.pathname.replace(/\/+$/, "");
+    const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
+    if (installMatch) return installMatch[1];
+    const directNumMatch = path.match(/^\/(\d{6,16})$/);
+    if (directNumMatch) return directNumMatch[1];
     return null;
 }
 
-// Определение точной модели iPhone без версии системы
-function detectDeviceModel() {
+function estimateAppleDeviceModel() {
     const ua = navigator.userAgent || "";
-    const isIPhone = /iPhone/.test(ua) || (navigator.platform === "iPhone");
-    if (isIPhone) {
-        const w = Math.min(window.screen.width, window.screen.height);
-        const h = Math.max(window.screen.width, window.screen.height);
-        const dpr = window.devicePixelRatio || 2;
-        let gpu = "";
-        try {
-            const canvas = document.createElement("canvas");
-            const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-            if (gl) {
-                const dbg = gl.getExtension("WEBGL_debug_renderer_info");
-                if (dbg) gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || "";
-            }
-        } catch (e) {}
-
-        const resKey = `${w}x${h}@${dpr}`;
-        if (resKey === "440x956@3") return "iPhone 16 Pro Max";
-        if (resKey === "402x874@3") return "iPhone 16 Pro";
-        if (resKey === "430x932@3") {
-            if (gpu.includes("A18")) return "iPhone 16 Plus";
-            if (gpu.includes("A17")) return "iPhone 15 Pro Max";
-            if (gpu.includes("A16")) return "iPhone 15 Plus / 14 Pro Max";
-            return "iPhone 15 Pro Max / 16 Plus";
-        }
-        if (resKey === "393x852@3") {
-            if (gpu.includes("A18")) return "iPhone 16";
-            if (gpu.includes("A17")) return "iPhone 15 Pro";
-            if (gpu.includes("A16")) return "iPhone 15 / 14 Pro";
-            return "iPhone 15 Pro";
-        }
-        if (resKey === "428x926@3") {
-            if (gpu.includes("A15")) return "iPhone 14 Plus / 13 Pro Max";
-            if (gpu.includes("A14")) return "iPhone 12 Pro Max";
-            return "iPhone 13 Pro Max / 14 Plus";
-        }
-        if (resKey === "390x844@3") {
-            if (gpu.includes("A15")) return "iPhone 14 / 13 / 13 Pro";
-            if (gpu.includes("A14")) return "iPhone 12 / 12 Pro";
-            return "iPhone 13 / 14";
-        }
-        if (resKey === "375x812@3") {
-            if (gpu.includes("A15")) return "iPhone 13 mini";
-            if (gpu.includes("A14")) return "iPhone 12 mini";
-            if (gpu.includes("A13")) return "iPhone 11 Pro";
-            if (gpu.includes("A12")) return "iPhone XS";
-            return "iPhone 11 Pro / X";
-        }
-        if (resKey === "414x896@3") {
-            if (gpu.includes("A13")) return "iPhone 11 Pro Max";
-            return "iPhone XS Max / 11 Pro Max";
-        }
-        if (resKey === "414x896@2") {
-            if (gpu.includes("A13")) return "iPhone 11";
-            return "iPhone 11 / XR";
-        }
-        if (resKey === "375x667@2") return "iPhone SE";
-        return "iPhone";
-    }
-    if (/iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return "iPad";
-    if (/Macintosh/.test(ua)) return "Mac";
-    if (/Android/.test(ua)) return "Android";
-    if (/Windows/.test(ua)) return "Windows PC";
-    return "iPhone";
+    if (/iPad/i.test(ua)) return "iPad";
+    if (!/iPhone/i.test(ua)) return /Android/i.test(ua) ? "Android" : "ПК / Смартфон";
+    const w = Math.min(screen.width, screen.height);
+    const h = Math.max(screen.width, screen.height);
+    const dpr = window.devicePixelRatio || 1;
+    const px = Math.round(w * dpr) + "x" + Math.round(h * dpr);
+    const known = {
+        "1320x2868": "iPhone 16 Pro Max",
+        "1206x2622": "iPhone 16 Pro",
+        "1290x2796": "iPhone 15 Pro Max",
+        "1179x2556": "iPhone 15 Pro",
+        "1284x2778": "iPhone 13 Pro Max / 14 Plus",
+        "1170x2532": "iPhone 13 Pro / 14",
+        "1242x2688": "iPhone 11 Pro Max",
+        "1125x2436": "iPhone 11 Pro / X / XS",
+        "828x1792": "iPhone 11 / XR",
+        "1080x2340": "iPhone 13 mini"
+    };
+    return known[px] || "iPhone";
 }
 
-function getYekaterinburgTime() {
-    try {
-        return new Date().toLocaleString("ru-RU", {
-            timeZone: "Asia/Yekaterinburg",
-            day: "2-digit", month: "2-digit", year: "numeric",
-            hour: "2-digit", minute: "2-digit", second: "2-digit"
-        }) + " (ЕКБ)";
-    } catch (e) {
-        return new Date().toLocaleTimeString("ru-RU") + " (ЕКБ)";
-    }
-}
+async function sendTelegramNotification(token, appKeys, ttlMinutes) {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
+    const appNames = appKeys.map(k => appsData.find(a => a.key === k)?.name).filter(Boolean);
+    const finalDevice = estimateAppleDeviceModel();
+    const timeStr = new Date().toLocaleTimeString("ru-RU", {
+        timeZone: "Asia/Yekaterinburg",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
 
-async function sendTelegramNotification(token, appNames) {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c") return;
-    const device = detectDeviceModel();
-    const timeStr = getYekaterinburgTime();
-    const text = `🔔 <b>Активирована разовая ссылка!</b>\n\n` +
-                 `🔑 <b>Токен:</b> <code>${token}</code>\n\n` +
-                 `📱 <b>Приложения:</b> ${appNames}\n\n` +
-                 `📲 <b>Устройство:</b> ${device}\n\n` +
-                 `🕒 <b>Время:</b> ${timeStr}`;
+    const notifyText =
+        `📲 <b>Ссылка для установки была активирована!</b>\n\n` +
+        `📱 <b>Приложения (${appKeys.length}):</b>\n- ${appNames.join("\n- ")}\n\n` +
+        `💻 <b>Устройство:</b> ${finalDevice}\n\n` +
+        `⏳ <b>Срок действия:</b> ${ttlMinutes} мин.\n\n` +
+        `⏰ <b>Время активации:</b> ${timeStr} (ЕКБ)\n\n` +
+        `🔢 <b>Код ссылки:</b> <code>${token}</code>\n\n` +
+        `<i>Ссылка привязана к устройству покупателя.</i>`;
+
     try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                chat_id: TELEGRAM_ADMIN_ID,
-                text: text,
+                chat_id: Number(ADMIN_TELEGRAM_ID),
+                text: notifyText,
                 parse_mode: "HTML",
                 reply_markup: {
-                    inline_keyboard: [[{ text: "🗑 Удалить уведомление", callback_data: "del_msg" }]]
+                    inline_keyboard: [[{ text: "🗑 Удалить уведомление", callback_data: "delete_notify_msg" }]]
                 }
             })
         });
-    } catch(e) {}
+    } catch (e) {}
 }
 
 function updateTokenHeroText(ttlMinutes) {
@@ -646,8 +640,8 @@ function renderTokenAppsList(appKeys) {
             container.innerHTML += `
             <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
                 <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                    <img src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1;">
+                    <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
                         <div class="app-grid-name">${mainName}</div>
                         ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
                         <div class="app-grid-version">${app.ios}</div>
@@ -712,7 +706,7 @@ function generateAppsGrid() {
         <div class="app-grid-card" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
             <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
                     <div class="app-grid-name">${mainName}</div>
                     ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
                     <div class="app-grid-version">${app.ios}</div>
@@ -728,39 +722,70 @@ function generateAppsGrid() {
 
 function toggleCart(key) {
     if (remoteConfig.appVisibility[key] === false) return;
-    if (cartItems.has(key)) cartItems.delete(key); else cartItems.add(key);
-    saveCart(); updateCartUI();
+    if (cartItems.has(key)) cartItems.delete(key);
+    else cartItems.add(key);
+    saveCart();
+    updateCartUI();
 }
-function removeFromCart(key) { cartItems.delete(key); saveCart(); updateCartUI(); }
-function clearCart() { cartItems.clear(); saveCart(); updateCartUI(); }
-function openCartScreen() { renderCartScreen(); switchScreen("cartApp"); window.scrollTo(0, 0); }
+
+function removeFromCart(key) {
+    cartItems.delete(key);
+    saveCart();
+    updateCartUI();
+}
+
+function clearCart() {
+    cartItems.clear();
+    saveCart();
+    updateCartUI();
+}
+
+function openCartScreen() {
+    renderCartScreen();
+    switchScreen("cartApp");
+    window.scrollTo(0, 0);
+}
 
 function renderCartScreen() {
+    const titleEl = document.getElementById("cartScreenTitle");
+    const subtitleEl = document.getElementById("cartScreenSubtitle");
     const listEl = document.getElementById("cartItemsList");
+    const emptyEl = document.getElementById("cartEmptyBox");
+    const summaryCard = document.getElementById("cartSummaryCard");
+    const checkoutBtn = document.getElementById("cartCheckoutBtn");
+    const clearBtn = document.getElementById("cartClearAllBtn");
+    const countEl = document.getElementById("cartScreenCount");
+    const totalEl = document.getElementById("cartScreenTotal");
     if (!listEl) return;
+
     if (cartItems.size === 0) {
-        document.getElementById("cartScreenTitle").textContent = "Корзина пуста";
-        document.getElementById("cartScreenSubtitle").style.display = "none";
-        listEl.innerHTML = ""; listEl.style.display = "none";
-        document.getElementById("cartEmptyBox").style.display = "block";
-        document.getElementById("cartSummaryCard").style.display = "none";
-        document.getElementById("cartCheckoutBtn").style.display = "none";
-        document.getElementById("cartClearAllBtn").style.display = "none";
+        if (titleEl) titleEl.textContent = "Корзина пуста";
+        if (subtitleEl) subtitleEl.style.display = "none";
+        listEl.innerHTML = "";
+        listEl.style.display = "none";
+        if (emptyEl) emptyEl.style.display = "block";
+        if (summaryCard) summaryCard.style.display = "none";
+        if (checkoutBtn) checkoutBtn.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
         return;
     }
-    document.getElementById("cartScreenTitle").textContent = "Ваша корзина";
-    document.getElementById("cartScreenSubtitle").style.display = "block";
-    document.getElementById("cartEmptyBox").style.display = "none";
-    listEl.style.display = "flex";
-    document.getElementById("cartSummaryCard").style.display = "flex";
-    document.getElementById("cartCheckoutBtn").style.display = "flex";
-    document.getElementById("cartClearAllBtn").style.display = "flex";
 
-    let total = 0; let html = "";
+    if (titleEl) titleEl.textContent = "Ваша корзина";
+    if (subtitleEl) subtitleEl.style.display = "block";
+    if (emptyEl) emptyEl.style.display = "none";
+    listEl.style.display = "flex";
+    if (summaryCard) summaryCard.style.display = "flex";
+    if (checkoutBtn) checkoutBtn.style.display = "flex";
+    if (clearBtn) clearBtn.style.display = "flex";
+
+    let total = 0;
+    let html = "";
     cartItems.forEach(k => {
         const app = appsData.find(a => a.key === k);
         if (!app) return;
-        const p = getAppPrice(k); const isPrem = p >= 500; total += p;
+        const p = getAppPrice(k);
+        const isPrem = p >= 500;
+        total += p;
         html += `
         <div class="cart-item-row">
             <div class="cart-item-left">
@@ -776,14 +801,20 @@ function renderCartScreen() {
             </div>
         </div>`;
     });
+
     listEl.innerHTML = html;
-    document.getElementById("cartScreenCount").textContent = cartItems.size + " шт.";
-    document.getElementById("cartScreenTotal").textContent = total + " ₽";
+    if (countEl) countEl.textContent = cartItems.size + " шт.";
+    if (totalEl) totalEl.textContent = total + " ₽";
 }
 
 function updateCartUI() {
     let validChanged = false;
-    cartItems.forEach(k => { if (remoteConfig.appVisibility[k] === false) { cartItems.delete(k); validChanged = true; }});
+    cartItems.forEach(k => {
+        if (remoteConfig.appVisibility[k] === false) {
+            cartItems.delete(k);
+            validChanged = true;
+        }
+    });
     if (validChanged) saveCart();
 
     appsData.forEach(app => {
@@ -791,51 +822,79 @@ function updateCartUI() {
         const priceTag = document.getElementById("gridPrice_" + app.key);
         if (priceTag) {
             const p = getAppPrice(app.key);
-            if (priceTag.textContent !== (p + " ₽")) {
-                priceTag.textContent = p + " ₽";
+            const expectedPriceStr = p + " ₽";
+            if (priceTag.textContent !== expectedPriceStr) {
+                priceTag.textContent = expectedPriceStr;
                 priceTag.classList.toggle("premium", p >= 500);
             }
         }
         if (btn) {
             const inCart = cartItems.has(app.key);
-            if (btn.textContent !== (inCart ? "✓ В корзине" : "В корзину")) {
+            const expectedText = inCart ? "✓ В корзине" : "В корзину";
+            if (btn.textContent !== expectedText) {
                 btn.classList.toggle("in-cart", inCart);
-                btn.textContent = inCart ? "✓ В корзине" : "В корзину";
+                btn.textContent = expectedText;
             }
         }
     });
 
-    const fabBadge = document.getElementById("cartFabBadge");
-    if (fabBadge) fabBadge.textContent = cartItems.size;
     const fabBtn = document.getElementById("cartFabBtn");
-    if (fabBtn) fabBtn.classList.toggle("visible", cartItems.size > 0 && currentScreenId === "mainApp");
+    const fabBadge = document.getElementById("cartFabBadge");
+    if (fabBadge && fabBadge.textContent !== String(cartItems.size)) {
+        fabBadge.textContent = cartItems.size;
+    }
+    if (fabBtn) {
+        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
+        if (fabBtn.classList.contains("visible") !== shouldShow) {
+            fabBtn.classList.toggle("visible", shouldShow);
+        }
+    }
     if (currentScreenId === "cartApp") renderCartScreen();
 }
 
 function checkoutCart() {
     if (cartItems.size === 0) return;
-    let total = 0; const lines = [];
+    let total = 0;
+    const lines = [];
     cartItems.forEach(k => {
         const app = appsData.find(a => a.key === k);
-        if (app) { const p = getAppPrice(k); total += p; lines.push("• " + app.name + " — " + p + " ₽"); }
+        if (app) {
+            const p = getAppPrice(k);
+            total += p;
+            lines.push("• " + app.name + " — " + p + " ₽");
+        }
     });
-    const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" + lines.join("\n") + "\n\n💰 Итого к оплате: " + total + " ₽\nОтправьте, пожалуйста, реквизиты для оплаты.";
-    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(message).catch(() => {}); } catch (e) {}
+    const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
+        lines.join("\n") + "\n\n" +
+        "💰 Итого к оплате: " + total + " ₽\n" +
+        "Отправьте, пожалуйста, реквизиты для оплаты.";
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(message).catch(() => {});
+        }
+    } catch (e) {}
     window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
 }
 
 function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 
 function switchScreen(id, pushHistory = true) {
-    if (currentScreenId && currentScreenId !== id && pushHistory) HISTORY_STACK.push(currentScreenId);
-    if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
-        previousScreen = currentScreenId; sessionStorage.setItem("previousScreen", previousScreen);
+    if (currentScreenId && currentScreenId !== id && pushHistory) {
+        HISTORY_STACK.push(currentScreenId);
     }
-    currentScreenId = id; sessionStorage.setItem("currentScreenId", currentScreenId);
+    if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
+        previousScreen = currentScreenId;
+        sessionStorage.setItem("previousScreen", previousScreen);
+    }
+    currentScreenId = id;
+    sessionStorage.setItem("currentScreenId", currentScreenId);
 
     if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp"].includes(id)) {
-        document.body.style.overflow = "hidden"; window.scrollTo(0, 0);
-    } else { document.body.style.overflow = ""; }
+        document.body.style.overflow = "hidden";
+        window.scrollTo(0, 0);
+    } else {
+        document.body.style.overflow = "";
+    }
 
     document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
     document.getElementById(id)?.classList.add("active-screen");
@@ -851,82 +910,177 @@ function switchScreen(id, pushHistory = true) {
     }
     if (burgerBtn) burgerBtn.style.display = "flex";
     if (backBtn) {
-        if (["welcomeApp", "maintenanceApp", "tokenApp"].includes(id)) backBtn.classList.remove("visible");
-        else backBtn.classList.add("visible");
+        if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp") {
+            backBtn.classList.remove("visible");
+        } else {
+            backBtn.classList.add("visible");
+        }
     }
 }
 
-function handleBrandClick(event) { if (event) event.preventDefault(); if (!isScreenLocked(currentScreenId)) goHome(); }
+function handleBrandClick(event) {
+    if (event) event.preventDefault();
+    if (isScreenLocked(currentScreenId)) return;
+    goHome();
+}
+
 function handleNavBack(event) {
     if (event) event.preventDefault();
     if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false); else goHome();
+    if (HISTORY_STACK.length > 0) {
+        switchScreen(HISTORY_STACK.pop(), false);
+    } else {
+        goHome();
+    }
 }
+
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false); else switchScreen(previousScreen);
+    if (HISTORY_STACK.length > 0) {
+        switchScreen(HISTORY_STACK.pop(), false);
+    } else {
+        switchScreen(previousScreen);
+    }
     if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
 }
+
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
-    if (isFromToken) { switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false); return; }
-    if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp", false); return; }
+    if (isFromToken) {
+        switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
+        return;
+    }
+    if (!isSiteCurrentlyEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
     switchScreen("mainApp", false);
 }
+
 function openCatalog() {
-    if (!isSiteCurrentlyEnabled) { switchScreen("maintenanceApp"); return; }
-    sessionStorage.setItem("site_access", "true"); switchScreen("mainApp");
+    if (!isSiteCurrentlyEnabled) {
+        switchScreen("maintenanceApp");
+        return;
+    }
+    sessionStorage.setItem("site_access", "true");
+    switchScreen("mainApp");
 }
-function showGuideScreen() { document.getElementById("burgerMenuModal")?.classList.remove("active"); switchScreen("guideApp"); }
-function showTipsScreen() { document.getElementById("burgerMenuModal")?.classList.remove("active"); switchScreen("tipsApp"); }
-function toggleBurgerMenu() { document.getElementById("burgerMenuModal")?.classList.toggle("active"); }
+
+function showGuideScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("guideApp");
+}
+
+function showTipsScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("tipsApp");
+}
+
+function toggleBurgerMenu() {
+    document.getElementById("burgerMenuModal")?.classList.toggle("active");
+}
+
 async function checkSiteStatusManual() {
     const btn = document.getElementById("checkStatusBtn");
     if (btn) btn.textContent = "Проверка...";
     await syncAll();
-    if (isSiteCurrentlyEnabled) switchScreen("mainApp"); else if (btn) btn.textContent = "Проверить снова";
+    if (isSiteCurrentlyEnabled) switchScreen("mainApp");
+    else if (btn) btn.textContent = "Проверить снова";
 }
 
 function installFromToken(key, appUrl) {
     if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
     const saved = getActiveTokenSession();
-    if (!saved || Date.now() >= saved.expires_at) { isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return; }
-    const fullPlistUrl = appUrl.startsWith("http") ? appUrl : (CLIENT_SITE_URL + appUrl);
-    window.location.href = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+    if (!saved || Date.now() >= saved.expires_at) {
+        isTokenExpired = true;
+        clearActiveTokenSession();
+        switchScreen("tokenErrorApp");
+        return;
+    }
+    const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
+    const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
+    const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
     const btn = document.getElementById("tokenBtn_" + key);
     if (btn) {
-        const originalText = btn.textContent; btn.classList.add("installed"); btn.innerHTML = "✓";
-        setTimeout(() => { btn.classList.remove("installed"); btn.textContent = originalText; }, 2000);
+        const originalText = btn.textContent;
+        btn.classList.add("installed");
+        btn.innerHTML = "✓";
+        setTimeout(() => {
+            btn.classList.remove("installed");
+            btn.textContent = originalText;
+        }, 2000);
     }
+    window.location.href = installUrl;
 }
 
 function setCategory(cat, btn) {
-    currentCategory = cat; document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
-    btn.classList.add("active"); filterApps();
+    currentCategory = cat;
+    document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
+    btn.classList.add("active");
+    filterApps();
 }
 
 function filterApps() {
-    const query = (document.getElementById("appSearchInput")?.value || "").trim().toLowerCase();
+    const searchInput = document.getElementById("appSearchInput");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
     document.getElementById("searchClear")?.classList.toggle("visible", query.length > 0);
     let count = 0;
+
     document.querySelectorAll("#appListContainer .app-grid-card").forEach(card => {
         const key = card.getAttribute("data-key");
-        if (remoteConfig.appVisibility[key] === false) { card.style.display = "none"; return; }
+        if (remoteConfig.appVisibility[key] === false) {
+            card.style.display = "none";
+            return;
+        }
         const name = card.querySelector(".app-grid-name").textContent.toLowerCase() + " " + (card.querySelector(".app-grid-subname")?.textContent.toLowerCase() || "");
         const cat = card.getAttribute("data-category");
         const match = name.includes(query) && (currentCategory === "all" || cat === currentCategory);
         card.style.display = match ? "flex" : "none";
         if (match) count++;
     });
-    const emptyEl = document.getElementById("searchEmpty"); if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
-    const countEl = document.getElementById("appCountDisplay"); if (countEl) countEl.textContent = count;
-}
-function clearAppSearch() { const input = document.getElementById("appSearchInput"); if (!input) return; input.value = ""; filterApps(); input.focus({ preventScroll: true }); }
 
+    const emptyEl = document.getElementById("searchEmpty");
+    if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
+    const countEl = document.getElementById("appCountDisplay");
+    if (countEl) countEl.textContent = count;
+}
+
+function clearAppSearch() {
+    const input = document.getElementById("appSearchInput");
+    if (!input) return;
+    input.value = "";
+    filterApps();
+    input.focus({ preventScroll: true });
+}
+
+// Мгновенная синхронизация за 1 быстрый запрос без CORS preflight
 async function syncAll() {
     try {
-        const res = await redisPipeline([
+        const snapRaw = await redisFast("GET", "app_config");
+        if (snapRaw) {
+            const parsed = JSON.parse(snapRaw);
+            if (parsed.prices) remoteConfig.appPrices = parsed.prices;
+            if (parsed.visibility) remoteConfig.appVisibility = parsed.visibility;
+            updateCartUI();
+
+            if (!isFromToken) {
+                const siteEnabled = parsed.siteEnabled !== false;
+                if (isSiteCurrentlyEnabled !== siteEnabled) {
+                    isSiteCurrentlyEnabled = siteEnabled;
+                    if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
+                    else {
+                        let lastScreen = sessionStorage.getItem("currentScreenId");
+                        switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
+                    }
+                }
+                if (!siteEnabled) return;
+            }
+            filterApps();
+            return;
+        }
+
+        const res = await redisFastPipeline([
             ["HGETALL", "app_prices"],
             ["HGETALL", "app_visibility"],
             ["GET", "site_enabled"]
@@ -950,16 +1104,22 @@ async function syncAll() {
 
         if (isFromToken) return;
         const siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
+
         if (isSiteCurrentlyEnabled !== siteEnabled) {
             isSiteCurrentlyEnabled = siteEnabled;
-            if (!siteEnabled) switchScreen("maintenanceApp");
-            else switchScreen(sessionStorage.getItem("currentScreenId") && sessionStorage.getItem("currentScreenId") !== "maintenanceApp" ? sessionStorage.getItem("currentScreenId") : "mainApp");
+            if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
+            else {
+                let lastScreen = sessionStorage.getItem("currentScreenId");
+                switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
+            }
         }
+        if (!siteEnabled) return;
         filterApps();
     } catch (e) {}
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    generateAppsGrid();
     const token = extractTokenFromLocation();
     const savedSession = getActiveTokenSession();
 
@@ -971,70 +1131,136 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (token) {
         isFromToken = true;
-        switchScreen("tokenApp");
-
+        // Если это то же самое устройство и сессия уже активна — открываем мгновенно без ожидания сети
         if (savedSession && savedSession.token === token) {
-            if (savedSession.expires_at > Date.now() && savedSession.app_keys.length > 0) {
+            const timeLeft = savedSession.expires_at - Date.now();
+            if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
                 updateTokenHeroText(savedSession.ttl_minutes || 3);
                 renderTokenAppsList(savedSession.app_keys);
-                startTokenCountdown(savedSession.expiresAt || savedSession.expires_at);
+                startTokenCountdown(savedSession.expires_at);
+                switchScreen("tokenApp");
+                syncAll();
+                setInterval(syncAll, 1000);
                 return;
             } else {
-                isTokenExpired = true; clearActiveTokenSession(); switchScreen("tokenErrorApp"); return;
+                isTokenExpired = true;
+                clearActiveTokenSession();
+                switchScreen("tokenErrorApp");
+                return;
             }
         }
 
-        const res = await redisPipeline([
-            ["GET", "token:" + token],
-            ["TTL", "token:" + token],
-            ["GET", "claim:" + token]
-        ]);
+        // Проверяем новую структуру link:<token> (и старую token:<token> для совместимости)
+        try {
+            const res = await redisFastPipeline([
+                ["GET", "link:" + token],
+                ["GET", "token:" + token],
+                ["TTL", "token:" + token]
+            ]);
 
-        const tokenData = res ? res[0]?.result : null;
-        const ttlSeconds = res ? Number(res[1]?.result || 0) : 0;
-        const existingClaim = res ? res[2]?.result : null;
+            const rawLinkJson = res ? res[0]?.result : null;
+            const legacyTokenData = res ? res[1]?.result : null;
+            const legacyTtl = res ? Number(res[2]?.result || 0) : 0;
 
-        if (tokenData && ttlSeconds > 0) {
-            if (existingClaim && existingClaim !== myDeviceId) {
+            if (rawLinkJson) {
+                const linkObj = JSON.parse(rawLinkJson);
+                const now = Date.now();
+                const ttlMins = Number(linkObj.ttl_minutes) || 3;
+                const ttlMs = ttlMins * 60 * 1000;
+
+                // Если ссылка уже была открыта раньше
+                if (linkObj.is_used) {
+                    const expiresAt = Number(linkObj.activated_at) + ttlMs;
+                    if (linkObj.device_id !== myDeviceId || now >= expiresAt) {
+                        isTokenExpired = true;
+                        switchScreen("tokenErrorApp");
+                        return;
+                    }
+                    // То же устройство, время ещё не вышло
+                    saveActiveTokenSession({ token: token, app_keys: linkObj.app_keys, expires_at: expiresAt, ttl_minutes: ttlMins });
+                    updateTokenHeroText(ttlMins);
+                    renderTokenAppsList(linkObj.app_keys);
+                    startTokenCountdown(expiresAt);
+                    switchScreen("tokenApp");
+                    syncAll();
+                    setInterval(syncAll, 1000);
+                    return;
+                }
+
+                // ПЕРВОЕ ОТКРЫТИЕ ССЫЛКИ ПОКУПАТЕЛЕМ: запускаем таймер прямо сейчас!
+                const activatedAt = now;
+                const expiresAt = activatedAt + ttlMs;
+                linkObj.is_used = true;
+                linkObj.activated_at = activatedAt;
+                linkObj.device_id = myDeviceId;
+
+                // Записываем активацию в базу и выставляем автоудаление ровно через ttlMins
+                redisFast("SET", "link:" + token, JSON.stringify(linkObj), "EX", ttlMins * 60);
+
+                saveActiveTokenSession({ token: token, app_keys: linkObj.app_keys, expires_at: expiresAt, ttl_minutes: ttlMins });
+                updateTokenHeroText(ttlMins);
+                renderTokenAppsList(linkObj.app_keys);
+                startTokenCountdown(expiresAt);
+                // Сразу открываем полностью готовый экран с приложениями без экрана "Проверка..."
+                switchScreen("tokenApp");
+
+                sendTelegramNotification(token, linkObj.app_keys, ttlMins);
+                syncAll();
+                setInterval(syncAll, 1000);
+                return;
+            } else if (legacyTokenData && legacyTtl > 0) {
+                const keys = legacyTokenData.split(",").map(s => s.trim()).filter(Boolean);
+                const ttlMins = Math.ceil(legacyTtl / 60);
+                const expiresAt = Date.now() + (legacyTtl * 1000);
+                saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
+                updateTokenHeroText(ttlMins);
+                renderTokenAppsList(keys);
+                startTokenCountdown(expiresAt);
+                switchScreen("tokenApp");
+                return;
+            } else {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
-
-            const keys = tokenData.split(",").map(s => s.trim()).filter(Boolean);
-            const ttlMins = Math.ceil(ttlSeconds / 60);
-            const expiresAt = Date.now() + (ttlSeconds * 1000);
-
-            saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-            updateTokenHeroText(ttlMins);
-            renderTokenAppsList(keys);
-            startTokenCountdown(expiresAt);
-
-            if (!existingClaim) {
-                redisCommand("SET", "claim:" + token, myDeviceId, "EX", ttlSeconds);
-                const appNames = keys.map(k => appsData.find(x => x.key === k)?.name || k).join(', ');
-                sendTelegramNotification(token, appNames);
-            }
-            return;
-        } else {
+        } catch (e) {
             isTokenExpired = true;
             switchScreen("tokenErrorApp");
             return;
         }
     }
 
-    generateAppsGrid();
-    let lastScreen = sessionStorage.getItem("currentScreenId");
-    if (sessionStorage.getItem("site_access") === "true") {
-        if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "mainApp"; switchScreen(lastScreen); }
-        else if (lastScreen === "cartApp") { renderCartScreen(); switchScreen("cartApp"); } else switchScreen("mainApp");
+    await syncAll();
+    if (!isSiteCurrentlyEnabled) {
+        switchScreen("maintenanceApp");
     } else {
-        if (INFO_SCREENS.includes(lastScreen)) { previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp"; switchScreen(lastScreen); }
-        else switchScreen("welcomeApp");
+        let lastScreen = sessionStorage.getItem("currentScreenId");
+        let hasEntered = sessionStorage.getItem("site_access") === "true";
+        if (hasEntered) {
+            if (INFO_SCREENS.includes(lastScreen)) {
+                previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
+                switchScreen(lastScreen);
+            } else if (lastScreen === "cartApp") {
+                renderCartScreen();
+                switchScreen("cartApp");
+            } else {
+                switchScreen("mainApp");
+            }
+        } else {
+            if (INFO_SCREENS.includes(lastScreen)) {
+                previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
+                switchScreen(lastScreen);
+            } else {
+                switchScreen("welcomeApp");
+            }
+        }
     }
-    syncAll();
-    setInterval(syncAll, 1500);
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncAll(); });
+
+    // Быстрая фоновая синхронизация каждые 800 мс
+    setInterval(syncAll, 800);
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") syncAll();
+    });
 });
 </script>
 </body>
