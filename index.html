@@ -403,7 +403,6 @@ const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-// Мгновенные запросы без CORS preflight (экономит 150-300мс на каждом обращении)
 async function redisFast(...cmd) {
     try {
         const res = await fetch(`${UPSTASH_URL}?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
@@ -515,23 +514,54 @@ const LOCKED_SCREENS = ["tokenErrorApp"];
 const INFO_SCREENS = ["guideApp", "tipsApp"];
 const HISTORY_STACK = [];
 
+// Тройное сохранение сессии на первом устройстве (LocalStorage + SessionStorage + Cookie) для поддержки перезагрузки страницы
 function saveActiveTokenSession(dataObj) {
     const str = JSON.stringify(dataObj);
-    try { localStorage.setItem("active_token_data", str); } catch (e) {}
-    try { sessionStorage.setItem("active_token_data", str); } catch (e) {}
+    try { localStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
+    try { sessionStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
+    try {
+        const expDate = new Date(dataObj.expires_at).toUTCString();
+        document.cookie = "tok_" + dataObj.token + "=" + encodeURIComponent(str) + "; expires=" + expDate + "; path=/; SameSite=Lax";
+    } catch (e) {}
 }
 
-function getActiveTokenSession() {
+function getActiveTokenSession(token) {
+    if (!token) return null;
     let raw = null;
-    try { raw = localStorage.getItem("active_token_data"); } catch (e) {}
-    if (!raw) { try { raw = sessionStorage.getItem("active_token_data"); } catch (e) {} }
+    try { raw = localStorage.getItem("active_token_data_" + token); } catch (e) {}
+    if (!raw) { try { raw = sessionStorage.getItem("active_token_data_" + token); } catch (e) {} }
+    if (!raw) {
+        try {
+            const match = document.cookie.match(new RegExp('(^| )tok_' + token + '=([^;]+)'));
+            if (match) raw = decodeURIComponent(match[2]);
+        } catch (e) {}
+    }
     if (!raw) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
 }
 
-function clearActiveTokenSession() {
-    try { localStorage.removeItem("active_token_data"); } catch (e) {}
-    try { sessionStorage.removeItem("active_token_data"); } catch (e) {}
+function clearActiveTokenSession(token) {
+    if (!token) return;
+    try { localStorage.removeItem("active_token_data_" + token); } catch (e) {}
+    try { sessionStorage.removeItem("active_token_data_" + token); } catch (e) {}
+    try { document.cookie = "tok_" + token + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; } catch (e) {}
+}
+
+function getOrCreateDeviceId() {
+    let devId = null;
+    try { devId = localStorage.getItem("apprestore_device_id"); } catch (e) {}
+    if (!devId) {
+        try {
+            const m = document.cookie.match(/(^| )apprestore_dev_id=([^;]+)/);
+            if (m) devId = m[2];
+        } catch (e) {}
+    }
+    if (!devId) {
+        devId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+    }
+    try { localStorage.setItem("apprestore_device_id", devId); } catch (e) {}
+    try { document.cookie = "apprestore_dev_id=" + devId + "; max-age=31536000; path=/; SameSite=Lax"; } catch (e) {}
+    return devId;
 }
 
 function getAppPrice(key) {
@@ -578,8 +608,12 @@ function estimateAppleDeviceModel() {
     return known[px] || "iPhone";
 }
 
-async function sendTelegramNotification(token, appKeys, ttlMinutes) {
+// Отправка уведомления строго 1 раз (защищено атомарным ключом notif:<token> NX в Redis)
+async function sendTelegramNotificationOnce(token, appKeys, ttlMinutes) {
     if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
+    const notifLock = await redisFast("SET", "notif:" + token, "1", "NX", "EX", 86400);
+    if (notifLock !== "OK") return; // Уведомление по этому токену уже было отправлено!
+
     const appNames = appKeys.map(k => appsData.find(a => a.key === k)?.name).filter(Boolean);
     const finalDevice = estimateAppleDeviceModel();
     const timeStr = new Date().toLocaleTimeString("ru-RU", {
@@ -653,7 +687,7 @@ function renderTokenAppsList(appKeys) {
     });
 }
 
-function startTokenCountdown(expiresAtTimestamp) {
+function startTokenCountdown(expiresAtTimestamp, currentToken) {
     const display = document.getElementById("tokenCountdownDisplay");
     const box = document.getElementById("tokenTimerBox");
     if (!display) return;
@@ -677,7 +711,7 @@ function startTokenCountdown(expiresAtTimestamp) {
             isTokenExpired = true;
             display.textContent = "ИСТЕКЛО";
             display.style.color = "#ef4444";
-            clearActiveTokenSession();
+            clearActiveTokenSession(currentToken);
             const container = document.getElementById("singleTokenAppContainer");
             if (container) container.innerHTML = "";
             switchScreen("tokenErrorApp");
@@ -991,10 +1025,11 @@ async function checkSiteStatusManual() {
 
 function installFromToken(key, appUrl) {
     if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
-    const saved = getActiveTokenSession();
+    const currentToken = extractTokenFromLocation();
+    const saved = getActiveTokenSession(currentToken);
     if (!saved || Date.now() >= saved.expires_at) {
         isTokenExpired = true;
-        clearActiveTokenSession();
+        clearActiveTokenSession(currentToken);
         switchScreen("tokenErrorApp");
         return;
     }
@@ -1054,7 +1089,6 @@ function clearAppSearch() {
     input.focus({ preventScroll: true });
 }
 
-// Мгновенная синхронизация за 1 быстрый запрос без CORS preflight
 async function syncAll() {
     try {
         const snapRaw = await redisFast("GET", "app_config");
@@ -1079,150 +1113,107 @@ async function syncAll() {
             filterApps();
             return;
         }
-
-        const res = await redisFastPipeline([
-            ["HGETALL", "app_prices"],
-            ["HGETALL", "app_visibility"],
-            ["GET", "site_enabled"]
-        ]);
-        if (!res) return;
-        const pricesRaw = res[0]?.result;
-        const visRaw = res[1]?.result;
-        const siteEnabledVal = res[2]?.result;
-
-        if (Array.isArray(pricesRaw)) {
-            const pObj = {};
-            for (let i = 0; i < pricesRaw.length; i += 2) pObj[pricesRaw[i]] = pricesRaw[i+1];
-            remoteConfig.appPrices = pObj;
-        }
-        if (Array.isArray(visRaw)) {
-            const vObj = {};
-            for (let i = 0; i < visRaw.length; i += 2) vObj[visRaw[i]] = String(visRaw[i+1]) !== "false";
-            remoteConfig.appVisibility = vObj;
-        }
-        updateCartUI();
-
-        if (isFromToken) return;
-        const siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
-
-        if (isSiteCurrentlyEnabled !== siteEnabled) {
-            isSiteCurrentlyEnabled = siteEnabled;
-            if (!siteEnabled) { switchScreen("maintenanceApp"); return; }
-            else {
-                let lastScreen = sessionStorage.getItem("currentScreenId");
-                switchScreen(lastScreen && lastScreen !== "maintenanceApp" ? lastScreen : "mainApp");
-            }
-        }
-        if (!siteEnabled) return;
-        filterApps();
     } catch (e) {}
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
     generateAppsGrid();
     const token = extractTokenFromLocation();
-    const savedSession = getActiveTokenSession();
-
-    let myDeviceId = localStorage.getItem("apprestore_device_id");
-    if (!myDeviceId) {
-        myDeviceId = Math.random().toString(36).substring(2, 15);
-        localStorage.setItem("apprestore_device_id", myDeviceId);
-    }
+    const myDeviceId = getOrCreateDeviceId();
 
     if (token) {
         isFromToken = true;
-        // Если это то же самое устройство и сессия уже активна — открываем мгновенно без ожидания сети
+
+        // Игнорируем ботов предпросмотра ссылок Telegram/WhatsApp, чтобы они не сжигали ссылку
+        const ua = navigator.userAgent || "";
+        if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) {
+            return;
+        }
+
+        // 1. Проверяем локальную сессию этого устройства (позволяет обновлять страницу на 1 устройстве)
+        const savedSession = getActiveTokenSession(token);
         if (savedSession && savedSession.token === token) {
             const timeLeft = savedSession.expires_at - Date.now();
             if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
                 updateTokenHeroText(savedSession.ttl_minutes || 3);
                 renderTokenAppsList(savedSession.app_keys);
-                startTokenCountdown(savedSession.expires_at);
+                startTokenCountdown(savedSession.expires_at, token);
                 switchScreen("tokenApp");
                 syncAll();
                 setInterval(syncAll, 1000);
                 return;
             } else {
                 isTokenExpired = true;
-                clearActiveTokenSession();
+                clearActiveTokenSession(token);
                 switchScreen("tokenErrorApp");
                 return;
             }
         }
 
-        // Проверяем новую структуру link:<token> (и старую token:<token> для совместимости)
+        // 2. АТОМАРНАЯ ПРОВЕРКА И БЛОКИРОВКА В REDIS НА 1 УСТРОЙСТВО
         try {
-            const res = await redisFastPipeline([
-                ["GET", "link:" + token],
-                ["GET", "token:" + token],
-                ["TTL", "token:" + token]
-            ]);
+            // Пытаемся атомарно захватить замок на этот токен (SET NX сработает ТОЛЬКО у 1-го устройства в мире!)
+            const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", 86400);
 
-            const rawLinkJson = res ? res[0]?.result : null;
-            const legacyTokenData = res ? res[1]?.result : null;
-            const legacyTtl = res ? Number(res[2]?.result || 0) : 0;
-
-            if (rawLinkJson) {
-                const linkObj = JSON.parse(rawLinkJson);
-                const now = Date.now();
-                const ttlMins = Number(linkObj.ttl_minutes) || 3;
-                const ttlMs = ttlMins * 60 * 1000;
-
-                // Если ссылка уже была открыта раньше
-                if (linkObj.is_used) {
-                    const expiresAt = Number(linkObj.activated_at) + ttlMs;
-                    if (linkObj.device_id !== myDeviceId || now >= expiresAt) {
-                        isTokenExpired = true;
-                        switchScreen("tokenErrorApp");
-                        return;
-                    }
-                    // То же устройство, время ещё не вышло
-                    saveActiveTokenSession({ token: token, app_keys: linkObj.app_keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-                    updateTokenHeroText(ttlMins);
-                    renderTokenAppsList(linkObj.app_keys);
-                    startTokenCountdown(expiresAt);
-                    switchScreen("tokenApp");
-                    syncAll();
-                    setInterval(syncAll, 1000);
+            if (lockResult !== "OK") {
+                // Замок уже кем-то занят! Проверяем, кем именно:
+                const lockOwner = await redisFast("GET", "lock:" + token);
+                if (lockOwner !== myDeviceId) {
+                    // Это ДРУГОЕ устройство — мгновенно блокируем и НЕ шлем никаких уведомлений!
+                    isTokenExpired = true;
+                    switchScreen("tokenErrorApp");
                     return;
                 }
+            }
 
-                // ПЕРВОЕ ОТКРЫТИЕ ССЫЛКИ ПОКУПАТЕЛЕМ: запускаем таймер прямо сейчас!
-                const activatedAt = now;
-                const expiresAt = activatedAt + ttlMs;
-                linkObj.is_used = true;
-                linkObj.activated_at = activatedAt;
-                linkObj.device_id = myDeviceId;
-
-                // Записываем активацию в базу и выставляем автоудаление ровно через ttlMins
-                redisFast("SET", "link:" + token, JSON.stringify(linkObj), "EX", ttlMins * 60);
-
-                saveActiveTokenSession({ token: token, app_keys: linkObj.app_keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-                updateTokenHeroText(ttlMins);
-                renderTokenAppsList(linkObj.app_keys);
-                startTokenCountdown(expiresAt);
-                // Сразу открываем полностью готовый экран с приложениями без экрана "Проверка..."
-                switchScreen("tokenApp");
-
-                sendTelegramNotification(token, linkObj.app_keys, ttlMins);
-                syncAll();
-                setInterval(syncAll, 1000);
-                return;
-            } else if (legacyTokenData && legacyTtl > 0) {
-                const keys = legacyTokenData.split(",").map(s => s.trim()).filter(Boolean);
-                const ttlMins = Math.ceil(legacyTtl / 60);
-                const expiresAt = Date.now() + (legacyTtl * 1000);
-                saveActiveTokenSession({ token: token, app_keys: keys, expires_at: expiresAt, ttl_minutes: ttlMins });
-                updateTokenHeroText(ttlMins);
-                renderTokenAppsList(keys);
-                startTokenCountdown(expiresAt);
-                switchScreen("tokenApp");
-                return;
-            } else {
+            // Читаем данные ссылки и сразу удаляем неактивированный оригинал из базы
+            const rawLinkJson = await redisFast("GET", "link:" + token);
+            if (!rawLinkJson) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
+
+            const linkObj = JSON.parse(rawLinkJson);
+            if (linkObj.is_used && linkObj.device_id && linkObj.device_id !== myDeviceId) {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+
+            const now = Date.now();
+            const ttlMins = Number(linkObj.ttl_minutes) || 3;
+            const ttlMs = ttlMins * 60 * 1000;
+            const activatedAt = linkObj.activated_at > 0 ? Number(linkObj.activated_at) : now;
+            const expiresAt = activatedAt + ttlMs;
+
+            if (now >= expiresAt) {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+
+            // Удаляем ссылку из базы, чтобы ни одно другое устройство больше никогда не смогло её прочитать
+            await redisFast("DEL", "link:" + token);
+
+            // Сохраняем сессию в браузере первого устройства (для перезагрузок страницы)
+            saveActiveTokenSession({
+                token: token,
+                app_keys: linkObj.app_keys,
+                expires_at: expiresAt,
+                ttl_minutes: ttlMins
+            });
+
+            updateTokenHeroText(ttlMins);
+            renderTokenAppsList(linkObj.app_keys);
+            startTokenCountdown(expiresAt, token);
+            switchScreen("tokenApp");
+
+            // Отправляем уведомление в Telegram строго 1 раз
+            sendTelegramNotificationOnce(token, linkObj.app_keys, ttlMins);
+            syncAll();
+            setInterval(syncAll, 1000);
+            return;
         } catch (e) {
             isTokenExpired = true;
             switchScreen("tokenErrorApp");
@@ -1256,7 +1247,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Быстрая фоновая синхронизация каждые 800 мс
     setInterval(syncAll, 800);
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") syncAll();
