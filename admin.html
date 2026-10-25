@@ -189,43 +189,24 @@
     </div>
 
     <script>
-        const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
-        const ADMIN_TELEGRAM_ID = "942963228";
-
-        const UPSTASH_URL = "https://elegant-airedale-218830.upstash.io";
-        const UPSTASH_TOKEN = "gQAAAAAAA1bOAAIgcDFkODU0ZjdkYjU5MDY0NGY1YjhlYjRjZmY3NDBhMDkzOQ";
+        const SUPABASE_URL = "https://ccghjrzpieyuebiclpqm.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_fwlyOR63ASdotUgvlsMxdQ_UwVlqHB5";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-        async function redisFast(...cmd) {
+        async function sbFetch(path, options = {}) {
             try {
-                const res = await fetch(`${UPSTASH_URL}`, {
-                    method: "POST",
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+                    ...options,
                     headers: {
-                        "Authorization": `Bearer ${UPSTASH_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(cmd),
-                    cache: "no-store"
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        ...(options.headers || {})
+                    }
                 });
                 if (!res.ok) return null;
-                const data = await res.json();
-                return data.result;
-            } catch (e) { return null; }
-        }
-
-        async function redisFastPipeline(commands) {
-            try {
-                const res = await fetch(`${UPSTASH_URL}/pipeline`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${UPSTASH_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(commands),
-                    cache: "no-store"
-                });
-                if (!res.ok) return null;
-                return await res.json();
+                const text = await res.text();
+                return text ? JSON.parse(text) : null;
             } catch (e) { return null; }
         }
 
@@ -303,16 +284,6 @@
             else openView('view-menu');
         });
 
-        async function syncConfigSnapshot() {
-            const snapshot = JSON.stringify({
-                prices: globalData.state.prices,
-                visibility: globalData.state.visibility,
-                siteEnabled: globalData.siteEnabled,
-                updatedAt: Date.now()
-            });
-            await redisFast("SET", "app_config", snapshot);
-        }
-
         function selectTtl(mins, el) {
             selectedTtlMinutes = mins;
             document.querySelectorAll('.ttl-pill').forEach(p => p.classList.remove('active'));
@@ -353,39 +324,29 @@
         async function loadData() {
             renderAllViews();
             try {
-                const snapRaw = await redisFast("GET", "app_config");
-                if (snapRaw) {
-                    const parsed = JSON.parse(snapRaw);
-                    globalData.state.prices = parsed.prices || {};
-                    globalData.state.visibility = parsed.visibility || {};
-                    globalData.siteEnabled = parsed.siteEnabled !== false;
-                    renderAllViews();
-                    return;
-                }
-
-                const res = await redisFastPipeline([
-                    ["HGETALL", "app_prices"],
-                    ["HGETALL", "app_visibility"],
-                    ["GET", "site_enabled"]
+                const [pricesRes, visRes, settingsRes] = await Promise.all([
+                    sbFetch("app_prices?select=*"),
+                    sbFetch("app_visibility?select=*"),
+                    sbFetch("site_settings?select=*")
                 ]);
-                if (!res) return;
-                const pricesRaw = res[0]?.result;
-                const visRaw = res[1]?.result;
-                const siteEnabledVal = res[2]?.result;
 
                 const prices = {};
-                if (Array.isArray(pricesRaw)) {
-                    for (let i = 0; i < pricesRaw.length; i += 2) prices[pricesRaw[i]] = pricesRaw[i+1];
+                if (Array.isArray(pricesRes)) {
+                    pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
                 }
                 const visibility = {};
-                if (Array.isArray(visRaw)) {
-                    for (let i = 0; i < visRaw.length; i += 2) visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
+                if (Array.isArray(visRes)) {
+                    visRes.forEach(row => { visibility[row.app_key] = row.is_visible; });
+                }
+                let siteEnabled = true;
+                if (Array.isArray(settingsRes)) {
+                    const s = settingsRes.find(x => x.key === "site_enabled");
+                    if (s) siteEnabled = s.value === "true";
                 }
 
                 globalData.state = { prices, visibility };
-                globalData.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
+                globalData.siteEnabled = siteEnabled;
                 renderAllViews();
-                syncConfigSnapshot();
             } catch (e) {}
         }
 
@@ -461,17 +422,22 @@
             const token = String(10000000 + (array[0] % 90000000));
             const appKeysArr = Array.from(selectedAppsForLink);
 
-            const linkRecord = JSON.stringify({
+            const linkRecord = {
+                token: token,
                 app_keys: appKeysArr,
                 ttl_minutes: selectedTtlMinutes,
                 is_used: false,
                 activated_at: 0,
                 device_id: null,
                 created_at: Date.now()
+            };
+
+            await sbFetch("app_links", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(linkRecord)
             });
 
-            await redisFast("DEL", "lock:" + token, "notif:" + token);
-            await redisFast("SET", "link:" + token, linkRecord, "EX", "86400");
             btn.innerText = prevText;
 
             const linkUrl = CLIENT_SITE_URL + '/?' + token;
@@ -530,13 +496,16 @@
             priceInput.value = getAdminAppPrice(key);
             document.getElementById('btn-save-price').onclick = () => {
                 const numPrice = parseInt(priceInput.value, 10);
-                const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? String(numPrice) : "250";
-                globalData.state.prices[key] = validPrice;
+                const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
+                globalData.state.prices[key] = String(validPrice);
                 renderPricesList();
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
-                syncConfigSnapshot();
-                redisFast("HSET", "app_prices", key, validPrice);
+                sbFetch("app_prices", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ app_key: key, price: validPrice, updated_at: Date.now() })
+                });
             };
             openView('view-price-detail');
         }
@@ -574,8 +543,11 @@
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
-            syncConfigSnapshot();
-            redisFast("HSET", "app_visibility", key, String(makeVisible));
+            sbFetch("app_visibility", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify({ app_key: key, is_visible: makeVisible, updated_at: Date.now() })
+            });
         }
 
         function renderSettings() {
@@ -593,8 +565,11 @@
                 globalData.siteEnabled = newState;
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
-                syncConfigSnapshot();
-                redisFast("SET", "site_enabled", String(newState));
+                sbFetch("site_settings", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ key: "site_enabled", value: String(newState), updated_at: Date.now() })
+                });
             };
         }
 
