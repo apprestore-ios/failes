@@ -119,7 +119,7 @@
       }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
       .app-price-tag { font-size: 11px; font-weight: 750; color: #93c5fd; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
-      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); }
+      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
@@ -395,7 +395,6 @@
 </div>
 
 <script>
-
 const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
 const ADMIN_TELEGRAM_ID = "942963228";
 
@@ -1075,7 +1074,6 @@ function clearAppSearch() {
     input.focus({ preventScroll: true });
 }
 
-// Фоновая мгновенная синхронизация без задержек и без блокировки интерфейса
 async function syncAll() {
     try {
         const snapRaw = await redisFast("GET", "app_config");
@@ -1103,7 +1101,6 @@ async function syncAll() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Мгновенно отрисовываем карточки из массива без ожидания сети
     generateAppsGrid();
     const token = extractTokenFromLocation();
     const myDeviceId = getOrCreateDeviceId();
@@ -1111,13 +1108,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (token) {
         isFromToken = true;
 
-        // Отсекаем ботов предпросмотра мессенджеров
         const ua = navigator.userAgent || "";
         if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) {
             return;
         }
 
-        // Проверяем сохраненную сессию на первом устройстве
         const savedSession = getActiveTokenSession(token);
         if (savedSession && savedSession.token === token) {
             const timeLeft = savedSession.expires_at - Date.now();
@@ -1137,7 +1132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // Атомарный захват в Redis на первое устройство
         try {
             const lockResult = await redisFast("SET", "lock:" + token, myDeviceId, "NX", "EX", 86400);
 
@@ -1176,7 +1170,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            // Сжигаем оригинал ссылки в базе
             await redisFast("DEL", "link:" + token);
 
             saveActiveTokenSession({
@@ -1202,7 +1195,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Обычный вход в каталог: открываем экран СРАЗУ же без ожидания ответа базы
     let lastScreen = sessionStorage.getItem("currentScreenId");
     let hasEntered = sessionStorage.getItem("site_access") === "true";
     if (hasEntered) {
@@ -1224,9 +1216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Запускаем фоновую синхронизацию цен и статуса
     syncAll();
-    setInterval(syncAll, 800);
+    setInterval(syncAll, 600);
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") syncAll();
     });
