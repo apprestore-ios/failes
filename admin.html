@@ -6,18 +6,19 @@
     <title>AppRestore Admin</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --text: #f8fafc; --muted: rgba(255, 255, 255, 0.55); --card-bg: rgba(17, 24, 39, 0.55); --accent: #3b82f6; }
+        :root { --text: #f8fafc; --muted: rgba(255, 255, 255, 0.55); --card-bg: rgba(17, 24, 39, 0.65); --accent: #3b82f6; }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; background-color: #0b0f17; }
+        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; background: #0b0f17; }
         body { 
             color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
             user-select: none; -webkit-user-select: none;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: transparent !important;
         }
         .aurora-bg {
-            position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: 0;
+            position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -1;
             background-color: #0b0f17;
-            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D8%B8%D0%BF%D1%8B/fon_saita.jpg");
+            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
         .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
@@ -188,7 +189,6 @@
     </div>
 
     <script>
-        
         const TELEGRAM_BOT_TOKEN = "8798433533:AAFs4j2nEOcF0FCrHp6uzQwPDudN09Cb36c";
         const ADMIN_TELEGRAM_ID = "942963228";
 
@@ -206,6 +206,18 @@
                 if (!res.ok) return null;
                 const data = await res.json();
                 return data.result;
+            } catch (e) { return null; }
+        }
+
+        async function redisFastPipeline(commands) {
+            try {
+                const res = await fetch(`${UPSTASH_URL}/pipeline?_token=${encodeURIComponent(UPSTASH_TOKEN)}&_t=${Date.now()}`, {
+                    method: "POST",
+                    body: JSON.stringify(commands),
+                    cache: "no-store"
+                });
+                if (!res.ok) return null;
+                return await res.json();
             } catch (e) { return null; }
         }
 
@@ -340,7 +352,32 @@
                     globalData.state.visibility = parsed.visibility || {};
                     globalData.siteEnabled = parsed.siteEnabled !== false;
                     renderAllViews();
+                    return;
                 }
+
+                const res = await redisFastPipeline([
+                    ["HGETALL", "app_prices"],
+                    ["HGETALL", "app_visibility"],
+                    ["GET", "site_enabled"]
+                ]);
+                if (!res) return;
+                const pricesRaw = res[0]?.result;
+                const visRaw = res[1]?.result;
+                const siteEnabledVal = res[2]?.result;
+
+                const prices = {};
+                if (Array.isArray(pricesRaw)) {
+                    for (let i = 0; i < pricesRaw.length; i += 2) prices[pricesRaw[i]] = pricesRaw[i+1];
+                }
+                const visibility = {};
+                if (Array.isArray(visRaw)) {
+                    for (let i = 0; i < visRaw.length; i += 2) visibility[visRaw[i]] = String(visRaw[i+1]) !== "false";
+                }
+
+                globalData.state = { prices, visibility };
+                globalData.siteEnabled = siteEnabledVal === null ? true : (String(siteEnabledVal) === "true");
+                renderAllViews();
+                syncConfigSnapshot();
             } catch (e) {}
         }
 
@@ -425,7 +462,6 @@
                 created_at: Date.now()
             });
 
-            // Сбрасываем старые замки (если совпал код) и записываем новую ссылку
             await redisFast("DEL", "lock:" + token, "notif:" + token);
             await redisFast("SET", "link:" + token, linkRecord, "EX", 86400);
             btn.innerText = prevText;
@@ -492,6 +528,7 @@
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
                 syncConfigSnapshot();
+                redisFast("HSET", "app_prices", key, validPrice);
             };
             openView('view-price-detail');
         }
@@ -530,6 +567,7 @@
 
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
             syncConfigSnapshot();
+            redisFast("HSET", "app_visibility", key, String(makeVisible));
         }
 
         function renderSettings() {
@@ -548,45 +586,9 @@
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
                 syncConfigSnapshot();
+                redisFast("SET", "site_enabled", String(newState));
             };
         }
-
-        // Автоматическое отключение старого вебхука Cloudflare и удаление уведомлений по кнопке
-        let webhookCleared = false;
-        let lastUpdateOffset = Number(localStorage.getItem("tg_upd_offset") || 0);
-
-        async function pollTelegramUpdates() {
-            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "ВАШ_ТОКЕН_БОТА") return;
-            try {
-                if (!webhookCleared) {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=false`);
-                    webhookCleared = true;
-                }
-                const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateOffset}&timeout=0`);
-                const data = await res.json();
-                if (data.ok && Array.isArray(data.result)) {
-                    for (const upd of data.result) {
-                        lastUpdateOffset = upd.update_id + 1;
-                        localStorage.setItem("tg_upd_offset", String(lastUpdateOffset));
-
-                        if (upd.callback_query && (upd.callback_query.data === "delete_notify_msg" || upd.callback_query.data === "del_msg")) {
-                            const chatId = upd.callback_query.message.chat.id;
-                            const msgId = upd.callback_query.message.message_id;
-                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-                                method: "POST", headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ callback_query_id: upd.callback_query.id, text: "Уведомление удалено" })
-                            });
-                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
-                                method: "POST", headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ chat_id: chatId, message_id: msgId })
-                            });
-                        }
-                    }
-                }
-            } catch (e) {}
-        }
-        setInterval(pollTelegramUpdates, 1500);
-        pollTelegramUpdates();
 
         loadData();
     </script>
