@@ -127,7 +127,7 @@
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
 
-      .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 2px; }
+      .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
       .cart-items-list::-webkit-scrollbar { width: 4px; }
       .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
       .cart-empty-alert {
@@ -160,8 +160,6 @@
       .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; }
       .btn-telegram { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.5); color: #a78bfa; box-shadow: none; }
       .btn-telegram .sf-icon { font-size: 20px; margin-right: 6px; }
-      .btn-channel { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; box-shadow: none; }
-      .btn-channel .sf-icon { font-size: 20px; margin-right: 6px; }
 
       .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
       .categories-bar::-webkit-scrollbar { display: none; }
@@ -183,6 +181,8 @@
       .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
       .menu-modal.active { display: flex; }
       .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; }
+      .menu-sheet::-webkit-scrollbar { width: 4px; }
+      .menu-sheet::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
       .menu-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
       .menu-item { padding: 13px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; transition: transform 0.2s ease; }
       .menu-item:active { transform: scale(0.98); }
@@ -194,13 +194,16 @@
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
 
-      /* Оформление для юридических документов */
-      .legal-scroll-area {
+      /* Область прокрутки для всех информационных окон в бургер-меню со сдвинутым вправо скроллбаром */
+      .legal-scroll-area, .info-scroll-area {
           display: flex; flex-direction: column; gap: 10px;
-          max-height: 56dvh; overflow-y: auto; padding-right: 4px; text-align: left;
+          max-height: 58dvh; overflow-y: auto;
+          padding-right: 10px; margin-right: -10px;
+          text-align: left; width: calc(100% + 10px);
       }
-      .legal-scroll-area::-webkit-scrollbar { width: 4px; }
-      .legal-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .legal-scroll-area::-webkit-scrollbar, .info-scroll-area::-webkit-scrollbar { width: 4px; }
+      .legal-scroll-area::-webkit-scrollbar-thumb, .info-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .info-scroll-area .step-card { margin-bottom: 0; }
       .legal-section-card {
           background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1);
           border-radius: 16px; padding: 14px; text-align: left;
@@ -401,27 +404,31 @@
 
 <div class="container" id="guideApp">
     <div class="auth-box" style="padding-top: 22px;">
-        <div class="auth-title" style="text-align: center; margin-bottom: 6px; font-size: 19px;">Инструкция по заказу и установке</div>
-        <div class="step-card" style="margin-top: 8px;"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
-        <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Заказать установку в Telegram»</b>, отправьте сформированное сообщение продавцу и оплатите заказ по реквизитам.</div></div>
-        <div class="step-card"><div class="step-icon">3</div><div class="step-text">Перейдите по полученной персональной ссылке в Safari и нажмите <b>«Установить»</b>.</div></div>
-        <div class="step-card" style="margin-bottom: 0;"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 10px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 8px;">Понятно, вернуться назад</button>
+        <div class="auth-title" style="text-align: center; margin-bottom: 2px; font-size: 19px;">Инструкция по заказу и установке</div>
+        <div class="info-scroll-area">
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Заказать установку в Telegram»</b>, отправьте сформированное сообщение продавцу и оплатите заказ по реквизитам.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">Перейдите по полученной персональной ссылке в Safari и нажмите <b>«Установить»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
     </div>
 </div>
 
 <div class="container" id="tipsApp">
     <div class="auth-box" style="padding-top: 22px;">
-        <div class="auth-title" style="text-align: center; margin-bottom: 6px; font-size: 19px;">Полезные советы</div>
-        <div class="auth-description" style="margin-bottom: 6px; text-align: center; font-weight: 600;">1. Отключите сгружение:</div>
-        <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
-        <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
-        <div class="auth-description" style="margin-top: 14px; margin-bottom: 6px; text-align: center; font-weight: 600;">2. Защита от удаления:</div>
-        <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
-        <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
-        <div class="step-card" style="margin-bottom: 0;"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 14px;">Понятно, вернуться назад</button>
+        <div class="auth-title" style="text-align: center; margin-bottom: 2px; font-size: 19px;">Полезные советы</div>
+        <div class="info-scroll-area">
+            <div class="auth-description" style="text-align: center; font-weight: 600;">1. Отключите сгружение:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
+            <div class="auth-description" style="margin-top: 6px; text-align: center; font-weight: 600;">2. Защита от удаления:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 4px;">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -495,9 +502,7 @@
             </div>
         </div>
 
-        <a href="https://t.me/apprestore_ios" target="_blank" class="btn btn-channel" style="margin-top: 4px;"><span class="sf-icon">&#xFA8E;</span> Наш Telegram канал</a>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram"><span class="sf-icon">&#xF9E8;</span> Поддержка в Telegram</a>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 4px;">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -603,9 +608,7 @@
             </div>
         </div>
 
-        <a href="https://t.me/apprestore_ios" target="_blank" class="btn btn-channel" style="margin-top: 4px;"><span class="sf-icon">&#xFA8E;</span> Наш Telegram канал</a>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram"><span class="sf-icon">&#xF9E8;</span> Поддержка в Telegram</a>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 4px;">Понятно, вернуться назад</button>
     </div>
 </div>
 
