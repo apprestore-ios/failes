@@ -194,7 +194,6 @@
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
 
-      /* Компактное окно для всех разделов бургер-меню: прокручивается только текст внутри */
       #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box {
           padding: 18px 18px 16px;
           gap: 10px;
@@ -1346,14 +1345,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const maxWaitBeforeActivation = 24 * 60 * 60 * 1000;
             if (!linkObj.is_used && (now - createdAt > maxWaitBeforeActivation)) {
-                await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
 
             if (linkObj.is_used) {
-                await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
@@ -1366,12 +1363,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 method: "PATCH",
                 body: JSON.stringify({
                     is_used: true,
-                    activated_at: now,
+                    activated_at: new Date(now).toISOString(),
                     device_id: myDeviceId
                 })
             });
-
-            await sbFetch(`app_links?token=eq.${token}`, { method: "DELETE" });
 
             const appNames = (linkObj.app_keys || []).map(k => {
                 const found = appsData.find(a => a.key === k.trim());
