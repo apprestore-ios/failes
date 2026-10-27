@@ -593,6 +593,20 @@
             }
         }
 
+        function loadFromLocalStorageCache() {
+            try {
+                const pCache = localStorage.getItem("apprestore_prices_cache");
+                const vCache = localStorage.getItem("apprestore_visibility_cache");
+                const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+                if (pCache) siteState.prices = JSON.parse(pCache);
+                if (vCache) siteState.visibility = JSON.parse(vCache);
+                if (sCache !== null) {
+                    siteEnabled = sCache === "true";
+                    if (!siteEnabled) switchScreen("maintenanceApp");
+                }
+            } catch(e) {}
+        }
+
         async function fetchSiteDataFromSupabase() {
             try {
                 const [pricesRes, visRes, settingsRes] = await Promise.all([
@@ -617,10 +631,26 @@
                         }
                     }
                 }
+                // Сохраняем в кэш для будущих открытий
+                try {
+                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
+                    localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
+                    localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+                } catch(e) {}
+
                 updateCartUI();
                 filterApps();
             } catch (e) {}
         }
+
+        // Слушаем изменения из админки (мгновенное обновление на лету без перезагрузки)
+        window.addEventListener('storage', (event) => {
+            if (event.key && event.key.startsWith("apprestore_")) {
+                loadFromLocalStorageCache();
+                updateCartUI();
+                filterApps();
+            }
+        });
 
         function saveActiveTokenSession(dataObj) {
             const str = JSON.stringify(dataObj);
@@ -685,7 +715,7 @@
         function updateTokenHeroText(ttlMinutes) {
             const descEl = document.getElementById("tokenHeroDesc");
             if (!descEl) return;
-            const m = Number(ttlMinutes) || 3;
+            const m = Number(ttlMinutes) || 5;
             const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
             descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
         }
@@ -1130,10 +1160,11 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Сразу строим сетку приложений, чтобы каталог открывался мгновенно без задержек
+            // 1. Сначала мгновенно подгружаем из кэша, чтобы каталог открывался без задержки и пустоты
+            loadFromLocalStorageCache();
             generateAppsGrid();
 
-            // Фоном запрашиваем актуальные данные из Supabase
+            // 2. Фоном запрашиваем свежие данные из базы Supabase
             fetchSiteDataFromSupabase();
 
             const token = extractTokenFromLocation();
@@ -1150,7 +1181,7 @@
                 if (savedSession && savedSession.token === token) {
                     const timeLeft = savedSession.expires_at - Date.now();
                     if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
-                        updateTokenHeroText(savedSession.ttl_minutes || 3);
+                        updateTokenHeroText(savedSession.ttl_minutes || 5);
                         renderTokenAppsList(savedSession.app_keys);
                         startTokenCountdown(savedSession.expires_at, token);
                         switchScreen("tokenApp");
