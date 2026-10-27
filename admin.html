@@ -189,9 +189,8 @@
     </div>
 
     <script>
-        // НАСТРОЙКИ GITHUB API
-        const GITHUB_TOKEN = "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"; // Вставьте ваш личный токен (ghp_...)
-        const GITHUB_REPO = "apprestore-ios/failes"; // Например: myname/store
+        const GITHUB_TOKEN = "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";
+        const GITHUB_REPO = "apprestore-ios/failes";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
         let dbData = {
@@ -219,7 +218,6 @@
 
         async function saveGitHubJSON(newData) {
             try {
-                // Сначала получаем свежий sha перед записью, чтобы избежать конфликтов
                 const checkRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/database.json`, {
                     headers: { "Authorization": `Bearer ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" }
                 });
