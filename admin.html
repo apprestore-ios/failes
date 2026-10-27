@@ -205,7 +205,7 @@
                 });
                 if (!res.ok) return null;
                 const text = await res.text();
-                return text ? JSON.parse(text) : null;
+                return text ? JSON.parse(text) : { success: true };
             } catch (e) { return null; }
         }
 
@@ -340,6 +340,12 @@
                     sbFetch("app_visibility?select=*"),
                     sbFetch("site_settings?select=*")
                 ]);
+
+                // Не перезаписываем рабочие данные пустыми значениями при ошибке Supabase.
+                if (!Array.isArray(pricesRes) || !Array.isArray(visRes) || !Array.isArray(settingsRes)) {
+                    showToast("Не удалось обновить данные Supabase");
+                    return;
+                }
 
                 const prices = {};
                 if (Array.isArray(pricesRes)) {
@@ -525,10 +531,12 @@
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
 
-                sbFetch("app_prices", {
+                sbFetch("app_prices?on_conflict=app_key", {
                     method: "POST",
-                    headers: { "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ app_key: key, price: validPrice, updated_at: Date.now() })
+                    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                    body: JSON.stringify({ app_key: key, price: validPrice })
+                }).then(result => {
+                    if (result === null) showToast("Ошибка сохранения цены в Supabase");
                 });
             };
             openView('view-price-detail');
@@ -572,10 +580,12 @@
 
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
 
-            sbFetch("app_visibility", {
+            sbFetch("app_visibility?on_conflict=app_key", {
                 method: "POST",
-                headers: { "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify({ app_key: key, is_visible: makeVisible, updated_at: Date.now() })
+                headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                body: JSON.stringify({ app_key: key, is_visible: makeVisible })
+            }).then(result => {
+                if (result === null) showToast("Ошибка сохранения видимости в Supabase");
             });
         }
 
@@ -600,10 +610,12 @@
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
 
-                sbFetch("site_settings", {
+                sbFetch("site_settings?on_conflict=key", {
                     method: "POST",
-                    headers: { "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ key: "site_enabled", value: String(newState), updated_at: Date.now() })
+                    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                    body: JSON.stringify({ key: "site_enabled", value: String(newState) })
+                }).then(result => {
+                    if (result === null) showToast("Ошибка сохранения статуса сайта в Supabase");
                 });
             };
         }
