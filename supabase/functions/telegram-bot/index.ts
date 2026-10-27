@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
-const ADMIN_CHAT_ID = Deno.env.get('ADMIN_CHAT_ID')
+const ADMIN_CHAT_ID = Deno.env.get('ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_ADMIN_ID')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 function parseDeviceName(ua: string): string {
@@ -25,8 +26,15 @@ function parseDeviceName(ua: string): string {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
   
   try {
+    if (!TELEGRAM_BOT_TOKEN) {
+      return new Response(JSON.stringify({ success: false, error: 'TELEGRAM_BOT_TOKEN не настроен' }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
     const body = await req.json()
 
     // 1. Уведомление об активации (для сайта/приложения)
@@ -45,18 +53,32 @@ serve(async (req) => {
         ]
       };
 
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      if (!ADMIN_CHAT_ID) {
+        return new Response(JSON.stringify({ success: false, error: 'ADMIN_CHAT_ID / TELEGRAM_ADMIN_ID не настроен' }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+
+      const telegramResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          chat_id: ADMIN_CHAT_ID, 
-          text: text, 
+        body: JSON.stringify({
+          chat_id: ADMIN_CHAT_ID,
+          text,
           parse_mode: 'Markdown',
           reply_markup: replyMarkup
         })
       })
-      
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
+      const telegramResult = await telegramResponse.json()
+      if (!telegramResponse.ok || !telegramResult.ok) {
+        return new Response(JSON.stringify({ success: false, error: 'Telegram sendMessage failed' }), {
+          status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200
+      })
     }
 
     // 2. Обработка запросов от Telegram (команда /start)
