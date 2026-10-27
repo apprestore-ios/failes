@@ -602,7 +602,11 @@
                 if (vCache) siteState.visibility = JSON.parse(vCache);
                 if (sCache !== null) {
                     siteEnabled = sCache === "true";
-                    if (!siteEnabled) switchScreen("maintenanceApp");
+                    if (!siteEnabled && currentScreenId !== "maintenanceApp") {
+                        switchScreen("maintenanceApp");
+                    } else if (siteEnabled && currentScreenId === "maintenanceApp") {
+                        switchScreen("mainApp");
+                    }
                 }
             } catch(e) {}
         }
@@ -643,7 +647,8 @@
                             hasChanges = true;
                             if (!siteEnabled) {
                                 switchScreen("maintenanceApp");
-                                return;
+                            } else if (currentScreenId === "maintenanceApp") {
+                                switchScreen("mainApp");
                             }
                         }
                     }
@@ -662,10 +667,10 @@
             } catch (e) {}
         }
 
-        // Фоновый опрос базы каждые 2 секунды для мгновенного обновления цен/видимости на лету
+        // Авто-опрос базы каждые 1 секунду для мгновенного применения изменений (включение/выключение, цены, видимость)
         setInterval(() => {
             fetchSiteDataFromSupabase(false);
-        }, 2000);
+        }, 1000);
 
         function getOrCreateDeviceId() {
             let devId = "";
@@ -772,8 +777,6 @@
                     isTokenExpired = true;
                     display.textContent = "ИСТЕКЛО";
                     display.style.color = "#ef4444";
-                    const container = document.getElementById("singleTokenAppContainer");
-                    if (container) container.innerHTML = "";
                     switchScreen("tokenErrorApp");
                 }
             }
@@ -1094,7 +1097,6 @@
             const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
             const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
             
-            // Отправка уведомления в Telegram об активации/установке
             try {
                 fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
                     method: "POST",
@@ -1161,7 +1163,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             loadFromLocalStorageCache();
             generateAppsGrid();
-            fetchSiteDataFromSupabase(true);
+            await fetchSiteDataFromSupabase(true);
 
             const token = extractTokenFromLocation();
 
@@ -1187,9 +1189,8 @@
                         const ttlMs = ttlMins * 60 * 1000;
                         const now = Date.now();
 
-                        // Проверяем привязку устройства (ограничение: строго на одном устройстве)
+                        // Строгая проверка устройства: если девайс уже записан и он другой — сразу ошибка без зависания
                         if (row.device_id && row.device_id !== currentDevice) {
-                            // Открыто с другого устройства! Блокируем
                             isTokenExpired = true;
                             switchScreen("tokenErrorApp");
                             return;
@@ -1197,7 +1198,6 @@
 
                         let activatedAt = Number(row.activated_at) || 0;
                         if (!row.is_used || !activatedAt) {
-                            // Первая активация ссылки на этом устройстве
                             activatedAt = now;
                             await sbFetch(`app_links?token=eq.${token}`, {
                                 method: "PATCH",
@@ -1212,8 +1212,17 @@
                             sessionExpiresAt = expiresAt;
                             sessionAppKeys = row.app_keys || [];
                         }
+                    } else {
+                        // Если токен вообще не найден в базе
+                        isTokenExpired = true;
+                        switchScreen("tokenErrorApp");
+                        return;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    isTokenExpired = true;
+                    switchScreen("tokenErrorApp");
+                    return;
+                }
 
                 if (isValidToken && sessionAppKeys.length > 0) {
                     updateTokenHeroText(sessionTtlMinutes);
@@ -1247,7 +1256,7 @@
                     previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
                     switchScreen(lastScreen);
                     if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
-                    if (lastScreen === "offerApp" == lastScreen && false) {}
+                    if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
                 } else {
                     switchScreen("welcomeApp");
                 }
