@@ -18,35 +18,43 @@ serve(async (req) => {
     if (body.action === 'notify_activation') {
       const { token, app_keys, device_name } = body
       const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : app_keys
-      const text = `🔔 *Новая активация!*\n\n🔑 Токен: \`${token}\`\n📱 Устройство: \`${device_name}\`\n📦 Приложения: \`${appsList}\``
       
+      // Время по Екатеринбургу (UTC+5)
+      const ekbTime = new Date().toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg" });
+
+      const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n🔑 Токен: \`${token}\`\n⏰ Время (Екб): \`${ekbTime}\`\n📱 Устройство: \`${device_name}\``
+      
+      const replyMarkup = {
+        inline_keyboard: [
+          [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
+        ]
+      };
+
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: text, parse_mode: 'Markdown' })
+        body: JSON.stringify({ 
+          chat_id: ADMIN_CHAT_ID, 
+          text: text, 
+          parse_mode: 'Markdown',
+          reply_markup: replyMarkup
+        })
       })
       
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
     }
 
-    // 2. Обработка запросов от Telegram (команда /start)
+    // 2. Обработка запросов от Telegram (команда /start и удаление сообщения по кнопке)
     if (body.message) {
       const chatId = body.message.chat.id
       const text = body.message.text
-
       const isAdmin = String(chatId) === String(ADMIN_CHAT_ID)
 
       if (text === '/start') {
-        const replyMarkup: any = {
-          inline_keyboard: []
-        }
-
+        const replyMarkup: any = { inline_keyboard: [] }
         if (isAdmin) {
           replyMarkup.inline_keyboard.push([
-            { 
-              text: "⚙️ Открыть Админ-панель", 
-              web_app: { url: "https://apprestore-ios.ru/admin.html" } 
-            }
+            { text: "⚙️ Открыть Админ-панель", web_app: { url: "https://apprestore-ios.ru/admin.html" } }
           ])
         }
 
@@ -60,6 +68,22 @@ serve(async (req) => {
           })
         })
       }
+    }
+
+    if (body.callback_query) {
+      const query = body.callback_query
+      if (query.data === 'delete_msg') {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: query.message.chat.id, message_id: query.message.message_id })
+        })
+      }
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: query.id })
+      })
     }
 
     return new Response('OK', { status: 200 })
