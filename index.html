@@ -607,7 +607,7 @@
             } catch(e) {}
         }
 
-        async function fetchSiteDataFromSupabase() {
+        async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
             try {
                 const [pricesRes, visRes, settingsRes] = await Promise.all([
                     sbFetch("app_prices?select=*"),
@@ -615,79 +615,70 @@
                     sbFetch("site_settings?select=*")
                 ]);
 
+                let hasChanges = false;
+                const newPrices = {};
                 if (Array.isArray(pricesRes)) {
-                    pricesRes.forEach(row => { siteState.prices[row.app_key] = String(row.price); });
+                    pricesRes.forEach(row => { newPrices[row.app_key] = String(row.price); });
                 }
+                if (JSON.stringify(newPrices) !== JSON.stringify(siteState.prices)) {
+                    siteState.prices = newPrices;
+                    hasChanges = true;
+                }
+
+                const newVis = {};
                 if (Array.isArray(visRes)) {
-                    visRes.forEach(row => { siteState.visibility[row.app_key] = row.is_visible; });
+                    visRes.forEach(row => { newVis[row.app_key] = row.is_visible; });
                 }
+                if (JSON.stringify(newVis) !== JSON.stringify(siteState.visibility)) {
+                    siteState.visibility = newVis;
+                    hasChanges = true;
+                }
+
                 if (Array.isArray(settingsRes)) {
                     const s = settingsRes.find(x => x.key === "site_enabled");
                     if (s) {
-                        siteEnabled = s.value === "true";
-                        if (!siteEnabled) {
-                            switchScreen("maintenanceApp");
-                            return;
+                        const newEnabled = s.value === "true";
+                        if (newEnabled !== siteEnabled) {
+                            siteEnabled = newEnabled;
+                            hasChanges = true;
+                            if (!siteEnabled) {
+                                switchScreen("maintenanceApp");
+                                return;
+                            }
                         }
                     }
                 }
+
                 try {
                     localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
                     localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
                     localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
                 } catch(e) {}
 
-                updateCartUI();
-                filterApps();
+                if (hasChanges || forceUpdateUI) {
+                    updateCartUI();
+                    filterApps();
+                }
             } catch (e) {}
         }
 
-        // Авто-опрос кэша каждые 1.5 секунды для мгновенного применения изменений из админки без перезагрузки
+        // Фоновый опрос базы каждые 2 секунды для мгновенного обновления цен/видимости на лету
         setInterval(() => {
-            const oldPrices = JSON.stringify(siteState.prices);
-            const oldVis = JSON.stringify(siteState.visibility);
-            const oldEnabled = siteEnabled;
-            
-            loadFromLocalStorageCache();
+            fetchSiteDataFromSupabase(false);
+        }, 2000);
 
-            if (JSON.stringify(siteState.prices) !== oldPrices || 
-                JSON.stringify(siteState.visibility) !== oldVis || 
-                siteEnabled !== oldEnabled) {
-                updateCartUI();
-                filterApps();
-            }
-        }, 1500);
-
-        function saveActiveTokenSession(dataObj) {
-            const str = JSON.stringify(dataObj);
-            try { localStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
-            try { sessionStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
+        function getOrCreateDeviceId() {
+            let devId = "";
             try {
-                const expDate = new Date(dataObj.expires_at).toUTCString();
-                document.cookie = "tok_" + dataObj.token + "=" + encodeURIComponent(str) + "; expires=" + expDate + "; path=/; SameSite=Lax";
-            } catch (e) {}
-        }
-
-        function getActiveTokenSession(token) {
-            if (!token) return null;
-            let raw = null;
-            try { raw = localStorage.getItem("active_token_data_" + token); } catch (e) {}
-            if (!raw) { try { raw = sessionStorage.getItem("active_token_data_" + token); } catch (e) {} }
-            if (!raw) {
-                try {
-                    const match = document.cookie.match(new RegExp('(^| )tok_' + token + '=([^;]+)'));
-                    if (match) raw = decodeURIComponent(match[2]);
-                } catch (e) {}
+                devId = localStorage.getItem("apprestore_device_id");
+                if (!devId) {
+                    devId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                    localStorage.setItem("apprestore_device_id", devId);
+                }
+            } catch (e) {
+                devId = 'dev_fallback_' + Date.now();
             }
-            if (!raw) return null;
-            try { return JSON.parse(raw); } catch (e) { return null; }
-        }
-
-        function clearActiveTokenSession(token) {
-            if (!token) return;
-            try { localStorage.removeItem("active_token_data_" + token); } catch (e) {}
-            try { sessionStorage.removeItem("active_token_data_" + token); } catch (e) {}
-            try { document.cookie = "tok_" + token + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; } catch (e) {}
+            return devId;
         }
 
         function getAppPrice(key) {
@@ -781,7 +772,6 @@
                     isTokenExpired = true;
                     display.textContent = "ИСТЕКЛО";
                     display.style.color = "#ef4444";
-                    clearActiveTokenSession(currentToken);
                     const container = document.getElementById("singleTokenAppContainer");
                     if (container) container.innerHTML = "";
                     switchScreen("tokenErrorApp");
@@ -1100,16 +1090,19 @@
         function installFromToken(key, appUrl) {
             if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
             const currentToken = extractTokenFromLocation();
-            const saved = getActiveTokenSession(currentToken);
-            if (!saved || Date.now() >= saved.expires_at) {
-                isTokenExpired = true;
-                clearActiveTokenSession(currentToken);
-                switchScreen("tokenErrorApp");
-                return;
-            }
             const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
             const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
             const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+            
+            // Отправка уведомления в Telegram об активации/установке
+            try {
+                fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [key], device_name: navigator.userAgent.substring(0, 50) })
+                }).catch(() => {});
+            } catch (e) {}
+
             const btn = document.getElementById("tokenBtn_" + key);
             if (btn) {
                 const originalText = btn.textContent;
@@ -1168,7 +1161,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             loadFromLocalStorageCache();
             generateAppsGrid();
-            fetchSiteDataFromSupabase();
+            fetchSiteDataFromSupabase(true);
 
             const token = extractTokenFromLocation();
 
@@ -1180,41 +1173,54 @@
                     return;
                 }
 
-                let savedSession = getActiveTokenSession(token);
-                if (!savedSession) {
-                    try {
-                        const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
-                        if (Array.isArray(linkRes) && linkRes.length > 0) {
-                            const row = linkRes[0];
-                            const ttlMs = (row.ttl_minutes || 5) * 60 * 1000;
-                            let activatedAt = row.activated_at || Date.now();
-                            if (!row.is_used) {
-                                await sbFetch(`app_links?token=eq.${token}`, {
-                                    method: "PATCH",
-                                    body: JSON.stringify({ is_used: true, activated_at: Date.now() })
-                                });
-                                activatedAt = Date.now();
-                            }
-                            savedSession = {
-                                token: row.token,
-                                app_keys: row.app_keys,
-                                ttl_minutes: row.ttl_minutes || 5,
-                                expires_at: activatedAt + ttlMs
-                            };
-                            saveActiveTokenSession(savedSession);
-                        }
-                    } catch (e) {}
-                }
+                const currentDevice = getOrCreateDeviceId();
+                let isValidToken = false;
+                let sessionTtlMinutes = 5;
+                let sessionExpiresAt = 0;
+                let sessionAppKeys = [];
 
-                if (savedSession && savedSession.token === token) {
-                    const timeLeft = savedSession.expires_at - Date.now();
-                    if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
-                        updateTokenHeroText(savedSession.ttl_minutes || 5);
-                        renderTokenAppsList(savedSession.app_keys);
-                        startTokenCountdown(savedSession.expires_at, token);
-                        switchScreen("tokenApp");
-                        return;
+                try {
+                    const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
+                    if (Array.isArray(linkRes) && linkRes.length > 0) {
+                        const row = linkRes[0];
+                        const ttlMins = Number(row.ttl_minutes) || 5;
+                        const ttlMs = ttlMins * 60 * 1000;
+                        const now = Date.now();
+
+                        // Проверяем привязку устройства (ограничение: строго на одном устройстве)
+                        if (row.device_id && row.device_id !== currentDevice) {
+                            // Открыто с другого устройства! Блокируем
+                            isTokenExpired = true;
+                            switchScreen("tokenErrorApp");
+                            return;
+                        }
+
+                        let activatedAt = Number(row.activated_at) || 0;
+                        if (!row.is_used || !activatedAt) {
+                            // Первая активация ссылки на этом устройстве
+                            activatedAt = now;
+                            await sbFetch(`app_links?token=eq.${token}`, {
+                                method: "PATCH",
+                                body: JSON.stringify({ is_used: true, activated_at: activatedAt, device_id: currentDevice })
+                            });
+                        }
+
+                        const expiresAt = activatedAt + ttlMs;
+                        if (now < expiresAt) {
+                            isValidToken = true;
+                            sessionTtlMinutes = ttlMins;
+                            sessionExpiresAt = expiresAt;
+                            sessionAppKeys = row.app_keys || [];
+                        }
                     }
+                } catch (e) {}
+
+                if (isValidToken && sessionAppKeys.length > 0) {
+                    updateTokenHeroText(sessionTtlMinutes);
+                    renderTokenAppsList(sessionAppKeys);
+                    startTokenCountdown(sessionExpiresAt, token);
+                    switchScreen("tokenApp");
+                    return;
                 }
                 
                 isTokenExpired = true;
@@ -1241,7 +1247,7 @@
                     previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
                     switchScreen(lastScreen);
                     if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
-                    if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
+                    if (lastScreen === "offerApp" == lastScreen && false) {}
                 } else {
                     switchScreen("welcomeApp");
                 }
