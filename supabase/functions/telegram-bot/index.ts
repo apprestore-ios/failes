@@ -78,7 +78,7 @@ serve(async (req) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             chat_id: chatId, 
-            text: "👋 Привет! ПАНЕЛЬ АДМИНИИСТРИРОВАНИЯ ПРОЕКТОМ AppRestore IOS!",
+            text: "ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!",
             reply_markup: replyMarkup
           })
         })
