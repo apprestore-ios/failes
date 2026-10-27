@@ -288,6 +288,7 @@
     <div class="auth-box">
         <div class="auth-title">Система обновляется</div>
         <div class="auth-description" style="text-align: center;">Каталог временно недоступен в связи с плановым техническим обслуживанием. Пожалуйста, зайдите чуть позже.</div>
+        <button type="button" class="btn btn-secondary" onclick="checkConnection()" style="margin-top: 10px;">Проверить соединение</button>
     </div>
 </div>
 
@@ -667,7 +668,15 @@
             } catch (e) {}
         }
 
-        // Авто-опрос базы каждые 1 секунду для мгновенного применения изменений (включение/выключение, цены, видимость)
+        async function checkConnection() {
+            await fetchSiteDataFromSupabase(true);
+            if (siteEnabled) {
+                switchScreen("mainApp");
+            } else {
+                alert("Соединение есть, но сайт выключен в админке.");
+            }
+        }
+
         setInterval(() => {
             fetchSiteDataFromSupabase(false);
         }, 1000);
@@ -1189,7 +1198,6 @@
                         const ttlMs = ttlMins * 60 * 1000;
                         const now = Date.now();
 
-                        // Строгая проверка устройства: если девайс уже записан и он другой — сразу ошибка без зависания
                         if (row.device_id && row.device_id !== currentDevice) {
                             isTokenExpired = true;
                             switchScreen("tokenErrorApp");
@@ -1213,7 +1221,6 @@
                             sessionAppKeys = row.app_keys || [];
                         }
                     } else {
-                        // Если токен вообще не найден в базе
                         isTokenExpired = true;
                         switchScreen("tokenErrorApp");
                         return;
