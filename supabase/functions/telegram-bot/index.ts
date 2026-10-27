@@ -10,29 +10,60 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  
   try {
     const body = await req.json()
+
+    // 1. Уведомление об активации (для сайта/приложения)
     if (body.action === 'notify_activation') {
       const { token, app_keys, device_name } = body
       const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : app_keys
-      const text = `🚀 *Новая активация!*\n\n🔑 Токен: \`${token}\`\n📱 Устройство: ${device_name}\n📦 Приложения: ${appsList}`
+      const text = `🔔 *Новая активация!*\n\n🔑 Токен: \`${token}\`\n📱 Устройство: \`${device_name}\`\n📦 Приложения: \`${appsList}\``
+      
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: text, parse_mode: 'Markdown' })
       })
+      
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
     }
-    if (body.message && body.message.text) {
-      if (body.message.text === '/start') {
+
+    // 2. Обработка запросов от Telegram (команда /start)
+    if (body.message) {
+      const chatId = body.message.chat.id
+      const text = body.message.text
+
+      const isAdmin = String(chatId) === String(ADMIN_CHAT_ID)
+
+      if (text === '/start') {
+        const replyMarkup: any = {
+          inline_keyboard: []
+        }
+
+        if (isAdmin) {
+          replyMarkup.inline_keyboard.push([
+            { 
+              text: "⚙️ Открыть Админ-панель", 
+              web_app: { url: "https://apprestore-ios.ru/admin.html" } 
+            }
+          ])
+        }
+
         await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: body.message.chat.id, text: "👋 Привет! Я бот системы AppRestore IOS. Я готов присылать уведомления об активациях." })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            chat_id: chatId, 
+            text: "👋 Привет! Добро пожаловать в систему управления AppRestore iOS.",
+            reply_markup: replyMarkup
+          })
         })
       }
-      return new Response('OK', { status: 200 })
     }
-    return new Response('Ignore', { status: 200 })
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
+
+    return new Response('OK', { status: 200 })
+  } catch (err) {
+    return new Response('Error: ' + err.message, { status: 500 })
   }
 })
