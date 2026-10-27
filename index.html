@@ -602,7 +602,7 @@
 
             <div class="legal-section-card">
                 <div class="legal-section-title">9. Заключительные положения</div>
-                <p class="legal-text">9.1. Исполнитель вправе обновлять настоящую оферту при изменении условий работы проекта или требований законодательства. Актуальная версия размещается на сайте <a href="https://apprestore-ios.ru" class="legal-link">https://apprestore-ios.ru</a>.</p>
+                <p class="legal-text">9.1. Исполнитель вправе обновлять настоящую оферту при изменении условий работы проекта или требований законодательства. Актуальная редакция публикуется на сайте <a href="https://apprestore-ios.ru" class="legal-link">https://apprestore-ios.ru</a>.</p>
                 <p class="legal-text">9.2. К отношениям между Исполнителем и Заказчиком применяется законодательство, подлежащее применению к соответствующим отношениям.</p>
                 <p class="legal-text">9.3. Если какое-либо положение оферты признаётся недействительным или неприменимым, это не влияет на действие остальных положений в той мере, в которой они могут применяться самостоятельно.</p>
                 <p class="legal-text">9.4. По вопросам заказа, установки приложений, оплаты и возврата Заказчик может связаться с Исполнителем через Telegram: <a href="https://t.me/dizabled" target="_blank" class="legal-link">@dizabled</a>.</p>
@@ -1264,10 +1264,14 @@ async function syncAll() {
         ]);
 
         if (pricesRes && Array.isArray(pricesRes)) {
-            pricesRes.forEach(row => { remoteConfig.appPrices[row.app_key] = row.price; });
+            const newPrices = {};
+            pricesRes.forEach(row => { newPrices[row.app_key] = row.price; });
+            remoteConfig.appPrices = newPrices;
         }
         if (visRes && Array.isArray(visRes)) {
-            visRes.forEach(row => { remoteConfig.appVisibility[row.app_key] = row.is_visible; });
+            const newVis = {};
+            visRes.forEach(row => { newVis[row.app_key] = row.is_visible; });
+            remoteConfig.appVisibility = newVis;
         }
         updateCartUI();
 
@@ -1343,6 +1347,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const now = Date.now();
             const createdAt = linkObj.created_at ? new Date(linkObj.created_at).getTime() : now;
 
+            // 1. Проверяем, была ли ссылка уже открыта на другом устройстве
+            if (linkObj.device_id && linkObj.device_id !== myDeviceId) {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+
             const maxWaitBeforeActivation = 24 * 60 * 60 * 1000;
             if (!linkObj.is_used && (now - createdAt > maxWaitBeforeActivation)) {
                 isTokenExpired = true;
@@ -1350,7 +1361,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            if (linkObj.is_used) {
+            if (linkObj.is_used && linkObj.device_id !== myDeviceId) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
@@ -1359,11 +1370,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const ttlMins = Number(linkObj.ttl_minutes) || 3;
             const ttlMs = ttlMins * 60 * 1000;
 
+            // 2. Жестко закрепляем за текущим устройством при первом открытии
             await sbFetch(`app_links?token=eq.${token}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     is_used: true,
-                    activated_at: new Date(now).toISOString(),
+                    activated_at: linkObj.activated_at || new Date(now).toISOString(),
                     device_id: myDeviceId
                 })
             });
