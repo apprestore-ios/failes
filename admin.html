@@ -189,69 +189,25 @@
     </div>
 
     <script>
-        const GITHUB_TOKEN = "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";
-        const GITHUB_REPO = "apprestore-ios/failes";
+        const SUPABASE_URL = "https://ccghjrzpieyuebiclpqm.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_fwlyOR63ASdotUgvlsMxdQ_UwVlqHB5";
         const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-        let dbData = {
-            settings: { catalog_enabled: true },
-            prices: {},
-            visibility: {},
-            links: []
-        };
-        let fileSha = "";
-
-        async function fetchGitHubJSON() {
+        async function sbFetch(path, options = {}) {
             try {
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/database.json`, {
-                    headers: { "Authorization": `Bearer ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" }
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+                    ...options,
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        ...(options.headers || {})
+                    }
                 });
                 if (!res.ok) return null;
-                const data = await res.json();
-                fileSha = data.sha;
-                const decoded = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                return decoded;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        async function saveGitHubJSON(newData) {
-            try {
-                const checkRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/database.json`, {
-                    headers: { "Authorization": `Bearer ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" }
-                });
-                if (checkRes.ok) {
-                    const checkData = await checkRes.json();
-                    fileSha = checkData.sha;
-                }
-
-                const jsonString = JSON.stringify(newData, null, 2);
-                const encodedContent = btoa(unescape(encodeURIComponent(jsonString)));
-
-                const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/database.json`, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `Bearer ${GITHUB_TOKEN}`,
-                        "Accept": "application/vnd.github.v3+json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "Admin update database.json",
-                        content: encodedContent,
-                        sha: fileSha
-                    })
-                });
-
-                if (res.ok) {
-                    const resData = await res.json();
-                    fileSha = resData.content.sha;
-                    return true;
-                }
-                return false;
-            } catch (e) {
-                return false;
-            }
+                const text = await res.text();
+                return text ? JSON.parse(text) : null;
+            } catch (e) { return null; }
         }
 
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
@@ -318,6 +274,7 @@
           { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png", ios: "iOS 18.0+" }
         ];
     
+        let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
         let selectedAppsForLink = new Set();
         let selectedTtlMinutes = 3;
         let selectedAppKey = "";
@@ -360,23 +317,39 @@
         }
 
         function getAdminAppPrice(key) {
-            if (dbData.prices && dbData.prices[key] !== undefined) {
-                return Number(dbData.prices[key]);
+            if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
+                return Number(globalData.state.prices[key]);
             }
             return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
         }
 
         async function loadData() {
             renderAllViews();
-            const remoteData = await fetchGitHubJSON();
-            if (remoteData) {
-                dbData = remoteData;
-                if (!dbData.settings) dbData.settings = { catalog_enabled: true };
-                if (!dbData.prices) dbData.prices = {};
-                if (!dbData.visibility) dbData.visibility = {};
-                if (!dbData.links) dbData.links = [];
+            try {
+                const [pricesRes, visRes, settingsRes] = await Promise.all([
+                    sbFetch("app_prices?select=*"),
+                    sbFetch("app_visibility?select=*"),
+                    sbFetch("site_settings?select=*")
+                ]);
+
+                const prices = {};
+                if (Array.isArray(pricesRes)) {
+                    pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
+                }
+                const visibility = {};
+                if (Array.isArray(visRes)) {
+                    visRes.forEach(row => { visibility[row.app_key] = row.is_visible; });
+                }
+                let siteEnabled = true;
+                if (Array.isArray(settingsRes)) {
+                    const s = settingsRes.find(x => x.key === "site_enabled");
+                    if (s) siteEnabled = s.value === "true";
+                }
+
+                globalData.state = { prices, visibility };
+                globalData.siteEnabled = siteEnabled;
                 renderAllViews();
-            }
+            } catch (e) {}
         }
 
         function openView(id) {
@@ -395,6 +368,7 @@
         }
 
         function renderAllViews() {
+            if (!globalData.state) return;
             renderCreateLinkList();
             renderPricesList();
             renderVisibilityList();
@@ -406,7 +380,7 @@
             const list = document.getElementById('list-create-link');
             const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
             list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const isVisible = dbData.visibility[app.key] !== false;
+                const isVisible = globalData.state.visibility[app.key] !== false;
                 const isChecked = selectedAppsForLink.has(app.key);
                 return `
                 <div class="app-item ${isVisible ? '' : 'app-unavailable'}" data-key="${app.key}" onclick="${isVisible ? 'toggleAppForLink(this.dataset.key)' : ''}">
@@ -421,7 +395,7 @@
         }
 
         function toggleAppForLink(key) {
-            if (dbData.visibility[key] === false) return;
+            if (globalData.state.visibility[key] === false) return;
             if (selectedAppsForLink.has(key)) selectedAppsForLink.delete(key);
             else selectedAppsForLink.add(key);
             document.getElementById('check-' + key)?.classList.toggle('checked', selectedAppsForLink.has(key));
@@ -460,16 +434,13 @@
                 created_at: Date.now()
             };
 
-            if (!dbData.links) dbData.links = [];
-            dbData.links.push(linkRecord);
+            await sbFetch("app_links", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(linkRecord)
+            });
 
-            const success = await saveGitHubJSON(dbData);
             btn.innerText = prevText;
-
-            if (!success) {
-                showToast("Ошибка сохранения на GitHub!");
-                return;
-            }
 
             const linkUrl = CLIENT_SITE_URL + '/?' + token;
             const ttlText = formatMinWord(selectedTtlMinutes);
@@ -525,19 +496,18 @@
             document.getElementById('detail-price-icon').src = app.icon;
             const priceInput = document.getElementById('detail-price-input');
             priceInput.value = getAdminAppPrice(key);
-            document.getElementById('btn-save-price').onclick = async () => {
+            document.getElementById('btn-save-price').onclick = () => {
                 const numPrice = parseInt(priceInput.value, 10);
                 const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
-                dbData.prices[key] = validPrice;
-                
-                const success = await saveGitHubJSON(dbData);
-                if (success) {
-                    renderPricesList();
-                    showToast('Цена успешно сохранена');
-                    openView('view-prices');
-                } else {
-                    showToast('Ошибка сохранения!');
-                }
+                globalData.state.prices[key] = String(validPrice);
+                renderPricesList();
+                showToast('Цена успешно сохранена');
+                openView('view-prices');
+                sbFetch("app_prices", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ app_key: key, price: validPrice, updated_at: Date.now() })
+                });
             };
             openView('view-price-detail');
         }
@@ -547,7 +517,7 @@
             if (!list) return;
             const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
             list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
-                const isVis = dbData.visibility[app.key] !== false;
+                const isVis = globalData.state.visibility[app.key] !== false;
                 return `
                 <div class="app-item" onclick="toggleVisibility('${app.key}')">
                     <img src="${app.icon}" class="app-icon">
@@ -560,10 +530,10 @@
             }).join('');
         }
 
-        async function toggleVisibility(key) {
-            const currentVis = dbData.visibility[key] !== false;
+        function toggleVisibility(key) {
+            const currentVis = globalData.state.visibility[key] !== false;
             const makeVisible = !currentVis;
-            dbData.visibility[key] = makeVisible;
+            globalData.state.visibility[key] = makeVisible;
 
             if (!makeVisible && selectedAppsForLink.has(key)) {
                 selectedAppsForLink.delete(key);
@@ -574,37 +544,34 @@
             if (sw) sw.classList.toggle('on', makeVisible);
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
-            const success = await saveGitHubJSON(dbData);
-            if (success) {
-                showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
-            } else {
-                showToast("Ошибка сохранения!");
-            }
+            showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
+            sbFetch("app_visibility", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify({ app_key: key, is_visible: makeVisible, updated_at: Date.now() })
+            });
         }
 
         function renderSettings() {
             const btnToggle = document.getElementById('btn-toggle-site');
             const indicator = document.getElementById('site-status-indicator');
-            const catalogOn = dbData.settings.catalog_enabled !== false;
-            
-            if (catalogOn) {
+            if (globalData.siteEnabled) {
                 indicator.innerText = "🟢 Работает"; indicator.style.color = "#4ade80";
                 btnToggle.innerText = "🔴 Выключить сайт"; btnToggle.className = "btn btn-danger"; btnToggle.style.background = "";
             } else {
                 indicator.innerText = "🔴 Выключен"; indicator.style.color = "#f87171";
                 btnToggle.innerText = "🟢 Включить сайт"; btnToggle.className = "btn"; btnToggle.style.background = "rgba(34, 197, 94, 0.8)";
             }
-            btnToggle.onclick = async () => {
-                const newState = !catalogOn;
-                dbData.settings.catalog_enabled = newState;
+            btnToggle.onclick = () => {
+                const newState = !globalData.siteEnabled;
+                globalData.siteEnabled = newState;
                 renderSettings();
-                
-                const success = await saveGitHubJSON(dbData);
-                if (success) {
-                    showToast(newState ? "Сайт включен" : "Сайт выключен");
-                } else {
-                    showToast("Ошибка сохранения!");
-                }
+                showToast(newState ? "Сайт включен" : "Сайт выключен");
+                sbFetch("site_settings", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ key: "site_enabled", value: String(newState), updated_at: Date.now() })
+                });
             };
         }
 
