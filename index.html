@@ -609,8 +609,16 @@
                 }
                 if (Array.isArray(settingsRes)) {
                     const s = settingsRes.find(x => x.key === "site_enabled");
-                    if (s) siteEnabled = s.value === "true";
+                    if (s) {
+                        siteEnabled = s.value === "true";
+                        if (!siteEnabled) {
+                            switchScreen("maintenanceApp");
+                            return;
+                        }
+                    }
                 }
+                updateCartUI();
+                filterApps();
             } catch (e) {}
         }
 
@@ -819,7 +827,6 @@
             const totalEl = document.getElementById("cartScreenTotal");
             if (!listEl) return;
 
-            // Удаляем из корзины те приложения, которые администратор скрыл
             cartItems.forEach(k => {
                 if (!isAppVisible(k)) cartItems.delete(k);
             });
@@ -1122,17 +1129,13 @@
             input.focus({ preventScroll: true });
         }
 
-        document.addEventListener("DOMContentLoaded", async () => {
-            // Загружаем актуальные настройки (цены, видимость, статус сайта) из Supabase
-            await fetchSiteDataFromSupabase();
-
-            // Если администратор выключил сайт, показываем экран техобслуживания
-            if (!siteEnabled) {
-                switchScreen("maintenanceApp");
-                return;
-            }
-
+        document.addEventListener("DOMContentLoaded", () => {
+            // Сразу строим сетку приложений, чтобы каталог открывался мгновенно без задержек
             generateAppsGrid();
+
+            // Фоном запрашиваем актуальные данные из Supabase
+            fetchSiteDataFromSupabase();
+
             const token = extractTokenFromLocation();
 
             if (token) {
