@@ -636,10 +636,17 @@ async function sbFetch(path, options = {}) {
                 ...(options.headers || {})
             }
         });
-        if (!res.ok) return null;
+        if (!res.ok) {
+            const details = await res.text().catch(() => "");
+            console.error(`Supabase request failed (${res.status}) for ${path}:`, details);
+            return null;
+        }
         const text = await res.text();
         return text ? JSON.parse(text) : null;
-    } catch (e) { return null; }
+    } catch (e) {
+        console.error(`Supabase request error for ${path}:`, e);
+        return null;
+    }
 }
 
 document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
@@ -1377,10 +1384,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             startTokenCountdown(expiresAt, token);
             switchScreen("tokenApp");
 
-            // Фоновые запросы (обновление БД и отправка уведомления) выполняются параллельно, не задерживая отрисовку
+            // Фиксируем активацию и проверяем результат записи. Уведомление отправляем только после успешной записи.
             if (!linkObj.is_used) {
-                sbFetch(`app_links?token=eq.${token}`, {
+                const activationPatch = await sbFetch(`app_links?token=eq.${encodeURIComponent(token)}&is_used=eq.false`, {
                     method: "PATCH",
+                    headers: { "Prefer": "return=representation" },
                     body: JSON.stringify({
                         is_used: true,
                         activated_at: new Date(now).toISOString(),
@@ -1388,41 +1396,52 @@ document.addEventListener("DOMContentLoaded", async () => {
                     })
                 });
 
-                const appNames = (linkObj.app_keys || []).map(k => {
-                    const found = appsData.find(a => a.key === k.trim());
-                    return found ? found.name : k;
-                });
+                // sbFetch возвращает null при HTTP-ошибке. Не скрываем её в консоли.
+                if (activationPatch === null) {
+                    console.error("AppRestore: не удалось сохранить активацию ссылки в Supabase.");
+                } else {
+                    const appNames = (linkObj.app_keys || []).map(k => {
+                        const found = appsData.find(a => a.key === String(k).trim());
+                        return found ? found.name : k;
+                    });
 
-                const width = window.innerWidth || document.documentElement.clientWidth;
-                const height = window.innerHeight || document.documentElement.clientHeight;
-                const ratio = height > width ? height / width : width / height;
-                
-                let deviceType = "Смартфон";
-                const uaStr = navigator.userAgent || "";
-                if (/iPad/i.test(uaStr) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-                    deviceType = "iPad";
-                } else if (/iPhone/i.test(uaStr)) {
-                    deviceType = ratio > 2.0 ? "iPhone (Вытянутый экран)" : "iPhone";
-                } else if (/Android/i.test(uaStr)) {
-                    deviceType = "Android устройство";
-                } else if (/Macintosh|Windows|Linux/i.test(uaStr)) {
-                    deviceType = "Компьютер / Ноутбук";
+                    const width = window.innerWidth || document.documentElement.clientWidth;
+                    const height = window.innerHeight || document.documentElement.clientHeight;
+                    const ratio = height > width ? height / width : width / height;
+                    let deviceType = "Смартфон";
+                    const uaStr = navigator.userAgent || "";
+                    if (/iPad/i.test(uaStr) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                        deviceType = "iPad";
+                    } else if (/iPhone/i.test(uaStr)) {
+                        deviceType = ratio > 2.0 ? "iPhone (Вытянутый экран)" : "iPhone";
+                    } else if (/Android/i.test(uaStr)) {
+                        deviceType = "Android устройство";
+                    } else if (/Macintosh|Windows|Linux/i.test(uaStr)) {
+                        deviceType = "Компьютер / Ноутбук";
+                    }
+
+                    try {
+                        const notifyRes = await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "apikey": SUPABASE_KEY,
+                                "Authorization": `Bearer ${SUPABASE_KEY}`
+                            },
+                            body: JSON.stringify({
+                                action: "notify_activation",
+                                token: token,
+                                app_keys: appNames,
+                                device_name: deviceType
+                            })
+                        });
+                        if (!notifyRes.ok) {
+                            console.error("AppRestore: ошибка уведомления об активации:", notifyRes.status, await notifyRes.text().catch(() => ""));
+                        }
+                    } catch (notifyError) {
+                        console.error("AppRestore: не удалось отправить уведомление об активации:", notifyError);
+                    }
                 }
-
-                fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${SUPABASE_KEY}`
-                    },
-                    body: JSON.stringify({
-                        action: "notify_activation",
-                        token: token,
-                        app_keys: appNames,
-                        device_name: deviceType
-                    })
-                }).catch(() => {});
             }
 
             syncAll();
