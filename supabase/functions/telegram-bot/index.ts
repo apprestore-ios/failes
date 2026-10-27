@@ -10,7 +10,12 @@ const corsHeaders = {
 
 function parseDeviceName(ua: string): string {
   if (!ua) return "iPhone / iOS устройство";
-  if (ua.includes("iPhone")) return "iPhone";
+  if (ua.includes("iPhone")) {
+    if (ua.includes("CPU OS 18_")) return "iPhone (iOS 18)";
+    if (ua.includes("CPU OS 17_")) return "iPhone (iOS 17)";
+    if (ua.includes("CPU OS 16_")) return "iPhone (iOS 16)";
+    return "iPhone";
+  }
   if (ua.includes("iPad")) return "iPad";
   if (ua.includes("Macintosh") || ua.includes("Mac OS")) return "Mac (Safari)";
   if (ua.includes("Windows")) return "Windows PC";
@@ -24,6 +29,7 @@ serve(async (req) => {
   try {
     const body = await req.json()
 
+    // 1. Уведомление об активации (для сайта/приложения)
     if (body.action === 'notify_activation') {
       const { token, app_keys, device_name } = body
       const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : app_keys
@@ -53,6 +59,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
     }
 
+    // 2. Обработка запросов от Telegram (команда /start)
     if (body.message) {
       const chatId = body.message.chat.id
       const text = body.message.text
@@ -66,457 +73,37 @@ serve(async (req) => {
           ])
         }
 
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text: "👋 Привет! Добро пожаловать в систему управления AppRestore iOS.", reply_markup: replyMarkup }) }) } }  if (body.callback_query) { const query = body.callback_query if (query.data === 'delete_msg') { await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            chat_id: chatId, 
+            text: "👋 Привет! ПАНЕЛЬ АДМИНИИСТРИРОВАНИЯ ПРОЕКТОМ AppRestore IOS!",
+            reply_markup: replyMarkup
+          })
+        })
+      }
+    }
+
+    // 3. Обработка нажатия на инлайн-кнопку «Удалить уведомление»
+    if (body.callback_query) {
+      const query = body.callback_query
+      if (query.data === 'delete_msg') {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chat_id: query.message.chat.id, message_id: query.message.message_id })
         })
       }
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: query.id }) }) }  return new Response('OK', { status: 200 }) } catch (err) { return new Response('Error: ' + err.message, { status: 500 }) } }) ```  ---  ### 2. Код для сайта и каталога (`index.html`)  Замените содержимое вашего файла `index.html` на этот код (в нем исправлено отображение экрана ошибки по истечении таймера, убран серый блок техобслуживания и добавлены верхние всплывающие уведомления об обновлении сайта):  ```html <!DOCTYPE html> <html lang="ru"> <head> <title>AppRestore IOS</title> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"> <meta name="theme-color" content="#0b0f17"> <meta name="apple-mobile-web-app-capable" content="yes"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <style> :root { --bg: #0b0f17; --text: #f8fafc; --muted: #94a3b8; --card-bg: rgba(30, 41, 59, 0.4); --card-border: 1.5px solid rgba(255, 255, 255, 0.12); --box-shadow: 0 20px 50px rgba(0,0,0,0.6); --input-bg: rgba(30,41,59,.4); --btn-install-bg: rgba(59, 130, 246, 0.15); --btn-install-border: rgba(59, 130, 246, 0.5); --btn-install-color: #93c5fd; --nav-bg: rgba(11, 15, 23, 0.4); --spring: cubic-bezier(.22,1,.36,1); } @font-face { font-family: "SFSymbols"; src: url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff2") format("woff2"), url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff") format("woff"), url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.ttf") format("truetype"), url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype"); font-weight: normal; font-style: normal; font-display: block; } .sf-icon { font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none; font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums; text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1; vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out; } html.fonts-loaded .sf-icon { opacity: 1; } * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; } html, body { width: 100\%; height: 100\%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; } body { min-height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text); background: var(--bg); display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: calc(max(12px, env(safe-area-inset-top)) + 65px) 0 max(40px, env(safe-area-inset-bottom)); user-select: none; -webkit-user-select: none; } input { user-select: text; -webkit-user-select: text; } .aurora-bg { position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10; background-image: linear-gradient(135deg, rgba(11,15,23,0.4) 0\%, rgba(17,24,39,0.6) 100\%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.jpg"); background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0); } .top-navbar { position: fixed; top: 0; left: 50\%; transform: translateX(-50\%); width: 100\%; max-width: 430px; padding: max(12px, env(safe-area-inset-top)) 16px 12px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: var(--nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(148, 163, 184, 0.1); } .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); cursor: pointer; } .nav-logo { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; } .nav-title { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--text) 15\%, var(--muted) 100\%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; } .nav-right-actions { display: flex; align-items: center; gap: 8px; } .back-btn, .burger-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); position: relative; } .back-btn { font-size: 20px; font-weight: 700; text-decoration: none; display: none; line-height: 1; padding-bottom: 2px; } .back-btn.visible { display: flex; } .burger-line { width: 18px; height: 2px; background: var(--muted); border-radius: 2px; position: relative; } .burger-line::before, .burger-line::after { content: ""; position: absolute; left: 0; width: 18px; height: 2px; background: var(--muted); border-radius: 2px; } .burger-line::before { top: -6px; } .burger-line::after { top: 6px; }  .cart-fab-wrap { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50\%; transform: translateX(-50\%); width: 100\%; max-width: 430px; padding: 0 18px; display: flex; justify-content: flex-end; pointer-events: none; z-index: 200; } .cart-fab-btn { pointer-events: auto; width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1.5px solid rgba(255, 255, 255, 0.22); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5), 0 4px 12px rgba(0,0,0,0.5); transform: scale(0) translateY(20px); opacity: 0; transition: transform 0.3s var(--spring), opacity 0.25s ease; } .cart-fab-btn.visible { transform: scale(1) translateY(0); opacity: 1; } .cart-fab-btn:active { transform: scale(0.93); } .cart-fab-badge { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 99px; background: #ef4444; color: #fff; font-size: 11.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #0b0f17; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }  .container { width: 100\%; max-width: 430px; padding: 0 16px; z-index: 2; display: none; flex-direction: column; justify-content: flex-start; flex: 1; opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring); } .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); } #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; } #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }  .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100\%; } .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20\%, var(--muted) 80\%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; } .hero-title span { background: linear-gradient(135deg, #60a5fa 0\%, #3b82f6 100\%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; } .hero-desc-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); margin-top: 14px; margin-bottom: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); } .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 500; }  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; width: 100\%; } .info-box { background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 14px 12px; text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--box-shadow); transition: border-color 0.3s ease; } .info-box-num { font-size: 20px; font-weight: 800; color: #3b82f6; margin-bottom: 4px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; } .info-box-label { font-size: 11.5px; color: var(--muted); line-height: 1.35; }  .catalog-header { display: flex; justify-content: center; align-items: center; width: 100\%; margin-bottom: 16px; background: rgba(30,41,59,0.3); border-radius: 14px; border: 1px solid rgba(148,163,184,0.15); padding: 8px 0; } .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); } .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }  .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100\%; padding-bottom: 50px; } .app-grid-card { background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease; width: 100\%; min-width: 0; position: relative; } .app-grid-card.app-unavailable { display: none !important; } .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; } .app-price-tag { font-size: 11px; font-weight: 750; color: #93c5fd; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; } .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; } .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100\%; line-height: 1.2; letter-spacing: -0.2px; } .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100\%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; } .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; } .app-grid-btn { width: 100\%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: auto; cursor: pointer; transition: all 0.2s; } .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; } .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }  .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100\%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; } .cart-items-list::-webkit-scrollbar { width: 4px; } .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; } .cart-empty-alert { display: none; width: 100\%; padding: 18px 16px; border-radius: 16px; background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.55); color: #fca5a5; font-size: 13.5px; font-weight: 600; line-height: 1.5; text-align: center; margin: 4px 0; } .cart-item-row { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100\%; flex-shrink: 0; } .cart-item-left { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; text-align: left; } .cart-item-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0; } .cart-item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; } .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; } .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; } .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; } .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; } .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; } .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; } .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100\%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; } .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); } .cart-summary-row.total { font-size: 16px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 2px; } .cart-summary-row.total span:last-child { color: #60a5fa; font-size: 18px; font-weight: 800; }  .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170\%); -webkit-backdrop-filter: blur(40px) saturate(170\%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100\%; box-shadow: var(--box-shadow); display: flex; flex-direction: column; gap: 14px; } .auth-title { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; } .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; } .btn { width: 100\%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); } .btn:active { transform: scale(.975); } .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); } .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text); box-shadow: none; } .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; } .btn-telegram { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.5); color: #a78bfa; box-shadow: none; } .btn-telegram .sf-icon { font-size: 20px; margin-right: 6px; }  .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100\%; } .categories-bar::-webkit-scrollbar { display: none; } .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; } .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); } .filter-chip .sf-icon { font-size: 18px; }  .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100\%; min-height: 54px; } .catalog-notice-icon { font-size: 24px; color: #facc15; position: absolute; left: 14px; top: 50\%; transform: translateY(-50\%); display: flex; } .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100\%; } .catalog-notice-text b { color: var(--text); font-weight: 650; }  .app-search-wrap { position: relative; margin-bottom: 12px; width: 100\%; } .app-search { width: 100\%; height: 42px; padding: 0 42px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; } .search-icon { position: absolute; left: 13px; top: 50\%; transform: translateY(-50\%); color: var(--muted); } .search-clear { position: absolute; right: 14px; top: 50\%; transform: translateY(-50\%); display: none; background: none; border: none; color: var(--muted); cursor: pointer; } .search-clear.visible { display: block; }  .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; } .menu-modal.active { display: flex; } .menu-sheet { width: 100\%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; } .menu-sheet::-webkit-scrollbar { width: 4px; } .menu-sheet::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; } .menu-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; } .menu-item { padding: 13px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100\%; transition: transform 0.2s ease; } .menu-item:active { transform: scale(0.98); } .menu-item-left { display: flex; align-items: center; gap: 12px; } .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }  .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); } .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50\%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); } .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; } .step-text b { color: #60a5fa; }  #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box { padding: 18px 18px 16px; gap: 10px; max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 80px); } .legal-scroll-area, .info-scroll-area { display: flex; flex-direction: column; gap: 10px; max-height: calc(100dvh - 295px); overflow-y: auto; padding-right: 10px; margin-right: -10px; text-align: left; width: calc(100\% + 10px); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; } .legal-scroll-area::-webkit-scrollbar, .info-scroll-area::-webkit-scrollbar { width: 4px; } .legal-scroll-area::-webkit-scrollbar-thumb, .info-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; } .info-scroll-area .step-card { margin-bottom: 0; } .legal-section-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); flex-shrink: 0; } .legal-section-title { font-size: 14.5px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; line-height: 1.35; } .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; } .legal-text:last-child { margin-bottom: 0; } .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }  /* Всплывающее уведомление сверху */ #top-toast-alert { position: fixed; top: -80px; left: 50\%; transform: translateX(-50\%); width: calc(100\% - 32px); max-width: 398px; background: rgba(17, 24, 39, 0.95); border: 1.5px solid rgba(251, 191, 36, 0.4); color: #fef08a; padding: 12px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 99999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); text-align: center; pointer-events: none; } #top-toast-alert.show { transform: translateY(calc(max(12px, env(safe-area-inset-top)) + 55px)); }  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } </style> <script> if ("fonts" in document) { document.fonts.load('1em "SFSymbols"').then(function() { document.documentElement.classList.add("fonts-loaded"); }).catch(function() { document.documentElement.classList.add("fonts-loaded"); }); } else { document.documentElement.classList.add("fonts-loaded"); } </script> </head> <body>  <div class="aurora-bg"></div> <div id="top-toast-alert">⚠️ Каталог всё ещё обновляется... Пожалуйста, подождите.</div>  <header class="top-navbar"> <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)"> <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" alt="logo" class="nav-logo"> <span class="nav-title">AppRestore IOS</span> </a> <div class="nav-right-actions"> <a href="#" class="back-btn" id="navBackBtn" onclick="handleNavBack(event)" title="Назад"><span class="sf-icon">&#xECAC;</span></a> <button class="burger-btn" onclick="toggleBurgerMenu()" aria-label="Меню" id="navBurgerBtn"> <div class="burger-line"></div> </button> </div> </header>  <div class="menu-modal" id="burgerMenuModal" onclick="toggleBurgerMenu()"> <div class="menu-sheet" onclick="event.stopPropagation()"> <div class="menu-header"> <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><span class="sf-icon">&#xECAC;</span></button> <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span> </div> <button class="menu-item" onclick="showGuideScreen()"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div><span>Инструкция</span></div><span class="sf-icon">&#xECA2;</span> </button> <button class="menu-item" onclick="showTipsScreen()"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div><span>Полезные советы</span></div><span class="sf-icon">&#xECA2;</span> </button> <button class="menu-item" onclick="showPolicyScreen()"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div><span>Политика использования</span></div><span class="sf-icon">&#xECA2;</span> </button> <button class="menu-item" onclick="showOfferScreen()"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Публичная оферта</span></div><span class="sf-icon">&#xECA2;</span> </button> <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xFA8E;</span></div><span>Наш Telegram канал</span></div><span class="sf-icon">&#xECA2;</span> </a> <a href="https://t.me/dizabled" target="_blank" class="menu-item"> <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка / Связаться</span></div><span class="sf-icon">&#xECA2;</span> </a> </div> </div>  <div class="container" id="maintenanceApp"> <div class="auth-box"> <div class="auth-title">Система обновляется</div> <div class="auth-description" style="text-align: center;">Каталог временно недоступен в связи с плановым техническим обслуживанием. Пожалуйста, зайдите чуть позже.</div> <button type="button" class="btn btn-secondary" onclick="checkConnection()" style="margin-top: 10px;">Проверить соединение</button> </div> </div>  <div class="container" id="welcomeApp"> <div class="hero-section"> <div class="hero-title">Приложения для <span>iPhone</span> быстро и понятно</div> <div class="hero-desc-box"> <p class="hero-desc">Для просмотра списка доступных приложений и оформления заказа нажмите <b>«Перейти к каталогу»</b>.</p> </div> </div> <button type="button" class="btn btn-primary" onclick="openCatalog()" style="margin-bottom: 12px; min-height: 50px; font-size: 15.5px; border-radius: 16px;"> Перейти к каталогу </button> <div class="info-grid"> <div class="info-box"><div class="info-box-num">40+</div><div class="info-box-label">приложений в каталоге</div></div> <div class="info-box"><div class="info-box-num">5 мин</div><div class="info-box-label">обычно занимает установка</div></div> <div class="info-box"><div class="info-box-num">без ПК</div><div class="info-box-label">нужны только iPhone и Safari</div></div> <div class="info-box"><div class="info-box-num">на сайте</div><div class="info-box-label">быстрый выбор в корзину</div></div> <div class="info-box"><div class="info-box-num">удобно</div><div class="info-box-label">не нужен сертификат разработчика</div></div> <div class="info-box"><div class="info-box-num">100\%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от учетной записи Apple ID</div></div> </div> </div>  <div class="container" id="mainApp"> <div class="catalog-notice"> <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div> <div class="catalog-notice-text">Добавьте нужные приложения <b>в корзину</b> и нажмите на кнопку корзины внизу справа.</div> </div> <div class="app-search-wrap"> <span class="search-icon"><span class="sf-icon">&#xFCA6;</span></span> <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()"> <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><span class="sf-icon">&#xECD2;</span></button> </div> <div class="categories-bar"> <button type="button" class="filter-chip active" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span>Все</button> <button type="button" class="filter-chip" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span>Банки</button> <button type="button" class="filter-chip" onclick="setCategory('social', this)"><span class="sf-icon">&#x0068;</span>Соцсети</button> <button type="button" class="filter-chip" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span>Инвестиции</button> <button type="button" class="filter-chip" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span>Другие</button> </div>  <div class="catalog-header"> <div class="catalog-title">Всего приложений: <span id="appCountDisplay">0</span></div> </div> <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div> <div class="apps-grid-container" id="appListContainer"></div> </div>  <div class="cart-fab-wrap"> <button type="button" class="cart-fab-btn" id="cartFabBtn" onclick="openCartScreen()" aria-label="Открыть корзину"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> <span class="cart-fab-badge" id="cartFabBadge">0</span> </button> </div>  <div class="container" id="cartApp"> <div class="auth-box" style="padding: 24px 18px;"> <div class="auth-title" id="cartScreenTitle" style="text-align: center; font-size: 20px; margin-bottom: 0;">Ваша корзина</div> <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>  <div id="cartEmptyBox" class="cart-empty-alert"> Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова! </div>  <div class="cart-items-list" id="cartItemsList"></div>  <div class="cart-summary-card" id="cartSummaryCard"> <div class="cart-summary-row"> <span>Выбрано приложений:</span> <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span> </div> <div class="cart-summary-row total"> <span>Итого к оплате:</span> <span id="cartScreenTotal">0 ₽</span> </div> </div>  <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;"> <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF9E8;</span> Заказать установку в Telegram </button> <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button> <button type="button" class="btn btn-secondary" onclick="switchScreen('mainApp')">Вернуться к каталогу</button> </div> </div>  <div class="container" id="tokenApp"> <div class="hero-section"> <div class="hero-title">Ваши <span>выбранные</span> приложения</div> <div class="hero-desc-box" style="margin-bottom: 14px; margin-top: 10px;"> <p class="hero-desc" id="tokenHeroDesc">Персональная ссылка активирована. Данная ссылка действует ограниченное время и только на одном устройстве! Установите приложения и обратитесь к продавцу.</p> </div> </div> <div class="catalog-notice" style="margin-top: 0;"> <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div> <div class="catalog-notice-text">Если установка не удалась, <b>обновите страницу и повторите попытку</b>.</div> </div> <div class="info-grid"> <div class="info-box" id="tokenTimerBox"> <div class="info-box-num" id="tokenCountdownDisplay">--:--</div> <div class="info-box-label">осталось до сгорания ссылки</div> </div> <div class="info-box"> <div class="info-box-num">БЕЗ ПК</div> <div class="info-box-label">не нужен компьютер и провод</div> </div> </div> <div class="catalog-header" style="margin-top: 14px;"> <div class="catalog-title">Выбранные приложения:</div> </div> <div class="apps-grid-container" id="singleTokenAppContainer"></div> </div>  <div class="container" id="tokenErrorApp"> <div class="auth-box"> <div class="auth-title" style="color: #fca5a5;">Установка недоступна</div> <div class="auth-description" style="text-align: center;">Срок действия ссылки истёк или она уже была использована на другом устройстве. Пожалуйста, обратитесь к продавцу для решения проблемы.</div> <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 6px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a> </div> </div>  <div class="container" id="guideApp"> <div class="auth-box"> <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div> <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);"> <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div> <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Заказать установку в Telegram»</b>, отправьте сформированное сообщение продавцу и оплатите заказ по реквизитам.</div></div> <div class="step-card"><div class="step-icon">3</div><div class="step-text">Перейдите по полученной персональной ссылке в Safari и нажмите <b>«Установить»</b>.</div></div> <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div> </div> <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 2px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a> <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button> </div> </div>  <div class="container" id="tipsApp"> <div class="auth-box"> <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Полезные советы</div> <div class="info-scroll-area"> <div class="auth-description" style="text-align: center; font-weight: 600;">1. Отключите сгружение:</div> <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div> <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div> <div class="auth-description" style="margin-top: 6px; text-align: center; font-weight: 600;">2. Защита от удаления:</div> <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div> <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div> <div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div> </div> <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button> </div> </div>  <div class="container" id="policyApp"> <div class="auth-box"> <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Политика использования AppRestore IOS</div> <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 26 октября 2026 года</div>  <div class="legal-scroll-area" id="policyContent"> <div style="text-align:center; padding: 20px;">Загрузка данных...</div> </div>  <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button> </div> </div>  <div class="container" id="offerApp"> <div class="auth-box"> <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Публичная оферта AppRestore IOS</div> <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 26 октября 2026 года</div>  <div class="legal-scroll-area" id="offerContent"> <div style="text-align:center; padding: 20px;">Загрузка данных...</div> </div>  <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button> </div> </div>  <script> const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co"; const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg"; const CLIENT_SITE_URL = "https://apprestore-ios.ru";  const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html"; const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";  async function sbFetch(path, options = {}) { try { const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...options, headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`,
-                        "Content-Type": "application/json",
-                        ...(options.headers || {})
-                    }
-                });
-                if (!res.ok) return null;
-                const text = await res.text();
-                return text ? JSON.parse(text) : null;
-            } catch (e) { return null; }
-        }
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: query.id })
+      })
+    }
 
-        document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
-        let lastTouchEnd = 0;
-        document.addEventListener("touchend", function(e) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) { e.preventDefault(); }
-            lastTouchEnd = now;
-        }, { passive: false });
-
-        const appsData = [
-          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" },
-          { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/domrf_roomassist.png", ios: "iOS 16.0+" },
-          { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png", ios: "iOS 18.0+" }
-        ];
-
-        let siteState = { prices: {}, visibility: {} };
-        let siteEnabled = true;
-        let currentCategory = "all";
-        let isFromToken = false;
-        let isTokenExpired = false;
-        let previousScreen = "welcomeApp";
-        let currentScreenId = "welcomeApp";
-        let tokenCountdownInterval = null;
-        let cartItems = new Set();
-
-        try {
-            const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
-            if (Array.isArray(savedCart)) {
-                savedCart.forEach(k => {
-                    if (appsData.some(a => a.key === k)) cartItems.add(k);
-                });
-            }
-        } catch (e) {}
-
-        function saveCart() {
-            try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
-        }
-
-        const LOCKED_SCREENS = ["tokenErrorApp", "maintenanceApp"];
-        const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp"];
-        const HISTORY_STACK = [];
-
-        async function loadExternalContent(url, containerId) {
-            const container = document.getElementById(containerId);
-            if (!container || container.dataset.loaded === "true") return;
-            try {
-                const res = await fetch(url);
-                if (res.ok) {
-                    container.innerHTML = await res.text();
-                    container.dataset.loaded = "true";
-                } else {
-                    container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки документа.</div>';
-                }
-            } catch (e) {
-                container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка сети.</div>';
-            }
-        }
-
-        function loadFromLocalStorageCache() {
-            try {
-                const pCache = localStorage.getItem("apprestore_prices_cache");
-                const vCache = localStorage.getItem("apprestore_visibility_cache");
-                const sCache = localStorage.getItem("apprestore_site_enabled_cache");
-                if (pCache) siteState.prices = JSON.parse(pCache);
-                if (vCache) siteState.visibility = JSON.parse(vCache);
-                if (sCache !== null) {
-                    siteEnabled = sCache === "true";
-                    const alertEl = document.getElementById("top-toast-alert");
-                    if (!siteEnabled) {
-                        if (alertEl) alertEl.classList.add("show");
-                        if (currentScreenId !== "maintenanceApp" && currentScreenId !== "tokenApp" && currentScreenId !== "tokenErrorApp") {
-                            switchScreen("maintenanceApp");
-                        }
-                    } else {
-                        if (alertEl) alertEl.classList.remove("show");
-                        if (currentScreenId === "maintenanceApp") {
-                            switchScreen("mainApp");
-                        }
-                    }
-                }
-            } catch(e) {}
-        }
-
-        async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
-            try {
-                const [pricesRes, visRes, settingsRes] = await Promise.all([
-                    sbFetch("app_prices?select=*"),
-                    sbFetch("app_visibility?select=*"),
-                    sbFetch("site_settings?select=*")
-                ]);
-
-                let hasChanges = false;
-                const newPrices = {};
-                if (Array.isArray(pricesRes)) {
-                    pricesRes.forEach(row => { newPrices[row.app_key] = String(row.price); });
-                }
-                if (JSON.stringify(newPrices) !== JSON.stringify(siteState.prices)) {
-                    siteState.prices = newPrices;
-                    hasChanges = true;
-                }
-
-                const newVis = {};
-                if (Array.isArray(visRes)) {
-                    visRes.forEach(row => { newVis[row.app_key] = row.is_visible; });
-                }
-                if (JSON.stringify(newVis) !== JSON.stringify(siteState.visibility)) {
-                    siteState.visibility = newVis;
-                    hasChanges = true;
-                }
-
-                if (Array.isArray(settingsRes)) {
-                    const s = settingsRes.find(x => x.key === "site_enabled");
-                    if (s) {
-                        const newEnabled = s.value === "true";
-                        const alertEl = document.getElementById("top-toast-alert");
-                        if (newEnabled !== siteEnabled) {
-                            siteEnabled = newEnabled;
-                            hasChanges = true;
-                            if (!siteEnabled) {
-                                if (alertEl) alertEl.classList.add("show");
-                                switchScreen("maintenanceApp");
-                            } else {
-                                if (alertEl) alertEl.classList.remove("show");
-                                if (currentScreenId === "maintenanceApp") {
-                                    switchScreen("mainApp");
-                                }
-                            }
-                        } else {
-                            if (!siteEnabled && alertEl && !alertEl.classList.contains("show")) {
-                                alertEl.classList.add("show");
-                            }
-                        }
-                    }
-                }
-
-                try {
-                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
-                    localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
-                    localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
-                } catch(e) {}
-
-                if (hasChanges || forceUpdateUI) {
-                    updateCartUI();
-                    filterApps();
-                }
-            } catch (e) {}
-        }
-
-        async function checkConnection() {
-            const alertEl = document.getElementById("top-toast-alert");
-            await fetchSiteDataFromSupabase(true);
-            if (siteEnabled) {
-                if (alertEl) alertEl.classList.remove("show");
-                switchScreen("mainApp");
-            } else {
-                if (alertEl) alertEl.classList.add("show");
-                alert("Соединение в порядке, но каталог всё ещё выключен в админке.");
-            }
-        }
-
-        setInterval(() => {
-            fetchSiteDataFromSupabase(false);
-        }, 1000);
-
-        function getOrCreateDeviceId() {
-            let devId = "";
-            try {
-                devId = localStorage.getItem("apprestore_device_id");
-                if (!devId) {
-                    devId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
-                    localStorage.setItem("apprestore_device_id", devId);
-                }
-            } catch (e) {
-                devId = 'dev_fallback_' + Date.now();
-            }
-            return devId;
-        }
-
-        function getAppPrice(key) {
-            if (siteState.prices && siteState.prices[key] !== undefined) {
-                return Number(siteState.prices[key]);
-            }
-            return (key === "mailru" || key === "alfabank") ? 500 : 250;
-        }
-
-        function isAppVisible(key) {
-            if (siteState.visibility && siteState.visibility[key] !== undefined) {
-                return siteState.visibility[key] !== false;
-            }
-            return true;
-        }
-
-        function extractTokenFromLocation() {
-            const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
-            if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
-            const urlParams = new URLSearchParams(window.location.search);
-            const qToken = urlParams.get("token");
-            if (qToken) return qToken.trim();
-            const path = window.location.pathname.replace(/\/+$/, "");
-            const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
-            if (installMatch) return installMatch[1];
-            const directNumMatch = path.match(/^\/(\d{6,16})$/);
-            if (directNumMatch) return directNumMatch[1];
-            return null;
-        }
-
-        function updateTokenHeroText(ttlMinutes) {
-            const descEl = document.getElementById("tokenHeroDesc");
-            if (!descEl) return;
-            const m = Number(ttlMinutes) || 5;
-            const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
-            descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
-        }
-
-        function renderTokenAppsList(appKeys) {
-            const container = document.getElementById("singleTokenAppContainer");
-            if (!container) return;
-            container.innerHTML = "";
-            appKeys.forEach(key => {
-                const cleanKey = key.trim();
-                const app = appsData.find(a => a.key === cleanKey);
-                if (app) {
-                    let mainName = app.name;
-                    let subName = "";
-                    let bracketIdx = app.name.indexOf(" (");
-                    if (bracketIdx !== -1 && app.name.endsWith(")")) {
-                        mainName = app.name.substring(0, bracketIdx);
-                        subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
-                    }
-                    container.innerHTML += `
-                    <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
-                        <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                            <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                            <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
-                                <div class="app-grid-name">${mainName}</div>${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
-                                <div class="app-grid-version">${app.ios}</div>
-                            </div>
-                        </div>
-                        <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
-                    </div>`;
-                }
-            });
-        }
-
-        function startTokenCountdown(expiresAtTimestamp, currentToken) {
-            const display = document.getElementById("tokenCountdownDisplay");
-            const box = document.getElementById("tokenTimerBox");
-            if (!display) return;
-            if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
-
-            function updateTimer() {
-                const diff = Math.max(0, expiresAtTimestamp - Date.now());
-                const totalSecs = Math.ceil(diff / 1000);
-                const mins = Math.floor(totalSecs / 60);
-                const secs = totalSecs % 60;
-                display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
-                if (totalSecs <= 60 && totalSecs > 0) {
-                    display.style.color = "#f87171";
-                    if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
-                } else {
-                    display.style.color = "#3b82f6";
-                    if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
-                }
-                if (diff <= 0) {
-                    clearInterval(tokenCountdownInterval);
-                    isTokenExpired = true;
-                    display.textContent = "ИСТЕКЛО";
-                    display.style.color = "#ef4444";
-                    switchScreen("tokenErrorApp");
-                }
-            }
-            updateTimer();
-            tokenCountdownInterval = setInterval(updateTimer, 1000);
-        }
-
-        function generateAppsGrid() {
-            const container = document.getElementById("appListContainer");
-            if (!container) return;
-            let html = "";
-            appsData.forEach(app => {
-                const price = getAppPrice(app.key);
-                const isPrem = price >= 500;
-                const isInCart = cartItems.has(app.key);
-                const isVisible = isAppVisible(app.key);
-                let mainName = app.name;
-                let subName = "";
-                let bracketIdx = app.name.indexOf(" (");
-                if (bracketIdx !== -1 && app.name.endsWith(")")) {
-                    mainName = app.name.substring(0, bracketIdx);
-                    subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
-                }
-                html += `
-                <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
-                    <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                        <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                        <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
-                            <div class="app-grid-name">${mainName}</div>${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
-                            <div class="app-grid-version">${app.ios}</div>
-                            <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${price} ₽</div>
-                        </div>
-                    </div>
-                    <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
-                </div>`;
-            });
-            container.innerHTML = html;
-            filterApps();
-        }
-
-        function toggleCart(key) {
-            if (!isAppVisible(key)) return;
-            if (cartItems.has(key)) cartItems.delete(key);
-            else cartItems.add(key);
-            saveCart();
-            updateCartUI();
-        }
-
-        function removeFromCart(key) {
-            cartItems.delete(key);
-            saveCart();
-            updateCartUI();
-        }
-
-        function clearCart() {
-            cartItems.clear();
-            saveCart();
-            updateCartUI();
-        }
-
-        function openCartScreen() {
-            renderCartScreen();
-            switchScreen("cartApp");
-            window.scrollTo(0, 0);
-        }
-
-        function renderCartScreen() {
-            const titleEl = document.getElementById("cartScreenTitle");
-            const subtitleEl = document.getElementById("cartScreenSubtitle");
-            const listEl = document.getElementById("cartItemsList");
-            const emptyEl = document.getElementById("cartEmptyBox");
-            const summaryCard = document.getElementById("cartSummaryCard");
-            const checkoutBtn = document.getElementById("cartCheckoutBtn");
-            const clearBtn = document.getElementById("cartClearAllBtn");
-            const countEl = document.getElementById("cartScreenCount");
-            const totalEl = document.getElementById("cartScreenTotal");
-            if (!listEl) return;
-
-            cartItems.forEach(k => {
-                if (!isAppVisible(k)) cartItems.delete(k);
-            });
-            saveCart();
-
-            if (cartItems.size === 0) {
-                if (titleEl) titleEl.textContent = "Корзина пуста";
-                if (subtitleEl) subtitleEl.style.display = "none";
-                listEl.innerHTML = "";
-                listEl.style.display = "none";
-                if (emptyEl) emptyEl.style.display = "block";
-                if (summaryCard) summaryCard.style.display = "none";
-                if (checkoutBtn) checkoutBtn.style.display = "none";
-                if (clearBtn) clearBtn.style.display = "none";
-                return;
-            }
-
-            if (titleEl) titleEl.textContent = "Ваша корзина";
-            if (subtitleEl) subtitleEl.style.display = "block";
-            if (emptyEl) emptyEl.style.display = "none";
-            listEl.style.display = "flex";
-            if (summaryCard) summaryCard.style.display = "flex";
-            if (checkoutBtn) checkoutBtn.style.display = "flex";
-            if (clearBtn) clearBtn.style.display = "flex";
-
-            let total = 0;
-            let html = "";
-            cartItems.forEach(k => {
-                const app = appsData.find(a => a.key === k);
-                if (!app) return;
-                const p = getAppPrice(k);
-                const isPrem = p >= 500;
-                total += p;
-                html += `
-                <div class="cart-item-row">
-                    <div class="cart-item-left">
-                        <img src="${app.icon}" class="cart-item-icon" alt="${app.name}">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${app.name}</div>
-                            <div class="cart-item-ios">${app.ios}</div>
-                        </div>
-                    </div>
-                    <div class="cart-item-right">
-                        <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
-                        <button type="button" class="cart-item-remove" onclick="
+    return new Response('OK', { status: 200 })
+  } catch (err) {
+    return new Response('Error: ' + err.message, { status: 500 })
+  }
+})
