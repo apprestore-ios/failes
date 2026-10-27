@@ -18,7 +18,7 @@
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -1;
             background-color: #0b0f17;
-            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
+            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8b/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
         .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
@@ -53,7 +53,7 @@
         .admin-price-badge { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px; flex-shrink: 0; }
         .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
         .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
-        .ttl-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
+        .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
         .ttl-pill {
             padding: 9px 4px; border-radius: 11px; background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.14); color: var(--muted);
@@ -128,8 +128,7 @@
             <h3 class="section-title" style="margin-bottom: 10px;">Создание разовой ссылки</h3>
             <div class="ttl-selector-label">Время работы после открытия клиентом:</div>
             <div class="ttl-pills">
-                <div class="ttl-pill active" onclick="selectTtl(3, this)">3 мин</div>
-                <div class="ttl-pill" onclick="selectTtl(5, this)">5 мин</div>
+                <div class="ttl-pill active" onclick="selectTtl(5, this)">5 мин</div>
                 <div class="ttl-pill" onclick="selectTtl(10, this)">10 мин</div>
                 <div class="ttl-pill" onclick="selectTtl(15, this)">15 мин</div>
                 <div class="ttl-pill" onclick="selectTtl(30, this)">30 мин</div>
@@ -144,7 +143,7 @@
         <div class="card" style="text-align:center; padding: 28px 20px;">
             <div style="font-size: 45px; margin-bottom: 12px;">✅</div>
             <h2 style="margin: 0 0 6px 0; font-size: 20px;">Ссылка создана!</h2>
-            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;">Действует 3 мин. с момента открытия на одном устройстве.</p>
+            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;">Действует 5 мин. с момента открытия на одном устройстве.</p>
             <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
             <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 600; margin-bottom: 10px;" onclick="copyLink()">
             <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📤 Переслать покупателю</button>
@@ -276,7 +275,7 @@
     
         let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
         let selectedAppsForLink = new Set();
-        let selectedTtlMinutes = 3;
+        let selectedTtlMinutes = 5; // По умолчанию 5 минут
         let selectedAppKey = "";
         let toastTimeout;
         let currentView = 'view-menu';
@@ -323,8 +322,28 @@
             return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
         }
 
+        function saveToLocalStorageCache() {
+            try {
+                localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices));
+                localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility));
+                localStorage.setItem("apprestore_site_enabled_cache", String(globalData.siteEnabled));
+                localStorage.setItem("apprestore_sync_trigger", Date.now().toString()); // Сигнал для каталога
+            } catch(e) {}
+        }
+
         async function loadData() {
+            // Подгружаем из локального кэша для мгновенного отображения
+            try {
+                const pCache = localStorage.getItem("apprestore_prices_cache");
+                const vCache = localStorage.getItem("apprestore_visibility_cache");
+                const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+                if (pCache) globalData.state.prices = JSON.parse(pCache);
+                if (vCache) globalData.state.visibility = JSON.parse(vCache);
+                if (sCache !== null) globalData.siteEnabled = sCache === "true";
+            } catch(e) {}
+
             renderAllViews();
+
             try {
                 const [pricesRes, visRes, settingsRes] = await Promise.all([
                     sbFetch("app_prices?select=*"),
@@ -348,6 +367,7 @@
 
                 globalData.state = { prices, visibility };
                 globalData.siteEnabled = siteEnabled;
+                saveToLocalStorageCache();
                 renderAllViews();
             } catch (e) {}
         }
@@ -500,9 +520,12 @@
                 const numPrice = parseInt(priceInput.value, 10);
                 const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
                 globalData.state.prices[key] = String(validPrice);
+                
+                saveToLocalStorageCache(); // Мгновенное обновление в кэше
                 renderPricesList();
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
+
                 sbFetch("app_prices", {
                     method: "POST",
                     headers: { "Prefer": "resolution=merge-duplicates" },
@@ -544,7 +567,9 @@
             if (sw) sw.classList.toggle('on', makeVisible);
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
+            saveToLocalStorageCache(); // Мгновенное обновление в кэше
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
+
             sbFetch("app_visibility", {
                 method: "POST",
                 headers: { "Prefer": "resolution=merge-duplicates" },
@@ -565,8 +590,11 @@
             btnToggle.onclick = () => {
                 const newState = !globalData.siteEnabled;
                 globalData.siteEnabled = newState;
+                
+                saveToLocalStorageCache(); // Мгновенное обновление в кэше
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
+
                 sbFetch("site_settings", {
                     method: "POST",
                     headers: { "Prefer": "resolution=merge-duplicates" },
