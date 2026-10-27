@@ -117,6 +117,7 @@
           box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
       }
+      .app-grid-card.app-unavailable { display: none !important; }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
       .app-price-tag { font-size: 11px; font-weight: 750; color: #93c5fd; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
       .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
@@ -464,644 +465,726 @@
 </div>
 
 <script>
-// Вставьте сюда прямые ссылки (Raw) на ваши HTML-файлы в GitHub
-const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html";
-const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";
+        const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg";
+        const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 
-const CLIENT_SITE_URL = "https://apprestore-ios.ru";
+        const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html";
+        const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";
 
-document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
-document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
-let lastTouchEnd = 0;
-document.addEventListener("touchend", function(e) {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) { e.preventDefault(); }
-    lastTouchEnd = now;
-}, { passive: false });
-
-const appsData = [
-  { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-  { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-  { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-  { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-  { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-  { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-  { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-  { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-  { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-  { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-  { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-  { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-  { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-  { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-  { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-  { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-  { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-  { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-  { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-  { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-  { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-  { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-  { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" },
-  { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/domrf_roomassist.png", ios: "iOS 16.0+" },
-  { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png", ios: "iOS 18.0+" }
-];
-
-let currentCategory = "all";
-let isFromToken = false;
-let isTokenExpired = false;
-let previousScreen = "welcomeApp";
-let currentScreenId = "welcomeApp";
-let tokenCountdownInterval = null;
-let cartItems = new Set();
-
-try {
-    const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
-    if (Array.isArray(savedCart)) {
-        savedCart.forEach(k => {
-            if (appsData.some(a => a.key === k)) cartItems.add(k);
-        });
-    }
-} catch (e) {}
-
-function saveCart() {
-    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
-}
-
-const LOCKED_SCREENS = ["tokenErrorApp"];
-const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp"];
-const HISTORY_STACK = [];
-
-async function loadExternalContent(url, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container || container.dataset.loaded === "true") return;
-    try {
-        const res = await fetch(url);
-        if (res.ok) {
-            container.innerHTML = await res.text();
-            container.dataset.loaded = "true";
-        } else {
-            container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки документа.</div>';
+        async function sbFetch(path, options = {}) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+                    ...options,
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        ...(options.headers || {})
+                    }
+                });
+                if (!res.ok) return null;
+                const text = await res.text();
+                return text ? JSON.parse(text) : null;
+            } catch (e) { return null; }
         }
-    } catch (e) {
-        container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка сети.</div>';
-    }
-}
 
-function saveActiveTokenSession(dataObj) {
-    const str = JSON.stringify(dataObj);
-    try { localStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
-    try { sessionStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
-    try {
-        const expDate = new Date(dataObj.expires_at).toUTCString();
-        document.cookie = "tok_" + dataObj.token + "=" + encodeURIComponent(str) + "; expires=" + expDate + "; path=/; SameSite=Lax";
-    } catch (e) {}
-}
+        document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
+        let lastTouchEnd = 0;
+        document.addEventListener("touchend", function(e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) { e.preventDefault(); }
+            lastTouchEnd = now;
+        }, { passive: false });
 
-function getActiveTokenSession(token) {
-    if (!token) return null;
-    let raw = null;
-    try { raw = localStorage.getItem("active_token_data_" + token); } catch (e) {}
-    if (!raw) { try { raw = sessionStorage.getItem("active_token_data_" + token); } catch (e) {} }
-    if (!raw) {
+        const appsData = [
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Банк (МТС Деньги)", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" },
+          { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/domrf_roomassist.png", ios: "iOS 16.0+" },
+          { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png", ios: "iOS 18.0+" }
+        ];
+
+        let siteState = { prices: {}, visibility: {} };
+        let siteEnabled = true;
+        let currentCategory = "all";
+        let isFromToken = false;
+        let isTokenExpired = false;
+        let previousScreen = "welcomeApp";
+        let currentScreenId = "welcomeApp";
+        let tokenCountdownInterval = null;
+        let cartItems = new Set();
+
         try {
-            const match = document.cookie.match(new RegExp('(^| )tok_' + token + '=([^;]+)'));
-            if (match) raw = decodeURIComponent(match[2]);
+            const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
+            if (Array.isArray(savedCart)) {
+                savedCart.forEach(k => {
+                    if (appsData.some(a => a.key === k)) cartItems.add(k);
+                });
+            }
         } catch (e) {}
-    }
-    if (!raw) return null;
-    try { return JSON.parse(raw); } catch (e) { return null; }
-}
 
-function clearActiveTokenSession(token) {
-    if (!token) return;
-    try { localStorage.removeItem("active_token_data_" + token); } catch (e) {}
-    try { sessionStorage.removeItem("active_token_data_" + token); } catch (e) {}
-    try { document.cookie = "tok_" + token + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; } catch (e) {}
-}
+        function saveCart() {
+            try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
+        }
 
-function getAppPrice(key) {
-    return (key === "mailru" || key === "alfabank") ? 500 : 250;
-}
+        const LOCKED_SCREENS = ["tokenErrorApp", "maintenanceApp"];
+        const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp"];
+        const HISTORY_STACK = [];
 
-function extractTokenFromLocation() {
-    const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
-    if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
-    const urlParams = new URLSearchParams(window.location.search);
-    const qToken = urlParams.get("token");
-    if (qToken) return qToken.trim();
-    const path = window.location.pathname.replace(/\/+$/, "");
-    const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
-    if (installMatch) return installMatch[1];
-    const directNumMatch = path.match(/^\/(\d{6,16})$/);
-    if (directNumMatch) return directNumMatch[1];
-    return null;
-}
-
-function updateTokenHeroText(ttlMinutes) {
-    const descEl = document.getElementById("tokenHeroDesc");
-    if (!descEl) return;
-    const m = Number(ttlMinutes) || 3;
-    const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
-    descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
-}
-
-function renderTokenAppsList(appKeys) {
-    const container = document.getElementById("singleTokenAppContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    appKeys.forEach(key => {
-        const cleanKey = key.trim();
-        const app = appsData.find(a => a.key === cleanKey);
-        if (app) {
-            let mainName = app.name;
-            let subName = "";
-            let bracketIdx = app.name.indexOf(" (");
-            if (bracketIdx !== -1 && app.name.endsWith(")")) {
-                mainName = app.name.substring(0, bracketIdx);
-                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+        async function loadExternalContent(url, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container || container.dataset.loaded === "true") return;
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    container.innerHTML = await res.text();
+                    container.dataset.loaded = "true";
+                } else {
+                    container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки документа.</div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка сети.</div>';
             }
-            container.innerHTML += `
-            <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                    <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
-                        <div class="app-grid-name">${mainName}</div>
-                        ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
-                        <div class="app-grid-version">${app.ios}</div>
-                    </div>
-                </div>
-                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
-            </div>`;
         }
-    });
-}
 
-function startTokenCountdown(expiresAtTimestamp, currentToken) {
-    const display = document.getElementById("tokenCountdownDisplay");
-    const box = document.getElementById("tokenTimerBox");
-    if (!display) return;
-    if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
+        async function fetchSiteDataFromSupabase() {
+            try {
+                const [pricesRes, visRes, settingsRes] = await Promise.all([
+                    sbFetch("app_prices?select=*"),
+                    sbFetch("app_visibility?select=*"),
+                    sbFetch("site_settings?select=*")
+                ]);
 
-    function updateTimer() {
-        const diff = Math.max(0, expiresAtTimestamp - Date.now());
-        const totalSecs = Math.ceil(diff / 1000);
-        const mins = Math.floor(totalSecs / 60);
-        const secs = totalSecs % 60;
-        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
-        if (totalSecs <= 60 && totalSecs > 0) {
-            display.style.color = "#f87171";
-            if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
-        } else {
-            display.style.color = "#3b82f6";
-            if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                if (Array.isArray(pricesRes)) {
+                    pricesRes.forEach(row => { siteState.prices[row.app_key] = String(row.price); });
+                }
+                if (Array.isArray(visRes)) {
+                    visRes.forEach(row => { siteState.visibility[row.app_key] = row.is_visible; });
+                }
+                if (Array.isArray(settingsRes)) {
+                    const s = settingsRes.find(x => x.key === "site_enabled");
+                    if (s) siteEnabled = s.value === "true";
+                }
+            } catch (e) {}
         }
-        if (diff <= 0) {
-            clearInterval(tokenCountdownInterval);
-            isTokenExpired = true;
-            display.textContent = "ИСТЕКЛО";
-            display.style.color = "#ef4444";
-            clearActiveTokenSession(currentToken);
+
+        function saveActiveTokenSession(dataObj) {
+            const str = JSON.stringify(dataObj);
+            try { localStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
+            try { sessionStorage.setItem("active_token_data_" + dataObj.token, str); } catch (e) {}
+            try {
+                const expDate = new Date(dataObj.expires_at).toUTCString();
+                document.cookie = "tok_" + dataObj.token + "=" + encodeURIComponent(str) + "; expires=" + expDate + "; path=/; SameSite=Lax";
+            } catch (e) {}
+        }
+
+        function getActiveTokenSession(token) {
+            if (!token) return null;
+            let raw = null;
+            try { raw = localStorage.getItem("active_token_data_" + token); } catch (e) {}
+            if (!raw) { try { raw = sessionStorage.getItem("active_token_data_" + token); } catch (e) {} }
+            if (!raw) {
+                try {
+                    const match = document.cookie.match(new RegExp('(^| )tok_' + token + '=([^;]+)'));
+                    if (match) raw = decodeURIComponent(match[2]);
+                } catch (e) {}
+            }
+            if (!raw) return null;
+            try { return JSON.parse(raw); } catch (e) { return null; }
+        }
+
+        function clearActiveTokenSession(token) {
+            if (!token) return;
+            try { localStorage.removeItem("active_token_data_" + token); } catch (e) {}
+            try { sessionStorage.removeItem("active_token_data_" + token); } catch (e) {}
+            try { document.cookie = "tok_" + token + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; } catch (e) {}
+        }
+
+        function getAppPrice(key) {
+            if (siteState.prices && siteState.prices[key] !== undefined) {
+                return Number(siteState.prices[key]);
+            }
+            return (key === "mailru" || key === "alfabank") ? 500 : 250;
+        }
+
+        function isAppVisible(key) {
+            if (siteState.visibility && siteState.visibility[key] !== undefined) {
+                return siteState.visibility[key] !== false;
+            }
+            return true;
+        }
+
+        function extractTokenFromLocation() {
+            const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
+            if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
+            const urlParams = new URLSearchParams(window.location.search);
+            const qToken = urlParams.get("token");
+            if (qToken) return qToken.trim();
+            const path = window.location.pathname.replace(/\/+$/, "");
+            const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
+            if (installMatch) return installMatch[1];
+            const directNumMatch = path.match(/^\/(\d{6,16})$/);
+            if (directNumMatch) return directNumMatch[1];
+            return null;
+        }
+
+        function updateTokenHeroText(ttlMinutes) {
+            const descEl = document.getElementById("tokenHeroDesc");
+            if (!descEl) return;
+            const m = Number(ttlMinutes) || 3;
+            const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
+            descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
+        }
+
+        function renderTokenAppsList(appKeys) {
             const container = document.getElementById("singleTokenAppContainer");
-            if (container) container.innerHTML = "";
-            switchScreen("tokenErrorApp");
+            if (!container) return;
+            container.innerHTML = "";
+            appKeys.forEach(key => {
+                const cleanKey = key.trim();
+                const app = appsData.find(a => a.key === cleanKey);
+                if (app) {
+                    let mainName = app.name;
+                    let subName = "";
+                    let bracketIdx = app.name.indexOf(" (");
+                    if (bracketIdx !== -1 && app.name.endsWith(")")) {
+                        mainName = app.name.substring(0, bracketIdx);
+                        subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+                    }
+                    container.innerHTML += `
+                    <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
+                        <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
+                            <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                            <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
+                                <div class="app-grid-name">${mainName}</div>
+                                ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                                <div class="app-grid-version">${app.ios}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
+                    </div>`;
+                }
+            });
         }
-    }
-    updateTimer();
-    tokenCountdownInterval = setInterval(updateTimer, 1000);
-}
 
-function generateAppsGrid() {
-    const container = document.getElementById("appListContainer");
-    if (!container) return;
-    let html = "";
-    appsData.forEach(app => {
-        const price = getAppPrice(app.key);
-        const isPrem = price >= 500;
-        const isInCart = cartItems.has(app.key);
-        let mainName = app.name;
-        let subName = "";
-        let bracketIdx = app.name.indexOf(" (");
-        if (bracketIdx !== -1 && app.name.endsWith(")")) {
-            mainName = app.name.substring(0, bracketIdx);
-            subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
-        }
-        html += `
-        <div class="app-grid-card" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
-            <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
-                <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
-                    <div class="app-grid-name">${mainName}</div>
-                    ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
-                    <div class="app-grid-version">${app.ios}</div>
-                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${price} ₽</div>
-                </div>
-            </div>
-            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
-        </div>`;
-    });
-    container.innerHTML = html;
-    filterApps();
-}
+        function startTokenCountdown(expiresAtTimestamp, currentToken) {
+            const display = document.getElementById("tokenCountdownDisplay");
+            const box = document.getElementById("tokenTimerBox");
+            if (!display) return;
+            if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
 
-function toggleCart(key) {
-    if (cartItems.has(key)) cartItems.delete(key);
-    else cartItems.add(key);
-    saveCart();
-    updateCartUI();
-}
-
-function removeFromCart(key) {
-    cartItems.delete(key);
-    saveCart();
-    updateCartUI();
-}
-
-function clearCart() {
-    cartItems.clear();
-    saveCart();
-    updateCartUI();
-}
-
-function openCartScreen() {
-    renderCartScreen();
-    switchScreen("cartApp");
-    window.scrollTo(0, 0);
-}
-
-function renderCartScreen() {
-    const titleEl = document.getElementById("cartScreenTitle");
-    const subtitleEl = document.getElementById("cartScreenSubtitle");
-    const listEl = document.getElementById("cartItemsList");
-    const emptyEl = document.getElementById("cartEmptyBox");
-    const summaryCard = document.getElementById("cartSummaryCard");
-    const checkoutBtn = document.getElementById("cartCheckoutBtn");
-    const clearBtn = document.getElementById("cartClearAllBtn");
-    const countEl = document.getElementById("cartScreenCount");
-    const totalEl = document.getElementById("cartScreenTotal");
-    if (!listEl) return;
-
-    if (cartItems.size === 0) {
-        if (titleEl) titleEl.textContent = "Корзина пуста";
-        if (subtitleEl) subtitleEl.style.display = "none";
-        listEl.innerHTML = "";
-        listEl.style.display = "none";
-        if (emptyEl) emptyEl.style.display = "block";
-        if (summaryCard) summaryCard.style.display = "none";
-        if (checkoutBtn) checkoutBtn.style.display = "none";
-        if (clearBtn) clearBtn.style.display = "none";
-        return;
-    }
-
-    if (titleEl) titleEl.textContent = "Ваша корзина";
-    if (subtitleEl) subtitleEl.style.display = "block";
-    if (emptyEl) emptyEl.style.display = "none";
-    listEl.style.display = "flex";
-    if (summaryCard) summaryCard.style.display = "flex";
-    if (checkoutBtn) checkoutBtn.style.display = "flex";
-    if (clearBtn) clearBtn.style.display = "flex";
-
-    let total = 0;
-    let html = "";
-    cartItems.forEach(k => {
-        const app = appsData.find(a => a.key === k);
-        if (!app) return;
-        const p = getAppPrice(k);
-        const isPrem = p >= 500;
-        total += p;
-        html += `
-        <div class="cart-item-row">
-            <div class="cart-item-left">
-                <img src="${app.icon}" class="cart-item-icon" alt="${app.name}">
-                <div class="cart-item-info">
-                    <div class="cart-item-name">${app.name}</div>
-                    <div class="cart-item-ios">${app.ios}</div>
-                </div>
-            </div>
-            <div class="cart-item-right">
-                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
-                <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
-            </div>
-        </div>`;
-    });
-
-    listEl.innerHTML = html;
-    if (countEl) countEl.textContent = cartItems.size + " шт.";
-    if (totalEl) totalEl.textContent = total + " ₽";
-}
-
-function updateCartUI() {
-    appsData.forEach(app => {
-        const btn = document.getElementById("gridBtn_" + app.key);
-        const priceTag = document.getElementById("gridPrice_" + app.key);
-        if (priceTag) {
-            const p = getAppPrice(app.key);
-            const expectedPriceStr = p + " ₽";
-            if (priceTag.textContent !== expectedPriceStr) {
-                priceTag.textContent = expectedPriceStr;
-                priceTag.classList.toggle("premium", p >= 500);
+            function updateTimer() {
+                const diff = Math.max(0, expiresAtTimestamp - Date.now());
+                const totalSecs = Math.ceil(diff / 1000);
+                const mins = Math.floor(totalSecs / 60);
+                const secs = totalSecs % 60;
+                display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+                if (totalSecs <= 60 && totalSecs > 0) {
+                    display.style.color = "#f87171";
+                    if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
+                } else {
+                    display.style.color = "#3b82f6";
+                    if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                }
+                if (diff <= 0) {
+                    clearInterval(tokenCountdownInterval);
+                    isTokenExpired = true;
+                    display.textContent = "ИСТЕКЛО";
+                    display.style.color = "#ef4444";
+                    clearActiveTokenSession(currentToken);
+                    const container = document.getElementById("singleTokenAppContainer");
+                    if (container) container.innerHTML = "";
+                    switchScreen("tokenErrorApp");
+                }
             }
-        }
-        if (btn) {
-            const inCart = cartItems.has(app.key);
-            const expectedText = inCart ? "✓ В корзине" : "В корзину";
-            if (btn.textContent !== expectedText) {
-                btn.classList.toggle("in-cart", inCart);
-                btn.textContent = expectedText;
-            }
-        }
-    });
-
-    const fabBtn = document.getElementById("cartFabBtn");
-    const fabBadge = document.getElementById("cartFabBadge");
-    if (fabBadge && fabBadge.textContent !== String(cartItems.size)) {
-        fabBadge.textContent = cartItems.size;
-    }
-    if (fabBtn) {
-        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
-        if (fabBtn.classList.contains("visible") !== shouldShow) {
-            fabBtn.classList.toggle("visible", shouldShow);
-        }
-    }
-    if (currentScreenId === "cartApp") renderCartScreen();
-}
-
-function checkoutCart() {
-    if (cartItems.size === 0) return;
-    let total = 0;
-    const lines = [];
-    cartItems.forEach(k => {
-        const app = appsData.find(a => a.key === k);
-        if (app) {
-            const p = getAppPrice(k);
-            total += p;
-            lines.push("• " + app.name + " — " + p + " ₽");
-        }
-    });
-    const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
-        lines.join("\n") + "\n\n" +
-        "💰 Итого к оплате: " + total + " ₽\n" +
-        "Отправьте, пожалуйста, реквизиты для оплаты.";
-    try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(message).catch(() => {});
-        }
-    } catch (e) {}
-    window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
-}
-
-function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
-
-function switchScreen(id, pushHistory = true) {
-    if (currentScreenId && currentScreenId !== id && pushHistory) {
-        HISTORY_STACK.push(currentScreenId);
-    }
-    if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
-        previousScreen = currentScreenId;
-        sessionStorage.setItem("previousScreen", previousScreen);
-    }
-    currentScreenId = id;
-    sessionStorage.setItem("currentScreenId", currentScreenId);
-
-    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
-        document.body.style.overflow = "hidden";
-        window.scrollTo(0, 0);
-    } else {
-        document.body.style.overflow = "";
-    }
-
-    document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
-    document.getElementById(id)?.classList.add("active-screen");
-
-    const backBtn = document.getElementById("navBackBtn");
-    const burgerBtn = document.getElementById("navBurgerBtn");
-    updateCartUI();
-
-    if (isScreenLocked(id)) {
-        if (backBtn) backBtn.classList.remove("visible");
-        if (burgerBtn) burgerBtn.style.display = "flex";
-        return;
-    }
-    if (burgerBtn) burgerBtn.style.display = "flex";
-    if (backBtn) {
-        if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp") {
-            backBtn.classList.remove("visible");
-        } else {
-            backBtn.classList.add("visible");
-        }
-    }
-}
-
-function handleBrandClick(event) {
-    if (event) event.preventDefault();
-    if (isScreenLocked(currentScreenId)) return;
-    goHome();
-}
-
-function handleNavBack(event) {
-    if (event) event.preventDefault();
-    if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) {
-        switchScreen(HISTORY_STACK.pop(), false);
-    } else {
-        goHome();
-    }
-}
-
-function goBackFromInfo(openMenu = false) {
-    if (isScreenLocked(currentScreenId)) return;
-    if (HISTORY_STACK.length > 0) {
-        switchScreen(HISTORY_STACK.pop(), false);
-    } else {
-        switchScreen(previousScreen);
-    }
-    if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
-}
-
-function goHome() {
-    if (isScreenLocked(currentScreenId)) return;
-    HISTORY_STACK.length = 0;
-    if (isFromToken) {
-        switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
-        return;
-    }
-    switchScreen("mainApp", false);
-}
-
-function openCatalog() {
-    sessionStorage.setItem("site_access", "true");
-    switchScreen("mainApp");
-}
-
-function showGuideScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("guideApp");
-    window.scrollTo(0, 0);
-}
-
-function showTipsScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("tipsApp");
-    window.scrollTo(0, 0);
-}
-
-function showPolicyScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("policyApp");
-    window.scrollTo(0, 0);
-    loadExternalContent(POLICY_URL, 'policyContent');
-}
-
-function showOfferScreen() {
-    document.getElementById("burgerMenuModal")?.classList.remove("active");
-    switchScreen("offerApp");
-    window.scrollTo(0, 0);
-    loadExternalContent(OFFER_URL, 'offerContent');
-}
-
-function toggleBurgerMenu() {
-    document.getElementById("burgerMenuModal")?.classList.toggle("active");
-}
-
-function installFromToken(key, appUrl) {
-    if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
-    const currentToken = extractTokenFromLocation();
-    const saved = getActiveTokenSession(currentToken);
-    if (!saved || Date.now() >= saved.expires_at) {
-        isTokenExpired = true;
-        clearActiveTokenSession(currentToken);
-        switchScreen("tokenErrorApp");
-        return;
-    }
-    const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
-    const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
-    const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
-    const btn = document.getElementById("tokenBtn_" + key);
-    if (btn) {
-        const originalText = btn.textContent;
-        btn.classList.add("installed");
-        btn.innerHTML = "✓";
-        setTimeout(() => {
-            btn.classList.remove("installed");
-            btn.textContent = originalText;
-        }, 2000);
-    }
-    window.location.href = installUrl;
-}
-
-function setCategory(cat, btn) {
-    currentCategory = cat;
-    document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
-    btn.classList.add("active");
-    filterApps();
-}
-
-function filterApps() {
-    const searchInput = document.getElementById("appSearchInput");
-    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
-    document.getElementById("searchClear")?.classList.toggle("visible", query.length > 0);
-    let count = 0;
-
-    document.querySelectorAll("#appListContainer .app-grid-card").forEach(card => {
-        const name = card.querySelector(".app-grid-name").textContent.toLowerCase() + " " + (card.querySelector(".app-grid-subname")?.textContent.toLowerCase() || "");
-        const cat = card.getAttribute("data-category");
-        const match = name.includes(query) && (currentCategory === "all" || cat === currentCategory);
-        card.style.display = match ? "flex" : "none";
-        if (match) count++;
-    });
-
-    const emptyEl = document.getElementById("searchEmpty");
-    if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
-    const countEl = document.getElementById("appCountDisplay");
-    if (countEl) countEl.textContent = count;
-}
-
-function clearAppSearch() {
-    const input = document.getElementById("appSearchInput");
-    if (!input) return;
-    input.value = "";
-    filterApps();
-    input.focus({ preventScroll: true });
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-    generateAppsGrid();
-    const token = extractTokenFromLocation();
-
-    if (token) {
-        isFromToken = true;
-
-        const ua = navigator.userAgent || "";
-        if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) {
-            return;
+            updateTimer();
+            tokenCountdownInterval = setInterval(updateTimer, 1000);
         }
 
-        const savedSession = getActiveTokenSession(token);
-        if (savedSession && savedSession.token === token) {
-            const timeLeft = savedSession.expires_at - Date.now();
-            if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
-                updateTokenHeroText(savedSession.ttl_minutes || 3);
-                renderTokenAppsList(savedSession.app_keys);
-                startTokenCountdown(savedSession.expires_at, token);
-                switchScreen("tokenApp");
-                return;
-            }
+        function generateAppsGrid() {
+            const container = document.getElementById("appListContainer");
+            if (!container) return;
+            let html = "";
+            appsData.forEach(app => {
+                const price = getAppPrice(app.key);
+                const isPrem = price >= 500;
+                const isInCart = cartItems.has(app.key);
+                const isVisible = isAppVisible(app.key);
+                let mainName = app.name;
+                let subName = "";
+                let bracketIdx = app.name.indexOf(" (");
+                if (bracketIdx !== -1 && app.name.endsWith(")")) {
+                    mainName = app.name.substring(0, bracketIdx);
+                    subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+                }
+                html += `
+                <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
+                    <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
+                        <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                        <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
+                            <div class="app-grid-name">${mainName}</div>
+                            ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                            <div class="app-grid-version">${app.ios}</div>
+                            <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${price} ₽</div>
+                        </div>
+                    </div>
+                    <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+            filterApps();
         }
-        
-        isTokenExpired = true;
-        switchScreen("tokenErrorApp");
-        return;
-    }
 
-    let lastScreen = sessionStorage.getItem("currentScreenId");
-    let hasEntered = sessionStorage.getItem("site_access") === "true";
-    if (hasEntered) {
-        if (INFO_SCREENS.includes(lastScreen)) {
-            previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
-            switchScreen(lastScreen);
-            if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
-            if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
-        } else if (lastScreen === "cartApp") {
+        function toggleCart(key) {
+            if (!isAppVisible(key)) return;
+            if (cartItems.has(key)) cartItems.delete(key);
+            else cartItems.add(key);
+            saveCart();
+            updateCartUI();
+        }
+
+        function removeFromCart(key) {
+            cartItems.delete(key);
+            saveCart();
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cartItems.clear();
+            saveCart();
+            updateCartUI();
+        }
+
+        function openCartScreen() {
             renderCartScreen();
             switchScreen("cartApp");
-        } else {
+            window.scrollTo(0, 0);
+        }
+
+        function renderCartScreen() {
+            const titleEl = document.getElementById("cartScreenTitle");
+            const subtitleEl = document.getElementById("cartScreenSubtitle");
+            const listEl = document.getElementById("cartItemsList");
+            const emptyEl = document.getElementById("cartEmptyBox");
+            const summaryCard = document.getElementById("cartSummaryCard");
+            const checkoutBtn = document.getElementById("cartCheckoutBtn");
+            const clearBtn = document.getElementById("cartClearAllBtn");
+            const countEl = document.getElementById("cartScreenCount");
+            const totalEl = document.getElementById("cartScreenTotal");
+            if (!listEl) return;
+
+            // Удаляем из корзины те приложения, которые администратор скрыл
+            cartItems.forEach(k => {
+                if (!isAppVisible(k)) cartItems.delete(k);
+            });
+            saveCart();
+
+            if (cartItems.size === 0) {
+                if (titleEl) titleEl.textContent = "Корзина пуста";
+                if (subtitleEl) subtitleEl.style.display = "none";
+                listEl.innerHTML = "";
+                listEl.style.display = "none";
+                if (emptyEl) emptyEl.style.display = "block";
+                if (summaryCard) summaryCard.style.display = "none";
+                if (checkoutBtn) checkoutBtn.style.display = "none";
+                if (clearBtn) clearBtn.style.display = "none";
+                return;
+            }
+
+            if (titleEl) titleEl.textContent = "Ваша корзина";
+            if (subtitleEl) subtitleEl.style.display = "block";
+            if (emptyEl) emptyEl.style.display = "none";
+            listEl.style.display = "flex";
+            if (summaryCard) summaryCard.style.display = "flex";
+            if (checkoutBtn) checkoutBtn.style.display = "flex";
+            if (clearBtn) clearBtn.style.display = "flex";
+
+            let total = 0;
+            let html = "";
+            cartItems.forEach(k => {
+                const app = appsData.find(a => a.key === k);
+                if (!app) return;
+                const p = getAppPrice(k);
+                const isPrem = p >= 500;
+                total += p;
+                html += `
+                <div class="cart-item-row">
+                    <div class="cart-item-left">
+                        <img src="${app.icon}" class="cart-item-icon" alt="${app.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${app.name}</div>
+                            <div class="cart-item-ios">${app.ios}</div>
+                        </div>
+                    </div>
+                    <div class="cart-item-right">
+                        <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
+                        <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
+                    </div>
+                </div>`;
+            });
+
+            listEl.innerHTML = html;
+            if (countEl) countEl.textContent = cartItems.size + " шт.";
+            if (totalEl) totalEl.textContent = total + " ₽";
+        }
+
+        function updateCartUI() {
+            appsData.forEach(app => {
+                const card = document.getElementById("appCard_" + app.key);
+                const btn = document.getElementById("gridBtn_" + app.key);
+                const priceTag = document.getElementById("gridPrice_" + app.key);
+                const isVisible = isAppVisible(app.key);
+
+                if (card) {
+                    card.classList.toggle("app-unavailable", !isVisible);
+                }
+
+                if (priceTag) {
+                    const p = getAppPrice(app.key);
+                    const expectedPriceStr = p + " ₽";
+                    if (priceTag.textContent !== expectedPriceStr) {
+                        priceTag.textContent = expectedPriceStr;
+                        priceTag.classList.toggle("premium", p >= 500);
+                    }
+                }
+                if (btn) {
+                    const inCart = cartItems.has(app.key);
+                    const expectedText = inCart ? "✓ В корзине" : "В корзину";
+                    if (btn.textContent !== expectedText) {
+                        btn.classList.toggle("in-cart", inCart);
+                        btn.textContent = expectedText;
+                    }
+                }
+            });
+
+            const fabBtn = document.getElementById("cartFabBtn");
+            const fabBadge = document.getElementById("cartFabBadge");
+            if (fabBadge && fabBadge.textContent !== String(cartItems.size)) {
+                fabBadge.textContent = cartItems.size;
+            }
+            if (fabBtn) {
+                const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
+                if (fabBtn.classList.contains("visible") !== shouldShow) {
+                    fabBtn.classList.toggle("visible", shouldShow);
+                }
+            }
+            if (currentScreenId === "cartApp") renderCartScreen();
+        }
+
+        function checkoutCart() {
+            if (cartItems.size === 0) return;
+            let total = 0;
+            const lines = [];
+            cartItems.forEach(k => {
+                const app = appsData.find(a => a.key === k);
+                if (app) {
+                    const p = getAppPrice(k);
+                    total += p;
+                    lines.push("• " + app.name + " — " + p + " ₽");
+                }
+            });
+            const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
+                lines.join("\n") + "\n\n" +
+                "💰 Итого к оплате: " + total + " ₽\n" +
+                "Отправьте, пожалуйста, реквизиты для оплаты.";
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(message).catch(() => {});
+                }
+            } catch (e) {}
+            window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
+        }
+
+        function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
+
+        function switchScreen(id, pushHistory = true) {
+            if (currentScreenId && currentScreenId !== id && pushHistory) {
+                HISTORY_STACK.push(currentScreenId);
+            }
+            if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
+                previousScreen = currentScreenId;
+                sessionStorage.setItem("previousScreen", previousScreen);
+            }
+            currentScreenId = id;
+            sessionStorage.setItem("currentScreenId", currentScreenId);
+
+            if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+                document.body.style.overflow = "hidden";
+                window.scrollTo(0, 0);
+            } else {
+                document.body.style.overflow = "";
+            }
+
+            document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
+            document.getElementById(id)?.classList.add("active-screen");
+
+            const backBtn = document.getElementById("navBackBtn");
+            const burgerBtn = document.getElementById("navBurgerBtn");
+            updateCartUI();
+
+            if (isScreenLocked(id)) {
+                if (backBtn) backBtn.classList.remove("visible");
+                if (burgerBtn) burgerBtn.style.display = "flex";
+                return;
+            }
+            if (burgerBtn) burgerBtn.style.display = "flex";
+            if (backBtn) {
+                if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp") {
+                    backBtn.classList.remove("visible");
+                } else {
+                    backBtn.classList.add("visible");
+                }
+            }
+        }
+
+        function handleBrandClick(event) {
+            if (event) event.preventDefault();
+            if (isScreenLocked(currentScreenId)) return;
+            goHome();
+        }
+
+        function handleNavBack(event) {
+            if (event) event.preventDefault();
+            if (isScreenLocked(currentScreenId)) return;
+            if (HISTORY_STACK.length > 0) {
+                switchScreen(HISTORY_STACK.pop(), false);
+            } else {
+                goHome();
+            }
+        }
+
+        function goBackFromInfo(openMenu = false) {
+            if (isScreenLocked(currentScreenId)) return;
+            if (HISTORY_STACK.length > 0) {
+                switchScreen(HISTORY_STACK.pop(), false);
+            } else {
+                switchScreen(previousScreen);
+            }
+            if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
+        }
+
+        function goHome() {
+            if (isScreenLocked(currentScreenId)) return;
+            HISTORY_STACK.length = 0;
+            if (isFromToken) {
+                switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
+                return;
+            }
+            switchScreen("mainApp", false);
+        }
+
+        function openCatalog() {
+            sessionStorage.setItem("site_access", "true");
             switchScreen("mainApp");
         }
-    } else {
-        if (INFO_SCREENS.includes(lastScreen)) {
-            previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
-            switchScreen(lastScreen);
-            if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
-            if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
-        } else {
-            switchScreen("welcomeApp");
+
+        function showGuideScreen() {
+            document.getElementById("burgerMenuModal")?.classList.remove("active");
+            switchScreen("guideApp");
+            window.scrollTo(0, 0);
         }
-    }
-});
-</script>
+
+        function showTipsScreen() {
+            document.getElementById("burgerMenuModal")?.classList.remove("active");
+            switchScreen("tipsApp");
+            window.scrollTo(0, 0);
+        }
+
+        function showPolicyScreen() {
+            document.getElementById("burgerMenuModal")?.classList.remove("active");
+            switchScreen("policyApp");
+            window.scrollTo(0, 0);
+            loadExternalContent(POLICY_URL, 'policyContent');
+        }
+
+        function showOfferScreen() {
+            document.getElementById("burgerMenuModal")?.classList.remove("active");
+            switchScreen("offerApp");
+            window.scrollTo(0, 0);
+            loadExternalContent(OFFER_URL, 'offerContent');
+        }
+
+        function toggleBurgerMenu() {
+            document.getElementById("burgerMenuModal")?.classList.toggle("active");
+        }
+
+        function installFromToken(key, appUrl) {
+            if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
+            const currentToken = extractTokenFromLocation();
+            const saved = getActiveTokenSession(currentToken);
+            if (!saved || Date.now() >= saved.expires_at) {
+                isTokenExpired = true;
+                clearActiveTokenSession(currentToken);
+                switchScreen("tokenErrorApp");
+                return;
+            }
+            const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
+            const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
+            const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+            const btn = document.getElementById("tokenBtn_" + key);
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.classList.add("installed");
+                btn.innerHTML = "✓";
+                setTimeout(() => {
+                    btn.classList.remove("installed");
+                    btn.textContent = originalText;
+                }, 2000);
+            }
+            window.location.href = installUrl;
+        }
+
+        function setCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
+            btn.classList.add("active");
+            filterApps();
+        }
+
+        function filterApps() {
+            const searchInput = document.getElementById("appSearchInput");
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+            document.getElementById("searchClear")?.classList.toggle("visible", query.length > 0);
+            let count = 0;
+
+            document.querySelectorAll("#appListContainer .app-grid-card").forEach(card => {
+                const key = card.getAttribute("data-key");
+                const isVisible = isAppVisible(key);
+                if (!isVisible) {
+                    card.style.display = "none";
+                    return;
+                }
+
+                const name = card.querySelector(".app-grid-name").textContent.toLowerCase() + " " + (card.querySelector(".app-grid-subname")?.textContent.toLowerCase() || "");
+                const cat = card.getAttribute("data-category");
+                const match = name.includes(query) && (currentCategory === "all" || cat === currentCategory);
+                card.style.display = match ? "flex" : "none";
+                if (match) count++;
+            });
+
+            const emptyEl = document.getElementById("searchEmpty");
+            if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
+            const countEl = document.getElementById("appCountDisplay");
+            if (countEl) countEl.textContent = count;
+        }
+
+        function clearAppSearch() {
+            const input = document.getElementById("appSearchInput");
+            if (!input) return;
+            input.value = "";
+            filterApps();
+            input.focus({ preventScroll: true });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Загружаем актуальные настройки (цены, видимость, статус сайта) из Supabase
+            await fetchSiteDataFromSupabase();
+
+            // Если администратор выключил сайт, показываем экран техобслуживания
+            if (!siteEnabled) {
+                switchScreen("maintenanceApp");
+                return;
+            }
+
+            generateAppsGrid();
+            const token = extractTokenFromLocation();
+
+            if (token) {
+                isFromToken = true;
+
+                const ua = navigator.userAgent || "";
+                if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) {
+                    return;
+                }
+
+                const savedSession = getActiveTokenSession(token);
+                if (savedSession && savedSession.token === token) {
+                    const timeLeft = savedSession.expires_at - Date.now();
+                    if (timeLeft > 0 && Array.isArray(savedSession.app_keys) && savedSession.app_keys.length > 0) {
+                        updateTokenHeroText(savedSession.ttl_minutes || 3);
+                        renderTokenAppsList(savedSession.app_keys);
+                        startTokenCountdown(savedSession.expires_at, token);
+                        switchScreen("tokenApp");
+                        return;
+                    }
+                }
+                
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+
+            let lastScreen = sessionStorage.getItem("currentScreenId");
+            let hasEntered = sessionStorage.getItem("site_access") === "true";
+            if (hasEntered) {
+                if (INFO_SCREENS.includes(lastScreen)) {
+                    previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
+                    switchScreen(lastScreen);
+                    if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
+                    if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
+                } else if (lastScreen === "cartApp") {
+                    renderCartScreen();
+                    switchScreen("cartApp");
+                } else {
+                    switchScreen("mainApp");
+                }
+            } else {
+                if (INFO_SCREENS.includes(lastScreen)) {
+                    previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
+                    switchScreen(lastScreen);
+                    if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
+                    if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
+                } else {
+                    switchScreen("welcomeApp");
+                }
+            }
+        });
+    </script>
 </body>
 </html>
