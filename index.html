@@ -602,7 +602,7 @@
 
             <div class="legal-section-card">
                 <div class="legal-section-title">9. Заключительные положения</div>
-                <p class="legal-text">9.1. Исполнитель вправе обновлять настоящую оферту при изменении условий работы проекта или требований законодательства. Актуальная редакция публикуется на сайте <a href="https://apprestore-ios.ru" class="legal-link">https://apprestore-ios.ru</a>.</p>
+                <p class="legal-text">9.1. Исполнитель вправе обновлять настоящую оферту при изменении условий работы проекта или требований законодательства. Актуальная версия размещается на сайте <a href="https://apprestore-ios.ru" class="legal-link">https://apprestore-ios.ru</a>.</p>
                 <p class="legal-text">9.2. К отношениям между Исполнителем и Заказчиком применяется законодательство, подлежащее применению к соответствующим отношениям.</p>
                 <p class="legal-text">9.3. Если какое-либо положение оферты признаётся недействительным или неприменимым, это не влияет на действие остальных положений в той мере, в которой они могут применяться самостоятельно.</p>
                 <p class="legal-text">9.4. По вопросам заказа, установки приложений, оплаты и возврата Заказчик может связаться с Исполнителем через Telegram: <a href="https://t.me/dizabled" target="_blank" class="legal-link">@dizabled</a>.</p>
@@ -1308,6 +1308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
+        // Проверяем, есть ли уже активная сессия на этом устройстве (защита от сгорания при обновлении страницы)
         const savedSession = getActiveTokenSession(token);
         if (savedSession && savedSession.token === token) {
             const timeLeft = savedSession.expires_at - Date.now();
@@ -1347,8 +1348,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const now = Date.now();
             const createdAt = linkObj.created_at ? new Date(linkObj.created_at).getTime() : now;
 
-            // 1. Проверяем, была ли ссылка уже открыта на другом устройстве
-            if (linkObj.device_id && linkObj.device_id !== myDeviceId) {
+            // Если ссылка уже использована другим устройством
+            if (linkObj.is_used && linkObj.device_id && linkObj.device_id !== myDeviceId) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
@@ -1361,64 +1362,71 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            if (linkObj.is_used && linkObj.device_id !== myDeviceId) {
+            const ttlMins = Number(linkObj.ttl_minutes) || 3;
+            const ttlMs = ttlMins * 60 * 1000;
+
+            // Если ссылка открывается впервые, фиксируем её за устройством и ставим is_used: true
+            if (!linkObj.is_used) {
+                await sbFetch(`app_links?token=eq.${token}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        is_used: true,
+                        activated_at: new Date(now).toISOString(),
+                        device_id: myDeviceId
+                    })
+                });
+
+                const appNames = (linkObj.app_keys || []).map(k => {
+                    const found = appsData.find(a => a.key === k.trim());
+                    return found ? found.name : k;
+                });
+
+                const width = window.innerWidth || document.documentElement.clientWidth;
+                const height = window.innerHeight || document.documentElement.clientHeight;
+                const ratio = height > width ? height / width : width / height;
+                
+                let deviceType = "Смартфон";
+                const ua = navigator.userAgent || "";
+                if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                    deviceType = "iPad";
+                } else if (/iPhone/i.test(ua)) {
+                    deviceType = ratio > 2.0 ? "iPhone (Вытянутый экран)" : "iPhone";
+                } else if (/Android/i.test(ua)) {
+                    deviceType = "Android устройство";
+                } else if (/Macintosh|Windows|Linux/i.test(ua)) {
+                    deviceType = "Компьютер / Ноутбук";
+                }
+
+                // Отправка уведомления в Telegram
+                try {
+                    await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "apikey": SUPABASE_KEY,
+                            "Authorization": `Bearer ${SUPABASE_KEY}`
+                        },
+                        body: JSON.stringify({
+                            action: "notify_activation",
+                            token: token,
+                            app_keys: appNames,
+                            device_name: deviceType
+                        })
+                    });
+                } catch (err) {}
+            }
+
+            // Вычисляем время сгорания на основе времени создания в базе (или текущего, если уже активирована)
+            const activationBaseTime = linkObj.activated_at ? new Date(linkObj.activated_at).getTime() : now;
+            const expiresAt = activationBaseTime + ttlMs;
+
+            if (Date.now() >= expiresAt) {
                 isTokenExpired = true;
                 switchScreen("tokenErrorApp");
                 return;
             }
 
-            const ttlMins = Number(linkObj.ttl_minutes) || 3;
-            const ttlMs = ttlMins * 60 * 1000;
-
-            // 2. Жестко закрепляем за текущим устройством при первом открытии
-            await sbFetch(`app_links?token=eq.${token}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    is_used: true,
-                    activated_at: linkObj.activated_at || new Date(now).toISOString(),
-                    device_id: myDeviceId
-                })
-            });
-
-            const appNames = (linkObj.app_keys || []).map(k => {
-                const found = appsData.find(a => a.key === k.trim());
-                return found ? found.name : k;
-            });
-
-            const width = window.innerWidth || document.documentElement.clientWidth;
-            const height = window.innerHeight || document.documentElement.clientHeight;
-            const ratio = height > width ? height / width : width / height;
-            
-            let deviceType = "Смартфон";
-            const ua = navigator.userAgent || "";
-            if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-                deviceType = "iPad";
-            } else if (/iPhone/i.test(ua)) {
-                deviceType = ratio > 2.0 ? "iPhone (Вытянутый экран)" : "iPhone";
-            } else if (/Android/i.test(ua)) {
-                deviceType = "Android устройство";
-            } else if (/Macintosh|Windows|Linux/i.test(ua)) {
-                deviceType = "Компьютер / Ноутбук";
-            }
-
-            try {
-                await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${SUPABASE_KEY}`
-                    },
-                    body: JSON.stringify({
-                        action: "notify_activation",
-                        token: token,
-                        app_keys: appNames,
-                        device_name: deviceType
-                    })
-                });
-            } catch (err) {}
-
-            const expiresAt = now + ttlMs;
+            // Сохраняем сессию локально, чтобы обновление страницы не сбрасывало таймер
             saveActiveTokenSession({
                 token: token,
                 app_keys: linkObj.app_keys,
