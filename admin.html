@@ -18,7 +18,7 @@
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -1;
             background-color: #0b0f17;
-            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8b/fon_saita.jpg");
+            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF%D1%8B/fon_saita.jpg");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
         .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
@@ -322,17 +322,7 @@
             return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
         }
 
-        function saveToLocalStorageCache() {
-            try {
-                localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices));
-                localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility));
-                localStorage.setItem("apprestore_site_enabled_cache", String(globalData.siteEnabled));
-                localStorage.setItem("apprestore_sync_trigger", Date.now().toString()); // Сигнал для каталога
-            } catch(e) {}
-        }
-
         async function loadData() {
-            // Подгружаем из локального кэша для мгновенного отображения
             try {
                 const pCache = localStorage.getItem("apprestore_prices_cache");
                 const vCache = localStorage.getItem("apprestore_visibility_cache");
@@ -367,7 +357,13 @@
 
                 globalData.state = { prices, visibility };
                 globalData.siteEnabled = siteEnabled;
-                saveToLocalStorageCache();
+                
+                try {
+                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(prices));
+                    localStorage.setItem("apprestore_visibility_cache", JSON.stringify(visibility));
+                    localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+                } catch(e) {}
+
                 renderAllViews();
             } catch (e) {}
         }
@@ -521,7 +517,10 @@
                 const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
                 globalData.state.prices[key] = String(validPrice);
                 
-                saveToLocalStorageCache(); // Мгновенное обновление в кэше
+                try {
+                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices));
+                } catch(e) {}
+
                 renderPricesList();
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
@@ -567,7 +566,10 @@
             if (sw) sw.classList.toggle('on', makeVisible);
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
-            saveToLocalStorageCache(); // Мгновенное обновление в кэше
+            try {
+                localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility));
+            } catch(e) {}
+
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
 
             sbFetch("app_visibility", {
@@ -591,7 +593,10 @@
                 const newState = !globalData.siteEnabled;
                 globalData.siteEnabled = newState;
                 
-                saveToLocalStorageCache(); // Мгновенное обновление в кэше
+                try {
+                    localStorage.setItem("apprestore_site_enabled_cache", String(newState));
+                } catch(e) {}
+
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
 
