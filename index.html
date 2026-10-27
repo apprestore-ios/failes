@@ -499,7 +499,7 @@
                 });
                 if (!res.ok) return null;
                 const text = await res.text();
-                return text ? JSON.parse(text) : null;
+                return text ? JSON.parse(text) : { success: true };
             } catch (e) { return null; }
         }
 
@@ -639,6 +639,11 @@
                     sbFetch("app_visibility?select=*"),
                     sbFetch("site_settings?select=*")
                 ]);
+
+                // Если хотя бы один запрос завершился ошибкой, не заменяем рабочий кэш пустыми объектами.
+                if (!Array.isArray(pricesRes) || !Array.isArray(visRes) || !Array.isArray(settingsRes)) {
+                    return;
+                }
 
                 let hasChanges = false;
                 const newPrices = {};
@@ -1142,7 +1147,7 @@
             const appNameRu = appObj ? appObj.name : key;
 
             try {
-                fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                fetch(`${SUPABASE_URL}/functions/v1/smooth-handler`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [appNameRu], device_name: navigator.userAgent })
@@ -1207,7 +1212,9 @@
         document.addEventListener("DOMContentLoaded", async () => {
             loadFromLocalStorageCache();
             generateAppsGrid();
-            await fetchSiteDataFromSupabase(true);
+            // Не блокируем показ каталога ожиданием Supabase: сеть может отвечать медленно.
+            // Данные из кэша уже применены, свежие значения обновятся в фоне.
+            fetchSiteDataFromSupabase(true);
 
             const token = extractTokenFromLocation();
 
