@@ -226,6 +226,18 @@
       .legal-link {
           color: #60a5fa; text-decoration: underline; font-weight: 650;
       }
+
+      /* Верхнее всплывающее уведомление об обновлении */
+      #top-toast-alert {
+          position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
+          width: calc(100% - 32px); max-width: 398px;
+          background: rgba(17, 24, 39, 0.95); border: 1.5px solid rgba(251, 191, 36, 0.4);
+          color: #fef08a; padding: 12px 16px; border-radius: 16px; font-size: 13px; font-weight: 600;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 99999;
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); text-align: center; pointer-events: none;
+      }
+      #top-toast-alert.show { transform: translateY(calc(max(12px, env(safe-area-inset-top)) + 55px)); }
+
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <script>
@@ -243,6 +255,7 @@
 <body>
 
 <div class="aurora-bg"></div>
+<div id="top-toast-alert">⚠️ Каталог всё ещё обновляется... Пожалуйста, подождите.</div>
 
 <header class="top-navbar">
     <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
@@ -603,10 +616,17 @@
                 if (vCache) siteState.visibility = JSON.parse(vCache);
                 if (sCache !== null) {
                     siteEnabled = sCache === "true";
-                    if (!siteEnabled && currentScreenId !== "maintenanceApp") {
-                        switchScreen("maintenanceApp");
-                    } else if (siteEnabled && currentScreenId === "maintenanceApp") {
-                        switchScreen("mainApp");
+                    const alertEl = document.getElementById("top-toast-alert");
+                    if (!siteEnabled) {
+                        if (alertEl) alertEl.classList.add("show");
+                        if (currentScreenId !== "maintenanceApp" && currentScreenId !== "tokenApp" && currentScreenId !== "tokenErrorApp") {
+                            switchScreen("maintenanceApp");
+                        }
+                    } else {
+                        if (alertEl) alertEl.classList.remove("show");
+                        if (currentScreenId === "maintenanceApp") {
+                            switchScreen("mainApp");
+                        }
                     }
                 }
             } catch(e) {}
@@ -643,13 +663,22 @@
                     const s = settingsRes.find(x => x.key === "site_enabled");
                     if (s) {
                         const newEnabled = s.value === "true";
+                        const alertEl = document.getElementById("top-toast-alert");
                         if (newEnabled !== siteEnabled) {
                             siteEnabled = newEnabled;
                             hasChanges = true;
                             if (!siteEnabled) {
+                                if (alertEl) alertEl.classList.add("show");
                                 switchScreen("maintenanceApp");
-                            } else if (currentScreenId === "maintenanceApp") {
-                                switchScreen("mainApp");
+                            } else {
+                                if (alertEl) alertEl.classList.remove("show");
+                                if (currentScreenId === "maintenanceApp") {
+                                    switchScreen("mainApp");
+                                }
+                            }
+                        } else {
+                            if (!siteEnabled && alertEl && !alertEl.classList.contains("show")) {
+                                alertEl.classList.add("show");
                             }
                         }
                     }
@@ -669,11 +698,14 @@
         }
 
         async function checkConnection() {
+            const alertEl = document.getElementById("top-toast-alert");
             await fetchSiteDataFromSupabase(true);
             if (siteEnabled) {
+                if (alertEl) alertEl.classList.remove("show");
                 switchScreen("mainApp");
             } else {
-                alert("Соединение есть, но сайт выключен в админке.");
+                if (alertEl) alertEl.classList.add("show");
+                alert("Соединение в порядке, но каталог всё ещё выключен в админке.");
             }
         }
 
@@ -1106,11 +1138,14 @@
             const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
             const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
             
+            const appObj = appsData.find(a => a.key === key);
+            const appNameRu = appObj ? appObj.name : key;
+
             try {
                 fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [key], device_name: navigator.userAgent.substring(0, 50) })
+                    body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [appNameRu], device_name: navigator.userAgent })
                 }).catch(() => {});
             } catch (e) {}
 
