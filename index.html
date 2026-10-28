@@ -687,16 +687,15 @@
         }
 
         async function checkConnection() {
-            const alertEl = document.getElementById("top-toast-alert");
-            await fetchSiteDataFromSupabase(true);
-            if (siteEnabled) {
-                if (alertEl) alertEl.classList.remove("show");
-                switchScreen("mainApp");
-            } else {
-                if (alertEl) alertEl.classList.add("show");
-                alert("Соединение в порядке, но каталог всё ещё выключен в админке.");
-            }
-        }
+    const alertEl = document.getElementById("top-toast-alert");
+    await fetchSiteDataFromSupabase(true);
+    if (siteEnabled) {
+        if (alertEl) alertEl.classList.remove("show");
+        switchScreen("mainApp");
+    } else {
+        if (alertEl) alertEl.classList.add("show");
+    }
+}
 
         setInterval(() => {
             fetchSiteDataFromSupabase(false);
