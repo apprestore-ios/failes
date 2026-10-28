@@ -161,21 +161,22 @@
         </div>
     </div>
 
-    <!-- Новое меню: Запуск акции -->
+    <!-- Запуск акции -->
     <div id="view-promo" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 12px;">Запуск акции</h3>
             <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
-                Укажите сумму, на которую нужно снизить цену. Для отмены скидки введите сумму с минусом (например, -50).
+                Выберите приложения, укажите сумму скидки и примените её. Для возврата нажмите «Вернуть базовые цены».
             </p>
-            <input type="text" inputmode="text" id="promo-discount-input" class="text-input" style="margin-bottom:12px;" placeholder="Скидка в рублях (например, 50)">
+            <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="margin-bottom:12px;" placeholder="Скидка в рублях (например, 50)">
             
             <div style="display:flex; gap:10px; margin-bottom:12px;">
                  <input type="search" id="promo-search" class="text-input" style="text-align:left; margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
                  <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.1); font-size:13px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
             </div>
             
-            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 12px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
+            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 10px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
+            <button class="btn btn-danger" id="btn-reset-promo" style="margin-bottom: 12px;" onclick="resetPromo()">🔄 Вернуть базовые цены (0)</button>
             <div id="list-promo" class="admin-scroll-list"></div>
         </div>
     </div>
@@ -486,18 +487,35 @@
 
         function updatePromoButton() {
             const btn = document.getElementById('btn-apply-promo');
-            if (!btn) return;
-            btn.innerText = `🏷️ Изменить цены (${selectedAppsForPromo.size})`;
-            if (selectedAppsForPromo.size > 0) {
-                btn.style.background = 'linear-gradient(135deg, #ca8a04, #a16207)';
-                btn.style.color = '#ffffff';
-                btn.style.border = 'none';
-                btn.style.boxShadow = '0 8px 20px rgba(202, 138, 4, 0.3)';
-            } else {
-                btn.style.background = 'rgba(234, 179, 8, 0.15)';
-                btn.style.color = '#fde047';
-                btn.style.border = '1px solid rgba(234, 179, 8, 0.4)';
-                btn.style.boxShadow = 'none';
+            const resetBtn = document.getElementById('btn-reset-promo');
+            const count = selectedAppsForPromo.size;
+            
+            if (btn) {
+                btn.innerText = `🏷️ Изменить цены (${count})`;
+                if (count > 0) {
+                    btn.style.background = 'linear-gradient(135deg, #ca8a04, #a16207)';
+                    btn.style.color = '#ffffff';
+                    btn.style.border = 'none';
+                    btn.style.boxShadow = '0 8px 20px rgba(202, 138, 4, 0.3)';
+                } else {
+                    btn.style.background = 'rgba(234, 179, 8, 0.15)';
+                    btn.style.color = '#fde047';
+                    btn.style.border = '1px solid rgba(234, 179, 8, 0.4)';
+                    btn.style.boxShadow = 'none';
+                }
+            }
+            
+            if (resetBtn) {
+                resetBtn.innerText = `🔄 Вернуть базовые цены (${count})`;
+                if (count > 0) {
+                    resetBtn.style.background = 'rgba(239, 68, 68, 0.15)';
+                    resetBtn.style.color = '#fca5a5';
+                    resetBtn.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+                } else {
+                    resetBtn.style.background = 'rgba(239, 68, 68, 0.05)';
+                    resetBtn.style.color = 'rgba(252, 165, 165, 0.5)';
+                    resetBtn.style.border = '1px solid rgba(239, 68, 68, 0.15)';
+                }
             }
         }
 
@@ -544,6 +562,48 @@
                     tg.HapticFeedback.notificationOccurred('success');
                     
                     discountInput.value = '';
+                    selectedAppsForPromo.clear();
+                    renderPromoList(); 
+                    renderPricesList(); 
+                } else {
+                    showToast("Ошибка при обновлении цен в БД");
+                }
+            } catch (e) {
+                showToast("Ошибка сети");
+            } finally {
+                updatePromoButton();
+            }
+        }
+
+        async function resetPromo() {
+            if (selectedAppsForPromo.size === 0) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-reset-promo');
+            const prevText = btn.innerText;
+            btn.innerText = "⏳ Сброс...";
+
+            const updates = [];
+            selectedAppsForPromo.forEach(key => {
+                const basePrice = (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+                updates.push({ app_key: key, price: basePrice });
+                globalData.state.prices[key] = String(basePrice);
+            });
+
+            try {
+                const res = await sbFetch("app_prices?on_conflict=app_key", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (res !== null) {
+                    try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
+                    showToast("Цены сброшены до базовых!");
+                    tg.HapticFeedback.notificationOccurred('success');
+                    
                     selectedAppsForPromo.clear();
                     renderPromoList(); 
                     renderPricesList(); 
