@@ -227,17 +227,6 @@
           color: #60a5fa; text-decoration: underline; font-weight: 650;
       }
 
-      /* Верхнее всплывающее уведомление об обновлении */
-      #top-toast-alert {
-          position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
-          width: calc(100% - 32px); max-width: 398px;
-          background: rgba(17, 24, 39, 0.95); border: 1.5px solid rgba(251, 191, 36, 0.4);
-          color: #fef08a; padding: 12px 16px; border-radius: 16px; font-size: 13px; font-weight: 600;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 99999;
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); text-align: center; pointer-events: none;
-      }
-      #top-toast-alert.show { transform: translateY(calc(max(12px, env(safe-area-inset-top)) + 55px)); }
-
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <script>
@@ -255,7 +244,6 @@
 <body>
 
 <div class="aurora-bg"></div>
-<div id="top-toast-alert">⚠️ Каталог всё ещё обновляется... Пожалуйста, подождите.</div>
 
 <header class="top-navbar">
     <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
@@ -499,7 +487,7 @@
                 });
                 if (!res.ok) return null;
                 const text = await res.text();
-                return text ? JSON.parse(text) : { success: true };
+                return text ? JSON.parse(text) : null;
             } catch (e) { return null; }
         }
 
@@ -520,7 +508,6 @@
           { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
           { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
           { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "incy", name: "INCY", category: "other", url: "/manifests/incy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/incy.png", ios: "iOS 15.0+" },
           { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
           { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
           { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
@@ -640,11 +627,6 @@
                     sbFetch("app_visibility?select=*"),
                     sbFetch("site_settings?select=*")
                 ]);
-
-                // Если хотя бы один запрос завершился ошибкой, не заменяем рабочий кэш пустыми объектами.
-                if (!Array.isArray(pricesRes) || !Array.isArray(visRes) || !Array.isArray(settingsRes)) {
-                    return;
-                }
 
                 let hasChanges = false;
                 const newPrices = {};
@@ -1213,9 +1195,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             loadFromLocalStorageCache();
             generateAppsGrid();
-            // Не блокируем показ каталога ожиданием Supabase: сеть может отвечать медленно.
-            // Данные из кэша уже применены, свежие значения обновятся в фоне.
-            fetchSiteDataFromSupabase(true);
+            await fetchSiteDataFromSupabase(true);
 
             const token = extractTokenFromLocation();
 
