@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Единый список приложений AppRestore iOS для каталога, админки и Telegram-бота.">
+  <title>AppRestore iOS — список приложений</title>
+  <style>
+    :root { color-scheme: dark; --bg:#080a12; --panel:#111827; --line:#273449; --text:#e5e7eb; --muted:#9ca3af; --accent:#a855f7; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:24px; background:var(--bg); color:var(--text); font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; }
+    main { max-width:1200px; margin:0 auto; }
+    h1 { font-size:24px; margin:0 0 6px; }
+    .note { color:var(--muted); margin:0 0 18px; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+    input,select { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:10px 12px; }
+    input { flex:1; min-width:220px; }
+    .count { color:var(--muted); align-self:center; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; }
+    table { width:100%; border-collapse:collapse; min-width:900px; }
+    th,td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle; }
+    th { background:var(--panel); position:sticky; top:0; }
+    tr:last-child td { border-bottom:0; }
+    .app { display:flex; align-items:center; gap:10px; min-width:180px; }
+    .app img { width:38px; height:38px; object-fit:cover; border-radius:9px; background:#1f2937; }
+    code { color:#d8b4fe; overflow-wrap:anywhere; }
+    a { color:#7dd3fc; }
+    .small { color:var(--muted); font-size:12px; }
+    .empty { padding:22px; text-align:center; color:var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>AppRestore iOS — единый список приложений</h1>
+  <p class="note">Источник данных для каталога, админки и Telegram-бота. Всего записей: <strong id="total">49</strong>. Редактируйте данные внутри блока <code>apps-data</code>; таблица ниже строится из него автоматически.</p>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Поиск по названию или ключу…" aria-label="Поиск">
+    <select id="category" aria-label="Фильтр категории">
+      <option value="all">Все категории</option>
+      <option value="banks">Банки</option>
+      <option value="social">Соцсети</option>
+      <option value="investments">Инвестиции</option>
+      <option value="other">Другие</option>
+    </select>
+    <span class="count" id="shown">49 приложений</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Приложение</th><th>Ключ</th><th>Категория</th><th>Версия</th><th>Минимальная iOS</th><th>Манифест</th><th>Иконка</th></tr></thead>
+      <tbody id="apps-table"></tbody>
+    </table>
+  </div>
+  <p class="small" style="margin-top:14px">Поле <code>version</code> оставлено null, потому что в исходном каталоге указана совместимость с iOS, а версия самого приложения не задана. Существующие ключи, названия, категории, пути манифестов и ссылки иконок сохранены.</p>
+</main>
+<script id="apps-data" type="application/json">
+[
+  {
+    "key": "vk",
+    "name": "ВКонтакте",
+    "manifest": "https://apprestore-ios.ru/manifests/vk.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png",
+    "version": null,
+    "ios": "iOS 17.6+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "max",
+    "name": "MAX",
+    "manifest": "https://apprestore-ios.ru/manifests/max.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png",
+    "version": null,
+    "ios": "iOS 15.5+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "vk_video",
+    "name": "VK Видео",
+    "manifest": "https://apprestore-ios.ru/manifests/vk_video.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png",
+    "version": null,
+    "ios": "iOS 17.6+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "vk_clips",
+    "name": "VK Клипы",
+    "manifest": "https://apprestore-ios.ru/manifests/vk_clips.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png",
+    "version": null,
+    "ios": "iOS 17.6+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "vk_massanger",
+    "name": "VK Me",
+    "manifest": "https://apprestore-ios.ru/manifests/vk_massanger.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png",
+    "version": null,
+    "ios": "iOS 17.6+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "vk_music",
+    "name": "VK Музыка (Аудиотропа)",
+    "manifest": "https://apprestore-ios.ru/manifests/vk_music.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png",
+    "version": null,
+    "ios": "iOS 16.6+",
+    "category": "social",
+    "enabled": true
+  },
+  {
+    "key": "mailru",
+    "name": "Почта Mail",
+    "manifest": "https://apprestore-ios.ru/manifests/mailru.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "sberfinansy",
+    "name": "СберБанк (Финансы Онлайн)",
+    "manifest": "https://apprestore-ios.ru/manifests/sberfinansy.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "alfabank",
+    "name": "Альфа Банк (Апгрейд)",
+    "manifest": "https://apprestore-ios.ru/manifests/alfabank.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png",
+    "version": null,
+    "ios": "iOS 14.0",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "premier_zoodelivery",
+    "name": "PREMIER (ZooDelivery)",
+    "manifest": "https://apprestore-ios.ru/manifests/premier_zoodelivery.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "avito",
+    "name": "Авито",
+    "manifest": "https://apprestore-ios.ru/manifests/avito.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png",
+    "version": null,
+    "ios": "iOS 15.2+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "sovkombank_vsekarty",
+    "name": "Совкомбанк (Все карты MDS)",
+    "manifest": "https://apprestore-ios.ru/manifests/sovkombank_vsekarty.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "tbank_8pro",
+    "name": "Т-Банк (8PRO)",
+    "manifest": "https://apprestore-ios.ru/manifests/tbank_8pro.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "sovkombank_sinoptik",
+    "name": "Совкомбанк (Синоптик+)",
+    "manifest": "https://apprestore-ios.ru/manifests/sovkombank_sinoptik.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png",
+    "version": null,
+    "ios": "iOS 17.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "avito_patrolkit",
+    "name": "Авито (PatrolKit)",
+    "manifest": "https://apprestore-ios.ru/manifests/avito_patrolkit.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "tbank_spotluna",
+    "name": "Т-Банк (Spotluna)",
+    "manifest": "https://apprestore-ios.ru/manifests/tbank_spotluna.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "lenta_original",
+    "name": "Лента",
+    "manifest": "https://apprestore-ios.ru/manifests/lenta_original.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png",
+    "version": null,
+    "ios": "iOS 14.4+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "yandex_pay",
+    "name": "Яндекс Пэй",
+    "manifest": "https://apprestore-ios.ru/manifests/yandex_pay.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "2gis",
+    "name": "2ГИС",
+    "manifest": "https://apprestore-ios.ru/manifests/2gis.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "yla",
+    "name": "Юла",
+    "manifest": "https://apprestore-ios.ru/manifests/yla.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png",
+    "version": null,
+    "ios": "iOS 15.6+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "psb",
+    "name": "ПСБ (Чайная Церемония)",
+    "manifest": "https://apprestore-ios.ru/manifests/psb.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "kuper",
+    "name": "Купер",
+    "manifest": "https://apprestore-ios.ru/manifests/kuper.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "rutube",
+    "name": "Rutube (Starship Battle)",
+    "manifest": "https://apprestore-ios.ru/manifests/rutube.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "mobio",
+    "name": "СберМобайл (Мобио)",
+    "manifest": "https://apprestore-ios.ru/manifests/mobio.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png",
+    "version": null,
+    "ios": "iOS 16.6+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "tmobail",
+    "name": "Т-Мобайл (TIMOB)",
+    "manifest": "https://apprestore-ios.ru/manifests/tmobail.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "ubrir_rubli",
+    "name": "УБРиР (РУбли)",
+    "manifest": "https://apprestore-ios.ru/manifests/ubrir_rubli.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "sberkids",
+    "name": "СберKids (SpeakaBoo)",
+    "manifest": "https://apprestore-ios.ru/manifests/sberkids.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "lenta_bystro",
+    "name": "Лента (Быстро Продукты)",
+    "manifest": "https://apprestore-ios.ru/manifests/lenta_bystro.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "avito_anero",
+    "name": "Авито (Anero)",
+    "manifest": "https://apprestore-ios.ru/manifests/avito_anero.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "craftersy",
+    "name": "Т-Банк (Craftersy)",
+    "manifest": "https://apprestore-ios.ru/manifests/craftersy.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "scbnotes",
+    "name": "СовкомБанк (SCB Notes)",
+    "manifest": "https://apprestore-ios.ru/manifests/scbnotes.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png",
+    "version": null,
+    "ios": "iOS 17.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "akbarsbank_vseychteno",
+    "name": "АК Барс (Всё Учтено)",
+    "manifest": "https://apprestore-ios.ru/manifests/akbarsbank_vseychteno.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "blum",
+    "name": "РокетБанк (Блум)",
+    "manifest": "https://apprestore-ios.ru/manifests/blum.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "happ_proxy",
+    "name": "Happ Proxy",
+    "manifest": "https://apprestore-ios.ru/manifests/happ_proxy.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "chatgpt",
+    "name": "ChatGPT",
+    "manifest": "https://apprestore-ios.ru/manifests/chatgpt.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "gemini",
+    "name": "Google Gemini",
+    "manifest": "https://apprestore-ios.ru/manifests/gemini.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png",
+    "version": null,
+    "ios": "iOS 14.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "lenta_lychsheonlain",
+    "name": "Лента (Лучше Онлайн)",
+    "manifest": "https://apprestore-ios.ru/manifests/lenta_lychsheonlain.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png",
+    "version": null,
+    "ios": "iOS 15.1+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "sberinvest",
+    "name": "СберИнвестиции (Сияние)",
+    "manifest": "https://apprestore-ios.ru/manifests/sberinvest.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "investments",
+    "enabled": true
+  },
+  {
+    "key": "vtbinvest",
+    "name": "ВТБ Инвестиции (Kafario)",
+    "manifest": "https://apprestore-ios.ru/manifests/vtbinvest.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png",
+    "version": null,
+    "ios": "iOS 17.6+",
+    "category": "investments",
+    "enabled": true
+  },
+  {
+    "key": "alfa_invest",
+    "name": "Альфа Инвестиции (Ход вверх)",
+    "manifest": "https://apprestore-ios.ru/manifests/alfa_invest.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "investments",
+    "enabled": true
+  },
+  {
+    "key": "gazprominvest_billfo",
+    "name": "ГазпромИнвестиции (BillFO)",
+    "manifest": "https://apprestore-ios.ru/manifests/gazprominvest_billfo.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "investments",
+    "enabled": true
+  },
+  {
+    "key": "sbpay",
+    "name": "СБПэй",
+    "manifest": "https://apprestore-ios.ru/manifests/sbpay.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png",
+    "version": null,
+    "ios": "iOS 13.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "yota_atoy",
+    "name": "YOTA (Atoy)",
+    "manifest": "https://apprestore-ios.ru/manifests/yota_atoy.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "gazpromneft",
+    "name": "Газпромнефть (Бак+Бонус)",
+    "manifest": "https://apprestore-ios.ru/manifests/gazpromneft.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png",
+    "version": null,
+    "ios": "iOS 15.0+",
+    "category": "other",
+    "enabled": true
+  },
+  {
+    "key": "novikombank",
+    "name": "Новикомбанк (Ночной код)",
+    "manifest": "https://apprestore-ios.ru/manifests/novikombank.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png",
+    "version": null,
+    "ios": "iOS 12.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "rshb_gysi",
+    "name": "РСХБ (Любовь и гуси)",
+    "manifest": "https://apprestore-ios.ru/manifests/rshb_gysi.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png",
+    "version": null,
+    "ios": "iOS 15.5+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "mtsdengi",
+    "name": "МТС Банк (МТС Деньги)",
+    "manifest": "https://apprestore-ios.ru/manifests/mtsdengi.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png",
+    "version": null,
+    "ios": "iOS 14.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "domrf_roomassist",
+    "name": "Дом.РФ (RoomAssist)",
+    "manifest": "https://apprestore-ios.ru/manifests/domrf_roomassist.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/domrf_roomassist.png",
+    "version": null,
+    "ios": "iOS 16.0+",
+    "category": "banks",
+    "enabled": true
+  },
+  {
+    "key": "moidomru_proskorost",
+    "name": "Мой дом.ру (ПРОскорость)",
+    "manifest": "https://apprestore-ios.ru/manifests/moidomru_proskorost.plist",
+    "icon": "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png",
+    "version": null,
+    "ios": "iOS 18.0+",
+    "category": "other",
+    "enabled": true
+  }
+]
+</script>
+<script>
+(function(){
+  const apps = JSON.parse(document.getElementById('apps-data').textContent);
+  const tbody = document.getElementById('apps-table');
+  const search = document.getElementById('search');
+  const category = document.getElementById('category');
+  const shown = document.getElementById('shown');
+  const categoryNames = { banks:'Банки', social:'Соцсети', investments:'Инвестиции', other:'Другие' };
+  function safeUrl(value) { try { const u = new URL(value, location.href); return ['https:','http:'].includes(u.protocol) ? u.href : '#'; } catch (_) { return '#'; } }
+  function render(){
+    const q = search.value.trim().toLocaleLowerCase('ru');
+    const c = category.value;
+    const filtered = apps.filter(a => (c === 'all' || a.category === c) && (a.name.toLocaleLowerCase('ru').includes(q) || a.key.toLowerCase().includes(q)));
+    shown.textContent = filtered.length + ' из ' + apps.length + ' приложений';
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">Ничего не найдено</td></tr>'; return; }
+    tbody.innerHTML = filtered.map(a => `<tr>
+      <td><div class="app"><img loading="lazy" src="${safeUrl(a.icon)}" alt="" onerror="this.style.visibility='hidden'"><span>${escapeHtml(a.name)}</span></div></td>
+      <td><code>${escapeHtml(a.key)}</code></td>
+      <td>${escapeHtml(categoryNames[a.category] || a.category)}</td>
+      <td>${a.version ? escapeHtml(a.version) : '<span class="small">Не указана</span>'}</td>
+      <td>${escapeHtml(a.ios || 'Не указана')}</td>
+      <td><a href="${safeUrl(a.manifest)}" target="_blank" rel="noopener">Открыть манифест</a></td>
+      <td><a href="${safeUrl(a.icon)}" target="_blank" rel="noopener">Открыть иконку</a></td>
+    </tr>`).join('');
+  }
+  function escapeHtml(value){return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  search.addEventListener('input', render);
+  category.addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>
