@@ -96,6 +96,16 @@
                 </div>
                 <div class="menu-chevron">›</div>
             </div>
+            
+            <div class="menu-item" onclick="openView('view-promo')">
+                <div class="menu-icon" style="background: rgba(234, 179, 8, 0.15);">🏷️</div>
+                <div class="menu-text">
+                    <div class="menu-title">Акции и скидки</div>
+                    <div class="menu-subtitle">Массовое изменение цен</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+            
             <div class="menu-item" onclick="openView('view-prices')">
                 <div class="menu-icon" style="background: rgba(168, 85, 247, 0.15);">💰</div>
                 <div class="menu-text">
@@ -123,6 +133,7 @@
         </div>
     </div>
 
+    <!-- Создание разовой ссылки -->
     <div id="view-create-link" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 10px;">Создание разовой ссылки</h3>
@@ -150,6 +161,26 @@
         </div>
     </div>
 
+    <!-- Новое меню: Запуск акции -->
+    <div id="view-promo" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 12px;">Запуск акции</h3>
+            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
+                Укажите сумму, на которую нужно снизить цену. Для отмены скидки введите сумму с минусом (например, -50).
+            </p>
+            <input type="text" inputmode="text" id="promo-discount-input" class="text-input" style="margin-bottom:12px;" placeholder="Скидка в рублях (например, 50)">
+            
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                 <input type="search" id="promo-search" class="text-input" style="text-align:left; margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
+                 <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.1); font-size:13px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
+            </div>
+            
+            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 12px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
+            <div id="list-promo" class="admin-scroll-list"></div>
+        </div>
+    </div>
+
+    <!-- Управление ценами -->
     <div id="view-prices" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 12px;">Цены на приложения</h3>
@@ -168,6 +199,7 @@
         </div>
     </div>
 
+    <!-- Видимость приложений -->
     <div id="view-visibility" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 12px;">Видимость в каталоге</h3>
@@ -176,6 +208,7 @@
         </div>
     </div>
 
+    <!-- Настройки системы -->
     <div id="view-settings" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 16px;">Глобальные параметры</h3>
@@ -277,6 +310,7 @@
     
         let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
         let selectedAppsForLink = new Set();
+        let selectedAppsForPromo = new Set(); // Для акции
         let selectedTtlMinutes = 5;
         let selectedAppKey = "";
         let toastTimeout;
@@ -343,7 +377,6 @@
                     sbFetch("site_settings?select=*")
                 ]);
 
-                // Не перезаписываем рабочие данные пустыми значениями при ошибке Supabase.
                 if (!Array.isArray(pricesRes) || !Array.isArray(visRes) || !Array.isArray(settingsRes)) {
                     showToast("Не удалось обновить данные Supabase");
                     return;
@@ -384,7 +417,9 @@
             if (id === 'view-menu') {
                 tg.BackButton.hide();
                 selectedAppsForLink.clear();
+                selectedAppsForPromo.clear();
                 updateGenerateButton();
+                updatePromoButton();
                 renderAllViews();
             } else {
                 tg.BackButton.show();
@@ -397,9 +432,132 @@
             renderPricesList();
             renderVisibilityList();
             renderSettings();
+            renderPromoList();
             updateGenerateButton();
+            updatePromoButton();
         }
 
+        /* ----- ЛОГИКА АКЦИЙ И СКИДОК ----- */
+        function renderPromoList() {
+            const list = document.getElementById('list-promo');
+            if (!list) return;
+            const query = (document.getElementById('promo-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+                const isVisible = globalData.state.visibility[app.key] !== false;
+                const isChecked = selectedAppsForPromo.has(app.key);
+                const currentPrice = getAdminAppPrice(app.key);
+                return `
+                <div class="app-item ${isVisible ? '' : 'app-unavailable'}" data-key="${app.key}" onclick="${isVisible ? 'toggleAppForPromo(this.dataset.key)' : ''}">
+                    <div class="checkbox ${isChecked ? 'checked' : ''}" id="check-promo-${app.key}" style="${isVisible ? '' : 'display:none;'}"></div>
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-status">${isVisible ? 'Текущая цена: ' + currentPrice + ' ₽' : '<span class="badge-unavailable">Недоступно</span>'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleAppForPromo(key) {
+            if (globalData.state.visibility[key] === false) return;
+            if (selectedAppsForPromo.has(key)) selectedAppsForPromo.delete(key);
+            else selectedAppsForPromo.add(key);
+            document.getElementById('check-promo-' + key)?.classList.toggle('checked', selectedAppsForPromo.has(key));
+            updatePromoButton();
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function selectAllPromo() {
+            const query = (document.getElementById('promo-search')?.value || '').trim().toLowerCase();
+            const visibleApps = appsData.filter(app => globalData.state.visibility[app.key] !== false && app.name.toLowerCase().includes(query));
+            
+            const allSelected = visibleApps.length > 0 && visibleApps.every(app => selectedAppsForPromo.has(app.key));
+            
+            if (allSelected) {
+                visibleApps.forEach(app => selectedAppsForPromo.delete(app.key));
+            } else {
+                visibleApps.forEach(app => selectedAppsForPromo.add(app.key));
+            }
+            
+            renderPromoList();
+            updatePromoButton();
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function updatePromoButton() {
+            const btn = document.getElementById('btn-apply-promo');
+            if (!btn) return;
+            btn.innerText = `🏷️ Изменить цены (${selectedAppsForPromo.size})`;
+            if (selectedAppsForPromo.size > 0) {
+                btn.style.background = 'linear-gradient(135deg, #ca8a04, #a16207)';
+                btn.style.color = '#ffffff';
+                btn.style.border = 'none';
+                btn.style.boxShadow = '0 8px 20px rgba(202, 138, 4, 0.3)';
+            } else {
+                btn.style.background = 'rgba(234, 179, 8, 0.15)';
+                btn.style.color = '#fde047';
+                btn.style.border = '1px solid rgba(234, 179, 8, 0.4)';
+                btn.style.boxShadow = 'none';
+            }
+        }
+
+        async function applyPromo() {
+            if (selectedAppsForPromo.size === 0) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+            
+            const discountInput = document.getElementById('promo-discount-input');
+            const discountText = discountInput.value.trim();
+            const discount = parseInt(discountText, 10);
+            
+            if (isNaN(discount) || discount === 0) {
+                showToast("Введите сумму изменения");
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-apply-promo');
+            const prevText = btn.innerText;
+            btn.innerText = "⏳ Обновление...";
+
+            const updates = [];
+            selectedAppsForPromo.forEach(key => {
+                const currentPrice = getAdminAppPrice(key);
+                let newPrice = currentPrice - discount;
+                if (newPrice < 0) newPrice = 0; 
+                
+                updates.push({ app_key: key, price: newPrice });
+                globalData.state.prices[key] = String(newPrice);
+            });
+
+            try {
+                const res = await sbFetch("app_prices?on_conflict=app_key", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (res !== null) {
+                    try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
+                    showToast("Цены успешно обновлены!");
+                    tg.HapticFeedback.notificationOccurred('success');
+                    
+                    discountInput.value = '';
+                    selectedAppsForPromo.clear();
+                    renderPromoList(); 
+                    renderPricesList(); 
+                } else {
+                    showToast("Ошибка при обновлении цен в БД");
+                }
+            } catch (e) {
+                showToast("Ошибка сети");
+            } finally {
+                updatePromoButton();
+            }
+        }
+
+        /* ----- ЛОГИКА СОЗДАНИЯ ССЫЛОК ----- */
         function renderCreateLinkList() {
             const list = document.getElementById('list-create-link');
             const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
@@ -493,6 +651,7 @@
             };
         }
 
+        /* ----- ЛОГИКА ЦЕН ----- */
         function renderPricesList() {
             const list = document.getElementById('list-prices');
             if (!list) return;
@@ -544,6 +703,7 @@
             openView('view-price-detail');
         }
 
+        /* ----- ЛОГИКА ВИДИМОСТИ ----- */
         function renderVisibilityList() {
             const list = document.getElementById('list-visibility');
             if (!list) return;
@@ -571,6 +731,10 @@
                 selectedAppsForLink.delete(key);
                 updateGenerateButton();
             }
+            if (!makeVisible && selectedAppsForPromo.has(key)) {
+                selectedAppsForPromo.delete(key);
+                updatePromoButton();
+            }
             const sw = document.getElementById('vis-switch-' + key);
             const st = document.getElementById('vis-status-' + key);
             if (sw) sw.classList.toggle('on', makeVisible);
@@ -591,6 +755,7 @@
             });
         }
 
+        /* ----- ЛОГИКА НАСТРОЕК СИСТЕМЫ ----- */
         function renderSettings() {
             const btnToggle = document.getElementById('btn-toggle-site');
             const indicator = document.getElementById('site-status-indicator');
