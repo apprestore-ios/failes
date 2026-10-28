@@ -1147,7 +1147,7 @@
             const appNameRu = appObj ? appObj.name : key;
 
             try {
-                fetch(`${SUPABASE_URL}/functions/v1/smooth-handler`, {
+                fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [appNameRu], device_name: navigator.userAgent })
