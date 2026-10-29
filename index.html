@@ -544,7 +544,7 @@
           { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
           { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
           { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.png", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
           { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
           { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
           { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
@@ -905,6 +905,11 @@
                     currentPromoCode = null;
                     currentPromoDiscount = 0;
                 } else {
+                    await sbFetch(`promo_codes?code=eq.${code}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ is_used: true })
+                    });
+                    
                     msgEl.style.color = "#4ade80";
                     msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
                     currentPromoCode = promo.code;
@@ -951,6 +956,7 @@
             const orderNumEl = document.getElementById("cartScreenOrderNum");
             const promoRow = document.getElementById("cartPromoRow");
             const promoInputWrap = document.getElementById("promoInputWrap");
+            const msgEl = document.getElementById("promoMessage");
             
             if (!listEl) return;
 
@@ -969,6 +975,7 @@
                 if (checkoutBtn) checkoutBtn.style.display = "none";
                 if (clearBtn) clearBtn.style.display = "none";
                 if (promoInputWrap) promoInputWrap.style.display = "none";
+                if (msgEl) msgEl.style.display = "none";
                 return;
             }
 
@@ -984,6 +991,7 @@
             if (checkoutBtn) checkoutBtn.style.display = "flex";
             if (clearBtn) clearBtn.style.display = "flex";
             if (promoInputWrap) promoInputWrap.style.display = "flex";
+            if (currentPromoCode && msgEl) msgEl.style.display = "block";
 
             let total = 0;
             let html = "";
