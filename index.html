@@ -231,8 +231,10 @@
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
       .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
-      .cart-toggle-btn { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; width: 100%; display: none; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 10px; transition: background 0.2s; }
+      .cart-toggle-btn { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; width: 100%; display: none; align-items: center; justify-content: space-between; cursor: pointer; margin: 16px 0 10px 0; transition: background 0.2s; }
       .cart-toggle-btn:active { background: rgba(59, 130, 246, 0.25); }
+      .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
+      .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -366,7 +368,7 @@
 
         <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
             <span id="cartToggleListText">Выбранные приложения (0)</span>
-            <span class="sf-icon" id="cartToggleListIcon">&#xEC5E;</span>
+            <span class="sf-icon">&#xECA2;</span>
         </button>
 
         <div class="cart-items-list" id="cartItemsList"></div>
@@ -985,7 +987,6 @@
             const msgEl = document.getElementById("promoMessage");
             const toggleListBtn = document.getElementById("cartToggleListBtn");
             const toggleListText = document.getElementById("cartToggleListText");
-            const toggleListIcon = document.getElementById("cartToggleListIcon");
             
             if (!listEl) return;
 
@@ -1055,10 +1056,10 @@
                 
                 if (isCartListVisible) {
                     listEl.classList.remove("collapsed");
-                    if (toggleListIcon) toggleListIcon.innerHTML = "&#xEC5C;";
+                    if (toggleListBtn) toggleListBtn.classList.add("open");
                 } else {
                     listEl.classList.add("collapsed");
-                    if (toggleListIcon) toggleListIcon.innerHTML = "&#xEC5E;";
+                    if (toggleListBtn) toggleListBtn.classList.remove("open");
                 }
             } else {
                 if (toggleListBtn) toggleListBtn.style.display = "none";
