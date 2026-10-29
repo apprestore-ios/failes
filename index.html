@@ -356,6 +356,12 @@
 
         <div class="cart-items-list" id="cartItemsList"></div>
 
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 10px; margin-bottom: 0; display: flex; gap: 8px;">
+            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод (если есть)">
+            <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
+        </div>
+        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
+
         <div class="cart-summary-card" id="cartSummaryCard">
             <div class="cart-summary-row" id="cartOrderNumberRow">
                 <span>Номер заказа:</span>
@@ -364,6 +370,10 @@
             <div class="cart-summary-row">
                 <span>Выбрано приложений:</span>
                 <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
+            </div>
+            <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
+                <span>Скидка по промокоду:</span>
+                <span id="cartScreenDiscount">-0 ₽</span>
             </div>
             <div class="cart-summary-row total">
                 <span>Итого к оплате:</span>
@@ -568,6 +578,8 @@
         let tokenCountdownInterval = null;
         let cartItems = new Set();
         let currentOrderNumber = null;
+        let currentPromoCode = null;
+        let currentPromoDiscount = 0;
 
         try {
             const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
@@ -867,9 +879,55 @@
             updateCartUI();
         }
 
+        async function applyPromoCode() {
+            const input = document.getElementById("promoCodeInput");
+            const msgEl = document.getElementById("promoMessage");
+            const code = input.value.trim().toUpperCase();
+            
+            if (!code) {
+                msgEl.style.display = "block";
+                msgEl.style.color = "#fca5a5";
+                msgEl.textContent = "Введите промокод";
+                return;
+            }
+
+            msgEl.style.display = "block";
+            msgEl.style.color = "var(--muted)";
+            msgEl.textContent = "Проверка...";
+
+            const res = await sbFetch(`promo_codes?code=eq.${code}&select=*`);
+            
+            if (res && Array.isArray(res) && res.length > 0) {
+                const promo = res[0];
+                if (promo.is_used) {
+                    msgEl.style.color = "#fca5a5";
+                    msgEl.textContent = "Промокод уже использован";
+                    currentPromoCode = null;
+                    currentPromoDiscount = 0;
+                } else {
+                    msgEl.style.color = "#4ade80";
+                    msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
+                    currentPromoCode = promo.code;
+                    currentPromoDiscount = Number(promo.discount);
+                }
+            } else {
+                msgEl.style.color = "#fca5a5";
+                msgEl.textContent = "Промокод не найден";
+                currentPromoCode = null;
+                currentPromoDiscount = 0;
+            }
+            renderCartScreen();
+        }
+
         function clearCart() {
             cartItems.clear();
             currentOrderNumber = null;
+            currentPromoCode = null;
+            currentPromoDiscount = 0;
+            const input = document.getElementById('promoCodeInput');
+            if (input) input.value = '';
+            const msg = document.getElementById('promoMessage');
+            if (msg) msg.style.display = 'none';
             saveCart();
             updateCartUI();
         }
@@ -891,6 +949,8 @@
             const countEl = document.getElementById("cartScreenCount");
             const totalEl = document.getElementById("cartScreenTotal");
             const orderNumEl = document.getElementById("cartScreenOrderNum");
+            const promoRow = document.getElementById("cartPromoRow");
+            const promoInputWrap = document.getElementById("promoInputWrap");
             
             if (!listEl) return;
 
@@ -908,6 +968,7 @@
                 if (summaryCard) summaryCard.style.display = "none";
                 if (checkoutBtn) checkoutBtn.style.display = "none";
                 if (clearBtn) clearBtn.style.display = "none";
+                if (promoInputWrap) promoInputWrap.style.display = "none";
                 return;
             }
 
@@ -922,6 +983,7 @@
             if (summaryCard) summaryCard.style.display = "flex";
             if (checkoutBtn) checkoutBtn.style.display = "flex";
             if (clearBtn) clearBtn.style.display = "flex";
+            if (promoInputWrap) promoInputWrap.style.display = "flex";
 
             let total = 0;
             let html = "";
@@ -950,7 +1012,20 @@
             listEl.innerHTML = html;
             if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
             if (countEl) countEl.textContent = cartItems.size + " шт.";
-            if (totalEl) totalEl.textContent = total + " ₽";
+            
+            let finalTotal = total - currentPromoDiscount;
+            if (finalTotal < 0) finalTotal = 0;
+
+            if (currentPromoDiscount > 0) {
+                if (promoRow) promoRow.style.display = "flex";
+                const discountEl = document.getElementById("cartScreenDiscount");
+                if (discountEl) discountEl.textContent = "-" + currentPromoDiscount + " ₽";
+                
+                if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
+            } else {
+                if (promoRow) promoRow.style.display = "none";
+                if (totalEl) totalEl.textContent = finalTotal + " ₽";
+            }
         }
 
         function updateCartUI() {
@@ -1008,11 +1083,21 @@
                     lines.push("• " + app.name + " — " + p + " ₽");
                 }
             });
-            const message = "Здравствуйте! Хочу заказать установку приложений:\n" +
+            
+            let finalTotal = total - currentPromoDiscount;
+            if (finalTotal < 0) finalTotal = 0;
+
+            let message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
                 "📦 Заказ: " + (currentOrderNumber || "") + "\n\n" +
-                lines.join("\n") + "\n\n" +
-                "💰 Итого к оплате: " + total + " ₽\n" +
+                lines.join("\n") + "\n\n";
+                
+            if (currentPromoCode) {
+                message += "🏷 Промокод: " + currentPromoCode + " (-" + currentPromoDiscount + " ₽)\n";
+            }
+
+            message += "💰 Итого к оплате: " + finalTotal + " ₽\n" +
                 "Отправьте, пожалуйста, реквизиты для оплаты.";
+                
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(message).catch(() => {});
