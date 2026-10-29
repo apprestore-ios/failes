@@ -128,10 +128,10 @@
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
 
-      .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; transition: max-height 0.3s var(--spring), opacity 0.3s ease; }
+      .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
       .cart-items-list::-webkit-scrollbar { width: 4px; }
       .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
-      .cart-items-list.collapsed { max-height: 0; opacity: 0; margin: 0; padding: 0; pointer-events: none; }
+      .cart-items-list.collapsed { display: none !important; }
       .cart-empty-alert {
           display: none; width: 100%; padding: 18px 16px; border-radius: 16px;
           background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.55);
@@ -231,7 +231,7 @@
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
       .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
-      .cart-toggle-btn { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; width: 100%; display: none; align-items: center; justify-content: space-between; cursor: pointer; margin: 16px 0 10px 0; transition: background 0.2s; }
+      .cart-toggle-btn { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; width: 100%; display: none; align-items: center; justify-content: space-between; cursor: pointer; margin: 6px 0 4px 0; transition: background 0.2s; }
       .cart-toggle-btn:active { background: rgba(59, 130, 246, 0.25); }
       .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
       .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
@@ -373,7 +373,7 @@
 
         <div class="cart-items-list" id="cartItemsList"></div>
 
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 10px; margin-bottom: 0; display: flex; gap: 8px;">
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; display: flex; gap: 8px;">
             <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
             <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
         </div>
@@ -1048,7 +1048,6 @@
             });
 
             listEl.innerHTML = html;
-            listEl.style.display = "flex";
 
             if (cartItems.size >= 2) {
                 if (toggleListBtn) toggleListBtn.style.display = "flex";
