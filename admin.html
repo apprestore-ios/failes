@@ -52,6 +52,16 @@
         .app-status { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
         .admin-price-badge { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px; flex-shrink: 0; }
         .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+        
+        .promo-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.14); }
+        .promo-item:last-child { margin-bottom: 0; }
+        .promo-info { display: flex; flex-direction: column; gap: 4px; }
+        .promo-code-text { font-size: 16px; font-weight: 700; color: #4ade80; letter-spacing: 1px; }
+        .promo-details { font-size: 12px; color: var(--muted); }
+        .promo-status-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid transparent; }
+        .promo-status-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.4); }
+        .promo-status-used { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); }
+        
         .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
         .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
         .ttl-pill {
@@ -68,6 +78,8 @@
         .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: none; }
         .btn-gen { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: none; }
         .btn-gen-active { background: linear-gradient(135deg, #9333ea, #7e22ce); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3); }
+        .btn-promo-gen { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: none; }
+        .btn-promo-gen-active { background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3); }
         .text-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; margin-bottom: 10px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; transition: 0.2s; }
         .text-input:focus { border-color: var(--accent); }
         .switch { position: relative; width: 50px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 15px; transition: 0.2s; flex-shrink: 0; }
@@ -97,11 +109,29 @@
                 <div class="menu-chevron">›</div>
             </div>
             
+            <div class="menu-item" onclick="openView('view-create-promo-code')">
+                <div class="menu-icon" style="background: rgba(16, 185, 129, 0.15);">🎁</div>
+                <div class="menu-text">
+                    <div class="menu-title">Создать промокод</div>
+                    <div class="menu-subtitle">Скидка на выбранные приложения</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+
+            <div class="menu-item" onclick="openView('view-promo-codes-list')">
+                <div class="menu-icon" style="background: rgba(244, 63, 94, 0.15);">📋</div>
+                <div class="menu-text">
+                    <div class="menu-title">Список промокодов</div>
+                    <div class="menu-subtitle">Статусы и история создания</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+
             <div class="menu-item" onclick="openView('view-promo')">
                 <div class="menu-icon" style="background: rgba(234, 179, 8, 0.15);">🏷️</div>
                 <div class="menu-text">
-                    <div class="menu-title">Акции и скидки</div>
-                    <div class="menu-subtitle">Массовое изменение цен</div>
+                    <div class="menu-title">Массовые акции</div>
+                    <div class="menu-subtitle">Глобальное изменение цен</div>
                 </div>
                 <div class="menu-chevron">›</div>
             </div>
@@ -129,6 +159,46 @@
                     <div class="menu-subtitle">Статус работы сайта</div>
                 </div>
                 <div class="menu-chevron">›</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Создание промокода -->
+    <div id="view-create-promo-code" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 10px;">Создание промокода</h3>
+            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
+                Промокод сработает, только если в корзине будут приложения из выбранного списка.
+            </p>
+            <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="text-input" style="margin-bottom:12px; font-weight: 600;" placeholder="Скидка в рублях (например, 100)">
+            
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                 <input type="search" id="promo-code-search" class="text-input" style="text-align:left; margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoCodeList()">
+                 <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.1); font-size:13px; box-shadow: none;" onclick="selectAllPromoCodeApps()">Все</button>
+            </div>
+            
+            <button class="btn btn-promo-gen" id="btn-generate-promo-code" style="margin-bottom: 12px;" onclick="createPromoCode()">🎁 Создать промокод (0)</button>
+            <div id="list-promo-code-apps" class="admin-scroll-list"></div>
+        </div>
+    </div>
+
+    <div id="view-promo-code-result" class="view">
+        <div class="card" style="text-align:center; padding: 28px 20px;">
+            <div style="font-size: 45px; margin-bottom: 12px;">🎁</div>
+            <h2 style="margin: 0 0 6px 0; font-size: 20px;">Промокод создан!</h2>
+            <p id="result-promo-code-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;"></p>
+            <div id="result-promo-code-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
+            <input type="text" id="generated-promo-code-input" class="text-input" readonly style="color: #4ade80; font-weight: 700; font-size: 18px; margin-bottom: 10px; text-transform: uppercase;" onclick="copyPromoCode()">
+            <button class="btn" id="btn-forward-promo" style="background: linear-gradient(135deg, #059669, #047857);">📤 Переслать покупателю</button>
+        </div>
+    </div>
+
+    <!-- Список промокодов -->
+    <div id="view-promo-codes-list" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 16px;">Список промокодов</h3>
+            <div id="promo-codes-container" class="admin-scroll-list" style="max-height: 60dvh;">
+                <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
             </div>
         </div>
     </div>
@@ -161,10 +231,10 @@
         </div>
     </div>
 
-    <!-- Запуск акции -->
+    <!-- Запуск акции (Массовая) -->
     <div id="view-promo" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 12px;">Запуск акции</h3>
+            <h3 class="section-title" style="margin-bottom: 12px;">Массовая акция</h3>
             <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
                 Выберите приложения, укажите сумму скидки и примените её. Для возврата нажмите «Вернуть базовые цены».
             </p>
@@ -312,7 +382,8 @@
     
         let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
         let selectedAppsForLink = new Set();
-        let selectedAppsForPromo = new Set(); // Для акции
+        let selectedAppsForPromo = new Set();
+        let selectedAppsForPromoCode = new Set(); // Для генерации промокода
         let selectedTtlMinutes = 5;
         let selectedAppKey = "";
         let toastTimeout;
@@ -351,6 +422,18 @@
             navigator.clipboard.writeText(input.value).then(() => showToast("Ссылка скопирована!")).catch(() => {
                 input.select(); document.execCommand('copy'); showToast("Ссылка скопирована!");
             });
+        }
+
+        function copyPromoCode() {
+            const input = document.getElementById('generated-promo-code-input');
+            if (!input || !input.value) return;
+            navigator.clipboard.writeText(input.value).then(() => showToast("Промокод скопирован!")).catch(() => {
+                input.select(); document.execCommand('copy'); showToast("Промокод скопирован!");
+            });
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => showToast("Скопировано!")).catch(() => showToast("Ошибка копирования"));
         }
 
         function getAdminAppPrice(key) {
@@ -420,11 +503,16 @@
                 tg.BackButton.hide();
                 selectedAppsForLink.clear();
                 selectedAppsForPromo.clear();
+                selectedAppsForPromoCode.clear();
                 updateGenerateButton();
                 updatePromoButton();
+                updatePromoCodeButton();
                 renderAllViews();
             } else {
                 tg.BackButton.show();
+                if (id === 'view-promo-codes-list') {
+                    loadPromoCodesList();
+                }
             }
         }
 
@@ -435,9 +523,172 @@
             renderVisibilityList();
             renderSettings();
             renderPromoList();
+            renderPromoCodeList();
             updateGenerateButton();
             updatePromoButton();
+            updatePromoCodeButton();
         }
+
+        /* ----- ЛОГИКА СПИСКА ПРОМОКОДОВ ----- */
+        async function loadPromoCodesList() {
+            const container = document.getElementById('promo-codes-container');
+            container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
+            
+            const res = await sbFetch("promo_codes?select=*&order=created_at.desc");
+            
+            if (res === null) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки</div>';
+                return;
+            }
+            
+            if (res.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Промокодов пока нет</div>';
+                return;
+            }
+            
+            container.innerHTML = res.map(promo => {
+                const isUsed = promo.is_used;
+                const statusClass = isUsed ? 'promo-status-used' : 'promo-status-active';
+                const statusText = isUsed ? 'Использован' : 'Активен';
+                const appCount = Array.isArray(promo.app_keys) ? promo.app_keys.length : 0;
+                
+                return `
+                <div class="promo-item" onclick="copyText('${promo.code}')">
+                    <div class="promo-info">
+                        <div class="promo-code-text">${promo.code}</div>
+                        <div class="promo-details">Скидка: ${promo.discount} ₽ • Приложений: ${appCount}</div>
+                    </div>
+                    <div class="promo-status-badge ${statusClass}">${statusText}</div>
+                </div>`;
+            }).join('');
+        }
+
+        /* ----- ЛОГИКА СОЗДАНИЯ ПРОМОКОДА ----- */
+        function renderPromoCodeList() {
+            const list = document.getElementById('list-promo-code-apps');
+            if (!list) return;
+            const query = (document.getElementById('promo-code-search')?.value || '').trim().toLowerCase();
+            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+                const isVisible = globalData.state.visibility[app.key] !== false;
+                const isChecked = selectedAppsForPromoCode.has(app.key);
+                return `
+                <div class="app-item ${isVisible ? '' : 'app-unavailable'}" data-key="${app.key}" onclick="${isVisible ? 'toggleAppForPromoCode(this.dataset.key)' : ''}">
+                    <div class="checkbox ${isChecked ? 'checked' : ''}" id="check-promocode-${app.key}" style="${isVisible ? '' : 'display:none;'}"></div>
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-info">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-status">${isVisible ? app.ios : '<span class="badge-unavailable">Недоступно</span>'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleAppForPromoCode(key) {
+            if (globalData.state.visibility[key] === false) return;
+            if (selectedAppsForPromoCode.has(key)) selectedAppsForPromoCode.delete(key);
+            else selectedAppsForPromoCode.add(key);
+            document.getElementById('check-promocode-' + key)?.classList.toggle('checked', selectedAppsForPromoCode.has(key));
+            updatePromoCodeButton();
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function selectAllPromoCodeApps() {
+            const query = (document.getElementById('promo-code-search')?.value || '').trim().toLowerCase();
+            const visibleApps = appsData.filter(app => globalData.state.visibility[app.key] !== false && app.name.toLowerCase().includes(query));
+            
+            const allSelected = visibleApps.length > 0 && visibleApps.every(app => selectedAppsForPromoCode.has(app.key));
+            
+            if (allSelected) {
+                visibleApps.forEach(app => selectedAppsForPromoCode.delete(app.key));
+            } else {
+                visibleApps.forEach(app => selectedAppsForPromoCode.add(app.key));
+            }
+            
+            renderPromoCodeList();
+            updatePromoCodeButton();
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function updatePromoCodeButton() {
+            const btn = document.getElementById('btn-generate-promo-code');
+            if (!btn) return;
+            btn.innerText = `🎁 Создать промокод (${selectedAppsForPromoCode.size})`;
+            btn.className = selectedAppsForPromoCode.size > 0 ? "btn btn-promo-gen-active" : "btn btn-promo-gen";
+        }
+
+        async function createPromoCode() {
+            if (selectedAppsForPromoCode.size === 0) {
+                tg.HapticFeedback.notificationOccurred('error');
+                showToast("Выберите хотя бы одно приложение!");
+                return;
+            }
+
+            const discountInput = document.getElementById('promo-code-discount-input');
+            const discount = parseInt(discountInput.value.trim(), 10);
+
+            if (isNaN(discount) || discount <= 0) {
+                showToast("Введите корректную сумму скидки!");
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate-promo-code');
+            const prevText = btn.innerText;
+            btn.innerText = "⏳ Создание...";
+
+            const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let promoText = "PROMO-";
+            const array = new Uint32Array(5);
+            crypto.getRandomValues(array);
+            for (let i = 0; i < 5; i++) {
+                promoText += charset[array[i] % charset.length];
+            }
+
+            const appKeysArr = Array.from(selectedAppsForPromoCode);
+
+            const promoRecord = {
+                code: promoText,
+                discount: discount,
+                app_keys: appKeysArr,
+                is_used: false
+            };
+
+            const res = await sbFetch("promo_codes", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(promoRecord)
+            });
+
+            btn.innerText = prevText;
+
+            if (res === null) {
+                showToast("Ошибка при создании промокода в БД!");
+                return;
+            }
+
+            document.getElementById('generated-promo-code-input').value = promoText;
+            document.getElementById('result-promo-code-desc').innerText = `Скидка ${discount} ₽ на выбранные приложения. Сработает только 1 раз!`;
+
+            const container = document.getElementById('result-promo-code-apps');
+            const appNamesList = [];
+            container.innerHTML = appKeysArr.map(key => {
+                const app = appsData.find(a => a.key === key);
+                if (!app) return '';
+                appNamesList.push(app.name);
+                return `<div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); padding:6px 10px; border-radius:10px;">
+                    <img src="${app.icon}" style="width:24px; height:24px; border-radius:6px;">
+                    <span style="font-size:13px; font-weight:600; color:var(--text); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
+                </div>`;
+            }).join('');
+
+            openView('view-promo-code-result');
+            document.getElementById('btn-forward-promo').onclick = () => {
+                const text = `🎁 Дарю промокод на скидку ${discount} ₽!\n\nПромокод: ${promoText}\n\n📱 Действует при заказе следующих приложений:\n${appNamesList.map(n => `• ${n}`).join('\n')}\n\nКод можно использовать только один раз при оформлении через корзину сайта!`;
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(CLIENT_SITE_URL)}&text=${encodeURIComponent(text)}`;
+                tg.openTelegramLink(shareUrl);
+            };
+        }
+
 
         /* ----- ЛОГИКА АКЦИЙ И СКИДОК ----- */
         function renderPromoList() {
@@ -795,6 +1046,10 @@
             if (!makeVisible && selectedAppsForPromo.has(key)) {
                 selectedAppsForPromo.delete(key);
                 updatePromoButton();
+            }
+            if (!makeVisible && selectedAppsForPromoCode.has(key)) {
+                selectedAppsForPromoCode.delete(key);
+                updatePromoCodeButton();
             }
             const sw = document.getElementById('vis-switch-' + key);
             const st = document.getElementById('vis-status-' + key);
