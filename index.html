@@ -357,6 +357,10 @@
         <div class="cart-items-list" id="cartItemsList"></div>
 
         <div class="cart-summary-card" id="cartSummaryCard">
+            <div class="cart-summary-row" id="cartOrderNumberRow">
+                <span>Номер заказа:</span>
+                <span id="cartScreenOrderNum" style="color: var(--text); font-weight: 650;">#00000</span>
+            </div>
             <div class="cart-summary-row">
                 <span>Выбрано приложений:</span>
                 <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
@@ -563,6 +567,7 @@
         let currentScreenId = "welcomeApp";
         let tokenCountdownInterval = null;
         let cartItems = new Set();
+        let currentOrderNumber = null;
 
         try {
             const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
@@ -688,15 +693,15 @@
         }
 
         async function checkConnection() {
-    const alertEl = document.getElementById("top-toast-alert");
-    await fetchSiteDataFromSupabase(true);
-    if (siteEnabled) {
-        if (alertEl) alertEl.classList.remove("show");
-        switchScreen("mainApp");
-    } else {
-        if (alertEl) alertEl.classList.add("show");
-    }
-}
+            const alertEl = document.getElementById("top-toast-alert");
+            await fetchSiteDataFromSupabase(true);
+            if (siteEnabled) {
+                if (alertEl) alertEl.classList.remove("show");
+                switchScreen("mainApp");
+            } else {
+                if (alertEl) alertEl.classList.add("show");
+            }
+        }
 
         setInterval(() => {
             fetchSiteDataFromSupabase(false);
@@ -864,6 +869,7 @@
 
         function clearCart() {
             cartItems.clear();
+            currentOrderNumber = null;
             saveCart();
             updateCartUI();
         }
@@ -884,6 +890,8 @@
             const clearBtn = document.getElementById("cartClearAllBtn");
             const countEl = document.getElementById("cartScreenCount");
             const totalEl = document.getElementById("cartScreenTotal");
+            const orderNumEl = document.getElementById("cartScreenOrderNum");
+            
             if (!listEl) return;
 
             cartItems.forEach(k => {
@@ -901,6 +909,10 @@
                 if (checkoutBtn) checkoutBtn.style.display = "none";
                 if (clearBtn) clearBtn.style.display = "none";
                 return;
+            }
+
+            if (!currentOrderNumber) {
+                currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
             }
 
             if (titleEl) titleEl.textContent = "Ваша корзина";
@@ -936,6 +948,7 @@
             });
 
             listEl.innerHTML = html;
+            if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
             if (countEl) countEl.textContent = cartItems.size + " шт.";
             if (totalEl) totalEl.textContent = total + " ₽";
         }
@@ -995,7 +1008,8 @@
                     lines.push("• " + app.name + " — " + p + " ₽");
                 }
             });
-            const message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
+            const message = "Здравствуйте! Хочу заказать установку приложений:\n" +
+                "📦 Заказ: " + (currentOrderNumber || "") + "\n\n" +
                 lines.join("\n") + "\n\n" +
                 "💰 Итого к оплате: " + total + " ₽\n" +
                 "Отправьте, пожалуйста, реквизиты для оплаты.";
