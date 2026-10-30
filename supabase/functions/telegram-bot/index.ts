@@ -50,7 +50,11 @@ serve(async (req) => {
         typeof device_model === 'string' && device_model.trim()
           ? device_model.trim()
           : (typeof device_name === 'string' && device_name.trim() ? device_name.trim() : '');
-      const deviceFormatted = suppliedDeviceModel || parseDeviceName('');
+
+      // В уведомлении показываем только название устройства, без параметров экрана.
+      const deviceFormatted = (suppliedDeviceModel || parseDeviceName(''))
+        .split(' · ')[0]
+        .slice(0, 100);
 
       // Пустая строка между каждым пунктом делает уведомление читабельнее.
       const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n\n🔑 Токен: \`${token || 'Не указан'}\`\n\n⏰ Время (Екб): \`${ekbTime}\`\n\n📱 Устройство: \`${deviceFormatted}\``
