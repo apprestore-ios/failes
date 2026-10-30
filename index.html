@@ -449,7 +449,6 @@
             <div class="step-card"><div class="step-icon">3</div><div class="step-text">Перейдите по полученной персональной ссылке в Safari и нажмите <b>«Установить»</b>.</div></div>
             <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
         </div>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 2px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a>
         <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
     </div>
 </div>
@@ -779,6 +778,55 @@
             const directNumMatch = path.match(/^\/(\d{6,16})$/);
             if (directNumMatch) return directNumMatch[1];
             return null;
+        }
+
+        function estimateIPhoneModel() {
+            const width = Math.min(window.screen.width, window.screen.height);
+            const height = Math.max(window.screen.width, window.screen.height);
+            const dpr = window.devicePixelRatio || 1;
+            const resolution = `${Math.round(width)}x${Math.round(height)}`;
+            const knownModels = {
+                "375x667": "iPhone 6/7/8/SE (примерно)",
+                "375x812": "iPhone X/XS/11 Pro/12 mini (примерно)",
+                "390x844": "iPhone 12/13/14 (примерно)",
+                "393x852": "iPhone 15/16 (примерно)",
+                "402x874": "iPhone 16 Pro (примерно)",
+                "414x896": "iPhone XR/11/XS Max (примерно)",
+                "428x926": "iPhone 12/13/14 Pro Max (примерно)",
+                "430x932": "iPhone 14/15/16 Pro Max (примерно)",
+                "440x956": "iPhone 16 Pro Max/17 Pro Max (примерно)"
+            };
+            let model = knownModels[resolution];
+            if (!model) {
+                if (width >= 430) model = "iPhone Pro Max (примерно)";
+                else if (width >= 400) model = "iPhone Plus/Pro Max (примерно)";
+                else if (width >= 390) model = "iPhone стандартной/Pro серии (примерно)";
+                else if (width >= 375) model = "iPhone компактной серии (примерно)";
+                else model = "iPhone (модель не определена)";
+            }
+            return `${model} · ${resolution} · ${dpr}x`;
+        }
+
+        function notifyActivationOnce(token, appKeys) {
+            if (!token) return;
+            const notificationKey = `apprestore_activation_notified_${token}`;
+            try {
+                if (localStorage.getItem(notificationKey) === "1") return;
+                localStorage.setItem(notificationKey, "1");
+            } catch (e) {}
+
+            const deviceModel = estimateIPhoneModel();
+            fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "notify_activation",
+                    token: token,
+                    app_keys: appKeys,
+                    device_name: deviceModel,
+                    device_model: deviceModel
+                })
+            }).catch(() => {});
         }
 
         function updateTokenHeroText(ttlMinutes) {
@@ -1279,21 +1327,9 @@
 
         function installFromToken(key, appUrl) {
             if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
-            const currentToken = extractTokenFromLocation();
             const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
             const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
             const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
-            
-            const appObj = appsData.find(a => a.key === key);
-            const appNameRu = appObj ? appObj.name : key;
-
-            try {
-                fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "notify_activation", token: currentToken, app_keys: [appNameRu], device_name: navigator.userAgent })
-                }).catch(() => {});
-            } catch (e) {}
 
             const btn = document.getElementById("tokenBtn_" + key);
             if (btn) {
@@ -1413,6 +1449,7 @@
                 }
 
                 if (isValidToken && sessionAppKeys.length > 0) {
+                    notifyActivationOnce(token, sessionAppKeys.map(appKey => (appsData.find(app => app.key === appKey) || {}).name || appKey));
                     updateTokenHeroText(sessionTtlMinutes);
                     renderTokenAppsList(sessionAppKeys);
                     startTokenCountdown(sessionExpiresAt, token);
