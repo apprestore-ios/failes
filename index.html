@@ -781,30 +781,46 @@
         }
 
         function estimateIPhoneModel() {
+            // Safari сообщает логический размер экрана и DPR, но не аппаратный идентификатор.
+            // Поэтому выбираем осторожную группу совместимых моделей, не выдавая её за точную.
             const width = Math.min(window.screen.width, window.screen.height);
             const height = Math.max(window.screen.width, window.screen.height);
-            const dpr = window.devicePixelRatio || 1;
+            const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
             const resolution = `${Math.round(width)}x${Math.round(height)}`;
-            const knownModels = {
-                "375x667": "iPhone 6/7/8/SE (примерно)",
-                "375x812": "iPhone X/XS/11 Pro/12 mini (примерно)",
-                "390x844": "iPhone 12/13/14 (примерно)",
-                "393x852": "iPhone 15/16 (примерно)",
-                "402x874": "iPhone 16 Pro (примерно)",
-                "414x896": "iPhone XR/11/XS Max (примерно)",
-                "428x926": "iPhone 12/13/14 Pro Max (примерно)",
-                "430x932": "iPhone 14/15/16 Pro Max (примерно)",
-                "440x956": "iPhone 16 Pro Max/17 Pro Max (примерно)"
+
+            const modelByScreenAndDpr = {
+                "375x667@2": "iPhone 6 / 7 / 8 / SE (2-го или 3-го поколения)",
+                "375x812@3": "iPhone X / XS / 11 Pro",
+                "390x844@3": "iPhone 12 / 13 / 14",
+                "393x852@3": "iPhone 15 / 16 / 16e",
+                "402x874@3": "iPhone 16 Pro / 17 Pro",
+                "414x896@2": "iPhone XR / 11",
+                "414x896@3": "iPhone XS Max / 11 Pro Max",
+                "428x926@3": "iPhone 12 Pro Max / 13 Pro Max / 14 Plus",
+                "430x932@3": "iPhone 14 Pro Max / 15 Plus / 15 Pro Max",
+                "440x956@3": "iPhone 16 Plus / 16 Pro Max / 17 Pro Max"
             };
-            let model = knownModels[resolution];
+
+            const modelKey = `${resolution}@${Math.round(dpr)}`;
+            let model = modelByScreenAndDpr[modelKey];
+
+            // Резервная классификация для размеров, которых нет в таблице.
             if (!model) {
-                if (width >= 430) model = "iPhone Pro Max (примерно)";
-                else if (width >= 400) model = "iPhone Plus/Pro Max (примерно)";
-                else if (width >= 390) model = "iPhone стандартной/Pro серии (примерно)";
-                else if (width >= 375) model = "iPhone компактной серии (примерно)";
+                if (width >= 440) model = "iPhone большого размера (Plus / Pro Max)";
+                else if (width >= 420) model = "iPhone Pro Max / Plus";
+                else if (width >= 400) model = "iPhone крупного размера";
+                else if (width >= 390) model = "iPhone стандартного размера";
+                else if (width >= 375) model = "iPhone компактного размера";
                 else model = "iPhone (модель не определена)";
             }
-            return `${model} · ${resolution} · ${dpr}x`;
+
+            // DPR используется как дополнительная проверка типа экрана.
+            // Само название модели возвращаем без разрешения, DPR и других технических данных.
+            if (dpr < 1.5 || dpr > 4) {
+                return "iPhone (модель не определена)";
+            }
+
+            return model;
         }
 
         function notifyActivationOnce(token, appKeys) {
