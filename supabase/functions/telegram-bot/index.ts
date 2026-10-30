@@ -10,12 +10,12 @@ const corsHeaders = {
 }
 
 function parseDeviceName(ua: string): string {
-  if (!ua) return "iPhone / iOS устройство";
+  if (!ua) return "iPhone (модель не передана сайтом)";
   if (ua.includes("iPhone")) {
-    if (ua.includes("CPU OS 18_")) return "iPhone (iOS 18)";
-    if (ua.includes("CPU OS 17_")) return "iPhone (iOS 17)";
-    if (ua.includes("CPU OS 16_")) return "iPhone (iOS 16)";
-    return "iPhone";
+    if (ua.includes("CPU OS 18_")) return "iPhone (модель не определена, iOS 18)";
+    if (ua.includes("CPU OS 17_")) return "iPhone (модель не определена, iOS 17)";
+    if (ua.includes("CPU OS 16_")) return "iPhone (модель не определена, iOS 16)";
+    return "iPhone (модель не определена)";
   }
   if (ua.includes("iPad")) return "iPad";
   if (ua.includes("Macintosh") || ua.includes("Mac OS")) return "Mac (Safari)";
@@ -39,14 +39,22 @@ serve(async (req) => {
 
     // 1. Уведомление об активации (для сайта/приложения)
     if (body.action === 'notify_activation') {
-      const { token, app_keys, device_name } = body
-      const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : app_keys
-      
-      const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
-      const deviceFormatted = parseDeviceName(device_name);
+      const { token, app_keys, device_name, device_model } = body
+      const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : (app_keys || 'Не указаны')
 
-      const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n🔑 Токен: \`${token}\`\n⏰ Время (Екб): \`${ekbTime}\`\n📱 Устройство: \`${deviceFormatted}\``
-      
+      const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
+
+      // Сайт передаёт примерную модель iPhone в device_model.
+      // Используем её в приоритете, чтобы не заменять на общее «iPhone».
+      const suppliedDeviceModel =
+        typeof device_model === 'string' && device_model.trim()
+          ? device_model.trim()
+          : (typeof device_name === 'string' && device_name.trim() ? device_name.trim() : '');
+      const deviceFormatted = suppliedDeviceModel || parseDeviceName('');
+
+      // Пустая строка между каждым пунктом делает уведомление читабельнее.
+      const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n\n🔑 Токен: \`${token || 'Не указан'}\`\n\n⏰ Время (Екб): \`${ekbTime}\`\n\n📱 Устройство: \`${deviceFormatted}\``
+
       const replyMarkup = {
         inline_keyboard: [
           [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
