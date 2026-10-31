@@ -760,7 +760,7 @@
             if (siteState.prices && siteState.prices[key] !== undefined) {
                 return Number(siteState.prices[key]);
             }
-            return (key === "mailru" || key === "alfabank") ? 500 : 250;
+            return 250;
         }
 
         function isAppVisible(key) {
