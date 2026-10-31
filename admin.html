@@ -428,7 +428,7 @@
             if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
                 return Number(globalData.state.prices[key]);
             }
-            return (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+            return 250;
         }
 
         async function loadData() {
@@ -767,7 +767,7 @@
 
             const updates = [];
             selectedAppsForPromo.forEach(key => {
-                const basePrice = (key === 'mailru' || key === 'alfabank') ? 500 : 250;
+                const basePrice = 250;
                 updates.push({ app_key: key, price: basePrice });
                 globalData.state.prices[key] = String(basePrice);
             });
