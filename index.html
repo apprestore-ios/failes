@@ -119,34 +119,8 @@
       }
       .app-grid-card.app-unavailable { display: none !important; }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
-      .app-price-tag {
-          position: relative; isolation: isolate; overflow: hidden;
-          font-size: 11.5px; font-weight: 750; letter-spacing: .15px;
-          color: #eff8ff; display: inline-block; margin-top: 4px;
-          padding: 4px 9px; border-radius: 9px;
-          background:
-              radial-gradient(ellipse at 18% 0%, rgba(255,255,255,.40), transparent 58%),
-              linear-gradient(145deg, rgba(56,189,248,.38), rgba(59,130,246,.24) 48%, rgba(147,197,253,.32));
-          border: 1px solid rgba(191,230,255,.72);
-          -webkit-backdrop-filter: blur(18px) saturate(185%);
-          backdrop-filter: blur(18px) saturate(185%);
-          box-shadow: inset 0 1px 1px rgba(255,255,255,.38),
-                      inset 0 -1px 1px rgba(255,255,255,.08),
-                      0 2px 15px rgba(56,189,248,.34),
-                      0 0 0 1px rgba(255,255,255,.035);
-          text-shadow: 0 1px 5px rgba(255,255,255,.16);
-      }
-      .app-price-tag.premium {
-          color: #f4edff;
-          background:
-              radial-gradient(ellipse at 18% 0%, rgba(255,255,255,.32), transparent 58%),
-              linear-gradient(145deg, rgba(192,132,252,.46), rgba(147,51,234,.30) 52%, rgba(167,139,250,.38));
-          border-color: rgba(233,213,255,.78);
-          box-shadow: inset 0 1px 1px rgba(255,255,255,.42),
-                      inset 0 -1px 1px rgba(255,255,255,.10),
-                      0 2px 16px rgba(168,85,247,.42),
-                      0 0 0 1px rgba(255,255,255,.04);
-      }
+      .app-price-tag { font-size: 11px; font-weight: 750; color: #93c5fd; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
+      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
@@ -170,31 +144,8 @@
       .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
       .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-      .cart-item-price {
-          position: relative; isolation: isolate;
-          padding: 6px 10px; border-radius: 10px; font-size: 12.5px;
-          font-weight: 750; letter-spacing: .1px; color: #eff8ff;
-          background:
-              radial-gradient(ellipse at 18% 0%, rgba(255,255,255,.40), transparent 58%),
-              linear-gradient(145deg, rgba(56,189,248,.38), rgba(59,130,246,.24) 48%, rgba(147,197,253,.32));
-          border: 1px solid rgba(191,230,255,.72);
-          -webkit-backdrop-filter: blur(18px) saturate(185%);
-          backdrop-filter: blur(18px) saturate(185%);
-          box-shadow: inset 0 1px 1px rgba(255,255,255,.38),
-                      inset 0 -1px 1px rgba(255,255,255,.08),
-                      0 2px 15px rgba(56,189,248,.34);
-          text-shadow: 0 1px 5px rgba(255,255,255,.16);
-      }
-      .cart-item-price.premium {
-          color: #f4edff;
-          background:
-              radial-gradient(ellipse at 18% 0%, rgba(255,255,255,.32), transparent 58%),
-              linear-gradient(145deg, rgba(192,132,252,.46), rgba(147,51,234,.30) 52%, rgba(167,139,250,.38));
-          border-color: rgba(233,213,255,.78);
-          box-shadow: inset 0 1px 1px rgba(255,255,255,.42),
-                      inset 0 -1px 1px rgba(255,255,255,.10),
-                      0 2px 16px rgba(168,85,247,.42);
-      }
+      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; }
+      .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
       .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
       .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
       .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
