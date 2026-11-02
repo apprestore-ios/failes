@@ -163,7 +163,8 @@
       .req-row:last-child { border-bottom: none; padding-bottom: 0; }
       .req-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
       .req-value-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-      .req-value { font-size: 15.5px; font-weight: 750; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; }
+      .req-value { font-size: 15.5px; font-weight: 750; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; text-decoration: none; }
+      .req-value:visited, .req-value:active, .req-value:hover { color: var(--text); }
       .req-copy-btn {
           background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.45);
           color: #93c5fd; border-radius: 9px; padding: 5px 10px; font-size: 11.5px; font-weight: 650; cursor: pointer; flex-shrink: 0;
@@ -399,7 +400,7 @@
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
             <button class="cart-back-btn" onclick="switchScreen('cartApp')"><span class="sf-icon">&#xECAC;</span></button>
-            <div class="auth-title" style="font-size: 20px; margin: 0;">Заказ <span id="paymentOrderNum" style="color: #60a5fa;">#00000</span></div>
+            <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
             Переведите точную сумму по реквизитам ниже (СБП) и нажмите <b>«Я оплатил»</b>
@@ -407,9 +408,15 @@
 
         <div class="requisites-card">
             <div class="req-row">
+                <span class="req-label">Номер заказа:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="paymentOrderNum" style="color: var(--text);">#00000</span>
+                </div>
+            </div>
+            <div class="req-row">
                 <span class="req-label">Номер телефона (СБП):</span>
                 <div class="req-value-wrap">
-                    <span class="req-value" id="reqPhoneText" style="color: var(--text);">89221194735</span>
+                    <span class="req-value" id="reqPhoneText">89221194735</span>
                     <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
                 </div>
             </div>
@@ -467,6 +474,9 @@
         </div>
         <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
             🚀 Начать установку
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 2px;">
+            Вернуться в каталог
         </button>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -641,6 +651,7 @@ const appsData = [
   { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: L_BASE + "rutube.png", ios: "iOS 16.0+" },
   { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: L_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
   { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: L_BASE + "tmobile.png", ios: "iOS 16.0+" },
+  { key: "azslukoil", name: "АЗС Лукойл", category: "other", url: "/manifests/azslukoil.plist", icon: L_BASE + "azslukoil.png", ios: "iOS 14.0+" },
   { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: L_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
   { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: L_BASE + "sberkids.png", ios: "iOS 15.0+" },
   { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
