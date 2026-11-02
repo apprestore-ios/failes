@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const ADMIN_CHAT_ID = Deno.env.get('ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_ADMIN_ID')
+// TELEGRAM_ADMIN_ID — личный Telegram ID владельца для проверки прав; ADMIN_CHAT_ID — куда слать уведомления.
+const ADMIN_USER_ID = Deno.env.get('TELEGRAM_ADMIN_ID') || ADMIN_CHAT_ID
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://gwypxcdnefxlhwvtkvkc.supabase.co'
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -79,7 +81,7 @@ serve(async (req) => {
     if (orderActions.includes(body.action)) {
       const user = await validateTelegramInitData(String(body.initData || ''));
       if (!user?.id) return new Response(JSON.stringify({success:false,error:'Откройте мини-приложение через Telegram-бота.'}), {status:401,headers:{...corsHeaders,'Content-Type':'application/json'}});
-      const isAdmin = String(user.id) === String(ADMIN_CHAT_ID);
+      const isAdmin = String(user.id) === String(ADMIN_USER_ID);
       const sendJson = (payload:any, status=200) => new Response(JSON.stringify(payload), {status,headers:{...corsHeaders,'Content-Type':'application/json'}});
       if (body.action === 'create_order') {
         const rawItems = Array.isArray(body.items) ? body.items : [];
@@ -204,25 +206,39 @@ serve(async (req) => {
     if (body.message) {
       const chatId = body.message.chat.id
       const text = body.message.text
-      const isAdmin = String(chatId) === String(ADMIN_CHAT_ID)
+      const senderId = body.message.from?.id ?? chatId
+      const isAdmin = String(senderId) === String(ADMIN_USER_ID)
 
-      if (text === '/start') {
+      if (typeof text === 'string' && text.startsWith('/start')) {
+        // Администратор видит только панель управления, обычный пользователь — приветствие и каталог.
         const replyMarkup: any = { inline_keyboard: [] }
+        const messageText = isAdmin
+          ? "ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!"
+          : "Добро пожаловать в AppRestore IOS! 🍎\n\nОткройте каталог, чтобы выбрать приложения и оформить заказ. Если нужна помощь, напишите в поддержку @dizabled.";
+
         if (isAdmin) {
           replyMarkup.inline_keyboard.push([
             { text: "⚙️ Открыть Админ-панель", web_app: { url: "https://apprestore-ios.ru/admin.html" } }
           ])
+        } else {
+          replyMarkup.inline_keyboard.push([
+            { text: "🛍 Открыть каталог", web_app: { url: "https://apprestore-ios.ru/" } }
+          ])
         }
 
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        const startResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            chat_id: chatId, 
-            text: "ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!",
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: messageText,
             reply_markup: replyMarkup
           })
         })
+        const startResult = await startResponse.json().catch(() => ({}))
+        if (!startResponse.ok || !startResult.ok) {
+          console.error('Telegram /start sendMessage failed:', JSON.stringify(startResult))
+        }
       }
     }
 
