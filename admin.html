@@ -145,9 +145,6 @@
                 </div>
                 <div class="menu-chevron">›</div>
             </div>
-            <div class="menu-item" onclick="openView('view-orders'); loadOrders()">
-                <div class="menu-icon" style="background: rgba(59,130,246,.15);">🧾</div><div class="menu-text"><div class="menu-title">Заказы клиентов</div><div class="menu-subtitle">Подтверждение оплаты и выдача ссылок</div></div><div class="menu-chevron">›</div>
-            </div>
             <div class="menu-item" onclick="openView('view-settings')">
                 <div class="menu-icon" style="background: rgba(236, 72, 153, 0.15);">⚙️</div>
                 <div class="menu-text">
@@ -265,11 +262,6 @@
         </div>
     </div>
 
-
-    <div id="view-orders" class="view">
-      <div class="card"><h3 class="section-title">Заказы клиентов</h3><p style="font-size:12px;color:var(--muted);line-height:1.5">После проверки перевода нажмите «Подтвердить оплату и выдать ссылку». Ссылка действует 15 минут с момента первого открытия.</p><div id="orders-list"><p style="color:var(--muted)">Загрузка…</p></div><button class="btn btn-secondary" onclick="loadOrders()" style="margin-top:12px">Обновить список</button></div>
-    </div>
-
     <!-- Настройки системы -->
     <div id="view-settings" class="view">
         <div class="card">
@@ -367,7 +359,6 @@
           { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
           { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
           { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "azslukoil", name: "АЗС Лукойл", category: "other", url: "/manifests/azslukoil.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/azslukoil.png", ios: "iOS 15.0+" },
           { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
           { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
           { key: "mtsdengi", name: "МТС Деньги", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" },
@@ -1038,23 +1029,6 @@
         }
 
         loadData();
-    
-        const ORDER_API_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co/functions/v1/telegram-bot";
-        async function orderApi(action, extra = {}) {
-          const initData = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) || "";
-          const r = await fetch(ORDER_API_URL, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,initData,...extra})});
-          const d = await r.json().catch(()=>({})); if(!r.ok || d.success===false) throw new Error(d.error||"Ошибка запроса"); return d;
-        }
-        async function loadOrders(){
-          const box=document.getElementById('orders-list'); if(!box)return; box.innerHTML='<p style="color:var(--muted)">Загрузка…</p>';
-          try { const d=await orderApi('admin_orders'); if(!d.orders.length){box.innerHTML='<p style="color:var(--muted)">Заказов пока нет.</p>';return;}
-            box.innerHTML=d.orders.map(o=>`<div style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.1)"><div style="display:flex;justify-content:space-between;gap:8px"><b>Заказ №${escapeHtml(String(o.order_number))}</b><span style="font-size:12px;color:var(--muted)">${escapeHtml(o.status_label||o.status)}</span></div><div style="font-size:12px;color:var(--muted);margin:6px 0">${escapeHtml(o.first_name||'Клиент')} ${o.username?'(@'+escapeHtml(o.username)+')':''} · ${new Date(o.created_at).toLocaleString('ru-RU')}</div><div style="font-size:13px;line-height:1.5">${(o.items||[]).map(i=>'• '+escapeHtml(i.app_name)+' — '+i.price+' ₽').join('<br>')}</div><b style="display:block;margin:8px 0">Итого: ${o.total_amount} ₽</b>${o.status==='pending'?`<button class="btn" onclick="markOrderPaid('${o.order_number}')">Клиент оплатил — подтвердить и выдать ссылку</button><button class="btn btn-danger" style="margin-top:7px" onclick="cancelOrder('${o.order_number}')">Отменить заказ</button>`:o.status==='paid'?`<button class="btn" onclick="markOrderPaid('${o.order_number}')">Подтвердить и выдать ссылку</button><button class="btn btn-danger" style="margin-top:7px" onclick="cancelOrder('${o.order_number}')">Отменить заказ</button>`:o.install_token?`<div style="font-size:12px;word-break:break-all;color:#93c5fd">Ссылка: ${CLIENT_SITE_URL}/?${escapeHtml(o.install_token)}</div>`:''}</div>`).join('');
-          } catch(e){box.innerHTML='<p style="color:#fca5a5">'+escapeHtml(e.message)+'</p>';}
-        }
-        async function markOrderPaid(orderNumber){ if(!confirm('Подтверждаете получение оплаты и выдачу ссылки на 15 минут?'))return; try{await orderApi('confirm_payment',{order_number:orderNumber});showToast('Оплата подтверждена, ссылка выдана');loadOrders();}catch(e){showToast(e.message||'Ошибка');} }
-        async function cancelOrder(orderNumber){ if(!confirm('Отменить заказ №'+orderNumber+'?'))return; try{await orderApi('cancel_order',{order_number:orderNumber});showToast('Заказ отменён');loadOrders();}catch(e){showToast(e.message||'Ошибка');} }
-        function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-</script>
+    </script>
 </body>
 </html>
