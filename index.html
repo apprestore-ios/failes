@@ -279,7 +279,7 @@
             <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span>
         </div>
         <button class="menu-item" onclick="showMyOrdersScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF74A;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
         </button>
         <button class="menu-item" onclick="showGuideScreen()">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div><span>Инструкция</span></div><span class="sf-icon">&#xECA2;</span>
@@ -457,7 +457,7 @@
         </div>
 
         <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
-            ✓ Я оплатил
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Я оплатил
         </button>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -1364,7 +1364,6 @@ async function confirmOrderPaid() {
         if (orderRow && orderRow.id) {
             activeOrderId = orderRow.id;
             
-            // Сохраняем локально для раздела "Мои заказы"
             if (!myLocalOrders.some(o => o.id === orderRow.id)) {
                 myLocalOrders.unshift({ id: orderRow.id, order_number: currentOrderNumber });
                 saveMyLocalOrders();
@@ -1399,7 +1398,7 @@ async function confirmOrderPaid() {
     } catch (e) {} finally {
         if (btn) {
             btn.disabled = false;
-            btn.textContent = "✓ Я оплатил";
+            btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Я оплатил';
         }
     }
 }
@@ -1525,6 +1524,10 @@ function switchScreen(id, pushHistory = true) {
 
     document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
     document.getElementById(id)?.classList.add("active-screen");
+
+    if (id === "myOrdersApp") {
+        renderMyOrdersList();
+    }
 
     const backBtn = document.getElementById("navBackBtn");
     const burgerBtn = document.getElementById("navBurgerBtn");
