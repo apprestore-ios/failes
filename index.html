@@ -91,7 +91,7 @@
           opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
-      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
       .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -205,7 +205,7 @@
       .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
       .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
       .step-text b { color: #60a5fa; }
-      #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box {
+      #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box, #myOrdersApp .auth-box {
           padding: 18px 18px 16px; gap: 10px;
           max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 80px);
       }
@@ -229,6 +229,18 @@
       .cart-toggle-btn:active { background: rgba(59, 130, 246, 0.25); }
       .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
       .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
+
+      /* Стили для карточек в Моих заказах */
+      .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
+      .my-order-item:last-child { margin-bottom: 0; }
+      .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
+      .my-order-status { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 7px; }
+      .my-order-status.pending { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+      .my-order-status.approved { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+      .my-order-status.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+      .my-order-apps { font-size: 12px; color: var(--muted); line-height: 1.35; }
+      .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
+
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <script>
@@ -266,6 +278,9 @@
             <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
             <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span>
         </div>
+        <button class="menu-item" onclick="showMyOrdersScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
         <button class="menu-item" onclick="showGuideScreen()">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div><span>Инструкция</span></div><span class="sf-icon">&#xECA2;</span>
         </button>
@@ -500,6 +515,23 @@
     </div>
 </div>
 
+<!-- Экран «Мои заказы» -->
+<div class="container" id="myOrdersApp">
+    <div class="auth-box" style="padding: 24px 18px;">
+        <div class="cart-header-row">
+            <button class="cart-back-btn" onclick="switchScreen('mainApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" style="font-size: 20px; margin: 0;">Мои заказы</div>
+        </div>
+        <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">История ваших заказов на этом устройстве</div>
+        
+        <div class="admin-scroll-list" id="myOrdersListContainer" style="max-height: 44dvh; text-align: left; width: 100%;">
+            <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="switchScreen('mainApp')" style="margin-top: 4px;">Вернуться в каталог</button>
+    </div>
+</div>
+
 <div class="container" id="tokenApp">
     <div class="hero-section">
         <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
@@ -698,6 +730,7 @@ let isCartListVisible = false;
 let activeOrderId = null;
 let activeApprovedLink = "";
 let orderPollingInterval = null;
+let myLocalOrders = [];
 
 try {
     const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
@@ -708,14 +741,21 @@ try {
     if (savedOrderId) activeOrderId = Number(savedOrderId);
     const savedOrderNum = localStorage.getItem("apprestore_active_order_num");
     if (savedOrderNum) currentOrderNumber = savedOrderNum;
+
+    const savedMyOrders = JSON.parse(localStorage.getItem("apprestore_my_orders_history") || "[]");
+    if (Array.isArray(savedMyOrders)) myLocalOrders = savedMyOrders;
 } catch (e) {}
 
 function saveCart() {
     try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
 }
 
+function saveMyLocalOrders() {
+    try { localStorage.setItem("apprestore_my_orders_history", JSON.stringify(myLocalOrders)); } catch (e) {}
+}
+
 const LOCKED_SCREENS = ["tokenErrorApp", "maintenanceApp"];
-const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp"];
+const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp"];
 const HISTORY_STACK = [];
 
 async function loadExternalContent(url, containerId) {
@@ -1323,6 +1363,13 @@ async function confirmOrderPaid() {
 
         if (orderRow && orderRow.id) {
             activeOrderId = orderRow.id;
+            
+            // Сохраняем локально для раздела "Мои заказы"
+            if (!myLocalOrders.some(o => o.id === orderRow.id)) {
+                myLocalOrders.unshift({ id: orderRow.id, order_number: currentOrderNumber });
+                saveMyLocalOrders();
+            }
+
             try {
                 localStorage.setItem("apprestore_active_order_id", String(activeOrderId));
                 localStorage.setItem("apprestore_active_order_num", currentOrderNumber);
@@ -1405,6 +1452,59 @@ function backToPaymentFromRejected() {
     switchScreen("paymentApp", false);
 }
 
+// Функции для экрана «Мои заказы»
+function showMyOrdersScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    renderMyOrdersList();
+    switchScreen("myOrdersApp");
+    window.scrollTo(0, 0);
+}
+
+async function renderMyOrdersList() {
+    const container = document.getElementById("myOrdersListContainer");
+    if (!container) return;
+
+    if (myLocalOrders.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--muted); font-size: 13.5px;">У вас пока нет сохраненных заказов на этом устройстве.</div>';
+        return;
+    }
+
+    container.innerHTML = '<div style="text-align:center; padding: 10px; color: var(--muted); font-size: 12px;">Загрузка данных...</div>';
+
+    let html = "";
+    for (const item of myLocalOrders) {
+        const res = await sbFetch(`orders?id=eq.${item.id}&select=*`);
+        if (Array.isArray(res) && res.length > 0) {
+            const ord = res[0];
+            let statusBadge = `<span class="my-order-status pending">⏳ Ожидает</span>`;
+            if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Оплачен</span>`;
+            else if (ord.status === "rejected") statusBadge = `<span class="my-order-status rejected">❌ Отклонен</span>`;
+
+            const appsStr = Array.isArray(ord.app_names) ? ord.app_names.join(", ") : "Приложения";
+            
+            let actionBtn = "";
+            if (ord.status === "approved" && ord.link_token) {
+                const link = `${CLIENT_SITE_URL}/?${ord.link_token}`;
+                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="window.location.href='${link}'">Получить ссылку / Установить</button>`;
+            }
+
+            html += `
+            <div class="my-order-item">
+                <div class="my-order-top">
+                    <span>Заказ ${ord.order_number}</span>
+                    ${statusBadge}
+                </div>
+                <div class="my-order-apps">${appsStr}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                    <span class="my-order-price">${ord.total_price} ₽</span>
+                </div>
+                ${actionBtn}
+            </div>`;
+        }
+    }
+    container.innerHTML = html || '<div style="text-align:center; padding: 20px; color: var(--muted);">Заказы не найдены в базе.</div>';
+}
+
 function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 
 function switchScreen(id, pushHistory = true) {
@@ -1416,7 +1516,7 @@ function switchScreen(id, pushHistory = true) {
     currentScreenId = id;
     sessionStorage.setItem("currentScreenId", currentScreenId);
 
-    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
         document.body.style.overflow = "hidden";
         window.scrollTo(0, 0);
     } else {
