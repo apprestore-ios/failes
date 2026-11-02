@@ -4,6 +4,7 @@
     <title>AppRestore IOS</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <meta name="theme-color" content="#0b0f17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -285,6 +286,7 @@
         <button class="menu-item" onclick="showOfferScreen()">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Публичная оферта</span></div><span class="sf-icon">&#xECA2;</span>
         </button>
+        <button class="menu-item" onclick="showMyOrders()"><div class="menu-item-left"><div class="menu-icon-wrap">📦</div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span></button>
         <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xFA8E;</span></div><span>AppRestore IOS в Telegram!</span></div><span class="sf-icon">&#xECA2;</span>
         </a>
@@ -561,7 +563,6 @@
           { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
           { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
           { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "azslukoil", name: "АЗС Лукойл", category: "other", url: "/manifests/azslukoil.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/azslukoil.png", ios: "iOS 14.0+" },
           { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
           { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
           { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
@@ -1199,39 +1200,48 @@
             if (currentScreenId === "cartApp") renderCartScreen();
         }
 
-        function checkoutCart() {
+        const ORDER_API_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co/functions/v1/telegram-bot";
+        const PAYMENT_DETAILS = "Перевод по номеру телефона: 89221194735\nБанк: ОТП Банк\nПолучатель: Артём Е.";
+        let currentCreatedOrder = null;
+        function orderApi(action, extra = {}) {
+            const initData = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) || "";
+            return fetch(ORDER_API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, initData, ...extra }) })
+              .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok || d.success === false) throw new Error(d.error || "Не удалось выполнить запрос"); return d; });
+        }
+        function showOrderModal(title, body, buttons = []) {
+            document.getElementById("orderModalTitle").textContent = title;
+            document.getElementById("orderModalBody").textContent = body;
+            const actions = document.getElementById("orderModalActions"); actions.innerHTML = "";
+            buttons.forEach(b => { const el = document.createElement("button"); el.className = "btn " + (b.className || "btn-primary"); el.textContent = b.label; el.onclick = b.onClick; actions.appendChild(el); });
+            const modal = document.getElementById("orderModal"); modal.style.display = "flex";
+        }
+        function closeOrderModal(){ document.getElementById("orderModal").style.display="none"; }
+        async function checkoutCart() {
             if (cartItems.size === 0) return;
-            let total = 0;
-            const lines = [];
-            cartItems.forEach(k => {
-                const app = appsData.find(a => a.key === k);
-                if (app) {
-                    const p = getAppPrice(k);
-                    total += p;
-                    lines.push("• " + app.name + " — " + p + " ₽");
-                }
-            });
-            
-            let finalTotal = total - currentPromoDiscount;
-            if (finalTotal < 0) finalTotal = 0;
-
-            let message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
-                "📦 Заказ: " + (currentOrderNumber || "") + "\n\n" +
-                lines.join("\n") + "\n\n";
-                
-            if (currentPromoCode) {
-                message += "🏷 Промокод: " + currentPromoCode + " (-" + currentPromoDiscount + " ₽)\n\n";
+            if (!(window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user)) {
+                showOrderModal("Откройте каталог в Telegram", "Оформление заказа доступно через Telegram-бот AppRestore IOS.", [{label:"Открыть поддержку",onClick:()=>location.href="https://t.me/dizabled"}]); return;
             }
-
-            message += "💰 Итого к оплате: " + finalTotal + " ₽\n" +
-                "Отправьте, пожалуйста, реквизиты для оплаты.";
-                
+            const checkoutBtn = document.getElementById("cartCheckoutBtn");
+            if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.textContent = "Создаём заказ…"; }
             try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(message).catch(() => {});
-                }
-            } catch (e) {}
-            window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
+                const items = Array.from(cartItems).map(key => { const app = appsData.find(a => a.key === key); return app ? { app_key: app.key, app_name: app.name } : null; }).filter(Boolean);
+                const result = await orderApi("create_order", { items, promo_code: currentPromoCode || "" });
+                currentCreatedOrder = result.order;
+                cartItems.clear(); updateCartUI();
+                showOrderModal("Заказ №" + result.order.order_number, "Приложения:\n" + result.order.items.map(i => "• " + i.app_name + " — " + i.price + " ₽").join("\n") + "\n\nК оплате: " + result.order.total_amount + " ₽\n\n" + PAYMENT_DETAILS + "\n\nПосле перевода нажмите «Я оплатил». Заказ будет проверен вручную.", [
+                  {label:"Я оплатил",onClick:async()=>{ try { await orderApi("mark_paid", { order_number: result.order.order_number }); showOrderModal("Оплата отмечена", "Заказ передан администратору на проверку. После подтверждения здесь появится ссылка на установку.", [{label:"Мои заказы",onClick:showMyOrders}]); } catch(e){ showOrderModal("Не получилось отправить", e.message); } } },
+                  {label:"Мои заказы",className:"btn-secondary",onClick:showMyOrders}
+                ]);
+            } catch (e) { showOrderModal("Не удалось оформить заказ", e.message || "Проверьте, что каталог открыт через Telegram."); }
+            finally { if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF9E8;</span> Оформить заказ'; } }
+        }
+        async function showMyOrders() {
+            try {
+                const data = await orderApi("my_orders");
+                if (!data.orders.length) { showOrderModal("Мои заказы", "У вас пока нет заказов."); return; }
+                const body = data.orders.map(o => "№"+o.order_number+" · "+o.total_amount+" ₽\nСтатус: "+({pending:"Ожидает оплаты",paid:"Оплата на проверке",issued:"Ссылка выдана",cancelled:"Отменён"}[o.status]||o.status)+"\n"+(o.items||[]).map(i=>"• "+i.app_name).join("\n")+(o.install_token?"\nСсылка: "+location.origin+"/?"+o.install_token:"")).join("\n\n────────────\n\n");
+                showOrderModal("Мои заказы", body, [{label:"Обновить",onClick:showMyOrders},{label:"Поддержка",className:"btn-secondary",onClick:()=>location.href="https://t.me/dizabled"}]);
+            } catch(e) { showOrderModal("Мои заказы", e.message || "Не удалось загрузить заказы."); }
         }
 
         function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
@@ -1510,5 +1520,15 @@
             }
         });
     </script>
+
+<div id="orderModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);padding:18px;align-items:center;justify-content:center;">
+ <div style="width:100%;max-width:430px;max-height:88dvh;overflow:auto;background:#101827;border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:22px;color:#f8fafc;box-shadow:0 20px 60px #0009">
+  <div style="font-size:21px;font-weight:750;margin-bottom:8px" id="orderModalTitle">Оплата заказа</div>
+  <div id="orderModalBody" style="font-size:14px;line-height:1.6;color:#cbd5e1;white-space:pre-line"></div>
+  <div id="orderModalActions" style="display:flex;flex-direction:column;gap:9px;margin-top:18px"></div>
+  <button class="btn btn-secondary" style="margin-top:10px" onclick="closeOrderModal()">Закрыть</button>
+ </div>
+</div>
+
 </body>
 </html>
