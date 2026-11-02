@@ -1,18 +1,28 @@
+```yaml
 name: Deploy Edge Function
+
 on:
   push:
     paths:
       - 'supabase/functions/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: supabase/setup-cli@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase functions deploy telegram-bot --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+
+      - name: Deploy Telegram bot
+        run: supabase functions deploy telegram-bot --no-verify-jwt --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+```
