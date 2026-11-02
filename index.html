@@ -92,7 +92,7 @@
           opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
-      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
 
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
@@ -120,7 +120,7 @@
       .app-grid-card.app-unavailable { display: none !important; }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
       .app-price-tag { font-size: 11px; font-weight: 750; color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
-      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); }
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
@@ -158,10 +158,33 @@
       .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
       .btn:active { transform: scale(.975); }
       .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
+      .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 8px 20px rgba(22,163,74,0.35); }
       .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text); box-shadow: none; }
       .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; }
       .btn-telegram { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.5); color: #a78bfa; box-shadow: none; }
       .btn-telegram .sf-icon { font-size: 20px; margin-right: 6px; }
+
+      .requisites-card {
+          background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(59, 130, 246, 0.35);
+          border-radius: 18px; padding: 16px; width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left;
+      }
+      .req-row { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 10px; }
+      .req-row:last-child { border-bottom: none; padding-bottom: 0; }
+      .req-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+      .req-value-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .req-value { font-size: 15.5px; font-weight: 750; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; }
+      .req-copy-btn {
+          background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.45);
+          color: #93c5fd; border-radius: 9px; padding: 5px 10px; font-size: 11.5px; font-weight: 650; cursor: pointer; flex-shrink: 0;
+      }
+      .req-copy-btn:active { transform: scale(0.95); }
+
+      .wait-spinner {
+          width: 52px; height: 52px; border-radius: 50%;
+          border: 3.5px solid rgba(59, 130, 246, 0.2); border-top-color: #3b82f6;
+          animation: spin 1s linear infinite; margin: 6px auto 4px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
 
       .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
       .categories-bar::-webkit-scrollbar { display: none; }
@@ -399,9 +422,110 @@
         </div>
 
         <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF9E8;</span> Заказать установку в Telegram
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Оплатить
         </button>
         <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
+    </div>
+</div>
+
+<!-- Экран оплаты по реквизитам -->
+<div class="container" id="paymentApp">
+    <div class="auth-box" style="padding: 24px 18px;">
+        <div class="cart-header-row">
+            <button class="cart-back-btn" onclick="switchScreen('cartApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
+        </div>
+        <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
+            Переведите точную сумму по реквизитам ниже (СБП) и нажмите <b>«Я оплатил»</b>
+        </div>
+
+        <div class="requisites-card">
+            <div class="req-row">
+                <span class="req-label">Номер телефона (СБП):</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="reqPhoneText">89221194735</span>
+                    <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Банк получателя:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">ОТП Банк</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Получатель:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">Артём Е.</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Сумма к переводу (Заказ <span id="paymentOrderNum">#00000</span>):</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" style="color: #60a5fa; font-size: 18px;" id="paymentTotalAmount">0 ₽</span>
+                    <button type="button" class="req-copy-btn" id="copySumBtn" onclick="copyPaymentSum()">Скопировать</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
+            ✓ Я оплатил
+        </button>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<!-- Экран ожидания подтверждения оплаты администратором -->
+<div class="container" id="orderWaitApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div class="wait-spinner"></div>
+        <div class="auth-title" style="font-size: 20px;">Проверка оплаты</div>
+        <div class="auth-description" style="text-align: center;">
+            Заказ <b id="waitOrderNum" style="color: var(--text);">#00000</b> отправлен на проверку администратору.<br><br>
+            Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится ваша персональная ссылка для установки.
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<!-- Экран успешного подтверждения оплаты с разовой ссылкой -->
+<div class="container" id="orderApprovedApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div style="font-size: 44px; line-height: 1; margin-bottom: 2px;">✅</div>
+        <div class="auth-title" style="color: #4ade80;">Оплата подтверждена!</div>
+        <div class="auth-description" style="text-align: center;">
+            Ваша персональная разовая ссылка на установку выбранных приложений готова (действует 15 минут с момента открытия):
+        </div>
+        <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
+            <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
+            🚀 Начать установку
+        </button>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<!-- Экран отклонения платежа администратором -->
+<div class="container" id="orderRejectedApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div style="font-size: 44px; line-height: 1; margin-bottom: 2px;">❌</div>
+        <div class="auth-title" style="color: #fca5a5;">Администратор не получил оплату</div>
+        <div class="auth-description" style="text-align: center;">
+            Платеж по вашему заказу не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="backToPaymentFromRejected()">
+            Вернуться к реквизитам
+        </button>
     </div>
 </div>
 
@@ -445,8 +569,8 @@
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
         <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
             <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
-            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Заказать установку в Telegram»</b>, отправьте сформированное сообщение продавцу и оплатите заказ по реквизитам.</div></div>
-            <div class="step-card"><div class="step-icon">3</div><div class="step-text">Перейдите по полученной персональной ссылке в Safari и нажмите <b>«Установить»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
             <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
         </div>
         <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
@@ -588,7 +712,6 @@
           { key: "movix_kinodom", name: "Movix (КиноДом)", category: "other", url: "/manifests/movix_kinodom.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/movix_kinodom.png", ios: "iOS 16.0+" },
           { key: "mibank_avkgid", name: "Металлинвест (Банк)", category: "banks", url: "/manifests/mibank_avkgid.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mibank_avkgid.png", ios: "iOS 15.0+" },
           { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alrosa.png", ios: "iOS 15.0+" }
-
         ];
 
         let siteState = { prices: {}, visibility: {} };
@@ -605,6 +728,10 @@
         let currentPromoDiscount = 0;
         let isCartListVisible = false;
 
+        let activeOrderId = null;
+        let activeApprovedLink = "";
+        let orderPollingInterval = null;
+
         try {
             const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
             if (Array.isArray(savedCart)) {
@@ -612,6 +739,10 @@
                     if (appsData.some(a => a.key === k)) cartItems.add(k);
                 });
             }
+            const savedOrderId = localStorage.getItem("apprestore_active_order_id");
+            if (savedOrderId) activeOrderId = Number(savedOrderId);
+            const savedOrderNum = localStorage.getItem("apprestore_active_order_num");
+            if (savedOrderNum) currentOrderNumber = savedOrderNum;
         } catch (e) {}
 
         function saveCart() {
@@ -771,6 +902,15 @@
             return true;
         }
 
+        function getCartFinalTotal() {
+            let total = 0;
+            cartItems.forEach(k => {
+                if (isAppVisible(k)) total += getAppPrice(k);
+            });
+            let finalTotal = total - currentPromoDiscount;
+            return finalTotal < 0 ? 0 : finalTotal;
+        }
+
         function extractTokenFromLocation() {
             const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
             if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
@@ -786,8 +926,6 @@
         }
 
         function estimateIPhoneModel() {
-            // Safari сообщает логический размер экрана и DPR, но не аппаратный идентификатор.
-            // Поэтому выбираем осторожную группу совместимых моделей, не выдавая её за точную.
             const width = Math.min(window.screen.width, window.screen.height);
             const height = Math.max(window.screen.width, window.screen.height);
             const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
@@ -809,7 +947,6 @@
             const modelKey = `${resolution}@${Math.round(dpr)}`;
             let model = modelByScreenAndDpr[modelKey];
 
-            // Резервная классификация для размеров, которых нет в таблице.
             if (!model) {
                 if (width >= 440) model = "iPhone большого размера (Plus / Pro Max)";
                 else if (width >= 420) model = "iPhone Pro Max / Plus";
@@ -819,8 +956,6 @@
                 else model = "iPhone (модель не определена)";
             }
 
-            // DPR используется как дополнительная проверка типа экрана.
-            // Само название модели возвращаем без разрешения, DPR и других технических данных.
             if (dpr < 1.5 || dpr > 4) {
                 return "iPhone (модель не определена)";
             }
@@ -853,7 +988,7 @@
         function updateTokenHeroText(ttlMinutes) {
             const descEl = document.getElementById("tokenHeroDesc");
             if (!descEl) return;
-            const m = Number(ttlMinutes) || 5;
+            const m = Number(ttlMinutes) || 15;
             const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
             descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
         }
@@ -1198,39 +1333,178 @@
             if (currentScreenId === "cartApp") renderCartScreen();
         }
 
+        /* ----- ОПЛАТА, ЗАКАЗЫ И ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ ----- */
+        function copyRequisite(text, btnId) {
+            const btn = document.getElementById(btnId);
+            const done = () => {
+                if (!btn) return;
+                const old = btn.textContent;
+                btn.textContent = "Скопировано ✓";
+                setTimeout(() => { btn.textContent = old; }, 1600);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(done);
+            } else {
+                done();
+            }
+        }
+
+        function copyPaymentSum() {
+            const sum = String(getCartFinalTotal());
+            copyRequisite(sum, "copySumBtn");
+        }
+
         function checkoutCart() {
             if (cartItems.size === 0) return;
-            let total = 0;
-            const lines = [];
-            cartItems.forEach(k => {
-                const app = appsData.find(a => a.key === k);
-                if (app) {
-                    const p = getAppPrice(k);
-                    total += p;
-                    lines.push("• " + app.name + " — " + p + " ₽");
-                }
-            });
-            
-            let finalTotal = total - currentPromoDiscount;
-            if (finalTotal < 0) finalTotal = 0;
+            if (!currentOrderNumber) {
+                currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
+            }
+            const finalTotal = getCartFinalTotal();
+            const orderNumEl = document.getElementById("paymentOrderNum");
+            const totalAmountEl = document.getElementById("paymentTotalAmount");
+            if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
+            if (totalAmountEl) totalAmountEl.textContent = finalTotal + " ₽";
+            switchScreen("paymentApp");
+        }
 
-            let message = "Здравствуйте! Хочу заказать установку приложений:\n\n" +
-                "📦 Заказ: " + (currentOrderNumber || "") + "\n\n" +
-                lines.join("\n") + "\n\n";
-                
-            if (currentPromoCode) {
-                message += "🏷 Промокод: " + currentPromoCode + " (-" + currentPromoDiscount + " ₽)\n\n";
+        async function confirmOrderPaid() {
+            if (cartItems.size === 0 && !activeOrderId) return;
+            const btn = document.getElementById("btnConfirmPaid");
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "⏳ Отправка уведомления...";
             }
 
-            message += "💰 Итого к оплате: " + finalTotal + " ₽\n" +
-                "Отправьте, пожалуйста, реквизиты для оплаты.";
-                
+            const appKeysArr = Array.from(cartItems);
+            const appNamesArr = appKeysArr.map(k => {
+                const a = appsData.find(x => x.key === k);
+                return a ? a.name : k;
+            });
+            const finalTotal = getCartFinalTotal();
+            const deviceId = getOrCreateDeviceId();
+
+            if (!currentOrderNumber) {
+                currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
+            }
+
             try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(message).catch(() => {});
+                let orderRow = null;
+                const existing = await sbFetch(`orders?order_number=eq.${encodeURIComponent(currentOrderNumber)}&select=*`);
+                if (Array.isArray(existing) && existing.length > 0) {
+                    orderRow = existing[0];
+                    await sbFetch(`orders?id=eq.${orderRow.id}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({
+                            status: "pending",
+                            total_price: finalTotal,
+                            app_keys: appKeysArr.length > 0 ? appKeysArr : orderRow.app_keys,
+                            app_names: appNamesArr.length > 0 ? appNamesArr : orderRow.app_names,
+                            updated_at: new Date().toISOString()
+                        })
+                    });
+                } else {
+                    const inserted = await sbFetch("orders", {
+                        method: "POST",
+                        headers: { "Prefer": "return=representation" },
+                        body: JSON.stringify({
+                            order_number: currentOrderNumber,
+                            app_keys: appKeysArr,
+                            app_names: appNamesArr,
+                            total_price: finalTotal,
+                            promo_code: currentPromoCode || null,
+                            discount: currentPromoDiscount || 0,
+                            status: "pending",
+                            device_id: deviceId
+                        })
+                    });
+                    if (Array.isArray(inserted) && inserted.length > 0) {
+                        orderRow = inserted[0];
+                    }
                 }
-            } catch (e) {}
-            window.location.href = "https://t.me/dizabled?text=" + encodeURIComponent(message);
+
+                if (orderRow && orderRow.id) {
+                    activeOrderId = orderRow.id;
+                    try {
+                        localStorage.setItem("apprestore_active_order_id", String(activeOrderId));
+                        localStorage.setItem("apprestore_active_order_num", currentOrderNumber);
+                    } catch (e) {}
+
+                    await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            action: "notify_new_order",
+                            order_id: orderRow.id,
+                            order_number: currentOrderNumber,
+                            app_keys: appKeysArr,
+                            app_names: appNamesArr,
+                            total_price: finalTotal,
+                            promo_code: currentPromoCode,
+                            discount: currentPromoDiscount
+                        })
+                    }).catch(() => {});
+
+                    const waitOrderEl = document.getElementById("waitOrderNum");
+                    if (waitOrderEl) waitOrderEl.textContent = currentOrderNumber;
+
+                    switchScreen("orderWaitApp");
+                    startOrderStatusPolling(orderRow.id);
+                }
+            } catch (e) {} finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "✓ Я оплатил";
+                }
+            }
+        }
+
+        function startOrderStatusPolling(orderId) {
+            if (!orderId) return;
+            if (orderPollingInterval) clearInterval(orderPollingInterval);
+
+            async function checkStatus() {
+                const res = await sbFetch(`orders?id=eq.${orderId}&select=*`);
+                if (!Array.isArray(res) || res.length === 0) return;
+                const order = res[0];
+
+                if (order.status === "approved" && order.link_token) {
+                    clearInterval(orderPollingInterval);
+                    orderPollingInterval = null;
+                    activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
+                    const linkEl = document.getElementById("approvedLinkText");
+                    if (linkEl) linkEl.textContent = activeApprovedLink;
+
+                    // Очищаем корзину после успешного подтверждения заказа
+                    cartItems.clear();
+                    currentOrderNumber = null;
+                    currentPromoCode = null;
+                    currentPromoDiscount = 0;
+                    saveCart();
+                    try {
+                        localStorage.removeItem("apprestore_active_order_id");
+                        localStorage.removeItem("apprestore_active_order_num");
+                    } catch (e) {}
+                    updateCartUI();
+
+                    switchScreen("orderApprovedApp", false);
+                } else if (order.status === "rejected") {
+                    clearInterval(orderPollingInterval);
+                    orderPollingInterval = null;
+                    switchScreen("orderRejectedApp", false);
+                }
+            }
+
+            checkStatus();
+            orderPollingInterval = setInterval(checkStatus, 2000);
+        }
+
+        function startApprovedInstallation() {
+            if (!activeApprovedLink) return;
+            window.location.href = activeApprovedLink;
+        }
+
+        function backToPaymentFromRejected() {
+            switchScreen("paymentApp", false);
         }
 
         function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
@@ -1246,7 +1520,7 @@
             currentScreenId = id;
             sessionStorage.setItem("currentScreenId", currentScreenId);
 
-            if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+            if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
                 document.body.style.overflow = "hidden";
                 window.scrollTo(0, 0);
             } else {
@@ -1267,7 +1541,7 @@
             }
             if (burgerBtn) burgerBtn.style.display = "flex";
             if (backBtn) {
-                if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp") {
+                if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp" || id === "orderWaitApp" || id === "orderApprovedApp") {
                     backBtn.classList.remove("visible");
                 } else {
                     backBtn.classList.add("visible");
@@ -1424,7 +1698,7 @@
 
                 const currentDevice = getOrCreateDeviceId();
                 let isValidToken = false;
-                let sessionTtlMinutes = 5;
+                let sessionTtlMinutes = 15;
                 let sessionExpiresAt = 0;
                 let sessionAppKeys = [];
 
@@ -1432,7 +1706,7 @@
                     const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
                     if (Array.isArray(linkRes) && linkRes.length > 0) {
                         const row = linkRes[0];
-                        const ttlMins = Number(row.ttl_minutes) || 5;
+                        const ttlMins = Number(row.ttl_minutes) || 15;
                         const ttlMs = ttlMins * 60 * 1000;
                         const now = Date.now();
 
@@ -1483,6 +1757,34 @@
                 return;
             }
 
+            // Если у покупателя есть активный ожидающий заказ, восстанавливаем проверку
+            if (activeOrderId) {
+                const checkRes = await sbFetch(`orders?id=eq.${activeOrderId}&select=*`);
+                if (Array.isArray(checkRes) && checkRes.length > 0) {
+                    const activeOrder = checkRes[0];
+                    if (activeOrder.status === "pending") {
+                        const waitOrderEl = document.getElementById("waitOrderNum");
+                        if (waitOrderEl) waitOrderEl.textContent = activeOrder.order_number || "";
+                        switchScreen("orderWaitApp", false);
+                        startOrderStatusPolling(activeOrder.id);
+                        return;
+                    } else if (activeOrder.status === "approved" && activeOrder.link_token) {
+                        activeApprovedLink = `${CLIENT_SITE_URL}/?${activeOrder.link_token}`;
+                        const linkEl = document.getElementById("approvedLinkText");
+                        if (linkEl) linkEl.textContent = activeApprovedLink;
+                        try {
+                            localStorage.removeItem("apprestore_active_order_id");
+                            localStorage.removeItem("apprestore_active_order_num");
+                        } catch (e) {}
+                        switchScreen("orderApprovedApp", false);
+                        return;
+                    } else if (activeOrder.status === "rejected") {
+                        switchScreen("orderRejectedApp", false);
+                        return;
+                    }
+                }
+            }
+
             let lastScreen = sessionStorage.getItem("currentScreenId");
             let hasEntered = sessionStorage.getItem("site_access") === "true";
             if (hasEntered) {
@@ -1494,6 +1796,8 @@
                 } else if (lastScreen === "cartApp") {
                     renderCartScreen();
                     switchScreen("cartApp");
+                } else if (lastScreen === "paymentApp" && cartItems.size > 0) {
+                    checkoutCart();
                 } else {
                     switchScreen("mainApp");
                 }
