@@ -1,4 +1,3 @@
-```yaml
 name: Deploy Edge Function
 
 on:
@@ -25,4 +24,3 @@ jobs:
         run: supabase functions deploy telegram-bot --no-verify-jwt --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-```
