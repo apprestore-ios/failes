@@ -93,31 +93,41 @@ serve(async (req) => {
       })
     }
 
-    // 2. Обработка запросов от Telegram (команда /start)
-    if (body.message) {
-      const chatId = body.message.chat.id
-      const text = body.message.text
-      const isAdmin = String(chatId) === String(ADMIN_CHAT_ID)
+   
+// 2. Обработка команды /start — только для администратора
+if (body.message) {
+  const chatId = body.message.chat.id;
+  const text = body.message.text;
 
-      if (text === '/start') {
-        const replyMarkup: any = { inline_keyboard: [] }
-        if (isAdmin) {
-          replyMarkup.inline_keyboard.push([
-            { text: "⚙️ Открыть Админ-панель", web_app: { url: "https://apprestore-ios.ru/admin.html" } }
-          ])
-        }
-
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            chat_id: chatId, 
-            text: "ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!",
-            reply_markup: replyMarkup
-          })
-        })
-      }
+  if (typeof text === 'string' && text.startsWith('/start')) {
+    // Посторонним пользователям бот не отвечает
+    if (String(chatId) !== String(ADMIN_CHAT_ID)) {
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      });
     }
+
+    // Ответ только администратору
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: 'ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!',
+        reply_markup: {
+          inline_keyboard: [[
+            {
+              text: '⚙️ Открыть Админ-панель',
+              web_app: { url: 'https://apprestore-ios.ru/admin.html' }
+            }
+          ]]
+        }
+      })
+    });
+  }
+}
+
 
     // 3. Обработка нажатия на инлайн-кнопку «Удалить уведомление»
     if (body.callback_query) {
