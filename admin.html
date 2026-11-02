@@ -29,7 +29,9 @@
         .menu-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
         .menu-item:active { background: rgba(0, 0, 0, 0.4); }
         .menu-item:last-child { border-bottom: none; }
-        .menu-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 18px; }
+        .menu-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 18px; position: relative; }
+        .menu-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: #ef4444; color: #fff; font-size: 10.5px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid #111827; }
+        .menu-badge.visible { display: flex; }
         .menu-text { flex: 1; }
         .menu-title { font-size: 16px; font-weight: 600; margin-bottom: 3px; letter-spacing: -0.3px; }
         .menu-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; }
@@ -64,6 +66,27 @@
         .promo-status-used { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); }
         .btn-delete-promo { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; }
         .btn-delete-promo:active { transform: scale(0.95); }
+
+        /* Стили карточек заказов */
+        .order-card { padding: 13px; margin-bottom: 10px; border-radius: 16px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.14); display: flex; flex-direction: column; gap: 8px; }
+        .order-card:last-child { margin-bottom: 0; }
+        .order-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .order-num { font-size: 15.5px; font-weight: 750; color: #fff; }
+        .order-time { font-size: 11px; color: var(--muted); }
+        .order-badge { padding: 4px 9px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid transparent; }
+        .order-badge.pending { background: rgba(234, 179, 8, 0.18); color: #fde047; border-color: rgba(234, 179, 8, 0.45); }
+        .order-badge.approved { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.45); }
+        .order-badge.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
+        .order-apps { font-size: 12.5px; color: #e2e8f0; line-height: 1.4; background: rgba(0,0,0,0.28); padding: 8px 10px; border-radius: 10px; }
+        .order-meta { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; }
+        .order-price { color: #60a5fa; font-size: 15px; font-weight: 800; }
+        .order-link-box { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); padding: 7px 10px; border-radius: 10px; font-size: 11.5px; color: #93c5fd; cursor: pointer; }
+        .order-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 2px; }
+        .order-btn { padding: 9px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; text-align: center; transition: 0.15s; }
+        .order-btn:active { transform: scale(0.96); }
+        .order-btn.approve { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; }
+        .order-btn.reject { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .order-btn.delete { grid-column: span 2; background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 600; padding: 7px; }
 
         .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
         .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
@@ -102,6 +125,18 @@
     <div id="view-menu" class="view active">
         <h2 class="page-title">Панель управления</h2>
         <div class="menu-card">
+            <div class="menu-item" onclick="openView('view-orders')">
+                <div class="menu-icon" style="background: rgba(59, 130, 246, 0.2);">
+                    📦
+                    <span class="menu-badge" id="pending-orders-badge">0</span>
+                </div>
+                <div class="menu-text">
+                    <div class="menu-title">Заказы</div>
+                    <div class="menu-subtitle">История заказов и проверка оплаты</div>
+                </div>
+                <div class="menu-chevron">›</div>
+            </div>
+
             <div class="menu-item" onclick="openView('view-create-link')">
                 <div class="menu-icon">🔗</div>
                 <div class="menu-text">
@@ -156,7 +191,24 @@
         </div>
     </div>
 
-    <!-- Управление промокодами (Создание + Список) -->
+    <!-- Управление заказами -->
+    <div id="view-orders" class="view">
+        <div class="card">
+            <h3 class="section-title" style="margin-bottom: 10px;">История заказов</h3>
+            <div class="ttl-pills" style="margin-bottom: 10px;">
+                <div class="ttl-pill active" onclick="setOrderFilter('all', this)">Все</div>
+                <div class="ttl-pill" onclick="setOrderFilter('pending', this)">Ожидают</div>
+                <div class="ttl-pill" onclick="setOrderFilter('approved', this)">Оплачены</div>
+                <div class="ttl-pill" onclick="setOrderFilter('rejected', this)">Отклонены</div>
+            </div>
+            <button class="btn" style="margin-bottom: 12px; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
+            <div id="orders-container" class="admin-scroll-list" style="max-height: 62dvh;">
+                <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Управление промокодами -->
     <div id="view-create-promo-code" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 10px;">Создать промокод</h3>
@@ -213,7 +265,7 @@
         </div>
     </div>
 
-    <!-- Запуск акции (Массовая) -->
+    <!-- Массовая акция -->
     <div id="view-promo" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 12px;">Массовая акция</h3>
@@ -308,66 +360,66 @@
             tg.setBackgroundColor('#0b0f17');
         } catch (e) {}
 
+        const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
         const appsData = [
-          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vk.png", ios: "iOS 17.6+" },
-          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/max.png", ios: "iOS 15.5+" },
-          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkvideo.png", ios: "iOS 17.6+" },
-          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkclips.png", ios: "iOS 17.6+" },
-          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmessenger.png", ios: "iOS 17.6+" },
-          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_tropa.png", ios: "iOS 16.6+" },
-          { key: "incy", name: "INCY", category: "other", url: "/manifests/incy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/incy.png", ios: "iOS 15.0+" },  
-          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mailru.png", ios: "iOS 16.0+" },
-          { key: "oblakomail", name: "Облако Mail", category: "other", url: "/manifests/oblakomail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/oblakomail.png", ios: "iOS 15.0+" },
-          { key: "okru", name: "Одноклассники", category: "social", url: "/manifests/okru.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/okru.png", ios: "iOS 15.6+" },
-          { key: "vkmusic_original", name: "VK Музыка (Оригинал)", category: "social", url: "/manifests/vkmusic_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vkmusic_original.png", ios: "iOS 17.6+" },
-          { key: "okko", name: "Okko", category: "other", url: "/manifests/okko.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/okko.png", ios: "iOS 16.0+" },
-          { key: "gazprombank_seif", name: "ГазпромБанк (Цифровой Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprombank_seif.png", ios: "iOS 16.0+" },
-          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfabank.png", ios: "iOS 14.0" },
-          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/premier_zoodelivery.png", ios: "iOS 16.0+" },
-          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito.png", ios: "iOS 15.2+" },
-          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 16.0+" },
-          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_8pro.png", ios: "iOS 16.0+" },
-          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_patrolkit.png", ios: "iOS 16.0+" },
-          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank.png", ios: "iOS 16.0+" },
-          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta.png", ios: "iOS 14.4+" },
-          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yandexpay.png", ios: "iOS 15.0+" },
-          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/2gis.png", ios: "iOS 16.0+" },
-          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/youla.png", ios: "iOS 15.6+" },
-          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/psb.png", ios: "iOS 15.0+" },
-          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/kuper.png", ios: "iOS 15.0+" },
-          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rutube.png", ios: "iOS 16.0+" },
-          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbermobail_mobio.png", ios: "iOS 16.6+" },
-          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tmobile.png", ios: "iOS 16.0+" },
-          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/ubrir_rybli.png", ios: "iOS 15.0+" },
-          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberkids.png", ios: "iOS 15.0+" },
-          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_bistropodukti.png", ios: "iOS 16.0+" },
-          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.png", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/avito_anero.png", ios: "iOS 16.0+" },
-          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/tbank_craftersy.png", ios: "iOS 16.0+" },
-          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sovkom.png", ios: "iOS 17.0+" },
-          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
-          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rocketbank_blum.png", ios: "iOS 15.0+" },
-          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/happ.png", ios: "iOS 15.0+" },
-          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/chatgpt.png", ios: "iOS 16.0+" },
-          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gemini.png", ios: "iOS 14.0+" },
-          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/lenta_lychsheonlain.png", ios: "iOS 15.1+" },
-          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sberinvest.png", ios: "iOS 16.0+" },
-          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/vtbinvest_kafario.png", ios: "iOS 17.6+" },
-          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazprominvest.png", ios: "iOS 15.0+" },
-          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/sbpay.png", ios: "iOS 13.0+" },
-          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/yota.png", ios: "iOS 15.0+" },
-          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
-          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/novikombank.png", ios: "iOS 12.0+" },
-          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/rshb.png", ios: "iOS 15.5+" },
-          { key: "mtsdengi", name: "МТС Деньги", category: "banks", url: "/manifests/mtsdengi.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mtsbank.png", ios: "iOS 14.0+" },
-          { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/domrf_roomassist.png", ios: "iOS 16.0+" },
-          { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/moidomru_proskorost.png", ios: "iOS 18.0+" },
-          { key: "movix_kinodom", name: "Movix (КиноДом)", category: "other", url: "/manifests/movix_kinodom.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/movix_kinodom.png", ios: "iOS 16.0+" },
-          { key: "mibank_avkgid", name: "Металлинвест (Банк)", category: "banks", url: "/manifests/mibank_avkgid.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/mibank_avkgid.png", ios: "iOS 15.0+" },
-          { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: "https://github.com/apprestore-ios/failes/releases/download/Логотипы/alrosa.png", ios: "iOS 15.0+" }
-            
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: L_BASE + "vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: L_BASE + "max.png", ios: "iOS 15.5+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: L_BASE + "vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: L_BASE + "vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: L_BASE + "vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: L_BASE + "vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "incy", name: "INCY", category: "other", url: "/manifests/incy.plist", icon: L_BASE + "incy.png", ios: "iOS 15.0+" },  
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: L_BASE + "mailru.png", ios: "iOS 16.0+" },
+          { key: "oblakomail", name: "Облако Mail", category: "other", url: "/manifests/oblakomail.plist", icon: L_BASE + "oblakomail.png", ios: "iOS 15.0+" },
+          { key: "okru", name: "Одноклассники", category: "social", url: "/manifests/okru.plist", icon: L_BASE + "okru.png", ios: "iOS 15.6+" },
+          { key: "vkmusic_original", name: "VK Музыка (Оригинал)", category: "social", url: "/manifests/vkmusic_original.plist", icon: L_BASE + "vkmusic_original.png", ios: "iOS 17.6+" },
+          { key: "okko", name: "Okko", category: "other", url: "/manifests/okko.plist", icon: L_BASE + "okko.png", ios: "iOS 16.0+" },
+          { key: "gazprombank_seif", name: "ГазпромБанк (Цифровой Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 14.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: L_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "sovkom.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: L_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: L_BASE + "sovkom.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: L_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: L_BASE + "tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: L_BASE + "lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: L_BASE + "yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: L_BASE + "2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: L_BASE + "youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: L_BASE + "psb.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: L_BASE + "kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: L_BASE + "rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: L_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: L_BASE + "tmobile.png", ios: "iOS 16.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: L_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: L_BASE + "sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.png", icon: L_BASE + "avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: L_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: L_BASE + "sovkom.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: L_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: L_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: L_BASE + "happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: L_BASE + "chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: L_BASE + "gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: L_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: L_BASE + "sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: L_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: L_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: L_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: L_BASE + "sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: L_BASE + "yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: L_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: L_BASE + "novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: L_BASE + "rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Деньги", category: "banks", url: "/manifests/mtsdengi.plist", icon: L_BASE + "mtsbank.png", ios: "iOS 14.0+" },
+          { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: L_BASE + "domrf_roomassist.png", ios: "iOS 16.0+" },
+          { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: L_BASE + "moidomru_proskorost.png", ios: "iOS 18.0+" },
+          { key: "movix_kinodom", name: "Movix (КиноДом)", category: "other", url: "/manifests/movix_kinodom.plist", icon: L_BASE + "movix_kinodom.png", ios: "iOS 16.0+" },
+          { key: "mibank_avkgid", name: "Металлинвест (Банк)", category: "banks", url: "/manifests/mibank_avkgid.plist", icon: L_BASE + "mibank_avkgid.png", ios: "iOS 15.0+" },
+          { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
         ];
     
         let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
@@ -377,6 +429,8 @@
         let selectedAppKey = "";
         let toastTimeout;
         let currentView = 'view-menu';
+        let currentOrderFilter = 'all';
+        let allOrdersCache = [];
 
         tg.BackButton.onClick(() => {
             if (currentView === 'view-price-detail') openView('view-prices');
@@ -385,7 +439,7 @@
 
         function selectTtl(mins, el) {
             selectedTtlMinutes = mins;
-            document.querySelectorAll('.ttl-pill').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#view-create-link .ttl-pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
             tg.HapticFeedback.selectionChanged();
         }
@@ -457,18 +511,12 @@
                 }
 
                 const prices = {};
-                if (Array.isArray(pricesRes)) {
-                    pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
-                }
+                pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
                 const visibility = {};
-                if (Array.isArray(visRes)) {
-                    visRes.forEach(row => { visibility[row.app_key] = row.is_visible; });
-                }
+                visRes.forEach(row => { visibility[row.app_key] = row.is_visible; });
                 let siteEnabled = true;
-                if (Array.isArray(settingsRes)) {
-                    const s = settingsRes.find(x => x.key === "site_enabled");
-                    if (s) siteEnabled = s.value === "true";
-                }
+                const s = settingsRes.find(x => x.key === "site_enabled");
+                if (s) siteEnabled = s.value === "true";
 
                 globalData.state = { prices, visibility };
                 globalData.siteEnabled = siteEnabled;
@@ -480,8 +528,26 @@
                 } catch(e) {}
 
                 renderAllViews();
+                updatePendingOrdersBadge();
             } catch (e) {}
         }
+
+        async function updatePendingOrdersBadge() {
+            const res = await sbFetch("orders?status=eq.pending&select=id");
+            const badge = document.getElementById("pending-orders-badge");
+            if (!badge) return;
+            if (Array.isArray(res) && res.length > 0) {
+                badge.textContent = res.length;
+                badge.classList.add("visible");
+            } else {
+                badge.classList.remove("visible");
+            }
+        }
+
+        setInterval(() => {
+            updatePendingOrdersBadge();
+            if (currentView === 'view-orders') loadOrdersList(true);
+        }, 5000);
 
         function openView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -495,11 +561,11 @@
                 updateGenerateButton();
                 updatePromoButton();
                 renderAllViews();
+                updatePendingOrdersBadge();
             } else {
                 tg.BackButton.show();
-                if (id === 'view-create-promo-code') {
-                    loadPromoCodesList();
-                }
+                if (id === 'view-create-promo-code') loadPromoCodesList();
+                if (id === 'view-orders') loadOrdersList();
             }
         }
 
@@ -514,18 +580,192 @@
             updatePromoButton();
         }
 
-        /* ----- ЛОГИКА ПРОМОКОДОВ (Создание и Список) ----- */
+        /* ----- ЛОГИКА УПРАВЛЕНИЯ ЗАКАЗАМИ ----- */
+        function setOrderFilter(filter, el) {
+            currentOrderFilter = filter;
+            document.querySelectorAll('#view-orders .ttl-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            tg.HapticFeedback.selectionChanged();
+            renderOrdersList();
+        }
+
+        async function loadOrdersList(silent = false) {
+            const container = document.getElementById('orders-container');
+            if (!silent && container) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
+            }
+            const res = await sbFetch("orders?select=*&order=created_at.desc");
+            if (res === null) {
+                if (!silent && container) container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки заказов</div>';
+                return;
+            }
+            allOrdersCache = res;
+            updatePendingOrdersBadge();
+            renderOrdersList();
+        }
+
+        function renderOrdersList() {
+            const container = document.getElementById('orders-container');
+            if (!container) return;
+
+            const filtered = allOrdersCache.filter(o => currentOrderFilter === 'all' || o.status === currentOrderFilter);
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--muted);">Заказов в этой категории нет</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(order => {
+                let statusText = "⏳ Ожидает";
+                let statusClass = "pending";
+                if (order.status === "approved") { statusText = "✅ Оплачен"; statusClass = "approved"; }
+                else if (order.status === "rejected") { statusText = "❌ Отклонен"; statusClass = "rejected"; }
+
+                const dateStr = order.created_at
+                    ? new Date(order.created_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+                    : "";
+
+                const appsNames = Array.isArray(order.app_names) && order.app_names.length > 0
+                    ? order.app_names.join(", ")
+                    : (Array.isArray(order.app_keys) ? order.app_keys.join(", ") : "Не указаны");
+
+                const promoInfo = order.promo_code ? `<div style="font-size:11.5px; color:#4ade80;">Промокод: ${order.promo_code} (-${order.discount || 0} ₽)</div>` : "";
+
+                const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
+                const linkBlock = linkUrl ? `
+                    <div class="order-link-box" onclick="copyText('${linkUrl}')">
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔗 ${linkUrl}</span>
+                        <span style="font-weight:700; flex-shrink:0;">Копировать</span>
+                    </div>
+                ` : "";
+
+                let actionsBlock = "";
+                if (order.status === "pending") {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn approve" onclick="approveOrderFromAdmin(${order.id})">✅ Подтвердить</button>
+                            <button class="order-btn reject" onclick="rejectOrderFromAdmin(${order.id})">❌ Не поступила</button>
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить заказ</button>
+                        </div>
+                    `;
+                } else if (order.status === "rejected") {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn approve" style="grid-column: span 2;" onclick="approveOrderFromAdmin(${order.id})">✅ Подтвердить оплату</button>
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить заказ</button>
+                        </div>
+                    `;
+                } else {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить из истории</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                <div class="order-card">
+                    <div class="order-top">
+                        <div>
+                            <div class="order-num">Заказ ${order.order_number || ('#' + order.id)}</div>
+                            <div class="order-time">${dateStr} (Екб)</div>
+                        </div>
+                        <div class="order-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="order-apps">${appsNames}</div>
+                    ${promoInfo}
+                    <div class="order-meta">
+                        <span style="color:var(--muted);">Сумма:</span>
+                        <span class="order-price">${order.total_price || 0} ₽</span>
+                    </div>
+                    ${linkBlock}
+                    ${actionsBlock}
+                </div>`;
+            }).join('');
+        }
+
+        async function approveOrderFromAdmin(orderId) {
+            const order = allOrdersCache.find(o => o.id === orderId);
+            if (!order) return;
+
+            let token = order.link_token;
+            if (!token) {
+                const array = new Uint32Array(1);
+                crypto.getRandomValues(array);
+                token = String(10000000 + (array[0] % 90000000));
+
+                const linkRecord = {
+                    token: token,
+                    app_keys: order.app_keys || [],
+                    ttl_minutes: 15,
+                    is_used: false,
+                    activated_at: 0,
+                    device_id: null,
+                    created_at: Date.now()
+                };
+
+                await sbFetch("app_links", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify(linkRecord)
+                });
+            }
+
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "approved",
+                    link_token: token,
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Оплата подтверждена! Ссылка выдана.");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
+        }
+
+        async function rejectOrderFromAdmin(orderId) {
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "rejected",
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Заказ отмечен как неоплаченный");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
+        }
+
+        async function deleteOrderFromAdmin(orderId) {
+            tg.HapticFeedback.impactOccurred('medium');
+            if (!confirm("Удалить этот заказ из истории?")) return;
+            const res = await sbFetch(`orders?id=eq.${orderId}`, { method: "DELETE" });
+            if (res !== null) {
+                showToast("Заказ удален");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при удалении заказа");
+            }
+        }
+
+        /* ----- ЛОГИКА ПРОМОКОДОВ ----- */
         async function loadPromoCodesList() {
             const container = document.getElementById('promo-codes-container');
             container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
             
             const res = await sbFetch("promo_codes?select=*&order=created_at.desc");
-            
             if (res === null) {
                 container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки</div>';
                 return;
             }
-            
             if (res.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Промокодов пока нет</div>';
                 return;
@@ -535,7 +775,6 @@
                 const isUsed = promo.is_used;
                 const statusClass = isUsed ? 'promo-status-used' : 'promo-status-active';
                 const statusText = isUsed ? 'Использован' : 'Активен';
-                
                 return `
                 <div class="promo-item">
                     <div class="promo-info" onclick="copyText('${promo.code}')">
@@ -568,24 +807,15 @@
             let promoText = "PROMO-";
             const array = new Uint32Array(5);
             crypto.getRandomValues(array);
-            for (let i = 0; i < 5; i++) {
-                promoText += charset[array[i] % charset.length];
-            }
-
-            const promoRecord = {
-                code: promoText,
-                discount: discount,
-                is_used: false
-            };
+            for (let i = 0; i < 5; i++) promoText += charset[array[i] % charset.length];
 
             const res = await sbFetch("promo_codes", {
                 method: "POST",
                 headers: { "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(promoRecord)
+                body: JSON.stringify({ code: promoText, discount: discount, is_used: false })
             });
 
             btn.innerText = prevText;
-
             if (res === null) {
                 showToast("Ошибка при создании промокода в БД!");
                 return;
@@ -593,7 +823,6 @@
 
             document.getElementById('generated-promo-code-input').value = promoText;
             document.getElementById('result-promo-code-desc').innerText = `Скидка ${discount} ₽ на всю сумму заказа. Сработает только 1 раз!`;
-
             openView('view-promo-code-result');
             
             document.getElementById('btn-forward-promo').onclick = () => {
@@ -606,17 +835,9 @@
         async function deletePromoCode(id) {
             tg.HapticFeedback.impactOccurred('medium');
             if (!confirm("Удалить этот промокод?")) return;
-
-            const res = await sbFetch(`promo_codes?id=eq.${id}`, {
-                method: "DELETE"
-            });
-
-            if (res === null) {
-                showToast("Ошибка при удалении промокода");
-            } else {
-                showToast("Промокод удален");
-                loadPromoCodesList(); 
-            }
+            const res = await sbFetch(`promo_codes?id=eq.${id}`, { method: "DELETE" });
+            if (res === null) showToast("Ошибка при удалении промокода");
+            else { showToast("Промокод удален"); loadPromoCodesList(); }
         }
 
         /* ----- ЛОГИКА АКЦИЙ И СКИДОК ----- */
@@ -652,15 +873,9 @@
         function selectAllPromo() {
             const query = (document.getElementById('promo-search')?.value || '').trim().toLowerCase();
             const visibleApps = appsData.filter(app => globalData.state.visibility[app.key] !== false && app.name.toLowerCase().includes(query));
-            
             const allSelected = visibleApps.length > 0 && visibleApps.every(app => selectedAppsForPromo.has(app.key));
-            
-            if (allSelected) {
-                visibleApps.forEach(app => selectedAppsForPromo.delete(app.key));
-            } else {
-                visibleApps.forEach(app => selectedAppsForPromo.add(app.key));
-            }
-            
+            if (allSelected) visibleApps.forEach(app => selectedAppsForPromo.delete(app.key));
+            else visibleApps.forEach(app => selectedAppsForPromo.add(app.key));
             renderPromoList();
             updatePromoButton();
             tg.HapticFeedback.selectionChanged();
@@ -670,7 +885,6 @@
             const btn = document.getElementById('btn-apply-promo');
             const resetBtn = document.getElementById('btn-reset-promo');
             const count = selectedAppsForPromo.size;
-            
             if (btn) {
                 btn.innerText = `🏷️ Изменить цены (${count})`;
                 if (count > 0) {
@@ -685,7 +899,6 @@
                     btn.style.boxShadow = 'none';
                 }
             }
-            
             if (resetBtn) {
                 resetBtn.innerText = `🔄 Вернуть базовые цены (${count})`;
                 if (count > 0) {
@@ -701,31 +914,21 @@
         }
 
         async function applyPromo() {
-            if (selectedAppsForPromo.size === 0) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-            
+            if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
             const discountInput = document.getElementById('promo-discount-input');
-            const discountText = discountInput.value.trim();
-            const discount = parseInt(discountText, 10);
-            
+            const discount = parseInt(discountInput.value.trim(), 10);
             if (isNaN(discount) || discount === 0) {
                 showToast("Введите сумму изменения");
                 tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
-
             const btn = document.getElementById('btn-apply-promo');
-            const prevText = btn.innerText;
             btn.innerText = "⏳ Обновление...";
 
             const updates = [];
             selectedAppsForPromo.forEach(key => {
-                const currentPrice = getAdminAppPrice(key);
-                let newPrice = currentPrice - discount;
+                let newPrice = getAdminAppPrice(key) - discount;
                 if (newPrice < 0) newPrice = 0; 
-                
                 updates.push({ app_key: key, price: newPrice });
                 globalData.state.prices[key] = String(newPrice);
             });
@@ -736,41 +939,27 @@
                     headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
                     body: JSON.stringify(updates)
                 });
-                
                 if (res !== null) {
                     try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
                     showToast("Цены успешно обновлены!");
-                    tg.HapticFeedback.notificationOccurred('success');
-                    
                     discountInput.value = '';
                     selectedAppsForPromo.clear();
                     renderPromoList(); 
                     renderPricesList(); 
-                } else {
-                    showToast("Ошибка при обновлении цен в БД");
-                }
-            } catch (e) {
-                showToast("Ошибка сети");
-            } finally {
-                updatePromoButton();
-            }
+                } else showToast("Ошибка при обновлении цен в БД");
+            } catch (e) { showToast("Ошибка сети"); }
+            finally { updatePromoButton(); }
         }
 
         async function resetPromo() {
-            if (selectedAppsForPromo.size === 0) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
+            if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
             const btn = document.getElementById('btn-reset-promo');
-            const prevText = btn.innerText;
             btn.innerText = "⏳ Сброс...";
 
             const updates = [];
             selectedAppsForPromo.forEach(key => {
-                const basePrice = 250;
-                updates.push({ app_key: key, price: basePrice });
-                globalData.state.prices[key] = String(basePrice);
+                updates.push({ app_key: key, price: 250 });
+                globalData.state.prices[key] = "250";
             });
 
             try {
@@ -779,23 +968,15 @@
                     headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
                     body: JSON.stringify(updates)
                 });
-                
                 if (res !== null) {
                     try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
                     showToast("Цены сброшены до базовых!");
-                    tg.HapticFeedback.notificationOccurred('success');
-                    
                     selectedAppsForPromo.clear();
                     renderPromoList(); 
                     renderPricesList(); 
-                } else {
-                    showToast("Ошибка при обновлении цен в БД");
-                }
-            } catch (e) {
-                showToast("Ошибка сети");
-            } finally {
-                updatePromoButton();
-            }
+                } else showToast("Ошибка при обновлении цен в БД");
+            } catch (e) { showToast("Ошибка сети"); }
+            finally { updatePromoButton(); }
         }
 
         /* ----- ЛОГИКА СОЗДАНИЯ ССЫЛОК ----- */
@@ -834,10 +1015,7 @@
         }
 
         async function createLink() {
-            if (selectedAppsForLink.size === 0) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
+            if (selectedAppsForLink.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
             const btn = document.getElementById('btn-generate-main');
             const prevText = btn.innerText;
             btn.innerText = "⏳ Создание...";
@@ -847,24 +1025,21 @@
             const token = String(10000000 + (array[0] % 90000000));
             const appKeysArr = Array.from(selectedAppsForLink);
 
-            const linkRecord = {
-                token: token,
-                app_keys: appKeysArr,
-                ttl_minutes: selectedTtlMinutes,
-                is_used: false,
-                activated_at: 0,
-                device_id: null,
-                created_at: Date.now()
-            };
-
             await sbFetch("app_links", {
                 method: "POST",
                 headers: { "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(linkRecord)
+                body: JSON.stringify({
+                    token: token,
+                    app_keys: appKeysArr,
+                    ttl_minutes: selectedTtlMinutes,
+                    is_used: false,
+                    activated_at: 0,
+                    device_id: null,
+                    created_at: Date.now()
+                })
             });
 
             btn.innerText = prevText;
-
             const linkUrl = CLIENT_SITE_URL + '/?' + token;
             const ttlText = formatMinWord(selectedTtlMinutes);
 
@@ -924,11 +1099,7 @@
                 const numPrice = parseInt(priceInput.value, 10);
                 const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
                 globalData.state.prices[key] = String(validPrice);
-                
-                try {
-                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices));
-                } catch(e) {}
-
+                try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
                 renderPricesList();
                 showToast('Цена успешно сохранена');
                 openView('view-prices');
@@ -964,8 +1135,7 @@
         }
 
         function toggleVisibility(key) {
-            const currentVis = globalData.state.visibility[key] !== false;
-            const makeVisible = !currentVis;
+            const makeVisible = !(globalData.state.visibility[key] !== false);
             globalData.state.visibility[key] = makeVisible;
 
             if (!makeVisible && selectedAppsForLink.has(key)) {
@@ -976,15 +1146,11 @@
                 selectedAppsForPromo.delete(key);
                 updatePromoButton();
             }
-            const sw = document.getElementById('vis-switch-' + key);
+            document.getElementById('vis-switch-' + key)?.classList.toggle('on', makeVisible);
             const st = document.getElementById('vis-status-' + key);
-            if (sw) sw.classList.toggle('on', makeVisible);
             if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
 
-            try {
-                localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility));
-            } catch(e) {}
-
+            try { localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility)); } catch(e) {}
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
 
             sbFetch("app_visibility?on_conflict=app_key", {
@@ -1010,11 +1176,7 @@
             btnToggle.onclick = () => {
                 const newState = !globalData.siteEnabled;
                 globalData.siteEnabled = newState;
-                
-                try {
-                    localStorage.setItem("apprestore_site_enabled_cache", String(newState));
-                } catch(e) {}
-
+                try { localStorage.setItem("apprestore_site_enabled_cache", String(newState)); } catch(e) {}
                 renderSettings();
                 showToast(newState ? "Сайт включен" : "Сайт выключен");
 
