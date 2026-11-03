@@ -406,6 +406,10 @@
                 <span>Выбрано приложений:</span>
                 <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
             </div>
+            <div class="cart-summary-row" id="cartBulkDiscountRow" style="display: none; color: #4ade80;">
+                <span>Скидка от 3 шт. (-40 ₽/шт.):</span>
+                <span id="cartScreenBulkDiscount">-0 ₽</span>
+            </div>
             <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
                 <span>Скидка по промокоду:</span>
                 <span id="cartScreenDiscount">-0 ₽</span>
@@ -892,7 +896,7 @@ function getOrCreateDeviceId() {
 
 function getAppPrice(key) {
     if (siteState.prices && siteState.prices[key] !== undefined) return Number(siteState.prices[key]);
-    return 250;
+    return 290;
 }
 
 function isAppVisible(key) {
@@ -900,10 +904,16 @@ function isAppVisible(key) {
     return true;
 }
 
+function getCartBulkDiscount() {
+    let visibleCount = 0;
+    cartItems.forEach(k => { if (isAppVisible(k)) visibleCount++; });
+    return visibleCount >= 3 ? visibleCount * 40 : 0;
+}
+
 function getCartFinalTotal() {
     let total = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
-    let finalTotal = total - currentPromoDiscount;
+    let finalTotal = total - getCartBulkDiscount() - currentPromoDiscount;
     return finalTotal < 0 ? 0 : finalTotal;
 }
 
@@ -1167,6 +1177,8 @@ function renderCartScreen() {
     const countEl = document.getElementById("cartScreenCount");
     const totalEl = document.getElementById("cartScreenTotal");
     const orderNumEl = document.getElementById("cartScreenOrderNum");
+    const bulkRow = document.getElementById("cartBulkDiscountRow");
+    const bulkDiscountEl = document.getElementById("cartScreenBulkDiscount");
     const promoRow = document.getElementById("cartPromoRow");
     const promoInputWrap = document.getElementById("promoInputWrap");
     const msgEl = document.getElementById("promoMessage");
@@ -1246,16 +1258,29 @@ function renderCartScreen() {
     if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
     if (countEl) countEl.textContent = cartItems.size + " шт.";
 
-    let finalTotal = total - currentPromoDiscount;
+    const bulkDiscount = getCartBulkDiscount();
+    const totalDiscount = bulkDiscount + currentPromoDiscount;
+    let finalTotal = total - totalDiscount;
     if (finalTotal < 0) finalTotal = 0;
+
+    if (bulkDiscount > 0) {
+        if (bulkRow) bulkRow.style.display = "flex";
+        if (bulkDiscountEl) bulkDiscountEl.textContent = "-" + bulkDiscount + " ₽";
+    } else {
+        if (bulkRow) bulkRow.style.display = "none";
+    }
 
     if (currentPromoDiscount > 0) {
         if (promoRow) promoRow.style.display = "flex";
         const discountEl = document.getElementById("cartScreenDiscount");
         if (discountEl) discountEl.textContent = "-" + currentPromoDiscount + " ₽";
-        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
     } else {
         if (promoRow) promoRow.style.display = "none";
+    }
+
+    if (totalDiscount > 0) {
+        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
+    } else {
         if (totalEl) totalEl.textContent = finalTotal + " ₽";
     }
 }
@@ -1335,6 +1360,7 @@ async function confirmOrderPaid() {
         return a ? a.name : k;
     });
     const finalTotal = getCartFinalTotal();
+    const totalOrderDiscount = getCartBulkDiscount() + (currentPromoDiscount || 0);
     const deviceId = getOrCreateDeviceId();
 
     if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
@@ -1349,6 +1375,7 @@ async function confirmOrderPaid() {
                 body: JSON.stringify({
                     status: "pending",
                     total_price: finalTotal,
+                    discount: totalOrderDiscount,
                     app_keys: appKeysArr.length > 0 ? appKeysArr : orderRow.app_keys,
                     app_names: appNamesArr.length > 0 ? appNamesArr : orderRow.app_names,
                     updated_at: new Date().toISOString()
@@ -1364,7 +1391,7 @@ async function confirmOrderPaid() {
                     app_names: appNamesArr,
                     total_price: finalTotal,
                     promo_code: currentPromoCode || null,
-                    discount: currentPromoDiscount || 0,
+                    discount: totalOrderDiscount,
                     status: "pending",
                     device_id: deviceId
                 })
@@ -1396,7 +1423,7 @@ async function confirmOrderPaid() {
                     app_names: appNamesArr,
                     total_price: finalTotal,
                     promo_code: currentPromoCode,
-                    discount: currentPromoDiscount
+                    discount: totalOrderDiscount
                 })
             }).catch(() => {});
 
