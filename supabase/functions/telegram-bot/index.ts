@@ -6,6 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 // ======================================================
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")
+
 const ADMIN_CHAT_ID =
   Deno.env.get("ADMIN_CHAT_ID") ||
   Deno.env.get("TELEGRAM_ADMIN_ID")
@@ -14,8 +15,8 @@ const SUPABASE_URL =
   Deno.env.get("SUPABASE_URL") ||
   "https://gwypxcdnefxlhwvtkvkc.supabase.co"
 
-// Для серверных операций необходим SERVICE ROLE KEY.
-// Не помещай его в HTML или публичный GitHub-код.
+// Для серверных операций используется SERVICE ROLE KEY.
+// Никогда не помещай его в HTML или публичный код сайта.
 const SUPABASE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 
 const CLIENT_SITE_URL = "https://apprestore-ios.ru"
@@ -64,9 +65,7 @@ function requireAdmin() {
 
 function requireSupabase() {
   if (!SUPABASE_KEY) {
-    throw new Error(
-      "Не настроен SUPABASE_SERVICE_ROLE_KEY"
-    )
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY не настроен")
   }
 }
 
@@ -187,23 +186,15 @@ function validDeviceId(value: unknown): value is string {
   )
 }
 
-function randomNumber(max: number): number {
-  const array = new Uint32Array(1)
-  crypto.getRandomValues(array)
-
-  return array[0] % max
-}
-
 function dateAfter(milliseconds: number): string {
   return new Date(Date.now() + milliseconds).toISOString()
 }
 
 // ======================================================
-// 3. НАСТРОЙКИ КОЛЕСА ФОРТУНЫ
+// 3. КОЛЕСО ФОРТУНЫ — ПРИЗЫ
 // ======================================================
 
-// Суммарная вероятность — 100%.
-// Последний сектор — дополнительный бонус 50 ₽.
+// Общая вероятность: 100%.
 
 const FORTUNE_PRIZES = [
   {
@@ -256,27 +247,8 @@ const FORTUNE_PRIZES = [
   },
 ]
 
-function selectFortunePrize() {
-  const totalWeight = FORTUNE_PRIZES.reduce(
-    (sum, prize) => sum + prize.weight,
-    0,
-  )
-
-  let random = randomNumber(totalWeight)
-
-  for (const prize of FORTUNE_PRIZES) {
-    random -= prize.weight
-
-    if (random < 0) {
-      return prize
-    }
-  }
-
-  return FORTUNE_PRIZES[0]
-}
-
 // ======================================================
-// 4. ПОЛУЧЕНИЕ ИСТОРИИ ВРАЩЕНИЙ
+// 4. ПОЛУЧЕНИЕ ПОСЛЕДНЕГО ВРАЩЕНИЯ
 // ======================================================
 
 async function getLatestSpin(deviceId: string) {
@@ -299,7 +271,7 @@ async function fortuneStatus(deviceId: string) {
   if (!validDeviceId(deviceId)) {
     return {
       success: false,
-      error: "Некорректный device_id",
+      error: "INVALID_DEVICE_ID",
     }
   }
 
@@ -325,7 +297,8 @@ async function fortuneStatus(deviceId: string) {
     latest.expires_at,
   ).getTime()
 
-  const nextSpinAt = createdAt + SPIN_INTERVAL_MS
+  const nextSpinAt =
+    createdAt + SPIN_INTERVAL_MS
 
   const activeBonus =
     latest.is_used === false &&
@@ -361,112 +334,34 @@ async function fortuneStatus(deviceId: string) {
 }
 
 // ======================================================
-// 6. ЗАПУСК КОЛЕСА
+// 6. ЗАПУСК КОЛЕСА — ЧЕРЕЗ SQL RPC
 // ======================================================
 
 async function fortuneSpin(deviceId: string) {
   if (!validDeviceId(deviceId)) {
     return {
       success: false,
-      error: "Некорректный device_id",
+      error: "INVALID_DEVICE_ID",
     }
   }
 
-  const latest = await getLatestSpin(deviceId)
-
-  const now = Date.now()
-
-  if (latest) {
-    const createdAt = new Date(
-      latest.created_at,
-    ).getTime()
-
-    const nextSpinAt = createdAt + SPIN_INTERVAL_MS
-
-    if (now < nextSpinAt) {
-      return {
-        success: false,
-        error: "SPIN_COOLDOWN",
-        message: "Следующее вращение пока недоступно",
-        next_spin_at: new Date(
-          nextSpinAt,
-        ).toISOString(),
-      }
-    }
-
-    const expiresAt = new Date(
-      latest.expires_at,
-    ).getTime()
-
-    if (
-      latest.is_used === false &&
-      expiresAt > now
-    ) {
-      return {
-        success: false,
-        error: "ACTIVE_BONUS",
-        message:
-          "Сначала необходимо использовать предыдущий выигрыш",
-        active_bonus: {
-          id: latest.id,
-          label: latest.prize_label,
-          value: Number(latest.prize_value),
-          expires_at: latest.expires_at,
-        },
-      }
-    }
-  }
-
-  const prize = selectFortunePrize()
-
-  const expiresAt = dateAfter(
-    PRIZE_VALIDITY_MS,
-  )
-
-  const inserted = await sbFetch(
-    "fortune_spins",
+  const result = await sbFetch(
+    "rpc/fortune_spin_atomic",
     {
       method: "POST",
-      headers: {
-        "Prefer": "return=representation",
-      },
       body: JSON.stringify({
-        device_id: deviceId,
-        prize_type: prize.type,
-        prize_label: prize.label,
-        prize_value: prize.value,
-        created_at: new Date().toISOString(),
-        expires_at: expiresAt,
-        is_used: false,
-        metadata: {},
+        p_device_id: deviceId,
       }),
     },
   )
 
-  if (
-    !Array.isArray(inserted) ||
-    inserted.length === 0
-  ) {
+  if (!result || typeof result !== "object") {
     throw new Error(
-      "Не удалось сохранить результат вращения",
+      "Не удалось получить результат вращения",
     )
   }
 
-  const result = inserted[0]
-
-  return {
-    success: true,
-    prize: {
-      id: result.id,
-      type: result.prize_type,
-      label: result.prize_label,
-      value: Number(result.prize_value),
-      expires_at: result.expires_at,
-    },
-    next_spin_at: new Date(
-      now + SPIN_INTERVAL_MS,
-    ).toISOString(),
-  }
+  return result
 }
 
 // ======================================================
@@ -508,7 +403,6 @@ async function fortuneUse(
     }
   }
 
-  // Получаем конкретный выигрыш.
   const rows = await sbFetch(
     `fortune_spins?id=eq.${encodeURIComponent(spinId)}&device_id=eq.${encodeURIComponent(deviceId)}&select=*&limit=1`,
   )
@@ -517,7 +411,6 @@ async function fortuneUse(
     return {
       success: false,
       error: "BONUS_NOT_FOUND",
-      message: "Выигрыш не найден",
     }
   }
 
@@ -539,7 +432,6 @@ async function fortuneUse(
     }
   }
 
-  // Проверяем существование заказа.
   const orders = await sbFetch(
     `orders?id=eq.${encodeURIComponent(orderId)}&select=id,status&limit=1`,
   )
@@ -555,18 +447,16 @@ async function fortuneUse(
     return {
       success: false,
       error: "ORDER_NOT_PENDING",
-      message: "К этому заказу нельзя применить бонус",
     }
   }
 
-  // Сохраняем информацию о применении бонуса.
   const metadata = {
     ...(spin.metadata || {}),
     order_id: orderId,
     used_at: new Date().toISOString(),
   }
 
-  await sbFetch(
+  const updated = await sbFetch(
     `fortune_spins?id=eq.${encodeURIComponent(spinId)}&device_id=eq.${encodeURIComponent(deviceId)}&is_used=eq.false`,
     {
       method: "PATCH",
@@ -580,6 +470,13 @@ async function fortuneUse(
       }),
     },
   )
+
+  if (!Array.isArray(updated) || updated.length === 0) {
+    return {
+      success: false,
+      error: "BONUS_ALREADY_USED",
+    }
+  }
 
   return {
     success: true,
@@ -615,19 +512,17 @@ serve(async (req) => {
     const body = await req.json()
 
     // ==================================================
-    // 9.1. КОЛЕСО ФОРТУНЫ — ПРОВЕРКА
+    // 9.1. КОЛЕСО — ПРОВЕРКА
     // ==================================================
 
     if (body.action === "fortune_status") {
-      const result = await fortuneStatus(
-        body.device_id,
+      return jsonResponse(
+        await fortuneStatus(body.device_id),
       )
-
-      return jsonResponse(result)
     }
 
     // ==================================================
-    // 9.2. КОЛЕСО ФОРТУНЫ — ВРАЩЕНИЕ
+    // 9.2. КОЛЕСО — ВРАЩЕНИЕ
     // ==================================================
 
     if (body.action === "fortune_spin") {
@@ -642,19 +537,17 @@ serve(async (req) => {
     }
 
     // ==================================================
-    // 9.3. КОЛЕСО ФОРТУНЫ — АКТИВНЫЙ БОНУС
+    // 9.3. КОЛЕСО — ПОЛУЧЕНИЕ БОНУСА
     // ==================================================
 
     if (body.action === "fortune_bonus") {
-      const result = await fortuneBonus(
-        body.device_id,
+      return jsonResponse(
+        await fortuneBonus(body.device_id),
       )
-
-      return jsonResponse(result)
     }
 
     // ==================================================
-    // 9.4. КОЛЕСО ФОРТУНЫ — ПРИМЕНЕНИЕ БОНУСА
+    // 9.4. КОЛЕСО — ПРИМЕНЕНИЕ БОНУСА
     // ==================================================
 
     if (body.action === "fortune_use") {
@@ -671,7 +564,7 @@ serve(async (req) => {
     }
 
     // ==================================================
-    // 9.5. УВЕДОМЛЕНИЕ ОБ АКТИВАЦИИ ССЫЛКИ
+    // 9.5. УВЕДОМЛЕНИЕ ОБ АКТИВАЦИИ
     // ==================================================
 
     if (body.action === "notify_activation") {
@@ -778,8 +671,7 @@ serve(async (req) => {
       let text =
         `💳 *Новый заказ ${order_number || ""}!*\n`
 
-      text +=
-        "Покупатель нажал «Я оплатил»\n\n"
+      text += "Покупатель нажал «Я оплатил»\n\n"
 
       text +=
         `📱 *Приложения:*\n${appsList}\n\n`
@@ -1122,7 +1014,10 @@ serve(async (req) => {
     })
 
   } catch (err) {
-    console.error("AppRestore Edge Function error:", err)
+    console.error(
+      "AppRestore Edge Function error:",
+      err,
+    )
 
     return jsonResponse(
       {
