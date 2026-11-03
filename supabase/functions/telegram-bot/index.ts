@@ -1,349 +1,1138 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
-const ADMIN_CHAT_ID = Deno.env.get('ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_ADMIN_ID')
+// ======================================================
+// 1. НАСТРОЙКИ
+// ======================================================
 
-// Подключение к Supabase (используются встроенные переменные окружения Edge Functions или твои данные проекта)
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || "https://gwypxcdnefxlhwvtkvkc.supabase.co"
-const SUPABASE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg"
+const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")
+const ADMIN_CHAT_ID =
+  Deno.env.get("ADMIN_CHAT_ID") ||
+  Deno.env.get("TELEGRAM_ADMIN_ID")
+
+const SUPABASE_URL =
+  Deno.env.get("SUPABASE_URL") ||
+  "https://gwypxcdnefxlhwvtkvkc.supabase.co"
+
+// Для серверных операций необходим SERVICE ROLE KEY.
+// Не помещай его в HTML или публичный GitHub-код.
+const SUPABASE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+
 const CLIENT_SITE_URL = "https://apprestore-ios.ru"
 
+const SPIN_INTERVAL_DAYS = 7
+const PRIZE_VALIDITY_DAYS = 7
+
+const SPIN_INTERVAL_MS =
+  SPIN_INTERVAL_DAYS * 24 * 60 * 60 * 1000
+
+const PRIZE_VALIDITY_MS =
+  PRIZE_VALIDITY_DAYS * 24 * 60 * 60 * 1000
+
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 }
 
-async function sbFetch(path: string, options: RequestInit = {}) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+// ======================================================
+// 2. ОБЩИЕ ФУНКЦИИ
+// ======================================================
+
+function jsonResponse(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  })
+}
+
+function requireTelegram() {
+  if (!TELEGRAM_BOT_TOKEN) {
+    throw new Error("TELEGRAM_BOT_TOKEN не настроен")
+  }
+}
+
+function requireAdmin() {
+  if (!ADMIN_CHAT_ID) {
+    throw new Error("ADMIN_CHAT_ID не настроен")
+  }
+}
+
+function requireSupabase() {
+  if (!SUPABASE_KEY) {
+    throw new Error(
+      "Не настроен SUPABASE_SERVICE_ROLE_KEY"
+    )
+  }
+}
+
+async function sbFetch(
+  path: string,
+  options: RequestInit = {},
+) {
+  requireSupabase()
+
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/${path}`,
+    {
       ...options,
       headers: {
-        "apikey": SUPABASE_KEY,
+        "apikey": SUPABASE_KEY!,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
-    })
-    if (!res.ok) return null
-    const text = await res.text()
-    return text ? JSON.parse(text) : { success: true }
-  } catch (_e) {
-    return null
+        ...(options.headers || {}),
+      },
+    },
+  )
+
+  const text = await response.text()
+
+  if (!response.ok) {
+    throw new Error(
+      `Supabase error ${response.status}: ${text}`,
+    )
   }
+
+  if (!text) {
+    return { success: true }
+  }
+
+  try {
+    return JSON.parse(text)
+  } catch {
+    return { success: true }
+  }
+}
+
+async function telegramRequest(
+  method: string,
+  payload: Record<string, unknown>,
+) {
+  requireTelegram()
+
+  const response = await fetch(
+    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  )
+
+  const result = await response.json()
+
+  if (!response.ok || !result.ok) {
+    throw new Error(
+      `Telegram ${method}: ${JSON.stringify(result)}`,
+    )
+  }
+
+  return result
 }
 
 function generateRandomToken(): string {
   const array = new Uint32Array(1)
   crypto.getRandomValues(array)
+
   return String(10000000 + (array[0] % 90000000))
 }
 
 function parseDeviceName(ua: string): string {
-  if (!ua) return "iPhone (модель не передана сайтом)";
-  if (ua.includes("iPhone")) {
-    if (ua.includes("CPU OS 18_")) return "iPhone (модель не определена, iOS 18)";
-    if (ua.includes("CPU OS 17_")) return "iPhone (модель не определена, iOS 17)";
-    if (ua.includes("CPU OS 16_")) return "iPhone (модель не определена, iOS 16)";
-    return "iPhone (модель не определена)";
+  if (!ua) {
+    return "iPhone (модель не передана сайтом)"
   }
-  if (ua.includes("iPad")) return "iPad";
-  if (ua.includes("Macintosh") || ua.includes("Mac OS")) return "Mac (Safari)";
-  if (ua.includes("Windows")) return "Windows PC";
-  if (ua.includes("Android")) return "Android устройство";
-  return "Мобильное устройство";
+
+  if (ua.includes("iPhone")) {
+    if (ua.includes("CPU OS 18_")) {
+      return "iPhone (модель не определена, iOS 18)"
+    }
+
+    if (ua.includes("CPU OS 17_")) {
+      return "iPhone (модель не определена, iOS 17)"
+    }
+
+    if (ua.includes("CPU OS 16_")) {
+      return "iPhone (модель не определена, iOS 16)"
+    }
+
+    return "iPhone (модель не определена)"
+  }
+
+  if (ua.includes("iPad")) return "iPad"
+
+  if (
+    ua.includes("Macintosh") ||
+    ua.includes("Mac OS")
+  ) {
+    return "Mac (Safari)"
+  }
+
+  if (ua.includes("Windows")) return "Windows PC"
+  if (ua.includes("Android")) return "Android устройство"
+
+  return "Мобильное устройство"
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
-  
-  try {
-    if (!TELEGRAM_BOT_TOKEN) {
-      return new Response(JSON.stringify({ success: false, error: 'TELEGRAM_BOT_TOKEN не настроен' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+function validDeviceId(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.trim().length >= 1 &&
+    value.trim().length <= 200
+  )
+}
+
+function randomNumber(max: number): number {
+  const array = new Uint32Array(1)
+  crypto.getRandomValues(array)
+
+  return array[0] % max
+}
+
+function dateAfter(milliseconds: number): string {
+  return new Date(Date.now() + milliseconds).toISOString()
+}
+
+// ======================================================
+// 3. НАСТРОЙКИ КОЛЕСА ФОРТУНЫ
+// ======================================================
+
+// Суммарная вероятность — 100%.
+// Последний сектор — дополнительный бонус 50 ₽.
+
+const FORTUNE_PRIZES = [
+  {
+    type: "discount",
+    label: "Скидка 50 ₽",
+    value: 50,
+    weight: 30,
+  },
+  {
+    type: "discount",
+    label: "Скидка 70 ₽",
+    value: 70,
+    weight: 20,
+  },
+  {
+    type: "discount",
+    label: "Скидка 100 ₽",
+    value: 100,
+    weight: 15,
+  },
+  {
+    type: "discount",
+    label: "Скидка 150 ₽",
+    value: 150,
+    weight: 12,
+  },
+  {
+    type: "discount",
+    label: "Скидка 200 ₽",
+    value: 200,
+    weight: 8,
+  },
+  {
+    type: "discount",
+    label: "Скидка 250 ₽",
+    value: 250,
+    weight: 5,
+  },
+  {
+    type: "discount",
+    label: "Скидка 300 ₽",
+    value: 300,
+    weight: 2,
+  },
+  {
+    type: "discount",
+    label: "Бонус 50 ₽",
+    value: 50,
+    weight: 8,
+  },
+]
+
+function selectFortunePrize() {
+  const totalWeight = FORTUNE_PRIZES.reduce(
+    (sum, prize) => sum + prize.weight,
+    0,
+  )
+
+  let random = randomNumber(totalWeight)
+
+  for (const prize of FORTUNE_PRIZES) {
+    random -= prize.weight
+
+    if (random < 0) {
+      return prize
+    }
+  }
+
+  return FORTUNE_PRIZES[0]
+}
+
+// ======================================================
+// 4. ПОЛУЧЕНИЕ ИСТОРИИ ВРАЩЕНИЙ
+// ======================================================
+
+async function getLatestSpin(deviceId: string) {
+  const rows = await sbFetch(
+    `fortune_spins?device_id=eq.${encodeURIComponent(deviceId)}&select=*&order=created_at.desc&limit=1`,
+  )
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null
+  }
+
+  return rows[0]
+}
+
+// ======================================================
+// 5. ПРОВЕРКА СОСТОЯНИЯ КОЛЕСА
+// ======================================================
+
+async function fortuneStatus(deviceId: string) {
+  if (!validDeviceId(deviceId)) {
+    return {
+      success: false,
+      error: "Некорректный device_id",
+    }
+  }
+
+  const latest = await getLatestSpin(deviceId)
+
+  if (!latest) {
+    return {
+      success: true,
+      can_spin: true,
+      next_spin_at: null,
+      active_bonus: null,
+      last_spin: null,
+    }
+  }
+
+  const now = Date.now()
+
+  const createdAt = new Date(
+    latest.created_at,
+  ).getTime()
+
+  const expiresAt = new Date(
+    latest.expires_at,
+  ).getTime()
+
+  const nextSpinAt = createdAt + SPIN_INTERVAL_MS
+
+  const activeBonus =
+    latest.is_used === false &&
+    expiresAt > now
+      ? {
+          id: latest.id,
+          type: latest.prize_type,
+          label: latest.prize_label,
+          value: Number(latest.prize_value),
+          expires_at: latest.expires_at,
+        }
+      : null
+
+  return {
+    success: true,
+
+    can_spin: now >= nextSpinAt,
+
+    next_spin_at: new Date(
+      nextSpinAt,
+    ).toISOString(),
+
+    active_bonus: activeBonus,
+
+    last_spin: {
+      id: latest.id,
+      label: latest.prize_label,
+      created_at: latest.created_at,
+      expires_at: latest.expires_at,
+      is_used: latest.is_used,
+    },
+  }
+}
+
+// ======================================================
+// 6. ЗАПУСК КОЛЕСА
+// ======================================================
+
+async function fortuneSpin(deviceId: string) {
+  if (!validDeviceId(deviceId)) {
+    return {
+      success: false,
+      error: "Некорректный device_id",
+    }
+  }
+
+  const latest = await getLatestSpin(deviceId)
+
+  const now = Date.now()
+
+  if (latest) {
+    const createdAt = new Date(
+      latest.created_at,
+    ).getTime()
+
+    const nextSpinAt = createdAt + SPIN_INTERVAL_MS
+
+    if (now < nextSpinAt) {
+      return {
+        success: false,
+        error: "SPIN_COOLDOWN",
+        message: "Следующее вращение пока недоступно",
+        next_spin_at: new Date(
+          nextSpinAt,
+        ).toISOString(),
+      }
     }
 
+    const expiresAt = new Date(
+      latest.expires_at,
+    ).getTime()
+
+    if (
+      latest.is_used === false &&
+      expiresAt > now
+    ) {
+      return {
+        success: false,
+        error: "ACTIVE_BONUS",
+        message:
+          "Сначала необходимо использовать предыдущий выигрыш",
+        active_bonus: {
+          id: latest.id,
+          label: latest.prize_label,
+          value: Number(latest.prize_value),
+          expires_at: latest.expires_at,
+        },
+      }
+    }
+  }
+
+  const prize = selectFortunePrize()
+
+  const expiresAt = dateAfter(
+    PRIZE_VALIDITY_MS,
+  )
+
+  const inserted = await sbFetch(
+    "fortune_spins",
+    {
+      method: "POST",
+      headers: {
+        "Prefer": "return=representation",
+      },
+      body: JSON.stringify({
+        device_id: deviceId,
+        prize_type: prize.type,
+        prize_label: prize.label,
+        prize_value: prize.value,
+        created_at: new Date().toISOString(),
+        expires_at: expiresAt,
+        is_used: false,
+        metadata: {},
+      }),
+    },
+  )
+
+  if (
+    !Array.isArray(inserted) ||
+    inserted.length === 0
+  ) {
+    throw new Error(
+      "Не удалось сохранить результат вращения",
+    )
+  }
+
+  const result = inserted[0]
+
+  return {
+    success: true,
+    prize: {
+      id: result.id,
+      type: result.prize_type,
+      label: result.prize_label,
+      value: Number(result.prize_value),
+      expires_at: result.expires_at,
+    },
+    next_spin_at: new Date(
+      now + SPIN_INTERVAL_MS,
+    ).toISOString(),
+  }
+}
+
+// ======================================================
+// 7. ПОЛУЧЕНИЕ АКТИВНОГО БОНУСА
+// ======================================================
+
+async function fortuneBonus(deviceId: string) {
+  const status = await fortuneStatus(deviceId)
+
+  if (!status.success) {
+    return status
+  }
+
+  return {
+    success: true,
+    bonus: status.active_bonus,
+  }
+}
+
+// ======================================================
+// 8. ПРИМЕНЕНИЕ ВЫИГРЫША К ЗАКАЗУ
+// ======================================================
+
+async function fortuneUse(
+  deviceId: string,
+  spinId: string,
+  orderId: string,
+) {
+  if (
+    !validDeviceId(deviceId) ||
+    typeof spinId !== "string" ||
+    typeof orderId !== "string" ||
+    !spinId.trim() ||
+    !orderId.trim()
+  ) {
+    return {
+      success: false,
+      error: "INVALID_PARAMETERS",
+    }
+  }
+
+  // Получаем конкретный выигрыш.
+  const rows = await sbFetch(
+    `fortune_spins?id=eq.${encodeURIComponent(spinId)}&device_id=eq.${encodeURIComponent(deviceId)}&select=*&limit=1`,
+  )
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return {
+      success: false,
+      error: "BONUS_NOT_FOUND",
+      message: "Выигрыш не найден",
+    }
+  }
+
+  const spin = rows[0]
+
+  if (spin.is_used) {
+    return {
+      success: false,
+      error: "BONUS_ALREADY_USED",
+    }
+  }
+
+  if (
+    new Date(spin.expires_at).getTime() <= Date.now()
+  ) {
+    return {
+      success: false,
+      error: "BONUS_EXPIRED",
+    }
+  }
+
+  // Проверяем существование заказа.
+  const orders = await sbFetch(
+    `orders?id=eq.${encodeURIComponent(orderId)}&select=id,status&limit=1`,
+  )
+
+  if (!Array.isArray(orders) || orders.length === 0) {
+    return {
+      success: false,
+      error: "ORDER_NOT_FOUND",
+    }
+  }
+
+  if (orders[0].status !== "pending") {
+    return {
+      success: false,
+      error: "ORDER_NOT_PENDING",
+      message: "К этому заказу нельзя применить бонус",
+    }
+  }
+
+  // Сохраняем информацию о применении бонуса.
+  const metadata = {
+    ...(spin.metadata || {}),
+    order_id: orderId,
+    used_at: new Date().toISOString(),
+  }
+
+  await sbFetch(
+    `fortune_spins?id=eq.${encodeURIComponent(spinId)}&device_id=eq.${encodeURIComponent(deviceId)}&is_used=eq.false`,
+    {
+      method: "PATCH",
+      headers: {
+        "Prefer": "return=representation",
+      },
+      body: JSON.stringify({
+        is_used: true,
+        used_at: new Date().toISOString(),
+        metadata,
+      }),
+    },
+  )
+
+  return {
+    success: true,
+    message: "Выигрыш привязан к заказу",
+    order_id: orderId,
+    bonus: {
+      id: spin.id,
+      label: spin.prize_label,
+      value: Number(spin.prize_value),
+    },
+  }
+}
+
+// ======================================================
+// 9. ОСНОВНОЙ ОБРАБОТЧИК
+// ======================================================
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: corsHeaders,
+    })
+  }
+
+  if (req.method !== "POST") {
+    return new Response("Method not allowed", {
+      status: 405,
+      headers: corsHeaders,
+    })
+  }
+
+  try {
     const body = await req.json()
 
-    // 1. Уведомление об активации разовой ссылки
-    if (body.action === 'notify_activation') {
-      const { token, app_keys, device_name, device_model } = body
-      const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : (app_keys || 'Не указаны')
+    // ==================================================
+    // 9.1. КОЛЕСО ФОРТУНЫ — ПРОВЕРКА
+    // ==================================================
 
-      const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
+    if (body.action === "fortune_status") {
+      const result = await fortuneStatus(
+        body.device_id,
+      )
+
+      return jsonResponse(result)
+    }
+
+    // ==================================================
+    // 9.2. КОЛЕСО ФОРТУНЫ — ВРАЩЕНИЕ
+    // ==================================================
+
+    if (body.action === "fortune_spin") {
+      const result = await fortuneSpin(
+        body.device_id,
+      )
+
+      return jsonResponse(
+        result,
+        result.success ? 200 : 400,
+      )
+    }
+
+    // ==================================================
+    // 9.3. КОЛЕСО ФОРТУНЫ — АКТИВНЫЙ БОНУС
+    // ==================================================
+
+    if (body.action === "fortune_bonus") {
+      const result = await fortuneBonus(
+        body.device_id,
+      )
+
+      return jsonResponse(result)
+    }
+
+    // ==================================================
+    // 9.4. КОЛЕСО ФОРТУНЫ — ПРИМЕНЕНИЕ БОНУСА
+    // ==================================================
+
+    if (body.action === "fortune_use") {
+      const result = await fortuneUse(
+        body.device_id,
+        body.spin_id,
+        body.order_id,
+      )
+
+      return jsonResponse(
+        result,
+        result.success ? 200 : 400,
+      )
+    }
+
+    // ==================================================
+    // 9.5. УВЕДОМЛЕНИЕ ОБ АКТИВАЦИИ ССЫЛКИ
+    // ==================================================
+
+    if (body.action === "notify_activation") {
+      requireAdmin()
+
+      const {
+        token,
+        app_keys,
+        device_name,
+        device_model,
+      } = body
+
+      const appsList = Array.isArray(app_keys)
+        ? app_keys.join(", ")
+        : (app_keys || "Не указаны")
+
+      const ekbTime = new Date().toLocaleTimeString(
+        "ru-RU",
+        {
+          timeZone: "Asia/Yekaterinburg",
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      )
 
       const suppliedDeviceModel =
-        typeof device_model === 'string' && device_model.trim()
+        typeof device_model === "string" &&
+        device_model.trim()
           ? device_model.trim()
-          : (typeof device_name === 'string' && device_name.trim() ? device_name.trim() : '');
+          : (
+              typeof device_name === "string" &&
+              device_name.trim()
+                ? device_name.trim()
+                : ""
+            )
 
-      const deviceFormatted = (suppliedDeviceModel || parseDeviceName(''))
-        .split(' · ')[0]
-        .slice(0, 100);
+      const deviceFormatted = (
+        suppliedDeviceModel || parseDeviceName("")
+      )
+        .split(" · ")[0]
+        .slice(0, 100)
 
-      const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n\n🔑 Токен: \`${token || 'Не указан'}\`\n\n⏰ Время (Екб): \`${ekbTime}\`\n\n📱 Устройство: \`${deviceFormatted}\``
+      const text =
+        `🔔 *Новая активация!*\n\n` +
+        `📦 Приложения: \`${appsList}\`\n\n` +
+        `🔑 Токен: \`${token || "Не указан"}\`\n\n` +
+        `⏰ Время (Екб): \`${ekbTime}\`\n\n` +
+        `📱 Устройство: \`${deviceFormatted}\``
 
-      const replyMarkup = {
-        inline_keyboard: [
-          [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-        ]
-      };
-
-      if (!ADMIN_CHAT_ID) {
-        return new Response(JSON.stringify({ success: false, error: 'ADMIN_CHAT_ID / TELEGRAM_ADMIN_ID не настроен' }), {
-          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
-
-      const telegramResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: ADMIN_CHAT_ID,
-          text,
-          parse_mode: 'Markdown',
-          reply_markup: replyMarkup
-        })
+      await telegramRequest("sendMessage", {
+        chat_id: ADMIN_CHAT_ID,
+        text,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "🗑 Удалить уведомление",
+                callback_data: "delete_msg",
+              },
+            ],
+          ],
+        },
       })
-      const telegramResult = await telegramResponse.json()
-      if (!telegramResponse.ok || !telegramResult.ok) {
-        return new Response(JSON.stringify({ success: false, error: 'Telegram sendMessage failed' }), {
-          status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
 
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200
+      return jsonResponse({
+        success: true,
       })
     }
 
-    // 2. Уведомление о новом заказе после нажатия «Я оплатил» на сайте
-    if (body.action === 'notify_new_order') {
-      const { order_id, order_number, app_names, total_price, promo_code, discount } = body
-      const appsList = Array.isArray(app_names) && app_names.length > 0
-        ? app_names.map((n: string) => `• ${n}`).join('\n')
-        : 'Не указаны'
+    // ==================================================
+    // 9.6. УВЕДОМЛЕНИЕ О НОВОМ ЗАКАЗЕ
+    // ==================================================
 
-      const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
+    if (body.action === "notify_new_order") {
+      requireAdmin()
 
-      let text = `💳 *Новый заказ ${order_number || ''}!*\n`
-      text += `Покупатель нажал «Я оплатил»\n\n`
-      text += `📱 *Приложения:*\n${appsList}\n\n`
+      const {
+        order_id,
+        order_number,
+        app_names,
+        total_price,
+        promo_code,
+        discount,
+      } = body
+
+      const appsList =
+        Array.isArray(app_names) &&
+        app_names.length > 0
+          ? app_names
+              .map((n: string) => `• ${n}`)
+              .join("\n")
+          : "Не указаны"
+
+      const ekbTime = new Date().toLocaleTimeString(
+        "ru-RU",
+        {
+          timeZone: "Asia/Yekaterinburg",
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      )
+
+      let text =
+        `💳 *Новый заказ ${order_number || ""}!*\n`
+
+      text +=
+        "Покупатель нажал «Я оплатил»\n\n"
+
+      text +=
+        `📱 *Приложения:*\n${appsList}\n\n`
+
       if (promo_code) {
-        text += `🏷 *Промокод:* \`${promo_code}\` (-${discount || 0} ₽)\n`
-      }
-      text += `💰 *Сумма к оплате:* \`${total_price || 0} ₽\`\n`
-      text += `⏰ *Время (Екб):* \`${ekbTime}\`\n`
-      text += `📊 *Статус:* ⏳ Ожидает подтверждения`
-
-      const replyMarkup = {
-        inline_keyboard: [
-          [{ text: "✅ Подтвердить оплату", callback_data: `approve_order:${order_id}` }],
-          [{ text: "❌ Оплата не поступила", callback_data: `reject_order:${order_id}` }],
-          [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-        ]
-      };
-
-      if (!ADMIN_CHAT_ID) {
-        return new Response(JSON.stringify({ success: false, error: 'ADMIN_CHAT_ID не настроен' }), {
-          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        text +=
+          `🏷 *Промокод:* \`${promo_code}\` (-${discount || 0} ₽)\n`
       }
 
-      const telegramResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: ADMIN_CHAT_ID,
-          text,
-          parse_mode: 'Markdown',
-          reply_markup: replyMarkup
-        })
+      text +=
+        `💰 *Сумма к оплате:* \`${total_price || 0} ₽\`\n`
+
+      text +=
+        `⏰ *Время (Екб):* \`${ekbTime}\`\n`
+
+      text +=
+        "📊 *Статус:* ⏳ Ожидает подтверждения"
+
+      await telegramRequest("sendMessage", {
+        chat_id: ADMIN_CHAT_ID,
+        text,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "✅ Подтвердить оплату",
+                callback_data: `approve_order:${order_id}`,
+              },
+            ],
+            [
+              {
+                text: "❌ Оплата не поступила",
+                callback_data: `reject_order:${order_id}`,
+              },
+            ],
+            [
+              {
+                text: "🗑 Удалить уведомление",
+                callback_data: "delete_msg",
+              },
+            ],
+          ],
+        },
       })
-      const telegramResult = await telegramResponse.json()
-      if (!telegramResponse.ok || !telegramResult.ok) {
-        return new Response(JSON.stringify({ success: false, error: 'Telegram sendMessage failed' }), {
-          status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
 
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200
+      return jsonResponse({
+        success: true,
       })
     }
 
-    // 3. Обработка команды /start — только для администратора
-    if (body.message) {
-      const chatId = body.message.chat.id;
-      const text = body.message.text;
+    // ==================================================
+    // 9.7. TELEGRAM WEBHOOK — /START
+    // ==================================================
 
-      if (typeof text === 'string' && text.startsWith('/start')) {
-        if (String(chatId) !== String(ADMIN_CHAT_ID)) {
-          return new Response(JSON.stringify({ success: true }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200
-          });
+    if (body.message) {
+      requireTelegram()
+      requireAdmin()
+
+      const chatId = body.message.chat.id
+      const text = body.message.text
+
+      if (
+        typeof text === "string" &&
+        text.startsWith("/start")
+      ) {
+        if (
+          String(chatId) !== String(ADMIN_CHAT_ID)
+        ) {
+          return jsonResponse({
+            success: true,
+          })
         }
 
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: 'ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!',
-            reply_markup: {
-              inline_keyboard: [[
+        await telegramRequest("sendMessage", {
+          chat_id: chatId,
+          text:
+            "ПАНЕЛЬ АДМИНИСТРАТОРА ПРОЕКТА AppRestore IOS!",
+          reply_markup: {
+            inline_keyboard: [
+              [
                 {
-                  text: '⚙️ Открыть Админ-панель',
-                  web_app: { url: 'https://apprestore-ios.ru/admin.html' }
-                }
-              ]]
-            }
-          })
-        });
+                  text: "⚙️ Открыть Админ-панель",
+                  web_app: {
+                    url:
+                      "https://apprestore-ios.ru/admin.html",
+                  },
+                },
+              ],
+            ],
+          },
+        })
       }
+
+      return jsonResponse({
+        success: true,
+      })
     }
 
-    // 4. Обработка нажатий на инлайн-кнопки в Telegram-боте
-    if (body.callback_query) {
-      const query = body.callback_query
-      const data = query.data || ''
-      const chatId = query.message?.chat?.id
-      const messageId = query.message?.message_id
-      const originalText = query.message?.text || ''
+    // ==================================================
+    // 9.8. TELEGRAM WEBHOOK — CALLBACK
+    // ==================================================
 
+    if (body.callback_query) {
+      requireTelegram()
+      requireAdmin()
+
+      const query = body.callback_query
+      const data = query.data || ""
+
+      const chatId = query.message?.chat?.id
+      const messageId =
+        query.message?.message_id
+
+      const originalText =
+        query.message?.text || ""
+
+      // ----------------------------------------------
       // Удаление уведомления
-      if (data === 'delete_msg') {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, message_id: messageId })
+      // ----------------------------------------------
+
+      if (data === "delete_msg") {
+        if (
+          String(chatId) !== String(ADMIN_CHAT_ID)
+        ) {
+          return jsonResponse({
+            success: true,
+          })
+        }
+
+        await telegramRequest("deleteMessage", {
+          chat_id: chatId,
+          message_id: messageId,
         })
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callback_query_id: query.id })
+
+        await telegramRequest("answerCallbackQuery", {
+          callback_query_id: query.id,
         })
-        return new Response('OK', { status: 200 })
+
+        return jsonResponse({
+          success: true,
+        })
       }
 
-      // Подтверждение оплаты заказа (генерирует ссылку на 15 минут)
-      if (data.startsWith('approve_order:')) {
-        const orderId = data.split(':')[1]
-        const orders = await sbFetch(`orders?id=eq.${orderId}&select=*`)
-        
-        if (Array.isArray(orders) && orders.length > 0) {
+      // ----------------------------------------------
+      // Подтверждение оплаты
+      // ----------------------------------------------
+
+      if (data.startsWith("approve_order:")) {
+        if (
+          String(chatId) !== String(ADMIN_CHAT_ID)
+        ) {
+          return jsonResponse({
+            success: true,
+          })
+        }
+
+        const orderId = data.split(":")[1]
+
+        const orders = await sbFetch(
+          `orders?id=eq.${encodeURIComponent(orderId)}&select=*`,
+        )
+
+        if (
+          Array.isArray(orders) &&
+          orders.length > 0
+        ) {
           const order = orders[0]
+
           let token = order.link_token
 
           if (!token) {
             token = generateRandomToken()
+
             const linkRecord = {
-              token: token,
+              token,
               app_keys: order.app_keys || [],
               ttl_minutes: 15,
               is_used: false,
               activated_at: 0,
               device_id: null,
-              created_at: Date.now()
+              created_at: Date.now(),
             }
+
             await sbFetch("app_links", {
               method: "POST",
-              headers: { "Prefer": "resolution=merge-duplicates" },
-              body: JSON.stringify(linkRecord)
+              headers: {
+                "Prefer": "resolution=merge-duplicates",
+              },
+              body: JSON.stringify(linkRecord),
             })
           }
 
-          await sbFetch(`orders?id=eq.${orderId}`, {
-            method: "PATCH",
-            body: JSON.stringify({
-              status: "approved",
-              link_token: token,
-              updated_at: new Date().toISOString()
-            })
-          })
+          await sbFetch(
+            `orders?id=eq.${encodeURIComponent(orderId)}`,
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                status: "approved",
+                link_token: token,
+                updated_at: new Date().toISOString(),
+              }),
+            },
+          )
 
-          const linkUrl = `${CLIENT_SITE_URL}/?${token}`
-          const updatedText = originalText.replace(/📊 Статус: .*/, '📊 Статус: ✅ Оплата подтверждена') + `\n🔗 Ссылка (15 мин): ${linkUrl}`
+          const linkUrl =
+            `${CLIENT_SITE_URL}/?${token}`
 
-          await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              message_id: messageId,
-              text: updatedText,
-              reply_markup: {
-                inline_keyboard: [
-                  [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-                ]
-              }
-            })
-          })
+          const updatedText =
+            originalText.replace(
+              /📊 Статус: .*/,
+              "📊 Статус: ✅ Оплата подтверждена",
+            ) +
+            `\n🔗 Ссылка (15 мин): ${linkUrl}`
 
-          await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callback_query_id: query.id, text: "✅ Оплата подтверждена! Ссылка отправлена клиенту." })
-          })
-        } else {
-          await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callback_query_id: query.id, text: "⚠️ Заказ не найден в базе", show_alert: true })
-          })
-        }
-        return new Response('OK', { status: 200 })
-      }
-
-      // Отклонение оплаты заказа
-      if (data.startsWith('reject_order:')) {
-        const orderId = data.split(':')[1]
-        await sbFetch(`orders?id=eq.${orderId}`, {
-          method: "PATCH",
-          body: JSON.stringify({
-            status: "rejected",
-            updated_at: new Date().toISOString()
-          })
-        })
-
-        const updatedText = originalText.replace(/📊 Статус: .*/, '📊 Статус: ❌ Оплата не поступила')
-
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          await telegramRequest("editMessageText", {
             chat_id: chatId,
             message_id: messageId,
             text: updatedText,
             reply_markup: {
               inline_keyboard: [
-                [{ text: "✅ Все-таки подтвердить оплату", callback_data: `approve_order:${orderId}` }],
-                [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-              ]
-            }
+                [
+                  {
+                    text: "🗑 Удалить уведомление",
+                    callback_data: "delete_msg",
+                  },
+                ],
+              ],
+            },
           })
-        })
 
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callback_query_id: query.id, text: "❌ Отмечено: оплата не поступила" })
+          await telegramRequest(
+            "answerCallbackQuery",
+            {
+              callback_query_id: query.id,
+              text:
+                "✅ Оплата подтверждена! Ссылка отправлена клиенту.",
+            },
+          )
+        } else {
+          await telegramRequest(
+            "answerCallbackQuery",
+            {
+              callback_query_id: query.id,
+              text: "⚠️ Заказ не найден в базе",
+              show_alert: true,
+            },
+          )
+        }
+
+        return jsonResponse({
+          success: true,
         })
-        return new Response('OK', { status: 200 })
       }
 
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callback_query_id: query.id })
+      // ----------------------------------------------
+      // Отклонение оплаты
+      // ----------------------------------------------
+
+      if (data.startsWith("reject_order:")) {
+        if (
+          String(chatId) !== String(ADMIN_CHAT_ID)
+        ) {
+          return jsonResponse({
+            success: true,
+          })
+        }
+
+        const orderId = data.split(":")[1]
+
+        await sbFetch(
+          `orders?id=eq.${encodeURIComponent(orderId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              status: "rejected",
+              updated_at: new Date().toISOString(),
+            }),
+          },
+        )
+
+        const updatedText =
+          originalText.replace(
+            /📊 Статус: .*/,
+            "📊 Статус: ❌ Оплата не поступила",
+          )
+
+        await telegramRequest("editMessageText", {
+          chat_id: chatId,
+          message_id: messageId,
+          text: updatedText,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text:
+                    "✅ Все-таки подтвердить оплату",
+                  callback_data:
+                    `approve_order:${orderId}`,
+                },
+              ],
+              [
+                {
+                  text: "🗑 Удалить уведомление",
+                  callback_data: "delete_msg",
+                },
+              ],
+            ],
+          },
+        })
+
+        await telegramRequest(
+          "answerCallbackQuery",
+          {
+            callback_query_id: query.id,
+            text: "❌ Отмечено: оплата не поступила",
+          },
+        )
+
+        return jsonResponse({
+          success: true,
+        })
+      }
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id: query.id,
+        },
+      )
+
+      return jsonResponse({
+        success: true,
       })
     }
 
-    return new Response('OK', { status: 200 })
+    return jsonResponse({
+      success: true,
+      message: "No action",
+    })
+
   } catch (err) {
-    return new Response('Error: ' + err.message, { status: 500 })
+    console.error("AppRestore Edge Function error:", err)
+
+    return jsonResponse(
+      {
+        success: false,
+        error:
+          err instanceof Error
+            ? err.message
+            : String(err),
+      },
+      500,
+    )
   }
 })
