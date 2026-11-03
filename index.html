@@ -8,6 +8,17 @@
     <meta name="theme-color" content="#0b0f17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        (function() {
+            if (window.location.pathname.toLowerCase().startsWith("/admin")) {
+                const tg = window.Telegram && window.Telegram.WebApp;
+                if (!tg || !tg.initData) {
+                    window.location.replace("https://apprestore-ios.ru");
+                }
+            }
+        })();
+    </script>
     <style>
       :root {
           --bg: #0b0f17; --text: #f8fafc; --muted: #94a3b8;
