@@ -492,7 +492,7 @@
             if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
                 return Number(globalData.state.prices[key]);
             }
-            return 250;
+            return 290;
         }
 
         async function loadData() {
@@ -967,8 +967,8 @@
 
             const updates = [];
             selectedAppsForPromo.forEach(key => {
-                updates.push({ app_key: key, price: 250 });
-                globalData.state.prices[key] = "250";
+                updates.push({ app_key: key, price: 290 });
+                globalData.state.prices[key] = "290";
             });
 
             try {
@@ -1106,7 +1106,7 @@
             priceInput.value = getAdminAppPrice(key);
             document.getElementById('btn-save-price').onclick = () => {
                 const numPrice = parseInt(priceInput.value, 10);
-                const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 250;
+                const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 290;
                 globalData.state.prices[key] = String(validPrice);
                 try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
                 renderPricesList();
