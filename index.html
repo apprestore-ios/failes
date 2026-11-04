@@ -731,6 +731,7 @@ const appsData = [
 
 let siteState = { prices: {}, visibility: {} };
 let siteEnabled = true;
+let bulkDiscountEnabled = true;
 let currentCategory = "all";
 let isFromToken = false;
 let isTokenExpired = false;
@@ -794,8 +795,10 @@ function loadFromLocalStorageCache() {
         const pCache = localStorage.getItem("apprestore_prices_cache");
         const vCache = localStorage.getItem("apprestore_visibility_cache");
         const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+        const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
         if (pCache) siteState.prices = JSON.parse(pCache);
         if (vCache) siteState.visibility = JSON.parse(vCache);
+        if (bCache !== null) bulkDiscountEnabled = bCache === "true";
         if (sCache !== null) {
             siteEnabled = sCache === "true";
             const alertEl = document.getElementById("top-toast-alert");
@@ -836,6 +839,15 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         }
 
         if (Array.isArray(settingsRes)) {
+            const bulkSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
+            if (bulkSetting) {
+                const newBulkDiscountEnabled = bulkSetting.value === "true";
+                if (newBulkDiscountEnabled !== bulkDiscountEnabled) {
+                    bulkDiscountEnabled = newBulkDiscountEnabled;
+                    hasChanges = true;
+                }
+            }
+
             const s = settingsRes.find(x => x.key === "site_enabled");
             if (s) {
                 const newEnabled = s.value === "true";
@@ -860,6 +872,7 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
             localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
             localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
             localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+            localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
         } catch(e) {}
 
         if (hasChanges || forceUpdateUI) {
@@ -905,6 +918,7 @@ function isAppVisible(key) {
 }
 
 function getCartBulkDiscount() {
+    if (!bulkDiscountEnabled) return 0;
     let visibleCount = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) visibleCount++; });
     return visibleCount >= 3 ? visibleCount * 40 : 0;
