@@ -202,26 +202,11 @@
     <!-- Управление заказами -->
     <div id="view-orders" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 10px;">Управление заказами</h3>
-            <div style="padding:12px; margin-bottom:12px; border-radius:14px; background:rgba(59,130,246,0.10); border:1px solid rgba(96,165,250,0.25);">
-                <div style="font-size:13px; font-weight:700; margin-bottom:6px;">⏱ Таймер проверки доступа</div>
-                <div style="font-size:11.5px; color:var(--muted); line-height:1.4; margin-bottom:9px;">Время, в течение которого покупатель проверяет полученный доступ. Истечение таймера не подтверждает заказ автоматически.</div>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <input id="order-check-duration" class="text-input" type="number" min="30" max="86400" step="1" value="60" style="margin:0; flex:1; text-align:left;">
-                    <span style="font-size:12px; color:var(--muted);">сек.</span>
-                    <button class="order-btn approve" style="padding:12px 14px;" onclick="saveOrderCheckDuration()">Сохранить</button>
-                </div>
-            </div>
-            <div class="ttl-pills" style="margin-bottom: 10px; overflow-x:auto; display:flex; flex-wrap:nowrap;">
-
+            <h3 class="section-title" style="margin-bottom: 10px;">История заказов</h3>
+            <div class="ttl-pills" style="margin-bottom: 10px;">
                 <div class="ttl-pill active" onclick="setOrderFilter('all', this)">Все</div>
-                <div class="ttl-pill" onclick="setOrderFilter('pending', this)">Старые ожидающие</div>
-                <div class="ttl-pill" onclick="setOrderFilter('payment_review', this)">Проверка оплаты</div>
+                <div class="ttl-pill" onclick="setOrderFilter('pending', this)">Ожидают</div>
                 <div class="ttl-pill" onclick="setOrderFilter('approved', this)">Оплачены</div>
-                <div class="ttl-pill" onclick="setOrderFilter('access_granted', this)">Доступ выдан</div>
-                <div class="ttl-pill" onclick="setOrderFilter('check_expired', this)">Таймер истёк</div>
-                <div class="ttl-pill" onclick="setOrderFilter('under_review', this)">Проблемы</div>
-                <div class="ttl-pill" onclick="setOrderFilter('buyer_confirmed', this)">Подтверждены</div>
                 <div class="ttl-pill" onclick="setOrderFilter('rejected', this)">Отклонены</div>
             </div>
             <button class="btn" style="margin-bottom: 12px; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
@@ -572,7 +557,7 @@
         }
 
         async function updatePendingOrdersBadge() {
-            const res = await sbFetch("orders?status=in.(pending,payment_review)&select=id");
+            const res = await sbFetch("orders?status=eq.pending&select=id");
             const badge = document.getElementById("pending-orders-badge");
             if (!badge) return;
             if (Array.isArray(res) && res.length > 0) {
@@ -604,7 +589,7 @@
             } else {
                 tg.BackButton.show();
                 if (id === 'view-create-promo-code') loadPromoCodesList();
-                if (id === 'view-orders') { loadOrdersList(); loadOrderCheckDuration(); }
+                if (id === 'view-orders') loadOrdersList();
             }
         }
 
@@ -620,39 +605,6 @@
         }
 
         /* ----- ЛОГИКА УПРАВЛЕНИЯ ЗАКАЗАМИ ----- */
-        async function callOrderFunction(payload) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...payload, initData: tg.initData || "" })
-                });
-                const data = await response.json().catch(() => ({}));
-                return response.ok && data.success !== false ? data : null;
-            } catch (e) { return null; }
-        }
-
-        async function loadOrderCheckDuration() {
-            const rows = await sbFetch("site_settings?key=eq.order_check_duration_seconds&select=value");
-            const input = document.getElementById("order-check-duration");
-            if (input && Array.isArray(rows) && rows.length && Number(rows[0].value) > 0) input.value = Number(rows[0].value);
-        }
-
-        async function saveOrderCheckDuration() {
-            const input = document.getElementById("order-check-duration");
-            const seconds = Math.floor(Number(input?.value));
-            if (!Number.isFinite(seconds) || seconds < 30 || seconds > 86400) {
-                showToast("Укажите от 30 до 86400 секунд");
-                return;
-            }
-            const existing = await sbFetch("site_settings?key=eq.order_check_duration_seconds&select=key");
-            const result = Array.isArray(existing) && existing.length
-                ? await sbFetch("site_settings?key=eq.order_check_duration_seconds", { method: "PATCH", body: JSON.stringify({ value: String(seconds) }) })
-                : await sbFetch("site_settings", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify({ key: "order_check_duration_seconds", value: String(seconds) }) });
-            if (result === null) showToast("Не удалось сохранить таймер. Проверьте доступ к site_settings.");
-            else showToast("Время проверки сохранено");
-        }
-
         function setOrderFilter(filter, el) {
             currentOrderFilter = filter;
             document.querySelectorAll('#view-orders .ttl-pill').forEach(p => p.classList.remove('active'));
@@ -663,7 +615,9 @@
 
         async function loadOrdersList(silent = false) {
             const container = document.getElementById('orders-container');
-            if (!silent && container) container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
+            if (!silent && container) {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
+            }
             const res = await sbFetch("orders?select=*&order=created_at.desc");
             if (res === null) {
                 if (!silent && container) container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки заказов</div>';
@@ -674,83 +628,156 @@
             renderOrdersList();
         }
 
-        function orderStatusInfo(order) {
-            const map = {
-                pending: ["⏳ Ожидает оплаты", "pending"],
-                payment_review: ["🔎 Проверка оплаты", "pending"],
-                approved: ["✅ Оплата подтверждена", "approved"],
-                access_granted: ["🔗 Доступ выдан", "approved"],
-                check_expired: ["⌛ Время истекло", "rejected"],
-                under_review: ["⚠️ Есть проблема", "rejected"],
-                buyer_confirmed: ["✅ Покупатель подтвердил", "approved"],
-                completed: ["🏁 Завершён", "approved"],
-                rejected: ["❌ Оплата не подтверждена", "rejected"]
-            };
-            return map[order.status] || [String(order.status || "Неизвестно"), "pending"];
-        }
-
         function renderOrdersList() {
             const container = document.getElementById('orders-container');
             if (!container) return;
+
             const filtered = allOrdersCache.filter(o => currentOrderFilter === 'all' || o.status === currentOrderFilter);
-            if (!filtered.length) {
+            if (filtered.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--muted);">Заказов в этой категории нет</div>';
                 return;
             }
+
             container.innerHTML = filtered.map(order => {
-                const [statusText, statusClass] = orderStatusInfo(order);
-                const dateStr = order.created_at ? new Date(order.created_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
-                const appsNames = Array.isArray(order.app_names) && order.app_names.length ? order.app_names.join(", ") : (Array.isArray(order.app_keys) ? order.app_keys.join(", ") : "Не указаны");
+                let statusText = "⏳ Ожидает";
+                let statusClass = "pending";
+                if (order.status === "approved") { statusText = "✅ Оплачен"; statusClass = "approved"; }
+                else if (order.status === "rejected") { statusText = "❌ Отклонен"; statusClass = "rejected"; }
+
+                const dateStr = order.created_at
+                    ? new Date(order.created_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+                    : "";
+
+                const appsNames = Array.isArray(order.app_names) && order.app_names.length > 0
+                    ? order.app_names.join(", ")
+                    : (Array.isArray(order.app_keys) ? order.app_keys.join(", ") : "Не указаны");
+
                 const promoInfo = order.promo_code ? `<div style="font-size:11.5px; color:#4ade80;">Промокод: ${order.promo_code} (-${order.discount || 0} ₽)</div>` : "";
+
                 const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
-                const linkBlock = linkUrl ? `<div class="order-link-box" onclick="copyText('${linkUrl}')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🔗 ${linkUrl}</span><span style="font-weight:700;flex-shrink:0;">Копировать</span></div>` : "";
-                const timerInfo = order.check_expires_at ? `<div style="font-size:11.5px;color:var(--muted);">Проверка доступа до: ${new Date(order.check_expires_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg" })}</div>` : "";
-                let actions = "";
-                if (["pending", "payment_review"].includes(order.status)) {
-                    actions = `<button class="order-btn approve" onclick="confirmPaymentFromAdmin(${order.id})">✅ Подтвердить оплату</button><button class="order-btn reject" onclick="rejectOrderFromAdmin(${order.id})">❌ Оплата не поступила</button>`;
-                } else if (order.status === "approved") {
-                    actions = `<button class="order-btn approve" style="grid-column:span 2;" onclick="grantOrderAccessFromAdmin(${order.id})">🔗 Выдать доступ и запустить таймер</button>`;
-                } else if (["check_expired", "under_review"].includes(order.status)) {
-                    actions = `<button class="order-btn approve" onclick="resolveOrderIssueFromAdmin(${order.id})">✓ Отметить решённым</button><button class="order-btn reject" onclick="grantOrderAccessFromAdmin(${order.id}, true)">↻ Выдать доступ повторно</button>`;
+                const linkBlock = linkUrl ? `
+                    <div class="order-link-box" onclick="copyText('${linkUrl}')">
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔗 ${linkUrl}</span>
+                        <span style="font-weight:700; flex-shrink:0;">Копировать</span>
+                    </div>
+                ` : "";
+
+                let actionsBlock = "";
+                if (order.status === "pending") {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn approve" onclick="approveOrderFromAdmin(${order.id})">✅ Подтвердить</button>
+                            <button class="order-btn reject" onclick="rejectOrderFromAdmin(${order.id})">❌ Не поступила</button>
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить заказ</button>
+                        </div>
+                    `;
+                } else if (order.status === "rejected") {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn approve" style="grid-column: span 2;" onclick="approveOrderFromAdmin(${order.id})">✅ Подтвердить оплату</button>
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить заказ</button>
+                        </div>
+                    `;
+                } else {
+                    actionsBlock = `
+                        <div class="order-actions">
+                            <button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить из истории</button>
+                        </div>
+                    `;
                 }
-                return `<div class="order-card"><div class="order-top"><div><div class="order-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="order-time">${dateStr} (Екб)</div></div><div class="order-badge ${statusClass}">${statusText}</div></div><div class="order-apps">${appsNames}</div>${promoInfo}<div class="order-meta"><span style="color:var(--muted);">Сумма:</span><span class="order-price">${order.total_price || 0} ₽</span></div>${timerInfo}${linkBlock}${order.issue_reported_at ? '<div style="font-size:12px;color:#fca5a5;">Покупатель сообщил о проблеме</div>' : ''}<div class="order-actions">${actions}<button class="order-btn delete" onclick="deleteOrderFromAdmin(${order.id})">🗑 Удалить из истории</button></div></div>`;
+
+                return `
+                <div class="order-card">
+                    <div class="order-top">
+                        <div>
+                            <div class="order-num">Заказ ${order.order_number || ('#' + order.id)}</div>
+                            <div class="order-time">${dateStr} (Екб)</div>
+                        </div>
+                        <div class="order-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="order-apps">${appsNames}</div>
+                    ${promoInfo}
+                    <div class="order-meta">
+                        <span style="color:var(--muted);">Сумма:</span>
+                        <span class="order-price">${order.total_price || 0} ₽</span>
+                    </div>
+                    ${linkBlock}
+                    ${actionsBlock}
+                </div>`;
             }).join('');
         }
 
-        async function confirmPaymentFromAdmin(orderId) {
-            const result = await callOrderFunction({ action: "admin_order_action", operation: "confirm_payment", order_id: orderId });
-            if (!result) { showToast("Не удалось подтвердить оплату"); return; }
-            showToast("Оплата подтверждена. Теперь можно отдельно выдать доступ.");
-            await loadOrdersList(true);
-        }
+        async function approveOrderFromAdmin(orderId) {
+            const order = allOrdersCache.find(o => o.id === orderId);
+            if (!order) return;
 
-        async function grantOrderAccessFromAdmin(orderId, retry = false) {
-            const result = await callOrderFunction({ action: "admin_order_action", operation: "grant_access", order_id: orderId, retry });
-            if (!result) { showToast("Не удалось выдать доступ"); return; }
-            showToast("Персональная ссылка выдана, таймер запущен");
-            await loadOrdersList(true);
-        }
+            let token = order.link_token;
+            if (!token) {
+                const array = new Uint32Array(1);
+                crypto.getRandomValues(array);
+                token = String(10000000 + (array[0] % 90000000));
 
-        async function resolveOrderIssueFromAdmin(orderId) {
-            const result = await callOrderFunction({ action: "admin_order_action", operation: "resolve_issue", order_id: orderId });
-            if (!result) { showToast("Не удалось обновить заказ"); return; }
-            showToast("Проблема отмечена как решённая");
-            await loadOrdersList(true);
+                const linkRecord = {
+                    token: token,
+                    app_keys: order.app_keys || [],
+                    ttl_minutes: 15,
+                    is_used: false,
+                    activated_at: 0,
+                    device_id: null,
+                    created_at: Date.now()
+                };
+
+                await sbFetch("app_links", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify(linkRecord)
+                });
+            }
+
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "approved",
+                    link_token: token,
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Оплата подтверждена! Ссылка выдана.");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
         }
 
         async function rejectOrderFromAdmin(orderId) {
-            const result = await callOrderFunction({ action: "admin_order_action", operation: "reject_payment", order_id: orderId });
-            if (!result) { showToast("Не удалось обновить статус оплаты"); return; }
-            showToast("Заказ отмечен как неоплаченный");
-            await loadOrdersList(true);
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "rejected",
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Заказ отмечен как неоплаченный");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
         }
 
         async function deleteOrderFromAdmin(orderId) {
             tg.HapticFeedback.impactOccurred('medium');
             if (!confirm("Удалить этот заказ из истории?")) return;
             const res = await sbFetch(`orders?id=eq.${orderId}`, { method: "DELETE" });
-            if (res !== null) { showToast("Заказ удален"); loadOrdersList(true); }
-            else showToast("Ошибка при удалении заказа");
+            if (res !== null) {
+                showToast("Заказ удален");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при удалении заказа");
+            }
         }
 
         /* ----- ЛОГИКА ПРОМОКОДОВ ----- */
