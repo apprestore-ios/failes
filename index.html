@@ -485,8 +485,8 @@
         <div class="wait-spinner"></div>
         <div class="auth-title" style="font-size: 20px;">Проверка оплаты</div>
         <div class="auth-description" style="text-align: center;">
-            Заказ <b id="waitOrderNum" style="color: var(--text);">#00000</b> отправлен администратору.<br><br>
-            После проверки оплаты администратор отдельно предоставит доступ. Статус заказа будет обновляться автоматически.
+            Заказ <b id="waitOrderNum" style="color: var(--text);">#00000</b> отправлен на проверку администратору.<br><br>
+            Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится ваша персональная ссылка для установки.
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -496,22 +496,16 @@
 
 <div class="container" id="orderApprovedApp">
     <div class="auth-box" style="padding: 26px 20px;">
-        <div class="auth-title" id="accessCheckTitle" style="color: #4ade80; font-size: 22px;">Доступ предоставлен!</div>
-        <div class="auth-description" id="accessCheckDescription" style="text-align: center;">
-            Персональная ссылка готова. Откройте её и проверьте доступ. Ссылка действует 15 минут после первого открытия.
-        </div>
-        <div id="accessCheckBanner" class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(168,85,247,0.45); background:rgba(168,85,247,0.10);">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:5px;">Осталось времени на проверку</div>
-            <div id="accessCheckCountdown" style="font-size:25px;font-weight:800;color:#d8b4fe;font-variant-numeric:tabular-nums;">01:00</div>
-            <div id="accessCheckState" style="font-size:11.5px;color:var(--muted);margin-top:5px;">Подтвердите результат проверки или сообщите о проблеме</div>
+        <div class="auth-title" style="color: #4ade80; font-size: 22px;">Оплата подтверждена!</div>
+        <div class="auth-description" style="text-align: center;">
+            Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
         </div>
         <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
             <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
         </div>
-        <button type="button" class="btn btn-primary" id="startApprovedInstallationBtn" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">🚀 Начать установку</button>
-        <button type="button" class="btn btn-success" id="confirmAccessBtn" onclick="confirmAccessReceived()" style="min-height:50px;">✅ Доступ работает</button>
-        <button type="button" class="btn btn-secondary" id="reportAccessIssueBtn" onclick="reportAccessProblem()" style="min-height:48px;">⚠️ Сообщить о проблеме</button>
-        <div id="accessCheckLockedNote" style="display:none;font-size:12px;color:var(--muted);text-align:center;line-height:1.45;">Обращение зарегистрировано. Администратор проверит ситуацию. Вы можете связаться с поддержкой.</div>
+        <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
+            🚀 Начать установку
+        </button>
         <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 2px;">
             Вернуться в каталог
         </button>
@@ -1393,7 +1387,7 @@ async function confirmOrderPaid() {
             await sbFetch(`orders?id=eq.${orderRow.id}`, {
                 method: "PATCH",
                 body: JSON.stringify({
-                    status: "payment_review",
+                    status: "pending",
                     total_price: finalTotal,
                     discount: totalOrderDiscount,
                     app_keys: appKeysArr.length > 0 ? appKeysArr : orderRow.app_keys,
@@ -1412,7 +1406,7 @@ async function confirmOrderPaid() {
                     total_price: finalTotal,
                     promo_code: currentPromoCode || null,
                     discount: totalOrderDiscount,
-                    status: "payment_review",
+                    status: "pending",
                     device_id: deviceId
                 })
             });
@@ -1461,135 +1455,43 @@ async function confirmOrderPaid() {
     }
 }
 
-let accessCountdownInterval = null;
-let currentAccessOrder = null;
-
-function renderAccessCheck(order) {
-    currentAccessOrder = order;
-    activeOrderId = order.id;
-    if (order.link_token) {
-        activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
-        const linkEl = document.getElementById("approvedLinkText");
-        if (linkEl) linkEl.textContent = activeApprovedLink;
-    }
-    const title = document.getElementById("accessCheckTitle");
-    const desc = document.getElementById("accessCheckDescription");
-    const state = document.getElementById("accessCheckState");
-    const banner = document.getElementById("accessCheckBanner");
-    const confirmBtn = document.getElementById("confirmAccessBtn");
-    const issueBtn = document.getElementById("reportAccessIssueBtn");
-    const note = document.getElementById("accessCheckLockedNote");
-    const installBtn = document.getElementById("startApprovedInstallationBtn");
-    if (order.status === "buyer_confirmed" || order.status === "completed") {
-        if (title) title.textContent = "Доступ подтверждён!";
-        if (desc) desc.textContent = "Спасибо! Заказ отмечен как подтверждённый.";
-        if (state) state.textContent = "Покупатель подтвердил получение доступа";
-        if (banner) banner.style.borderColor = "rgba(74,222,128,.45)";
-        if (confirmBtn) confirmBtn.style.display = "none";
-        if (issueBtn) issueBtn.style.display = "none";
-        if (note) { note.style.display = "block"; note.textContent = "Заказ подтверждён. Если понадобится помощь, обратитесь в поддержку."; }
-    } else if (order.status === "under_review") {
-        if (title) { title.textContent = "Обращение принято"; title.style.color = "#fbbf24"; }
-        if (desc) desc.textContent = "Вы сообщили о проблеме. Заказ передан администратору на проверку.";
-        if (state) state.textContent = "Проверка доступа приостановлена до рассмотрения обращения";
-        if (confirmBtn) confirmBtn.style.display = "none";
-        if (issueBtn) issueBtn.style.display = "none";
-        if (note) note.style.display = "block";
-    } else {
-        if (title) { title.textContent = "Доступ предоставлен!"; title.style.color = "#4ade80"; }
-        if (desc) desc.textContent = "Откройте персональную ссылку и проверьте доступ. Истечение таймера не означает автоматическое подтверждение заказа.";
-        if (confirmBtn) confirmBtn.style.display = "flex";
-        if (issueBtn) issueBtn.style.display = "flex";
-        if (note) note.style.display = "none";
-        const expires = order.check_expires_at ? new Date(order.check_expires_at).getTime() : 0;
-        const left = expires ? Math.max(0, expires - Date.now()) : 0;
-        const countdown = document.getElementById("accessCheckCountdown");
-        if (countdown) countdown.textContent = `${String(Math.floor(left/60000)).padStart(2,"0")}:${String(Math.floor((left%60000)/1000)).padStart(2,"0")}`;
-        if (order.status === "check_expired" || left <= 0) {
-            if (state) state.textContent = "Время проверки истекло. Вы всё ещё можете сообщить о проблеме или подтвердить доступ.";
-            if (countdown) countdown.textContent = "00:00";
-            if (banner) banner.style.borderColor = "rgba(251,191,36,.5)";
-        } else if (state) {
-            state.textContent = "Подтвердите результат проверки или сообщите о проблеме";
-        }
-        if (installBtn) installBtn.style.display = order.link_token ? "flex" : "none";
-    }
-    if (accessCountdownInterval) clearInterval(accessCountdownInterval);
-    if (!["buyer_confirmed", "completed", "under_review"].includes(order.status)) {
-        accessCountdownInterval = setInterval(() => {
-            const exp = currentAccessOrder?.check_expires_at ? new Date(currentAccessOrder.check_expires_at).getTime() : 0;
-            const ms = exp ? Math.max(0, exp - Date.now()) : 0;
-            const el = document.getElementById("accessCheckCountdown");
-            if (el) el.textContent = `${String(Math.floor(ms/60000)).padStart(2,"0")}:${String(Math.floor((ms%60000)/1000)).padStart(2,"0")}`;
-            if (ms <= 0) {
-                const st = document.getElementById("accessCheckState");
-                if (st) st.textContent = "Время проверки истекло. Вы всё ещё можете сообщить о проблеме.";
-            }
-        }, 1000);
-    }
-}
-
-async function callBuyerOrderAction(operation) {
-    if (!activeOrderId) return false;
-    try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "buyer_order_action", operation, order_id: activeOrderId, device_id: getOrCreateDeviceId(), link_token: currentAccessOrder?.link_token || "" })
-        });
-        const data = await response.json().catch(() => ({}));
-        return response.ok && data.success === true;
-    } catch (e) { return false; }
-}
-
-async function confirmAccessReceived() {
-    const btn = document.getElementById("confirmAccessBtn");
-    if (btn) btn.disabled = true;
-    const ok = await callBuyerOrderAction("confirm_access");
-    if (btn) btn.disabled = false;
-    if (!ok) { alert("Не удалось подтвердить доступ. Попробуйте ещё раз или обратитесь в поддержку."); return; }
-    if (currentAccessOrder) currentAccessOrder.status = "buyer_confirmed";
-    renderAccessCheck(currentAccessOrder);
-}
-
-async function reportAccessProblem() {
-    if (!confirm("Сообщить администратору, что с доступом возникла проблема?")) return;
-    const btn = document.getElementById("reportAccessIssueBtn");
-    if (btn) btn.disabled = true;
-    const ok = await callBuyerOrderAction("report_problem");
-    if (btn) btn.disabled = false;
-    if (!ok) { alert("Не удалось отправить обращение. Попробуйте ещё раз или напишите в поддержку."); return; }
-    if (currentAccessOrder) currentAccessOrder.status = "under_review";
-    renderAccessCheck(currentAccessOrder);
-}
-
 function startOrderStatusPolling(orderId) {
     if (!orderId) return;
     if (orderPollingInterval) clearInterval(orderPollingInterval);
+
     async function checkStatus() {
         const res = await sbFetch(`orders?id=eq.${orderId}&select=*`);
-        if (!Array.isArray(res) || !res.length) return;
+        if (!Array.isArray(res) || res.length === 0) return;
         const order = res[0];
-        const waitOrderEl = document.getElementById("waitOrderNum");
-        if (waitOrderEl) waitOrderEl.textContent = order.order_number || "";
-        const waitTitle = document.getElementById("waitOrderTitle");
-        const waitDescription = document.querySelector("#orderWaitApp .auth-description");
-        if (order.status === "approved") {
-            if (waitTitle) waitTitle.textContent = "Оплата подтверждена";
-            if (waitDescription) waitDescription.innerHTML = `Заказ <b>${order.order_number || ""}</b>: оплата подтверждена. Администратор должен отдельно выдать доступ. Эта страница автоматически обновится.`;
-        } else if (waitTitle) waitTitle.textContent = "Проверка оплаты";
-        if (["access_granted", "check_expired", "under_review", "buyer_confirmed", "completed"].includes(order.status)) {
-            if (order.status !== "under_review" && !order.link_token) return;
-            clearInterval(orderPollingInterval); orderPollingInterval = null;
-            renderAccessCheck(order);
+
+        if (order.status === "approved" && order.link_token) {
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
+            activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
+            const linkEl = document.getElementById("approvedLinkText");
+            if (linkEl) linkEl.textContent = activeApprovedLink;
+
+            cartItems.clear();
+            currentOrderNumber = null;
+            currentPromoCode = null;
+            currentPromoDiscount = 0;
+            saveCart();
+            try {
+                localStorage.removeItem("apprestore_active_order_id");
+                localStorage.removeItem("apprestore_active_order_num");
+            } catch (e) {}
+            updateCartUI();
+
             switchScreen("orderApprovedApp", false);
         } else if (order.status === "rejected") {
-            clearInterval(orderPollingInterval); orderPollingInterval = null;
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
             switchScreen("orderRejectedApp", false);
         }
     }
+
     checkStatus();
-    orderPollingInterval = setInterval(checkStatus, 2500);
+    orderPollingInterval = setInterval(checkStatus, 2000);
 }
 
 function startApprovedInstallation() {
@@ -1626,20 +1528,15 @@ async function renderMyOrdersList() {
         if (Array.isArray(res) && res.length > 0) {
             const ord = res[0];
             let statusBadge = `<span class="my-order-status pending">⏳ Ожидает</span>`;
-            if (ord.status === "payment_review") statusBadge = `<span class="my-order-status pending">🔎 Проверка оплаты</span>`;
-            else if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Оплата подтверждена</span>`;
-            else if (ord.status === "access_granted") statusBadge = `<span class="my-order-status approved">🔗 Доступ выдан</span>`;
-            else if (ord.status === "check_expired") statusBadge = `<span class="my-order-status rejected">⌛ Время истекло</span>`;
-            else if (ord.status === "under_review") statusBadge = `<span class="my-order-status rejected">⚠️ На проверке</span>`;
-            else if (["buyer_confirmed", "completed"].includes(ord.status)) statusBadge = `<span class="my-order-status approved">🏁 Подтверждён</span>`;
+            if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Оплачен</span>`;
             else if (ord.status === "rejected") statusBadge = `<span class="my-order-status rejected">❌ Отклонен</span>`;
 
             const appsStr = Array.isArray(ord.app_names) ? ord.app_names.join(", ") : "Приложения";
             
             let actionBtn = "";
-            if (["access_granted", "check_expired", "under_review", "buyer_confirmed", "completed"].includes(ord.status) && ord.link_token) {
+            if (ord.status === "approved" && ord.link_token) {
                 const link = `${CLIENT_SITE_URL}/?${ord.link_token}`;
-                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="window.location.href='${link}'">Открыть ссылку / Установить</button>`;
+                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="window.location.href='${link}'">Получить ссылку / Установить</button>`;
             }
 
             html += `
@@ -1899,16 +1796,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         const checkRes = await sbFetch(`orders?id=eq.${activeOrderId}&select=*`);
         if (Array.isArray(checkRes) && checkRes.length > 0) {
             const activeOrder = checkRes[0];
-            if (["pending", "payment_review", "approved"].includes(activeOrder.status)) {
+            if (activeOrder.status === "pending") {
                 const waitOrderEl = document.getElementById("waitOrderNum");
                 if (waitOrderEl) waitOrderEl.textContent = activeOrder.order_number || "";
                 switchScreen("orderWaitApp", false);
                 startOrderStatusPolling(activeOrder.id);
                 return;
-            } else if (["access_granted", "check_expired", "under_review", "buyer_confirmed", "completed"].includes(activeOrder.status)) {
-                renderAccessCheck(activeOrder);
+            } else if (activeOrder.status === "approved" && activeOrder.link_token) {
+                activeApprovedLink = `${CLIENT_SITE_URL}/?${activeOrder.link_token}`;
+                const linkEl = document.getElementById("approvedLinkText");
+                if (linkEl) linkEl.textContent = activeApprovedLink;
+                try {
+                    localStorage.removeItem("apprestore_active_order_id");
+                    localStorage.removeItem("apprestore_active_order_num");
+                } catch (e) {}
                 switchScreen("orderApprovedApp", false);
-                if (!(["buyer_confirmed", "completed", "under_review"].includes(activeOrder.status))) startOrderStatusPolling(activeOrder.id);
                 return;
             } else if (activeOrder.status === "rejected") {
                 switchScreen("orderRejectedApp", false);
