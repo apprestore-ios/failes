@@ -24,12 +24,23 @@
             --radius-item: 16px;
         }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; background: #070a0f; }
+        
+        /* Убираем прокрутку всей страницы целиком */
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100dvh; 
+            overflow: hidden; 
+            background: #070a0f; 
+        }
         body { 
             color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
             user-select: none; -webkit-user-select: none;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             background: transparent !important;
+            position: fixed;
+            inset: 0;
         }
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -1;
@@ -37,12 +48,29 @@
             background-image: linear-gradient(135deg, rgba(7,10,15,0.6) 0%, rgba(17,24,39,0.8) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
-        .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 24px 16px; animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-        .view.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        /* Экраны зафиксированы по высоте экрана */
+        .view { 
+            position: absolute; 
+            top: 0;
+            left: 0;
+            z-index: 2; 
+            display: none; 
+            width: 100%; 
+            max-width: 430px; 
+            height: 100dvh; 
+            padding: 16px; 
+            box-sizing: border-box;
+            overflow: hidden;
+            justify-content: center; 
+            align-items: center;
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .view.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         
-        h2.page-title { text-align: center; font-size: 24px; font-weight: 750; margin: 0 0 20px 0; letter-spacing: -0.5px; text-shadow: 0 4px 16px rgba(0,0,0,0.6); width: 100%; }
-        h3.section-title { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 14px 0; letter-spacing: -0.3px; width: 100%; }
+        h2.page-title { text-align: center; font-size: 24px; font-weight: 750; margin: 0 0 16px 0; letter-spacing: -0.5px; text-shadow: 0 4px 16px rgba(0,0,0,0.6); width: 100%; flex-shrink: 0; }
+        h3.section-title { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; letter-spacing: -0.3px; width: 100%; flex-shrink: 0; }
 
         /* Главное меню в виде премиальной сетки иконок */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
@@ -71,17 +99,37 @@
         .menu-card-title { font-size: 14.5px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.2px; color: var(--text); }
         .menu-card-subtitle { font-size: 11px; color: var(--muted); font-weight: 500; line-height: 1.3; }
 
-        /* Карточки разделов */
-        .card { background: var(--card-bg); border-radius: var(--radius-card); padding: 20px 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+        /* Карточки разделов подстроены под экран с внутренним скроллом */
+        .card { 
+            background: var(--card-bg); 
+            border-radius: var(--radius-card); 
+            padding: 16px; 
+            margin-bottom: 0; 
+            border: 1px solid rgba(255,255,255,0.12); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45); 
+            width: 100%; 
+            max-height: calc(100dvh - 32px);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px); 
+        }
         .card:last-child { margin-bottom: 0; }
-        .card h4 { margin: 0 0 12px 0; font-size: 15px; color: var(--text); font-weight: 650; text-align: center; }
+        .card h4 { margin: 0 0 10px 0; font-size: 15px; color: var(--text); font-weight: 650; text-align: center; flex-shrink: 0; }
 
-        .admin-scroll-list { width: 100%; max-height: 44dvh; overflow-y: auto; padding-right: 2px; }
+        /* Скроллится исключительно сам список внутри карточки, кнопки остаются на местах */
+        .admin-scroll-list { 
+            width: 100%; 
+            flex: 1;
+            overflow-y: auto; 
+            padding-right: 2px;
+            -webkit-overflow-scrolling: touch;
+        }
         .admin-scroll-list::-webkit-scrollbar { width: 4px; }
         .admin-scroll-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
         /* Элементы приложений в списках */
-        .app-item { display: flex; align-items: center; padding: 12px 14px; margin-bottom: 8px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; cursor: pointer; }
+        .app-item { display: flex; align-items: center; padding: 12px 14px; margin-bottom: 8px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; cursor: pointer; flex-shrink: 0; }
         .app-item:last-child { margin-bottom: 0; }
         .app-item:active { background: rgba(255, 255, 255, 0.12); transform: scale(0.99); }
         .app-item.app-unavailable { position: relative; cursor: not-allowed; border: 1.5px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.04); }
@@ -109,7 +157,7 @@
         .btn-delete-promo:active { transform: scale(0.95); }
 
         /* Карточки заказов */
-        .order-card { padding: 14px; margin-bottom: 10px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
+        .order-card { padding: 14px; margin-bottom: 10px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
         .order-card:last-child { margin-bottom: 0; }
         .order-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .order-num { font-size: 16px; font-weight: 750; color: #fff; letter-spacing: -0.2px; }
@@ -131,8 +179,8 @@
         .order-btn.delete { grid-column: span 2; background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 650; padding: 9px; box-shadow: none; }
 
         /* Временные капсулы (TTL & Filter Pills) */
-        .ttl-selector-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 10px; font-weight: 650; }
-        .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; width: 100%; }
+        .ttl-selector-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 650; flex-shrink: 0; }
+        .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; width: 100%; flex-shrink: 0; }
         .ttl-pill {
             padding: 10px 6px; border-radius: 14px; background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
@@ -145,7 +193,7 @@
         }
 
         /* Кнопки главного типа */
-        .btn { background: var(--accent); color: #fff; border: none; padding: 15px 18px; border-radius: var(--radius-btn); font-size: 15.5px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 24px rgba(59,130,246,0.3); display: flex; align-items: center; justify-content: center; text-decoration: none; letter-spacing: -0.2px; }
+        .btn { background: var(--accent); color: #fff; border: none; padding: 14px 18px; border-radius: var(--radius-btn); font-size: 15px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 24px rgba(59,130,246,0.3); display: flex; align-items: center; justify-content: center; text-decoration: none; letter-spacing: -0.2px; flex-shrink: 0; }
         .btn:active { transform: scale(0.97); }
         .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); box-shadow: none; }
         .btn-gen { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.35); box-shadow: none; }
@@ -153,7 +201,7 @@
         .btn-promo-gen { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: none; }
 
         /* Поля ввода */
-        .text-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.45); color: #fff; margin-bottom: 12px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; transition: 0.2s; font-weight: 500; }
+        .text-input { width: 100%; padding: 13px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.45); color: #fff; margin-bottom: 10px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; transition: 0.2s; font-weight: 500; flex-shrink: 0; }
         .text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
         /* Переключатели и чекбоксы */
@@ -219,7 +267,7 @@
             </div>
         </div>
 
-        <!-- Отдельная кнопка настроек снизу сетки для баланса -->
+        <!-- Кнопка настроек снизу сетки -->
         <div style="width: 100%; margin-top: 14px;">
             <div class="menu-card-item" style="flex-direction: row; padding: 14px 18px; justify-content: flex-start; text-align: left;" onclick="openView('view-settings')">
                 <div class="menu-card-icon" style="width: 42px; height: 42px; font-size: 20px; margin-bottom: 0; margin-right: 14px; background: rgba(249, 115, 22, 0.15);">⚙️</div>
@@ -235,15 +283,15 @@
     <!-- Управление заказами -->
     <div id="view-orders" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 12px;">История заказов</h3>
-            <div class="ttl-pills" style="margin-bottom: 12px;">
+            <h3 class="section-title">История заказов</h3>
+            <div class="ttl-pills">
                 <div class="ttl-pill active" onclick="setOrderFilter('all', this)">Все</div>
                 <div class="ttl-pill" onclick="setOrderFilter('pending', this)">Ожидают</div>
                 <div class="ttl-pill" onclick="setOrderFilter('approved', this)">Оплачены</div>
                 <div class="ttl-pill" onclick="setOrderFilter('rejected', this)">Отклонены</div>
             </div>
-            <button class="btn" style="margin-bottom: 12px; padding: 11px; font-size: 13.5px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
-            <div id="orders-container" class="admin-scroll-list" style="max-height: 60dvh;">
+            <button class="btn" style="margin-bottom: 10px; padding: 11px; font-size: 13.5px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
+            <div id="orders-container" class="admin-scroll-list">
                 <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
             </div>
         </div>
@@ -252,28 +300,27 @@
     <!-- Управление промокодами -->
     <div id="view-create-promo-code" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 10px;">Создать промокод</h3>
-            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -4px; margin-bottom: 14px; line-height: 1.4; font-weight: 500;">
+            <h3 class="section-title">Создать промокод</h3>
+            <p style="font-size: 12px; color: var(--muted); text-align: center; margin-top: -2px; margin-bottom: 10px; line-height: 1.35; font-weight: 500; flex-shrink: 0;">
                 Промокод дает скидку на всю сумму заказа и сгорает при использовании.
             </p>
-            <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="text-input" style="margin-bottom:12px; font-weight: 650;" placeholder="Скидка в рублях (например, 100)">
-            
-            <button class="btn btn-promo-gen" id="btn-generate-promo-code" style="margin-bottom: 18px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onclick="createPromoCode()">🎁 Сгенерировать</button>
+            <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="text-input" placeholder="Скидка в рублях (например, 100)">
+            <button class="btn btn-promo-gen" id="btn-generate-promo-code" style="margin-bottom: 14px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onclick="createPromoCode()">🎁 Сгенерировать</button>
 
-            <h3 class="section-title" style="margin-bottom: 12px; font-size: 16px;">Список промокодов</h3>
-            <div id="promo-codes-container" class="admin-scroll-list" style="max-height: 33dvh;">
+            <h3 class="section-title" style="font-size: 15px; margin-bottom: 8px;">Список промокодов</h3>
+            <div id="promo-codes-container" class="admin-scroll-list">
                 <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
             </div>
         </div>
     </div>
 
     <div id="view-promo-code-result" class="view">
-        <div class="card" style="text-align:center; padding: 32px 20px;">
-            <div style="font-size: 50px; margin-bottom: 12px;">🎁</div>
+        <div class="card" style="text-align:center; padding: 28px 16px; justify-content: center;">
+            <div style="font-size: 45px; margin-bottom: 10px;">🎁</div>
             <h2 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 750;">Промокод создан!</h2>
-            <p id="result-promo-code-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 18px; line-height: 1.4; font-weight: 500;"></p>
-            <input type="text" id="generated-promo-code-input" class="text-input" readonly style="color: #4ade80; font-weight: 750; font-size: 19px; margin-bottom: 12px; text-transform: uppercase;" onclick="copyPromoCode()">
-            <button class="btn" id="btn-forward-promo" style="background: linear-gradient(135deg, #059669, #047857); margin-bottom: 10px;">📤 Переслать покупателю</button>
+            <p id="result-promo-code-desc" style="color:var(--muted); font-size:13px; margin-bottom: 16px; line-height: 1.4; font-weight: 500;"></p>
+            <input type="text" id="generated-promo-code-input" class="text-input" readonly style="color: #4ade80; font-weight: 750; font-size: 18px; margin-bottom: 10px; text-transform: uppercase;" onclick="copyPromoCode()">
+            <button class="btn" id="btn-forward-promo" style="background: linear-gradient(135deg, #059669, #047857); margin-bottom: 8px;">📤 Переслать покупателю</button>
             <button class="btn btn-secondary" style="background: rgba(255,255,255,0.08); box-shadow: none;" onclick="openView('view-create-promo-code')">Вернуться к списку</button>
         </div>
     </div>
@@ -281,7 +328,7 @@
     <!-- Создание разовой ссылки -->
     <div id="view-create-link" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 10px;">Создание разовой ссылки</h3>
+            <h3 class="section-title">Создание разовой ссылки</h3>
             <div class="ttl-selector-label">Время работы после открытия клиентом:</div>
             <div class="ttl-pills">
                 <div class="ttl-pill active" onclick="selectTtl(5, this)">5 мин</div>
@@ -289,19 +336,19 @@
                 <div class="ttl-pill" onclick="selectTtl(15, this)">15 мин</div>
                 <div class="ttl-pill" onclick="selectTtl(30, this)">30 мин</div>
             </div>
-            <input type="search" id="create-link-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
-            <button class="btn btn-gen" id="btn-generate-main" style="margin-bottom: 12px;" onclick="createLink()">🔗 Сгенерировать ссылку (0)</button>
+            <input type="search" id="create-link-search" class="text-input" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
+            <button class="btn btn-gen" id="btn-generate-main" style="margin-bottom: 10px;" onclick="createLink()">🔗 Сгенерировать ссылку (0)</button>
             <div id="list-create-link" class="admin-scroll-list"></div>
         </div>
     </div>
 
     <div id="view-link-result" class="view">
-        <div class="card" style="text-align:center; padding: 32px 20px;">
-            <div style="font-size: 50px; margin-bottom: 12px;">✅</div>
+        <div class="card" style="text-align:center; padding: 28px 16px; justify-content: center;">
+            <div style="font-size: 45px; margin-bottom: 10px;">✅</div>
             <h2 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 750;">Ссылка создана!</h2>
-            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4; font-weight: 500;">Действует 5 мин. с момента открытия на одном устройстве.</p>
-            <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
-            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 650; margin-bottom: 12px;" onclick="copyLink()">
+            <p id="result-ttl-desc" style="color:var(--muted); font-size:13px; margin-bottom: 14px; line-height: 1.4; font-weight: 500;">Действует 5 мин. с момента открытия на одном устройстве.</p>
+            <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 140px; overflow-y: auto; text-align: left; padding: 4px; flex-shrink: 0;"></div>
+            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 650; margin-bottom: 10px;" onclick="copyLink()">
             <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📤 Переслать покупателю</button>
         </div>
     </div>
@@ -309,20 +356,20 @@
     <!-- Массовая акция -->
     <div id="view-promo" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 10px;">Массовая акция</h3>
-            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -4px; margin-bottom: 14px; line-height: 1.4; font-weight: 500;">
+            <h3 class="section-title">Массовая акция</h3>
+            <p style="font-size: 12px; color: var(--muted); text-align: center; margin-top: -2px; margin-bottom: 10px; line-height: 1.35; font-weight: 500; flex-shrink: 0;">
                 Выберите приложения, укажите сумму скидки и примените её. Для возврата нажмите «Вернуть базовые цены».
             </p>
             
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                 <input type="search" id="promo-search" class="text-input" style="text-align:left; margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
-                 <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.08); font-size:13.5px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-shrink: 0;">
+                 <input type="search" id="promo-search" class="text-input" style="margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
+                 <button class="btn" style="width:auto; padding: 0 14px; background: rgba(255,255,255,0.08); font-size:13px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
             </div>
             
-            <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="margin-bottom:12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 650;" placeholder="Скидка в рублях (например, 50)">
+            <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 650;" placeholder="Скидка в рублях (например, 50)">
             
-            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 10px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.35);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
-            <button class="btn btn-danger" id="btn-reset-promo" style="margin-bottom: 12px;" onclick="resetPromo()">🔄 Вернуть базовые цены (0)</button>
+            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 8px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.35);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
+            <button class="btn btn-danger" id="btn-reset-promo" style="margin-bottom: 10px;" onclick="resetPromo()">🔄 Вернуть базовые цены (0)</button>
             <div id="list-promo" class="admin-scroll-list"></div>
         </div>
     </div>
@@ -330,17 +377,17 @@
     <!-- Управление ценами -->
     <div id="view-prices" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 12px;">Цены на приложения</h3>
-            <input type="search" id="prices-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderPricesList()">
+            <h3 class="section-title">Цены на приложения</h3>
+            <input type="search" id="prices-search" class="text-input" placeholder="Поиск приложения..." oninput="renderPricesList()">
             <div id="list-prices" class="admin-scroll-list"></div>
         </div>
     </div>
 
     <div id="view-price-detail" class="view">
-        <div class="card" style="text-align:center; padding-top: 24px;">
+        <div class="card" style="text-align:center; padding-top: 24px; justify-content: center;">
             <img id="detail-price-icon" src="" style="width: 76px; height: 76px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
-            <h3 id="detail-price-name" style="margin: 0 0 18px 0; font-size: 20px; font-weight: 750;"></h3>
-            <h4 style="margin-bottom: 10px;">Стоимость установки (₽)</h4>
+            <h3 id="detail-price-name" style="margin: 0 0 16px 0; font-size: 20px; font-weight: 750;"></h3>
+            <h4 style="margin-bottom: 8px;">Стоимость установки (₽)</h4>
             <input type="tel" inputmode="numeric" id="detail-price-input" class="text-input" placeholder="Введите цену" style="font-weight: 700; font-size: 18px;">
             <button class="btn" id="btn-save-price" style="margin-top: 6px;">Сохранить цену</button>
         </div>
@@ -349,29 +396,29 @@
     <!-- Видимость приложений -->
     <div id="view-visibility" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 12px;">Видимость в каталоге</h3>
-            <input type="search" id="vis-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderVisibilityList()">
+            <h3 class="section-title">Видимость в каталоге</h3>
+            <input type="search" id="vis-search" class="text-input" placeholder="Поиск приложения..." oninput="renderVisibilityList()">
             <div id="list-visibility" class="admin-scroll-list"></div>
         </div>
     </div>
 
     <!-- Настройки системы -->
     <div id="view-settings" class="view">
-        <div class="card">
-            <h3 class="section-title" style="margin-bottom: 16px;">Глобальные параметры</h3>
-            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div class="card" style="justify-content: center;">
+            <h3 class="section-title" style="margin-bottom: 14px;">Глобальные параметры</h3>
+            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <span>Статус сайта</span>
                 <span id="site-status-indicator" style="font-size:12px; font-weight:700; padding:5px 10px; border-radius:10px; background:rgba(0,0,0,0.4);"></span>
             </h4>
             <button class="btn" id="btn-toggle-site"></button>
 
-            <div style="height:1px; background:rgba(255,255,255,0.1); margin:20px 0;"></div>
+            <div style="height:1px; background:rgba(255,255,255,0.1); margin:18px 0;"></div>
 
-            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                 <span>Скидка от 3 приложений</span>
                 <span id="bulk-discount-status-indicator" style="font-size:12px; font-weight:700; padding:5px 10px; border-radius:10px; background:rgba(0,0,0,0.4);"></span>
             </h4>
-            <p style="font-size:12.5px; line-height:1.45; color:var(--muted); text-align:center; margin:0 0 14px; font-weight: 500;">
+            <p style="font-size:12px; line-height:1.4; color:var(--muted); text-align:center; margin:0 0 12px; font-weight: 500;">
                 Скидка 40 ₽ за каждое приложение при покупке от 3 приложений. Промокоды продолжают работать независимо от этой настройки.
             </p>
             <button class="btn" id="btn-toggle-bulk-discount"></button>
