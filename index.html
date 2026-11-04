@@ -102,7 +102,7 @@
           opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
-      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #appleStep1App, #appleStep2App, #credentialsInputApp, #codeInputApp, #verificationTimerApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp, #tokenApp { justify-content: center; align-items: center; text-align: center; }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
       .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -212,9 +212,27 @@
       .menu-item:active { transform: scale(0.98); }
       .menu-item-left { display: flex; align-items: center; gap: 12px; }
       .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }
-      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); width: 100%; margin-bottom: 12px; }
-      .step-title { font-size: 16px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; }
-      .step-content { font-size: 14px; color: var(--text); line-height: 1.5; }
+      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+      .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
+      .step-text b { color: #60a5fa; }
+      #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box, #myOrdersApp .auth-box {
+          padding: 18px 18px 16px; gap: 10px;
+          max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 80px);
+      }
+      .legal-scroll-area, .info-scroll-area {
+          display: flex; flex-direction: column; gap: 10px; max-height: calc(100dvh - 295px); overflow-y: auto;
+          padding-right: 10px; margin-right: -10px; text-align: left; width: calc(100% + 10px);
+          overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+      }
+      .legal-scroll-area::-webkit-scrollbar, .info-scroll-area::-webkit-scrollbar { width: 4px; }
+      .legal-scroll-area::-webkit-scrollbar-thumb, .info-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .info-scroll-area .step-card { margin-bottom: 0; }
+      .legal-section-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); flex-shrink: 0; }
+      .legal-section-title { font-size: 14.5px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; line-height: 1.35; }
+      .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; }
+      .legal-text:last-child { margin-bottom: 0; }
+      .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
       .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
@@ -462,106 +480,13 @@
     </div>
 </div>
 
-<!-- ПОШАГОВАЯ ИНСТРУКЦИЯ (ЧЕРЕЗ НАСТРОЙКИ -> СВОЕ ИМЯ -> КОНТЕНТ И ПОКУПКИ) -->
-<div class="container" id="appleStep1App">
-    <div class="auth-box" style="padding: 24px 18px;">
-        <div class="auth-title" style="font-size: 19px;">Шаг 1 из 2</div>
-        <div class="step-card">
-            <div class="step-title">Откройте Настройки</div>
-            <div class="step-content">Зайдите в приложение <b>«Настройки»</b> на вашем iPhone и нажмите на <b>ваше имя (профиль Apple ID / Apple Account)</b> в самом верху.</div>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="switchScreen('appleStep2App')" style="margin-top: 6px;">Далее</button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">Поддержка</a>
-    </div>
-</div>
-
-<div class="container" id="appleStep2App">
-    <div class="auth-box" style="padding: 24px 18px;">
-        <div class="auth-title" style="font-size: 19px;">Шаг 2 из 2</div>
-        <div class="step-card">
-            <div class="step-title">Контент и покупки</div>
-            <div class="step-content">Нажмите на пункт <b>«Контент и покупки»</b>, затем выберите <b>«Выйти»</b>. Ваш основной iCloud останется на месте!</div>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="requestCredentials()" style="margin-top: 6px;">📩 Запросить данные</button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">Поддержка</a>
-    </div>
-</div>
-
-<!-- ОТОБРАЖЕНИЕ ДАННЫХ (ЛОГИН И ПАРОЛЬ) -->
-<div class="container" id="credentialsInputApp">
-    <div class="auth-box" style="padding: 26px 20px;">
-        <div class="auth-title" style="font-size: 20px;">Данные для входа</div>
-        <div class="auth-description" style="text-align: center;">
-            Администратор отправил данные. Скопируйте их и войдите в App Store:
-        </div>
-        <div class="requisites-card" style="padding: 14px; text-align: left;">
-            <div class="req-row">
-                <span class="req-label">Логин (Apple ID):</span>
-                <div class="req-value-wrap">
-                    <span class="req-value" id="displayAppLogin" style="color: #60a5fa; user-select: text;">⏳ Ожидание отправки из бота...</span>
-                    <button type="button" class="req-copy-btn" id="copyLoginBtn" onclick="copyRequisite(document.getElementById('displayAppLogin').textContent, 'copyLoginBtn')">Копировать</button>
-                </div>
-            </div>
-            <div class="req-row" style="margin-top: 8px;">
-                <span class="req-label">Пароль:</span>
-                <div class="req-value-wrap">
-                    <span class="req-value" id="displayAppPass" style="color: #60a5fa; user-select: text;">⏳ Ожидание отправки из бота...</span>
-                    <button type="button" class="req-copy-btn" id="copyPassBtn" onclick="copyRequisite(document.getElementById('displayAppPass').textContent, 'copyPassBtn')">Копировать</button>
-                </div>
-            </div>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="requestVerificationCode()" style="margin-top: 4px;">
-            🔑 Запросить код
-        </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">Поддержка</a>
-    </div>
-</div>
-
-<!-- ОТОБРАЖЕНИЕ И ОЖИДАНИЕ КОДА -->
-<div class="container" id="codeInputApp">
-    <div class="auth-box" style="padding: 26px 20px;">
-        <div class="auth-title" style="font-size: 20px;">Код подтверждения</div>
-        <div class="auth-description" style="text-align: center;">
-            Запрос на код отправлен. Как только вы отправите код из бота, он появится здесь:
-        </div>
-        <div class="requisites-card" style="padding: 14px; text-align: center;">
-            <span class="req-label">Двухфакторный код:</span>
-            <span class="req-value" id="displayVerificationCode" style="color: #4ade80; font-size: 24px; letter-spacing: 4px; user-select: text; display: block; margin-top: 8px;">⏳ Ожидание кода...</span>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="startVerificationTimer()" style="margin-top: 4px;">
-            ✨ Проверить работу
-        </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">Поддержка</a>
-    </div>
-</div>
-
-<!-- ТАЙМЕР ПРОВЕРКИ (1 МИНУТА) -->
-<div class="container" id="verificationTimerApp">
-    <div class="auth-box" style="padding: 26px 20px;">
-        <div class="auth-title" style="font-size: 20px; color: #4ade80;">Проверка работы</div>
-        <div class="auth-description" style="text-align: center;">
-            У вас есть 1 минута на проверку и скачивание приложений из купленного аккаунта:
-        </div>
-        <div class="info-box" id="checkTimerBox" style="margin: 10px 0;">
-            <div class="info-box-num" id="checkCountdownDisplay" style="font-size: 32px; color: #3b82f6;">01:00</div>
-            <div class="info-box-label">времени на проверку</div>
-        </div>
-        <button type="button" class="btn btn-success" onclick="finishCheckSuccess()" style="margin-top: 4px; font-size: 15px;">
-            ✅ Все работает
-        </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
-            <span class="sf-icon">&#xF9E8;</span> Поддержка
-        </a>
-    </div>
-</div>
-
 <div class="container" id="orderWaitApp">
     <div class="auth-box" style="padding: 26px 20px;">
         <div class="wait-spinner"></div>
         <div class="auth-title" style="font-size: 20px;">Проверка оплаты</div>
         <div class="auth-description" style="text-align: center;">
             Заказ <b id="waitOrderNum" style="color: var(--text);">#00000</b> отправлен на проверку администратору.<br><br>
-            Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится пошаговая инструкция.
+            Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится ваша персональная ссылка для установки.
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -571,11 +496,17 @@
 
 <div class="container" id="orderApprovedApp">
     <div class="auth-box" style="padding: 26px 20px;">
-        <div class="auth-title" style="color: #4ade80; font-size: 22px;">Заказ успешно завершен!</div>
+        <div class="auth-title" style="color: #4ade80; font-size: 22px;">Оплата подтверждена!</div>
         <div class="auth-description" style="text-align: center;">
-            Спасибо за покупку! Приложения успешно установлены. Не забудьте выйти из нашего сервисного аккаунта в App Store и вернуться в свой личный iCloud.
+            Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
         </div>
-        <button type="button" class="btn btn-primary" onclick="openCatalog()" style="margin-top: 10px;">
+        <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
+            <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
+            🚀 Начать установку
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 2px;">
             Вернуться в каталог
         </button>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
@@ -599,7 +530,7 @@
     </div>
 </div>
 
-<!-- Экран «Мои заказы» с кнопкой получения ссылки / возврата к активному этапу -->
+<!-- Экран «Мои заказы» -->
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
@@ -616,7 +547,6 @@
     </div>
 </div>
 
-<!-- Экран ссылки (если клиент зашел по токену) -->
 <div class="container" id="tokenApp">
     <div class="hero-section">
         <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
@@ -656,9 +586,10 @@
     <div class="auth-box">
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
         <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
-            <div class="step-card"><div class="step-title">Шаг 1</div><div class="step-content">Выберите нужные приложения в каталоге и откройте корзину.</div></div>
-            <div class="step-card"><div class="step-title">Шаг 2</div><div class="step-content">Оплатите заказ по реквизитам и нажмите «Я оплатил».</div></div>
-            <div class="step-card"><div class="step-title">Шаг 3</div><div class="step-content">Следуйте пошаговой инструкции на экране для входа в аккаунт.</div></div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
+            <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
         </div>
         <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
     </div>
@@ -668,7 +599,13 @@
     <div class="auth-box">
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Полезные советы</div>
         <div class="info-scroll-area">
-            <div class="step-card"><div class="step-title">Отключение сгружения</div><div class="step-content">«Настройки» ➝ «App Store» ➝ выключите «Сгружать неиспользуемые».</div></div>
+            <div class="auth-description" style="text-align: center; font-weight: 600;">1. Отключите сгружение:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
+            <div class="auth-description" style="margin-top: 6px; text-align: center; font-weight: 600;">2. Защита от удаления:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div>
         </div>
         <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button>
     </div>
@@ -677,6 +614,7 @@
 <div class="container" id="policyApp">
     <div class="auth-box">
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Политика использования AppRestore IOS</div>
+        <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 29 октября 2026 года</div>
         <div class="legal-scroll-area" id="policyContent">
             <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
         </div>
@@ -687,6 +625,7 @@
 <div class="container" id="offerApp">
     <div class="auth-box">
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Публичная оферта AppRestore IOS</div>
+        <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 29 октября 2026 года</div>
         <div class="legal-scroll-area" id="offerContent">
             <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
         </div>
@@ -798,13 +737,15 @@ let isFromToken = false;
 let isTokenExpired = false;
 let previousScreen = "welcomeApp";
 let currentScreenId = "welcomeApp";
+let tokenCountdownInterval = null;
 let cartItems = new Set();
 let currentOrderNumber = null;
 let currentPromoCode = null;
 let currentPromoDiscount = 0;
 let isCartListVisible = false;
 let activeOrderId = null;
-let checkTimerInterval = null;
+let activeApprovedLink = "";
+let orderPollingInterval = null;
 let myLocalOrders = [];
 
 try {
@@ -988,6 +929,140 @@ function getCartFinalTotal() {
     cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
     let finalTotal = total - getCartBulkDiscount() - currentPromoDiscount;
     return finalTotal < 0 ? 0 : finalTotal;
+}
+
+function extractTokenFromLocation() {
+    const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
+    if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get("token");
+    if (qToken) return qToken.trim();
+    const path = window.location.pathname.replace(/\/+$/, "");
+    const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
+    if (installMatch) return installMatch[1];
+    const directNumMatch = path.match(/^\/(\d{6,16})$/);
+    if (directNumMatch) return directNumMatch[1];
+    return null;
+}
+
+function estimateIPhoneModel() {
+    const width = Math.min(window.screen.width, window.screen.height);
+    const height = Math.max(window.screen.width, window.screen.height);
+    const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
+    const resolution = `${Math.round(width)}x${Math.round(height)}`;
+    const modelByScreenAndDpr = {
+        "375x667@2": "iPhone 6 / 7 / 8 / SE (2-го или 3-го поколения)",
+        "375x812@3": "iPhone X / XS / 11 Pro",
+        "390x844@3": "iPhone 12 / 13 / 14",
+        "393x852@3": "iPhone 15 / 16 / 16e",
+        "402x874@3": "iPhone 16 Pro / 17 Pro",
+        "414x896@2": "iPhone XR / 11",
+        "414x896@3": "iPhone XS Max / 11 Pro Max",
+        "428x926@3": "iPhone 12 Pro Max / 13 Pro Max / 14 Plus",
+        "430x932@3": "iPhone 14 Pro Max / 15 Plus / 15 Pro Max",
+        "440x956@3": "iPhone 16 Plus / 16 Pro Max / 17 Pro Max"
+    };
+    let model = modelByScreenAndDpr[`${resolution}@${Math.round(dpr)}`];
+    if (!model) {
+        if (width >= 440) model = "iPhone большого размера (Plus / Pro Max)";
+        else if (width >= 420) model = "iPhone Pro Max / Plus";
+        else if (width >= 400) model = "iPhone крупного размера";
+        else if (width >= 390) model = "iPhone стандартного размера";
+        else if (width >= 375) model = "iPhone компактного размера";
+        else model = "iPhone (модель не определена)";
+    }
+    if (dpr < 1.5 || dpr > 4) return "iPhone (модель не определена)";
+    return model;
+}
+
+function notifyActivationOnce(token, appKeys) {
+    if (!token) return;
+    const notificationKey = `apprestore_activation_notified_${token}`;
+    try {
+        if (localStorage.getItem(notificationKey) === "1") return;
+        localStorage.setItem(notificationKey, "1");
+    } catch (e) {}
+    const deviceModel = estimateIPhoneModel();
+    fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: "notify_activation",
+            token: token,
+            app_keys: appKeys,
+            device_name: deviceModel,
+            device_model: deviceModel
+        })
+    }).catch(() => {});
+}
+
+function updateTokenHeroText(ttlMinutes) {
+    const descEl = document.getElementById("tokenHeroDesc");
+    if (!descEl) return;
+    const m = Number(ttlMinutes) || 15;
+    const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
+    descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
+}
+
+function renderTokenAppsList(appKeys) {
+    const container = document.getElementById("singleTokenAppContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    appKeys.forEach(key => {
+        const cleanKey = key.trim();
+        const app = appsData.find(a => a.key === cleanKey);
+        if (app) {
+            let mainName = app.name, subName = "";
+            let bracketIdx = app.name.indexOf(" (");
+            if (bracketIdx !== -1 && app.name.endsWith(")")) {
+                mainName = app.name.substring(0, bracketIdx);
+                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+            }
+            container.innerHTML += `
+            <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
+                    <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; container-type: inline-size;">
+                        <div class="app-grid-name">${mainName}</div>
+                        ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                        <div class="app-grid-version">${app.ios}</div>
+                    </div>
+                </div>
+                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
+            </div>`;
+        }
+    });
+}
+
+function startTokenCountdown(expiresAtTimestamp) {
+    const display = document.getElementById("tokenCountdownDisplay");
+    const box = document.getElementById("tokenTimerBox");
+    if (!display) return;
+    if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
+
+    function updateTimer() {
+        const diff = Math.max(0, expiresAtTimestamp - Date.now());
+        const totalSecs = Math.ceil(diff / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+        if (totalSecs <= 60 && totalSecs > 0) {
+            display.style.color = "#f87171";
+            if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
+        } else {
+            display.style.color = "#3b82f6";
+            if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
+        }
+        if (diff <= 0) {
+            clearInterval(tokenCountdownInterval);
+            isTokenExpired = true;
+            display.textContent = "ИСТЕКЛО";
+            display.style.color = "#ef4444";
+            switchScreen("tokenErrorApp");
+        }
+    }
+    updateTimer();
+    tokenCountdownInterval = setInterval(updateTimer, 1000);
 }
 
 function generateAppsGrid() {
@@ -1366,8 +1441,11 @@ async function confirmOrderPaid() {
                 })
             }).catch(() => {});
 
-            // Переходим к первому шагу инструкции
-            switchScreen("appleStep1App");
+            const waitOrderEl = document.getElementById("waitOrderNum");
+            if (waitOrderEl) waitOrderEl.textContent = currentOrderNumber;
+
+            switchScreen("orderWaitApp");
+            startOrderStatusPolling(orderRow.id);
         }
     } catch (e) {} finally {
         if (btn) {
@@ -1377,115 +1455,55 @@ async function confirmOrderPaid() {
     }
 }
 
-// Запрос данных (логин/пароль) из шага 2
-async function requestCredentials() {
-    if (!activeOrderId) return;
-    try {
-        await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "notify_login_request",
-                order_id: activeOrderId,
-                order_number: currentOrderNumber
-            })
-        }).catch(() => {});
-    } catch (e) {}
-    switchScreen("credentialsInputApp");
-    startCredentialsPolling(activeOrderId);
-}
+function startOrderStatusPolling(orderId) {
+    if (!orderId) return;
+    if (orderPollingInterval) clearInterval(orderPollingInterval);
 
-// Запрос двухфакторного кода
-async function requestVerificationCode() {
-    if (!activeOrderId) return;
-    try {
-        await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "notify_code_request",
-                order_id: activeOrderId,
-                order_number: currentOrderNumber
-            })
-        }).catch(() => {});
-    } catch (e) {}
-    switchScreen("codeInputApp");
-    startCodePolling(activeOrderId);
-}
-
-function startCredentialsPolling(orderId) {
-    const loginEl = document.getElementById("displayAppLogin");
-    const passEl = document.getElementById("displayAppPass");
-    const interval = setInterval(async () => {
+    async function checkStatus() {
         const res = await sbFetch(`orders?id=eq.${orderId}&select=*`);
-        if (Array.isArray(res) && res.length > 0) {
-            const ord = res[0];
-            if (ord.app_login && ord.app_password) {
-                if (loginEl) loginEl.textContent = ord.app_login;
-                if (passEl) passEl.textContent = ord.app_password;
-                clearInterval(interval);
-            }
+        if (!Array.isArray(res) || res.length === 0) return;
+        const order = res[0];
+
+        if (order.status === "approved" && order.link_token) {
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
+            activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
+            const linkEl = document.getElementById("approvedLinkText");
+            if (linkEl) linkEl.textContent = activeApprovedLink;
+
+            cartItems.clear();
+            currentOrderNumber = null;
+            currentPromoCode = null;
+            currentPromoDiscount = 0;
+            saveCart();
+            try {
+                localStorage.removeItem("apprestore_active_order_id");
+                localStorage.removeItem("apprestore_active_order_num");
+            } catch (e) {}
+            updateCartUI();
+
+            switchScreen("orderApprovedApp", false);
+        } else if (order.status === "rejected") {
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
+            switchScreen("orderRejectedApp", false);
         }
-    }, 2000);
-}
-
-function startCodePolling(orderId) {
-    const codeEl = document.getElementById("displayVerificationCode");
-    const interval = setInterval(async () => {
-        const res = await sbFetch(`orders?id=eq.${orderId}&select=*`);
-        if (Array.isArray(res) && res.length > 0) {
-            const ord = res[0];
-            if (ord.verification_code) {
-                if (codeEl) codeEl.textContent = ord.verification_code;
-                clearInterval(interval);
-            }
-        }
-    }, 2000);
-}
-
-function startVerificationTimer() {
-    switchScreen("verificationTimerApp");
-    const display = document.getElementById("checkCountdownDisplay");
-    let totalSecs = 60;
-    if (checkTimerInterval) clearInterval(checkTimerInterval);
-
-    checkTimerInterval = setInterval(() => {
-        totalSecs--;
-        const mins = Math.floor(totalSecs / 60);
-        const secs = totalSecs % 60;
-        if (display) display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
-        if (totalSecs <= 0) {
-            clearInterval(checkTimerInterval);
-        }
-    }, 1000);
-}
-
-async function finishCheckSuccess() {
-    if (checkTimerInterval) clearInterval(checkTimerInterval);
-    if (activeOrderId) {
-        await sbFetch(`orders?id=eq.${activeOrderId}`, {
-            method: "PATCH",
-            body: JSON.stringify({ status: "approved", updated_at: new Date().toISOString() })
-        }).catch(() => {});
     }
-    cartItems.clear();
-    currentOrderNumber = null;
-    currentPromoCode = null;
-    currentPromoDiscount = 0;
-    saveCart();
-    try {
-        localStorage.removeItem("apprestore_active_order_id");
-        localStorage.removeItem("apprestore_active_order_num");
-    } catch (e) {}
-    updateCartUI();
-    switchScreen("orderApprovedApp", false);
+
+    checkStatus();
+    orderPollingInterval = setInterval(checkStatus, 2000);
+}
+
+function startApprovedInstallation() {
+    if (!activeApprovedLink) return;
+    window.location.href = activeApprovedLink;
 }
 
 function backToPaymentFromRejected() {
     switchScreen("paymentApp", false);
 }
 
-// Функции для экрана «Мои заказы» с восстановлением активного этапа
+// Функции для экрана «Мои заказы»
 function showMyOrdersScreen() {
     document.getElementById("burgerMenuModal")?.classList.remove("active");
     renderMyOrdersList();
@@ -1510,14 +1528,15 @@ async function renderMyOrdersList() {
         if (Array.isArray(res) && res.length > 0) {
             const ord = res[0];
             let statusBadge = `<span class="my-order-status pending">⏳ Ожидает</span>`;
-            if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Завершен</span>`;
+            if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Оплачен</span>`;
             else if (ord.status === "rejected") statusBadge = `<span class="my-order-status rejected">❌ Отклонен</span>`;
 
             const appsStr = Array.isArray(ord.app_names) ? ord.app_names.join(", ") : "Приложения";
-
+            
             let actionBtn = "";
-            if (ord.status === "pending" && activeOrderId === ord.id) {
-                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="switchScreen('appleStep1App')">Продолжить оформление</button>`;
+            if (ord.status === "approved" && ord.link_token) {
+                const link = `${CLIENT_SITE_URL}/?${ord.link_token}`;
+                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="window.location.href='${link}'">Получить ссылку / Установить</button>`;
             }
 
             html += `
@@ -1548,7 +1567,7 @@ function switchScreen(id, pushHistory = true) {
     currentScreenId = id;
     sessionStorage.setItem("currentScreenId", currentScreenId);
 
-    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "appleStep1App", "appleStep2App", "credentialsInputApp", "codeInputApp", "verificationTimerApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
         document.body.style.overflow = "hidden";
         window.scrollTo(0, 0);
     } else {
@@ -1646,6 +1665,25 @@ function toggleBurgerMenu() {
     document.getElementById("burgerMenuModal")?.classList.toggle("active");
 }
 
+function installFromToken(key, appUrl) {
+    if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
+    const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
+    const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
+    const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+
+    const btn = document.getElementById("tokenBtn_" + key);
+    if (btn) {
+        const originalText = btn.textContent;
+        btn.classList.add("installed");
+        btn.innerHTML = "✓";
+        setTimeout(() => {
+            btn.classList.remove("installed");
+            btn.textContent = originalText;
+        }, 2000);
+    }
+    window.location.href = installUrl;
+}
+
 function setCategory(cat, btn) {
     currentCategory = cat;
     document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
@@ -1691,6 +1729,96 @@ document.addEventListener("DOMContentLoaded", async () => {
     generateAppsGrid();
     await fetchSiteDataFromSupabase(true);
 
+    const token = extractTokenFromLocation();
+    if (token) {
+        isFromToken = true;
+        const ua = navigator.userAgent || "";
+        if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) return;
+
+        const currentDevice = getOrCreateDeviceId();
+        let isValidToken = false, sessionTtlMinutes = 15, sessionExpiresAt = 0, sessionAppKeys = [];
+
+        try {
+            const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
+            if (Array.isArray(linkRes) && linkRes.length > 0) {
+                const row = linkRes[0];
+                const ttlMins = Number(row.ttl_minutes) || 15;
+                const ttlMs = ttlMins * 60 * 1000;
+                const now = Date.now();
+
+                if (row.device_id && row.device_id !== currentDevice) {
+                    isTokenExpired = true;
+                    switchScreen("tokenErrorApp");
+                    return;
+                }
+
+                let activatedAt = Number(row.activated_at) || 0;
+                if (!row.is_used || !activatedAt) {
+                    activatedAt = now;
+                    await sbFetch(`app_links?token=eq.${token}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ is_used: true, activated_at: activatedAt, device_id: currentDevice })
+                    });
+                }
+
+                const expiresAt = activatedAt + ttlMs;
+                if (now < expiresAt) {
+                    isValidToken = true;
+                    sessionTtlMinutes = ttlMins;
+                    sessionExpiresAt = expiresAt;
+                    sessionAppKeys = row.app_keys || [];
+                }
+            } else {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+        } catch (e) {
+            isTokenExpired = true;
+            switchScreen("tokenErrorApp");
+            return;
+        }
+
+        if (isValidToken && sessionAppKeys.length > 0) {
+            notifyActivationOnce(token, sessionAppKeys.map(appKey => (appsData.find(app => app.key === appKey) || {}).name || appKey));
+            updateTokenHeroText(sessionTtlMinutes);
+            renderTokenAppsList(sessionAppKeys);
+            startTokenCountdown(sessionExpiresAt);
+            switchScreen("tokenApp");
+            return;
+        }
+        isTokenExpired = true;
+        switchScreen("tokenErrorApp");
+        return;
+    }
+
+    if (activeOrderId) {
+        const checkRes = await sbFetch(`orders?id=eq.${activeOrderId}&select=*`);
+        if (Array.isArray(checkRes) && checkRes.length > 0) {
+            const activeOrder = checkRes[0];
+            if (activeOrder.status === "pending") {
+                const waitOrderEl = document.getElementById("waitOrderNum");
+                if (waitOrderEl) waitOrderEl.textContent = activeOrder.order_number || "";
+                switchScreen("orderWaitApp", false);
+                startOrderStatusPolling(activeOrder.id);
+                return;
+            } else if (activeOrder.status === "approved" && activeOrder.link_token) {
+                activeApprovedLink = `${CLIENT_SITE_URL}/?${activeOrder.link_token}`;
+                const linkEl = document.getElementById("approvedLinkText");
+                if (linkEl) linkEl.textContent = activeApprovedLink;
+                try {
+                    localStorage.removeItem("apprestore_active_order_id");
+                    localStorage.removeItem("apprestore_active_order_num");
+                } catch (e) {}
+                switchScreen("orderApprovedApp", false);
+                return;
+            } else if (activeOrder.status === "rejected") {
+                switchScreen("orderRejectedApp", false);
+                return;
+            }
+        }
+    }
+
     let lastScreen = sessionStorage.getItem("currentScreenId");
     let hasEntered = sessionStorage.getItem("site_access") === "true";
     if (hasEntered) {
@@ -1704,8 +1832,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             switchScreen("cartApp");
         } else if (lastScreen === "paymentApp" && cartItems.size > 0) {
             checkoutCart();
-        } else if (lastScreen && document.getElementById(lastScreen)) {
-            switchScreen(lastScreen);
         } else {
             switchScreen("mainApp");
         }
