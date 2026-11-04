@@ -331,6 +331,17 @@
                 <span id="site-status-indicator" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.4);"></span>
             </h4>
             <button class="btn" id="btn-toggle-site"></button>
+
+            <div style="height:1px; background:rgba(255,255,255,0.1); margin:18px 0;"></div>
+
+            <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span>Скидка от 3 приложений</span>
+                <span id="bulk-discount-status-indicator" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.4);"></span>
+            </h4>
+            <p style="font-size:12px; line-height:1.45; color:var(--muted); text-align:center; margin:0 0 14px;">
+                Скидка 40 ₽ за каждое приложение при покупке от 3 приложений. Промокоды продолжают работать независимо от этой настройки.
+            </p>
+            <button class="btn" id="btn-toggle-bulk-discount"></button>
         </div>
     </div>
 
@@ -431,7 +442,7 @@
           { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
         ];
     
-        let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true };
+        let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true, bulkDiscountEnabled: true };
         let selectedAppsForLink = new Set();
         let selectedAppsForPromo = new Set();
         let selectedTtlMinutes = 5;
@@ -526,14 +537,18 @@
                 let siteEnabled = true;
                 const s = settingsRes.find(x => x.key === "site_enabled");
                 if (s) siteEnabled = s.value === "true";
+                const bulkDiscountSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
+                const bulkDiscountEnabled = bulkDiscountSetting ? bulkDiscountSetting.value === "true" : true;
 
                 globalData.state = { prices, visibility };
                 globalData.siteEnabled = siteEnabled;
+                globalData.bulkDiscountEnabled = bulkDiscountEnabled;
                 
                 try {
                     localStorage.setItem("apprestore_prices_cache", JSON.stringify(prices));
                     localStorage.setItem("apprestore_visibility_cache", JSON.stringify(visibility));
                     localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+                    localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
                 } catch(e) {}
 
                 renderAllViews();
@@ -1182,6 +1197,50 @@
                 indicator.innerText = "🔴 Выключен"; indicator.style.color = "#f87171";
                 btnToggle.innerText = "🟢 Включить сайт"; btnToggle.className = "btn"; btnToggle.style.background = "rgba(34, 197, 94, 0.8)";
             }
+
+            const bulkIndicator = document.getElementById('bulk-discount-status-indicator');
+            const bulkButton = document.getElementById('btn-toggle-bulk-discount');
+            if (bulkIndicator && bulkButton) {
+                if (globalData.bulkDiscountEnabled) {
+                    bulkIndicator.innerText = "🟢 Включена";
+                    bulkIndicator.style.color = "#4ade80";
+                    bulkButton.innerText = "🔴 Выключить скидку";
+                    bulkButton.className = "btn btn-danger";
+                    bulkButton.style.background = "";
+                } else {
+                    bulkIndicator.innerText = "🔴 Выключена";
+                    bulkIndicator.style.color = "#f87171";
+                    bulkButton.innerText = "🟢 Включить скидку";
+                    bulkButton.className = "btn";
+                    bulkButton.style.background = "rgba(34, 197, 94, 0.8)";
+                }
+
+                bulkButton.onclick = async () => {
+                    const newState = !globalData.bulkDiscountEnabled;
+                    const previousState = globalData.bulkDiscountEnabled;
+                    bulkButton.disabled = true;
+                    bulkButton.innerText = "⏳ Сохранение...";
+
+                    const result = await sbFetch("site_settings?on_conflict=key", {
+                        method: "POST",
+                        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                        body: JSON.stringify({ key: "bulk_discount_enabled", value: String(newState) })
+                    });
+
+                    if (result === null) {
+                        globalData.bulkDiscountEnabled = previousState;
+                        showToast("Не удалось сохранить настройку скидки");
+                    } else {
+                        globalData.bulkDiscountEnabled = newState;
+                        try { localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(newState)); } catch(e) {}
+                        showToast(newState ? "Скидка от 3 приложений включена" : "Скидка от 3 приложений выключена");
+                    }
+
+                    bulkButton.disabled = false;
+                    renderSettings();
+                };
+            }
+
             btnToggle.onclick = () => {
                 const newState = !globalData.siteEnabled;
                 globalData.siteEnabled = newState;
