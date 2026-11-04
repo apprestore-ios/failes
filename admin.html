@@ -14,9 +14,17 @@
         })();
     </script>
     <style>
-        :root { --text: #f8fafc; --muted: rgba(255, 255, 255, 0.55); --card-bg: rgba(17, 24, 39, 0.65); --accent: #3b82f6; }
+        :root { 
+            --text: #f8fafc; 
+            --muted: rgba(255, 255, 255, 0.55); 
+            --card-bg: rgba(17, 24, 39, 0.75); 
+            --accent: #3b82f6; 
+            --radius-btn: 24px;
+            --radius-card: 24px;
+            --radius-item: 16px;
+        }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; background: #0b0f17; }
+        html, body { margin: 0; padding: 0; width: 100%; min-height: 100dvh; overflow-x: hidden; background: #070a0f; }
         body { 
             color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
             user-select: none; -webkit-user-select: none;
@@ -25,104 +33,129 @@
         }
         .aurora-bg {
             position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -1;
-            background-color: #0b0f17;
-            background-image: linear-gradient(135deg, rgba(11,15,23,0.5) 0%, rgba(17,24,39,0.7) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png");
+            background-color: #070a0f;
+            background-image: linear-gradient(135deg, rgba(7,10,15,0.6) 0%, rgba(17,24,39,0.8) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png");
             background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
         }
-        .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 20px 16px; animation: fadeIn 0.2s ease-out; }
+        .view { position: relative; z-index: 2; display: none; width: 100%; max-width: 430px; min-height: 100dvh; padding: 24px 16px; animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
         .view.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        h2.page-title, h3.section-title { text-align: center; font-size: 21px; font-weight: 700; margin: 0 0 16px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); width: 100%; }
-        .menu-card { background: var(--card-bg); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; }
-        .menu-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
-        .menu-item:active { background: rgba(0, 0, 0, 0.4); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        
+        h2.page-title { text-align: center; font-size: 24px; font-weight: 750; margin: 0 0 20px 0; letter-spacing: -0.5px; text-shadow: 0 4px 16px rgba(0,0,0,0.6); width: 100%; }
+        h3.section-title { text-align: center; font-size: 18px; font-weight: 700; margin: 0 0 14px 0; letter-spacing: -0.3px; width: 100%; }
+
+        /* Главное меню */
+        .menu-card { background: var(--card-bg); border-radius: var(--radius-card); border: 1px solid rgba(255, 255, 255, 0.12); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); overflow: hidden; box-shadow: 0 24px 48px rgba(0,0,0,0.5); width: 100%; }
+        .menu-item { display: flex; align-items: center; padding: 16px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.2s; cursor: pointer; }
+        .menu-item:active { background: rgba(255, 255, 255, 0.08); }
         .menu-item:last-child { border-bottom: none; }
-        .menu-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 14px; font-size: 18px; position: relative; }
-        .menu-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: #ef4444; color: #fff; font-size: 10.5px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid #111827; }
+        
+        .menu-icon { width: 44px; height: 44px; border-radius: 14px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; margin-right: 16px; font-size: 20px; position: relative; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .menu-badge { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid #111827; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
         .menu-badge.visible { display: flex; }
-        .menu-text { flex: 1; }
-        .menu-title { font-size: 16px; font-weight: 600; margin-bottom: 3px; letter-spacing: -0.3px; }
-        .menu-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; }
-        .menu-chevron { color: rgba(255, 255, 255, 0.3); font-size: 20px; font-weight: 500; padding-left: 10px; }
-        .card { background: var(--card-bg); border-radius: 22px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.4); width: 100%; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        
+        .menu-text { flex: 1; min-width: 0; }
+        .menu-title { font-size: 16px; font-weight: 650; margin-bottom: 3px; letter-spacing: -0.3px; }
+        .menu-subtitle { font-size: 12.5px; color: var(--muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .menu-chevron { width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.4); font-size: 16px; font-weight: 600; margin-left: 10px; flex-shrink: 0; }
+
+        /* Карточки */
+        .card { background: var(--card-bg); border-radius: var(--radius-card); padding: 20px 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 40px rgba(0,0,0,0.45); width: 100%; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
         .card:last-child { margin-bottom: 0; }
-        .card h4 { margin: 0 0 12px 0; font-size: 16px; color: var(--text); font-weight: 600; text-align: center; }
+        .card h4 { margin: 0 0 12px 0; font-size: 15px; color: var(--text); font-weight: 650; text-align: center; }
+
         .admin-scroll-list { width: 100%; max-height: 44dvh; overflow-y: auto; padding-right: 2px; }
         .admin-scroll-list::-webkit-scrollbar { width: 4px; }
         .admin-scroll-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        .app-item { display: flex; align-items: center; padding: 11px 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.14); transition: 0.2s; cursor: pointer; }
+
+        /* Элементы приложений в списках */
+        .app-item { display: flex; align-items: center; padding: 12px 14px; margin-bottom: 8px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; cursor: pointer; }
         .app-item:last-child { margin-bottom: 0; }
-        .app-item:active { background: rgba(255, 255, 255, 0.14); }
-        .app-item.app-unavailable { position: relative; cursor: not-allowed; border: 1.5px solid rgba(239, 68, 68, 0.6); background: rgba(239, 68, 68, 0.05); }
+        .app-item:active { background: rgba(255, 255, 255, 0.12); transform: scale(0.99); }
+        .app-item.app-unavailable { position: relative; cursor: not-allowed; border: 1.5px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.04); }
         .app-item.app-unavailable > * { opacity: .45; }
-        .badge-unavailable { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); display: inline-block; }
-        .app-icon { width: 42px; height: 42px; border-radius: 11px; margin-right: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .badge-unavailable { background: rgba(239, 68, 68, 0.15); color: #fca5a5; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.3); display: inline-block; }
+        .app-icon { width: 44px; height: 44px; border-radius: 12px; margin-right: 14px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .app-info { flex: 1; min-width: 0; }
-        .app-name { font-size: 14.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .app-status { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
-        .admin-price-badge { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; margin-right: 8px; flex-shrink: 0; }
-        .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+        .app-name { font-size: 15px; font-weight: 650; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.2px; }
+        .app-status { font-size: 12px; color: var(--muted); margin-top: 3px; font-weight: 500; }
         
-        .promo-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.14); }
+        .admin-price-badge { padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 750; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #93c5fd; margin-right: 8px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2); }
+        .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.4); color: #d8b4fe; box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2); }
+        
+        /* Промокоды */
+        .promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; margin-bottom: 8px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.1); }
         .promo-item:last-child { margin-bottom: 0; }
         .promo-info { display: flex; flex-direction: column; gap: 4px; flex: 1; cursor: pointer; }
-        .promo-code-text { font-size: 16px; font-weight: 700; color: #4ade80; letter-spacing: 1px; }
-        .promo-details { font-size: 12px; color: var(--muted); }
+        .promo-code-text { font-size: 16px; font-weight: 750; color: #4ade80; letter-spacing: 0.8px; }
+        .promo-details { font-size: 12px; color: var(--muted); font-weight: 500; }
         .promo-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-        .promo-status-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid transparent; text-align: center; width: 100%; }
-        .promo-status-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.4); }
-        .promo-status-used { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); }
-        .btn-delete-promo { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; }
+        .promo-status-badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; width: 100%; }
+        .promo-status-active { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .promo-status-used { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-delete-promo { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 5px 10px; font-size: 11px; font-weight: 650; cursor: pointer; width: 100%; transition: 0.15s; }
         .btn-delete-promo:active { transform: scale(0.95); }
 
-        /* Стили карточек заказов */
-        .order-card { padding: 13px; margin-bottom: 10px; border-radius: 16px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.14); display: flex; flex-direction: column; gap: 8px; }
+        /* Карточки заказов */
+        .order-card { padding: 14px; margin-bottom: 10px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
         .order-card:last-child { margin-bottom: 0; }
         .order-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .order-num { font-size: 15.5px; font-weight: 750; color: #fff; }
-        .order-time { font-size: 11px; color: var(--muted); }
-        .order-badge { padding: 4px 9px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid transparent; }
-        .order-badge.pending { background: rgba(234, 179, 8, 0.18); color: #fde047; border-color: rgba(234, 179, 8, 0.45); }
-        .order-badge.approved { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.45); }
-        .order-badge.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
-        .order-apps { font-size: 12.5px; color: #e2e8f0; line-height: 1.4; background: rgba(0,0,0,0.28); padding: 8px 10px; border-radius: 10px; }
-        .order-meta { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; }
-        .order-price { color: #60a5fa; font-size: 15px; font-weight: 800; }
-        .order-link-box { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); padding: 7px 10px; border-radius: 10px; font-size: 11.5px; color: #93c5fd; cursor: pointer; }
-        .order-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 2px; }
-        .order-btn { padding: 9px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; text-align: center; transition: 0.15s; }
+        .order-num { font-size: 16px; font-weight: 750; color: #fff; letter-spacing: -0.2px; }
+        .order-time { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+        .order-badge { padding: 5px 10px; border-radius: 10px; font-size: 11.5px; font-weight: 750; }
+        .order-badge.pending { background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.35); }
+        .order-badge.approved { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+        .order-badge.rejected { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+        .order-apps { font-size: 13px; color: #e2e8f0; line-height: 1.4; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 12px; font-weight: 500; }
+        .order-meta { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 650; }
+        .order-price { color: #60a5fa; font-size: 16px; font-weight: 850; }
+        .order-link-box { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 9px 12px; border-radius: 12px; font-size: 12px; color: #93c5fd; cursor: pointer; transition: 0.15s; }
+        .order-link-box:active { background: rgba(59, 130, 246, 0.2); }
+        .order-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px; }
+        .order-btn { padding: 11px 10px; border-radius: 12px; font-size: 12.5px; font-weight: 750; border: none; cursor: pointer; text-align: center; transition: 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .order-btn:active { transform: scale(0.96); }
         .order-btn.approve { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; }
-        .order-btn.reject { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
-        .order-btn.delete { grid-column: span 2; background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 600; padding: 7px; }
+        .order-btn.reject { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+        .order-btn.delete { grid-column: span 2; background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 650; padding: 9px; box-shadow: none; }
 
-        .ttl-selector-label { font-size: 12.5px; color: var(--muted); text-align: center; margin-bottom: 8px; font-weight: 600; }
-        .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; width: 100%; }
+        /* Временные капсулы (TTL & Filter Pills) */
+        .ttl-selector-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 10px; font-weight: 650; }
+        .ttl-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; width: 100%; }
         .ttl-pill {
-            padding: 9px 4px; border-radius: 11px; background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.14); color: var(--muted);
-            font-size: 12.5px; font-weight: 600; text-align: center; cursor: pointer; transition: 0.2s;
+            padding: 10px 6px; border-radius: 14px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
+            font-size: 13px; font-weight: 650; text-align: center; cursor: pointer; transition: 0.2s;
         }
+        .ttl-pill:active { transform: scale(0.96); }
         .ttl-pill.active {
-            background: rgba(59, 130, 246, 0.22); border-color: #3b82f6; color: #fff;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            background: rgba(59, 130, 246, 0.25); border-color: #3b82f6; color: #fff;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
         }
-        .btn { background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+        /* Кнопки главного типа */
+        .btn { background: var(--accent); color: #fff; border: none; padding: 15px 18px; border-radius: var(--radius-btn); font-size: 15.5px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 24px rgba(59,130,246,0.3); display: flex; align-items: center; justify-content: center; text-decoration: none; letter-spacing: -0.2px; }
         .btn:active { transform: scale(0.97); }
-        .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: none; }
-        .btn-gen { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: none; }
-        .btn-gen-active { background: linear-gradient(135deg, #9333ea, #7e22ce); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3); }
-        .btn-promo-gen { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: none; }
-        .text-input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; margin-bottom: 10px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; transition: 0.2s; }
-        .text-input:focus { border-color: var(--accent); }
-        .switch { position: relative; width: 50px; height: 30px; background: rgba(255,255,255,0.15); border-radius: 15px; transition: 0.2s; flex-shrink: 0; }
-        .switch.on { background: #34c759; }
-        .switch::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .switch.on::after { transform: translateX(20px); }
-        .checkbox { width: 24px; height: 24px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.15s; }
-        .checkbox.checked { background: var(--accent); border-color: var(--accent); }
-        .checkbox.checked::after { content: '✓'; color: #fff; font-weight: bold; font-size: 14px; }
-        #toast { position: fixed; top: 16px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); box-shadow: none; }
+        .btn-gen { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.35); box-shadow: none; }
+        .btn-gen-active { background: linear-gradient(135deg, #9333ea, #7e22ce); color: #ffffff; border: none; box-shadow: 0 10px 24px rgba(147, 51, 234, 0.35); }
+        .btn-promo-gen { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: none; }
+
+        /* Поля ввода */
+        .text-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.45); color: #fff; margin-bottom: 12px; font-size: 15px; outline: none; text-align: center; user-select: text; -webkit-user-select: text; transition: 0.2s; font-weight: 500; }
+        .text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        /* Переключатели и чекбоксы */
+        .switch { position: relative; width: 52px; height: 30px; background: rgba(255,255,255,0.12); border-radius: 15px; transition: 0.25s; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .switch.on { background: #34c759; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(52, 199, 89, 0.4); }
+        .switch::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .switch.on::after { transform: translateX(22px); }
+        
+        .checkbox { width: 26px; height: 26px; border-radius: 9px; border: 2px solid rgba(255,255,255,0.3); margin-right: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.15s; background: rgba(0,0,0,0.2); }
+        .checkbox.checked { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); }
+        .checkbox.checked::after { content: '✓'; color: #fff; font-weight: 800; font-size: 14px; }
+
+        /* Всплывающие уведомления (Toast) */
+        #toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 650; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 14px 36px rgba(0,0,0,0.6); z-index: 9999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; backdrop-filter: blur(20px); }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
     </style>
 </head>
@@ -146,7 +179,7 @@
             </div>
 
             <div class="menu-item" onclick="openView('view-create-link')">
-                <div class="menu-icon">🔗</div>
+                <div class="menu-icon" style="background: rgba(168, 85, 247, 0.15);">🔗</div>
                 <div class="menu-text">
                     <div class="menu-title">Создать разовую ссылку</div>
                     <div class="menu-subtitle">Выбор приложений и времени работы</div>
@@ -173,7 +206,7 @@
             </div>
             
             <div class="menu-item" onclick="openView('view-prices')">
-                <div class="menu-icon" style="background: rgba(168, 85, 247, 0.15);">💰</div>
+                <div class="menu-icon" style="background: rgba(236, 72, 153, 0.15);">💰</div>
                 <div class="menu-text">
                     <div class="menu-title">Управление ценами</div>
                     <div class="menu-subtitle">Изменение стоимости приложений</div>
@@ -181,7 +214,7 @@
                 <div class="menu-chevron">›</div>
             </div>
             <div class="menu-item" onclick="openView('view-visibility')">
-                <div class="menu-icon" style="background: rgba(16, 185, 129, 0.15);">👁️</div>
+                <div class="menu-icon" style="background: rgba(6, 182, 212, 0.15);">👁️</div>
                 <div class="menu-text">
                     <div class="menu-title">Видимость приложений</div>
                     <div class="menu-subtitle">Скрыть или показать в каталоге</div>
@@ -189,7 +222,7 @@
                 <div class="menu-chevron">›</div>
             </div>
             <div class="menu-item" onclick="openView('view-settings')">
-                <div class="menu-icon" style="background: rgba(236, 72, 153, 0.15);">⚙️</div>
+                <div class="menu-icon" style="background: rgba(249, 115, 22, 0.15);">⚙️</div>
                 <div class="menu-text">
                     <div class="menu-title">Настройки системы</div>
                     <div class="menu-subtitle">Статус работы сайта</div>
@@ -202,15 +235,15 @@
     <!-- Управление заказами -->
     <div id="view-orders" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 10px;">История заказов</h3>
-            <div class="ttl-pills" style="margin-bottom: 10px;">
+            <h3 class="section-title" style="margin-bottom: 12px;">История заказов</h3>
+            <div class="ttl-pills" style="margin-bottom: 12px;">
                 <div class="ttl-pill active" onclick="setOrderFilter('all', this)">Все</div>
                 <div class="ttl-pill" onclick="setOrderFilter('pending', this)">Ожидают</div>
                 <div class="ttl-pill" onclick="setOrderFilter('approved', this)">Оплачены</div>
                 <div class="ttl-pill" onclick="setOrderFilter('rejected', this)">Отклонены</div>
             </div>
-            <button class="btn" style="margin-bottom: 12px; padding: 10px; font-size: 13px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
-            <div id="orders-container" class="admin-scroll-list" style="max-height: 62dvh;">
+            <button class="btn" style="margin-bottom: 12px; padding: 11px; font-size: 13.5px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="loadOrdersList()">🔄 Обновить список</button>
+            <div id="orders-container" class="admin-scroll-list" style="max-height: 60dvh;">
                 <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
             </div>
         </div>
@@ -220,28 +253,28 @@
     <div id="view-create-promo-code" class="view">
         <div class="card">
             <h3 class="section-title" style="margin-bottom: 10px;">Создать промокод</h3>
-            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
+            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -4px; margin-bottom: 14px; line-height: 1.4; font-weight: 500;">
                 Промокод дает скидку на всю сумму заказа и сгорает при использовании.
             </p>
-            <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="text-input" style="margin-bottom:12px; font-weight: 600;" placeholder="Скидка в рублях (например, 100)">
+            <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="text-input" style="margin-bottom:12px; font-weight: 650;" placeholder="Скидка в рублях (например, 100)">
             
-            <button class="btn btn-promo-gen" id="btn-generate-promo-code" style="margin-bottom: 16px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onclick="createPromoCode()">🎁 Сгенерировать</button>
+            <button class="btn btn-promo-gen" id="btn-generate-promo-code" style="margin-bottom: 18px; background: linear-gradient(135deg, #059669, #047857); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onclick="createPromoCode()">🎁 Сгенерировать</button>
 
             <h3 class="section-title" style="margin-bottom: 12px; font-size: 16px;">Список промокодов</h3>
-            <div id="promo-codes-container" class="admin-scroll-list" style="max-height: 35dvh;">
+            <div id="promo-codes-container" class="admin-scroll-list" style="max-height: 33dvh;">
                 <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
             </div>
         </div>
     </div>
 
     <div id="view-promo-code-result" class="view">
-        <div class="card" style="text-align:center; padding: 28px 20px;">
-            <div style="font-size: 45px; margin-bottom: 12px;">🎁</div>
-            <h2 style="margin: 0 0 6px 0; font-size: 20px;">Промокод создан!</h2>
-            <p id="result-promo-code-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;"></p>
-            <input type="text" id="generated-promo-code-input" class="text-input" readonly style="color: #4ade80; font-weight: 700; font-size: 18px; margin-bottom: 10px; text-transform: uppercase;" onclick="copyPromoCode()">
+        <div class="card" style="text-align:center; padding: 32px 20px;">
+            <div style="font-size: 50px; margin-bottom: 12px;">🎁</div>
+            <h2 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 750;">Промокод создан!</h2>
+            <p id="result-promo-code-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 18px; line-height: 1.4; font-weight: 500;"></p>
+            <input type="text" id="generated-promo-code-input" class="text-input" readonly style="color: #4ade80; font-weight: 750; font-size: 19px; margin-bottom: 12px; text-transform: uppercase;" onclick="copyPromoCode()">
             <button class="btn" id="btn-forward-promo" style="background: linear-gradient(135deg, #059669, #047857); margin-bottom: 10px;">📤 Переслать покупателю</button>
-            <button class="btn btn-secondary" onclick="openView('view-create-promo-code')">Вернуться к списку</button>
+            <button class="btn btn-secondary" style="background: rgba(255,255,255,0.08); box-shadow: none;" onclick="openView('view-create-promo-code')">Вернуться к списку</button>
         </div>
     </div>
 
@@ -256,19 +289,19 @@
                 <div class="ttl-pill" onclick="selectTtl(15, this)">15 мин</div>
                 <div class="ttl-pill" onclick="selectTtl(30, this)">30 мин</div>
             </div>
-            <input type="search" id="create-link-search" class="text-input" style="text-align:left; margin-bottom:10px;" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
+            <input type="search" id="create-link-search" class="text-input" style="text-align:left; margin-bottom:12px;" placeholder="Поиск приложения..." oninput="renderCreateLinkList()">
             <button class="btn btn-gen" id="btn-generate-main" style="margin-bottom: 12px;" onclick="createLink()">🔗 Сгенерировать ссылку (0)</button>
             <div id="list-create-link" class="admin-scroll-list"></div>
         </div>
     </div>
 
     <div id="view-link-result" class="view">
-        <div class="card" style="text-align:center; padding: 28px 20px;">
-            <div style="font-size: 45px; margin-bottom: 12px;">✅</div>
-            <h2 style="margin: 0 0 6px 0; font-size: 20px;">Ссылка создана!</h2>
-            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4;">Действует 5 мин. с момента открытия на одном устройстве.</p>
+        <div class="card" style="text-align:center; padding: 32px 20px;">
+            <div style="font-size: 50px; margin-bottom: 12px;">✅</div>
+            <h2 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 750;">Ссылка создана!</h2>
+            <p id="result-ttl-desc" style="color:var(--muted); font-size:13.5px; margin-bottom: 16px; line-height: 1.4; font-weight: 500;">Действует 5 мин. с момента открытия на одном устройстве.</p>
             <div id="result-selected-apps" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; text-align: left; padding: 4px;"></div>
-            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 600; margin-bottom: 10px;" onclick="copyLink()">
+            <input type="text" id="generated-link-input" class="text-input" readonly style="color: var(--accent); font-weight: 650; margin-bottom: 12px;" onclick="copyLink()">
             <button class="btn" id="btn-forward" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">📤 Переслать покупателю</button>
         </div>
     </div>
@@ -276,19 +309,19 @@
     <!-- Массовая акция -->
     <div id="view-promo" class="view">
         <div class="card">
-            <h3 class="section-title" style="margin-bottom: 12px;">Массовая акция</h3>
-            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -6px; margin-bottom: 12px; line-height: 1.4;">
+            <h3 class="section-title" style="margin-bottom: 10px;">Массовая акция</h3>
+            <p style="font-size: 12.5px; color: var(--muted); text-align: center; margin-top: -4px; margin-bottom: 14px; line-height: 1.4; font-weight: 500;">
                 Выберите приложения, укажите сумму скидки и примените её. Для возврата нажмите «Вернуть базовые цены».
             </p>
             
             <div style="display:flex; gap:10px; margin-bottom:12px;">
                  <input type="search" id="promo-search" class="text-input" style="text-align:left; margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
-                 <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.1); font-size:13px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
+                 <button class="btn" style="width:auto; padding: 0 16px; background: rgba(255,255,255,0.08); font-size:13.5px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
             </div>
             
-            <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="margin-bottom:12px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); font-weight: 600;" placeholder="Скидка в рублях (например, 50)">
+            <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="margin-bottom:12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 650;" placeholder="Скидка в рублях (например, 50)">
             
-            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 10px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
+            <button class="btn btn-gen" id="btn-apply-promo" style="margin-bottom: 10px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.35);" onclick="applyPromo()">🏷️ Изменить цены (0)</button>
             <button class="btn btn-danger" id="btn-reset-promo" style="margin-bottom: 12px;" onclick="resetPromo()">🔄 Вернуть базовые цены (0)</button>
             <div id="list-promo" class="admin-scroll-list"></div>
         </div>
@@ -304,12 +337,12 @@
     </div>
 
     <div id="view-price-detail" class="view">
-        <div class="card" style="text-align:center; padding-top: 22px;">
-            <img id="detail-price-icon" src="" style="width: 70px; height: 70px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
-            <h3 id="detail-price-name" style="margin: 0 0 18px 0; font-size: 20px;"></h3>
+        <div class="card" style="text-align:center; padding-top: 24px;">
+            <img id="detail-price-icon" src="" style="width: 76px; height: 76px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+            <h3 id="detail-price-name" style="margin: 0 0 18px 0; font-size: 20px; font-weight: 750;"></h3>
             <h4 style="margin-bottom: 10px;">Стоимость установки (₽)</h4>
-            <input type="tel" inputmode="numeric" id="detail-price-input" class="text-input" placeholder="Введите цену">
-            <button class="btn" id="btn-save-price">Сохранить цену</button>
+            <input type="tel" inputmode="numeric" id="detail-price-input" class="text-input" placeholder="Введите цену" style="font-weight: 700; font-size: 18px;">
+            <button class="btn" id="btn-save-price" style="margin-top: 6px;">Сохранить цену</button>
         </div>
     </div>
 
@@ -328,17 +361,17 @@
             <h3 class="section-title" style="margin-bottom: 16px;">Глобальные параметры</h3>
             <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                 <span>Статус сайта</span>
-                <span id="site-status-indicator" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.4);"></span>
+                <span id="site-status-indicator" style="font-size:12px; font-weight:700; padding:5px 10px; border-radius:10px; background:rgba(0,0,0,0.4);"></span>
             </h4>
             <button class="btn" id="btn-toggle-site"></button>
 
-            <div style="height:1px; background:rgba(255,255,255,0.1); margin:18px 0;"></div>
+            <div style="height:1px; background:rgba(255,255,255,0.1); margin:20px 0;"></div>
 
             <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <span>Скидка от 3 приложений</span>
-                <span id="bulk-discount-status-indicator" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.4);"></span>
+                <span id="bulk-discount-status-indicator" style="font-size:12px; font-weight:700; padding:5px 10px; border-radius:10px; background:rgba(0,0,0,0.4);"></span>
             </h4>
-            <p style="font-size:12px; line-height:1.45; color:var(--muted); text-align:center; margin:0 0 14px;">
+            <p style="font-size:12.5px; line-height:1.45; color:var(--muted); text-align:center; margin:0 0 14px; font-weight: 500;">
                 Скидка 40 ₽ за каждое приложение при покупке от 3 приложений. Промокоды продолжают работать независимо от этой настройки.
             </p>
             <button class="btn" id="btn-toggle-bulk-discount"></button>
@@ -375,8 +408,8 @@
         tg.expand();
         try {
             if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
-            tg.setHeaderColor('#0b0f17');
-            tg.setBackgroundColor('#0b0f17');
+            tg.setHeaderColor('#070a0f');
+            tg.setBackgroundColor('#070a0f');
         } catch (e) {}
 
         const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
@@ -652,13 +685,13 @@
                     ? order.app_names.join(", ")
                     : (Array.isArray(order.app_keys) ? order.app_keys.join(", ") : "Не указаны");
 
-                const promoInfo = order.promo_code ? `<div style="font-size:11.5px; color:#4ade80;">Промокод: ${order.promo_code} (-${order.discount || 0} ₽)</div>` : "";
+                const promoInfo = order.promo_code ? `<div style="font-size:12px; color:#4ade80; font-weight:600;">Промокод: ${order.promo_code} (-${order.discount || 0} ₽)</div>` : "";
 
                 const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
                 const linkBlock = linkUrl ? `
                     <div class="order-link-box" onclick="copyText('${linkUrl}')">
-                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔗 ${linkUrl}</span>
-                        <span style="font-weight:700; flex-shrink:0;">Копировать</span>
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;">🔗 ${linkUrl}</span>
+                        <span style="font-weight:750; flex-shrink:0;">Копировать</span>
                     </div>
                 ` : "";
 
@@ -919,7 +952,7 @@
                 } else {
                     btn.style.background = 'rgba(234, 179, 8, 0.15)';
                     btn.style.color = '#fde047';
-                    btn.style.border = '1px solid rgba(234, 179, 8, 0.4)';
+                    btn.style.border = '1px solid rgba(234, 179, 8, 0.35)';
                     btn.style.boxShadow = 'none';
                 }
             }
@@ -928,7 +961,7 @@
                 if (count > 0) {
                     resetBtn.style.background = 'rgba(239, 68, 68, 0.15)';
                     resetBtn.style.color = '#fca5a5';
-                    resetBtn.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+                    resetBtn.style.border = '1px solid rgba(239, 68, 68, 0.35)';
                 } else {
                     resetBtn.style.background = 'rgba(239, 68, 68, 0.05)';
                     resetBtn.style.color = 'rgba(252, 165, 165, 0.5)';
@@ -1076,9 +1109,9 @@
                 const app = appsData.find(a => a.key === key);
                 if (!app) return '';
                 appNamesList.push(app.name);
-                return `<div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); padding:6px 10px; border-radius:10px;">
-                    <img src="${app.icon}" style="width:24px; height:24px; border-radius:6px;">
-                    <span style="font-size:13px; font-weight:600; color:var(--text); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
+                return `<div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); padding:8px 12px; border-radius:12px;">
+                    <img src="${app.icon}" style="width:26px; height:26px; border-radius:8px; object-fit:cover;">
+                    <span style="font-size:13px; font-weight:650; color:var(--text); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${app.name}</span>
                 </div>`;
             }).join('');
 
@@ -1107,7 +1140,7 @@
                         <div class="app-status">${app.ios}</div>
                     </div>
                     <div class="admin-price-badge ${isPrem ? 'premium' : ''}">${price} ₽</div>
-                    <div style="color:var(--muted); font-size: 20px;">›</div>
+                    <div class="menu-chevron">›</div>
                 </div>`;
             }).join('');
         }
@@ -1195,7 +1228,7 @@
                 btnToggle.innerText = "🔴 Выключить сайт"; btnToggle.className = "btn btn-danger"; btnToggle.style.background = "";
             } else {
                 indicator.innerText = "🔴 Выключен"; indicator.style.color = "#f87171";
-                btnToggle.innerText = "🟢 Включить сайт"; btnToggle.className = "btn"; btnToggle.style.background = "rgba(34, 197, 94, 0.8)";
+                btnToggle.innerText = "🟢 Включить сайт"; btnToggle.className = "btn"; btnToggle.style.background = "rgba(34, 197, 94, 0.85)";
             }
 
             const bulkIndicator = document.getElementById('bulk-discount-status-indicator');
@@ -1212,7 +1245,7 @@
                     bulkIndicator.style.color = "#f87171";
                     bulkButton.innerText = "🟢 Включить скидку";
                     bulkButton.className = "btn";
-                    bulkButton.style.background = "rgba(34, 197, 94, 0.8)";
+                    bulkButton.style.background = "rgba(34, 197, 94, 0.85)";
                 }
 
                 bulkButton.onclick = async () => {
