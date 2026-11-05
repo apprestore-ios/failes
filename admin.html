@@ -800,8 +800,12 @@
             if (!container) return;
 
             const res = await sbFetch(`app_links?token=eq.${token}&select=*`);
-            if (!Array.isArray(res) || res.length === 0) return;
+            if (!Array.isArray(res) || res.length === 0) {
+                container.innerHTML = `<div style="color: var(--muted);">Заказ ожидает подтверждения оплаты.</div>`;
+                return;
+            }
             const row = res[0];
+            const status = row.auth_status || "none";
 
             const activeInputLogin = document.activeElement?.id === `adminLogin_${token}`;
             const activeInputPass = document.activeElement?.id === `adminPass_${token}`;
@@ -817,9 +821,11 @@
             const currentLogin = existingLoginInput ? existingLoginInput.value : defaultLogin;
             const currentPass = existingPassInput ? existingPassInput.value : defaultPass;
 
-            if (row.auth_status === "req_creds") {
+            if (status === "req_creds" || status === "none" || !row.auth_status) {
                 container.innerHTML = `
-                    <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">🔔 Клиент запросил логин и пароль!</div>
+                    <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">
+                        ${status === "req_creds" ? "🔔 Клиент запросил логин и пароль!" : "🔑 Выдача данных аккаунта"}
+                    </div>
                     <input type="text" id="adminLogin_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Логин (Apple ID)" value="${currentLogin}">
                     <input type="text" id="adminPass_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Пароль" value="${currentPass}">
                     <div style="display: flex; gap: 6px; width: 100%;">
@@ -827,24 +833,20 @@
                         <button class="btn btn-secondary" style="width: auto; padding: 0 12px; font-size: 11px; min-height: 36px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="saveDefaultCreds('${token}')">💾 Шаблон</button>
                     </div>
                 `;
-            } else if (row.auth_status === "creds_sent") {
+            } else if (status === "creds_sent") {
                 container.innerHTML = `
                     <div style="color: #60a5fa; font-weight: 650;">⏳ Логин и пароль отправлены. Ожидание запроса 2FA от клиента...</div>
-                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Выдан: ${row.apple_login}</div>
+                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Выдан: ${row.apple_login || "---"}</div>
                 `;
-            } else if (row.auth_status === "req_2fa") {
+            } else if (status === "req_2fa") {
                 container.innerHTML = `
                     <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">📲 Клиент запросил код 2FA!</div>
                     <input type="text" inputmode="numeric" id="admin2fa_${token}" class="text-input" style="font-size:15px; padding:8px; margin-bottom:6px; letter-spacing:2px; font-weight:700; color:#4ade80;" placeholder="6 цифр кода">
                     <button class="btn btn-success" style="padding:8px; font-size:12px; min-height:36px;" onclick="send2FAToClient('${token}')">Отправить код 2FA</button>
                 `;
-            } else if (row.auth_status === "2fa_sent") {
+            } else if (status === "2fa_sent") {
                 container.innerHTML = `
-                    <div style="color: #4ade80; font-weight: 650;">✅ Код 2FA (${row.two_fa_code}) успешно отправлен клиенту.</div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div style="color: var(--muted);">Ссылка выдана. Клиент еще не запросил данные аккаунта.</div>
+                    <div style="color: #4ade80; font-weight: 650;">✅ Код 2FA (${row.two_fa_code || "---"}) успешно отправлен клиенту.</div>
                 `;
             }
         }
