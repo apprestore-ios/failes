@@ -117,6 +117,11 @@
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
       .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
+      
+      /* Класс для диагонального зачеркивания */
+      .strike-diag { position: relative; display: inline-block; margin-right: 4px; opacity: 0.6; }
+      .strike-diag::after { content: ''; position: absolute; left: -2px; right: -2px; top: 50%; height: 1.5px; background-color: currentColor; transform: rotate(-15deg); }
+
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
@@ -1092,7 +1097,7 @@ function generateAppsGrid() {
         const basePrice = 290;
         let priceHtml = `${price} ₽`;
         if (price < basePrice) {
-            priceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${price} ₽</span>`;
+            priceHtml = `<span class="strike-diag">${basePrice} ₽</span> <span style="color: #4ade80;">${price} ₽</span>`;
         }
 
         let mainName = app.name, subName = "";
@@ -1261,7 +1266,7 @@ function renderCartScreen() {
         const basePrice = 290;
         let priceHtml = `${p} ₽`;
         if (p < basePrice) {
-            priceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${p} ₽</span>`;
+            priceHtml = `<span class="strike-diag">${basePrice} ₽</span> <span style="color: #4ade80;">${p} ₽</span>`;
         }
 
         html += `
@@ -1321,7 +1326,7 @@ function renderCartScreen() {
     }
 
     if (totalDiscount > 0) {
-        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
+        if (totalEl) totalEl.innerHTML = `<span class="strike-diag" style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</span> ${finalTotal} ₽`;
     } else {
         if (totalEl) totalEl.textContent = finalTotal + " ₽";
     }
@@ -1342,7 +1347,7 @@ function updateCartUI() {
             let expectedPriceHtml = `${p} ₽`;
             
             if (p < basePrice) {
-                expectedPriceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${p} ₽</span>`;
+                expectedPriceHtml = `<span class="strike-diag">${basePrice} ₽</span> <span style="color: #4ade80;">${p} ₽</span>`;
             }
             
             if (priceTag.innerHTML !== expectedPriceHtml) {
