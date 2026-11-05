@@ -736,7 +736,6 @@
 
                 const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
                 
-                // Проверка статуса выдачи аккаунта (если есть связь с app_links по токену)
                 let authBlock = "";
                 if (order.status === "approved" && order.link_token) {
                     authBlock = `<div id="adminAuthBlock_${order.link_token}" style="margin-top: 6px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; font-size: 12px; color: var(--muted);">Загрузка статуса выдачи...</div>`;
@@ -797,22 +796,35 @@
         }
 
         async function fetchAuthStatusForAdmin(token) {
-            const res = await sbFetch(`app_links?token=eq.${token}&select=*`);
             const container = document.getElementById(`adminAuthBlock_${token}`);
-            if (!container || !Array.isArray(res) || res.length === 0) return;
+            if (!container) return;
+
+            const res = await sbFetch(`app_links?token=eq.${token}&select=*`);
+            if (!Array.isArray(res) || res.length === 0) return;
             const row = res[0];
+
+            const activeInputLogin = document.activeElement?.id === `adminLogin_${token}`;
+            const activeInputPass = document.activeElement?.id === `adminPass_${token}`;
+            const activeInput2fa = document.activeElement?.id === `admin2fa_${token}`;
+
+            if (activeInputLogin || activeInputPass || activeInput2fa) return;
 
             let defaultLogin = localStorage.getItem("apprestore_default_login") || "";
             let defaultPass = localStorage.getItem("apprestore_default_pass") || "";
 
+            const existingLoginInput = document.getElementById(`adminLogin_${token}`);
+            const existingPassInput = document.getElementById(`adminPass_${token}`);
+            const currentLogin = existingLoginInput ? existingLoginInput.value : defaultLogin;
+            const currentPass = existingPassInput ? existingPassInput.value : defaultPass;
+
             if (row.auth_status === "req_creds") {
                 container.innerHTML = `
                     <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">🔔 Клиент запросил логин и пароль!</div>
-                    <input type="text" id="adminLogin_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Логин (Apple ID)" value="${defaultLogin}">
-                    <input type="text" id="adminPass_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Пароль" value="${defaultPass}">
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-primary" style="padding:8px; font-size:12px; min-height:36px;" onclick="sendCredsToClient('${token}')">Отправить данные</button>
-                        <button class="btn btn-secondary" style="padding:8px; font-size:11px; min-height:36px; width:auto;" onclick="saveDefaultCreds('${token}')">💾 Шаблон</button>
+                    <input type="text" id="adminLogin_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Логин (Apple ID)" value="${currentLogin}">
+                    <input type="text" id="adminPass_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Пароль" value="${currentPass}">
+                    <div style="display: flex; gap: 6px; width: 100%;">
+                        <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px; min-height: 36px;" onclick="sendCredsToClient('${token}')">Отправить данные</button>
+                        <button class="btn btn-secondary" style="width: auto; padding: 0 12px; font-size: 11px; min-height: 36px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="saveDefaultCreds('${token}')">💾 Шаблон</button>
                     </div>
                 `;
             } else if (row.auth_status === "creds_sent") {
