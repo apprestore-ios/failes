@@ -116,7 +116,7 @@
       .catalog-header { display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 16px; background: rgba(30,41,59,0.3); border-radius: 14px; border: 1px solid rgba(148,163,184,0.15); padding: 8px 0; }
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
-      .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
+      .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 20px; }
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
@@ -498,7 +498,7 @@
     <div class="auth-box" style="padding: 26px 20px;">
         <div class="auth-title" style="color: #4ade80; font-size: 22px;">Оплата подтверждена!</div>
         <div class="auth-description" style="text-align: center;">
-            Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
+            Ваша персональная разовая ссылка на установку выбранных приложений готова (действует 15 минут с момента открытия):
         </div>
         <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
             <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
@@ -568,6 +568,70 @@
             <div class="info-box-label">не нужен компьютер и провод</div>
         </div>
     </div>
+    
+    <!-- Кнопка «Я установил» и блок выдачи данных -->
+    <div id="authStepContainer" style="width: 100%; margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-success" id="btnUserInstalled" onclick="onUserClickedInstalled()" style="min-height: 50px; font-size: 15px;">
+            ✅ Я установил приложения
+        </button>
+
+        <div id="authWorkflowCard" class="requisites-card" style="display: none; text-align: center; border-color: rgba(59, 130, 246, 0.4);">
+            <div id="authStepWaiting" style="display: none; padding: 10px 0;">
+                <div class="wait-spinner" style="width: 36px; height: 36px; border-width: 3px;"></div>
+                <div style="font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 8px;">Ожидание данных от администратора...</div>
+                <div style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">Администратор проверяет запрос. Скоро здесь появится логин и пароль.</div>
+            </div>
+
+            <div id="authStepCreds" style="display: none; flex-direction: column; gap: 10px; text-align: left;">
+                <div style="font-size: 12.5px; font-weight: 600; color: #f59e0b; text-align: center; line-height: 1.4;">
+                    ⚠️ Входить СТРОГО через «Настройки» ➔ «Контент и покупки»! В iCloud заходить запрещено!
+                </div>
+                <div class="req-row">
+                    <span class="req-label">Логин (Apple ID):</span>
+                    <div class="req-value-wrap">
+                        <span class="req-value" id="authLoginText" style="font-size: 14px;">---</span>
+                        <button type="button" class="req-copy-btn" id="copyLoginBtn" onclick="copyRequisite(document.getElementById('authLoginText').textContent, 'copyLoginBtn')">Копировать</button>
+                    </div>
+                </div>
+                <div class="req-row">
+                    <span class="req-label">Пароль:</span>
+                    <div class="req-value-wrap">
+                        <span class="req-value" id="authPasswordText" style="font-size: 14px;">---</span>
+                        <button type="button" class="req-copy-btn" id="copyPasswordBtn" onclick="copyRequisite(document.getElementById('authPasswordText').textContent, 'copyPasswordBtn')">Копировать</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" id="btnRequest2FA" onclick="onUserRequested2FA()" style="margin-top: 4px; min-height: 44px; font-size: 13.5px;">
+                    📲 Запросить код 2FA
+                </button>
+            </div>
+
+            <div id="authStepWaiting2FA" style="display: none; padding: 10px 0;">
+                <div class="wait-spinner" style="width: 36px; height: 36px; border-width: 3px;"></div>
+                <div style="font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 8px;">Запрос кода 2FA отправлен администратору...</div>
+            </div>
+
+            <div id="authStepShow2FA" style="display: none; flex-direction: column; gap: 8px; text-align: center;">
+                <div style="font-size: 12px; color: var(--muted);">Код подтверждения (2FA):</div>
+                <div id="authTwoFACode" style="font-size: 26px; font-weight: 800; color: #4ade80; letter-spacing: 4px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 12px; user-select: text; -webkit-user-select: text;">------</div>
+                <button type="button" class="btn btn-success" onclick="onUserFinishedAuth()" style="min-height: 44px; font-size: 14px; margin-top: 4px;">
+                    ✅ Код введён / Всё готово
+                </button>
+            </div>
+
+            <div id="authStepTimer" style="display: none; flex-direction: column; gap: 10px; text-align: center; padding: 4px 0;">
+                <div style="font-size: 13.5px; font-weight: 600; color: #60a5fa;">Проверка работы приложений</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums;" id="authFinalTimerDisplay">01:00</div>
+                <div style="font-size: 11.5px; color: var(--muted); line-height: 1.35;">Убедитесь, что приложения открываются и работают стабильно.</div>
+                <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+                    <span class="sf-icon">&#xF9E8;</span> Поддержка
+                </a>
+                <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 2px;">
+                    🏠 Вернуться в каталог
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="catalog-header" style="margin-top: 14px;">
         <div class="catalog-title">Выбранные приложения:</div>
     </div>
@@ -731,7 +795,6 @@ const appsData = [
 
 let siteState = { prices: {}, visibility: {} };
 let siteEnabled = true;
-let bulkDiscountEnabled = true;
 let currentCategory = "all";
 let isFromToken = false;
 let isTokenExpired = false;
@@ -747,6 +810,9 @@ let activeOrderId = null;
 let activeApprovedLink = "";
 let orderPollingInterval = null;
 let myLocalOrders = [];
+let currentTokenValue = null;
+let tokenPollInterval = null;
+let finalTimerInterval = null;
 
 try {
     const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
@@ -795,10 +861,8 @@ function loadFromLocalStorageCache() {
         const pCache = localStorage.getItem("apprestore_prices_cache");
         const vCache = localStorage.getItem("apprestore_visibility_cache");
         const sCache = localStorage.getItem("apprestore_site_enabled_cache");
-        const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
         if (pCache) siteState.prices = JSON.parse(pCache);
         if (vCache) siteState.visibility = JSON.parse(vCache);
-        if (bCache !== null) bulkDiscountEnabled = bCache === "true";
         if (sCache !== null) {
             siteEnabled = sCache === "true";
             const alertEl = document.getElementById("top-toast-alert");
@@ -839,15 +903,6 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         }
 
         if (Array.isArray(settingsRes)) {
-            const bulkSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
-            if (bulkSetting) {
-                const newBulkDiscountEnabled = bulkSetting.value === "true";
-                if (newBulkDiscountEnabled !== bulkDiscountEnabled) {
-                    bulkDiscountEnabled = newBulkDiscountEnabled;
-                    hasChanges = true;
-                }
-            }
-
             const s = settingsRes.find(x => x.key === "site_enabled");
             if (s) {
                 const newEnabled = s.value === "true";
@@ -872,7 +927,6 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
             localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
             localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
             localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
-            localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
         } catch(e) {}
 
         if (hasChanges || forceUpdateUI) {
@@ -918,7 +972,6 @@ function isAppVisible(key) {
 }
 
 function getCartBulkDiscount() {
-    if (!bulkDiscountEnabled) return 0;
     let visibleCount = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) visibleCount++; });
     return visibleCount >= 3 ? visibleCount * 40 : 0;
@@ -1063,6 +1116,104 @@ function startTokenCountdown(expiresAtTimestamp) {
     }
     updateTimer();
     tokenCountdownInterval = setInterval(updateTimer, 1000);
+}
+
+/* --- Логика пошаговой выдачи аккаунта и 2FA --- */
+function onUserClickedInstalled() {
+    const btn = document.getElementById("btnUserInstalled");
+    const card = document.getElementById("authWorkflowCard");
+    const waiting = document.getElementById("authStepWaiting");
+    if (btn) btn.style.display = "none";
+    if (card) card.style.display = "flex";
+    if (waiting) waiting.style.display = "block";
+
+    updateLinkAuthStatus("req_creds");
+}
+
+async function updateLinkAuthStatus(status) {
+    if (!currentTokenValue) return;
+    await sbFetch(`app_links?token=eq.${currentTokenValue}`, {
+        method: "PATCH",
+        body: JSON.stringify({ auth_status: status })
+    });
+}
+
+async function onUserRequested2FA() {
+    const btn = document.getElementById("btnRequest2FA");
+    const credsBlock = document.getElementById("authStepCreds");
+    const waitBlock = document.getElementById("authStepWaiting2FA");
+    if (btn) btn.disabled = true;
+    if (credsBlock) credsBlock.style.display = "none";
+    if (waitBlock) waitBlock.style.display = "block";
+
+    await updateLinkAuthStatus("req_2fa");
+}
+
+function onUserFinishedAuth() {
+    const show2fa = document.getElementById("authStepShow2FA");
+    const timerBlock = document.getElementById("authStepTimer");
+    if (show2fa) show2fa.style.display = "none";
+    if (timerBlock) timerBlock.style.display = "flex";
+    startFinalVerificationTimer();
+}
+
+function startFinalVerificationTimer() {
+    const display = document.getElementById("authFinalTimerDisplay");
+    if (!display) return;
+    let totalSecs = 60;
+    if (finalTimerInterval) clearInterval(finalTimerInterval);
+
+    finalTimerInterval = setInterval(() => {
+        totalSecs--;
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+        if (totalSecs <= 0) {
+            clearInterval(finalTimerInterval);
+            display.textContent = "00:00";
+        }
+    }, 1000);
+}
+
+function startTokenStatusPolling(token) {
+    if (!token) return;
+    if (tokenPollInterval) clearInterval(tokenPollInterval);
+
+    tokenPollInterval = setInterval(async () => {
+        const res = await sbFetch(`app_links?token=eq.${token}&select=*`);
+        if (!Array.isArray(res) || res.length === 0) return;
+        const row = res[0];
+
+        const card = document.getElementById("authWorkflowCard");
+        const btnInstalled = document.getElementById("btnUserInstalled");
+        const waiting = document.getElementById("authStepWaiting");
+        const credsBlock = document.getElementById("authStepCreds");
+        const loginText = document.getElementById("authLoginText");
+        const passText = document.getElementById("authPasswordText");
+        const wait2fa = document.getElementById("authStepWaiting2FA");
+        const show2fa = document.getElementById("authStepShow2FA");
+        const code2fa = document.getElementById("authTwoFACode");
+
+        if (row.auth_status === "req_creds") {
+            if (btnInstalled) btnInstalled.style.display = "none";
+            if (card) card.style.display = "flex";
+            if (waiting) waiting.style.display = "block";
+        } else if (row.auth_status === "creds_sent" && row.apple_login) {
+            if (btnInstalled) btnInstalled.style.display = "none";
+            if (card) card.style.display = "flex";
+            if (waiting) waiting.style.display = "none";
+            if (credsBlock) credsBlock.style.display = "flex";
+            if (loginText) loginText.textContent = row.apple_login;
+            if (passText) passText.textContent = row.apple_password;
+        } else if (row.auth_status === "req_2fa") {
+            if (credsBlock) credsBlock.style.display = "none";
+            if (wait2fa) wait2fa.style.display = "block";
+        } else if (row.auth_status === "2fa_sent" && row.two_fa_code) {
+            if (wait2fa) wait2fa.style.display = "none";
+            if (show2fa) show2fa.style.display = "flex";
+            if (code2fa) code2fa.textContent = row.two_fa_code;
+        }
+    }, 2000);
 }
 
 function generateAppsGrid() {
@@ -1732,6 +1883,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const token = extractTokenFromLocation();
     if (token) {
         isFromToken = true;
+        currentTokenValue = token;
         const ua = navigator.userAgent || "";
         if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) return;
 
@@ -1784,6 +1936,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             updateTokenHeroText(sessionTtlMinutes);
             renderTokenAppsList(sessionAppKeys);
             startTokenCountdown(sessionExpiresAt);
+            startTokenStatusPolling(token);
             switchScreen("tokenApp");
             return;
         }
