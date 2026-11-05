@@ -87,7 +87,6 @@ serve(async (req) => {
 
       const replyMarkup = {
         inline_keyboard: [
-          [{ text: "⚙️ Открыть админку", web_app: { url: 'https://apprestore-ios.ru/admin.html' } }],
           [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
         ]
       };
@@ -120,41 +119,6 @@ serve(async (req) => {
       })
     }
 
-    // 1.1. Уведомление администратору, что клиент запросил логин/пароль или код 2FA
-    if (body.action === 'notify_auth_request') {
-      const { token, type } = body
-      const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
-
-      let title = type === '2fa' ? '📲 *Запрос кода 2FA!*' : '🔑 *Запрос логина и пароля!*';
-      let desc = type === '2fa' ? 'Клиент установил приложения и ожидает 6-значный код 2FA.' : 'Клиент нажал «Я установил» и ожидает выдачу данных Apple ID.';
-
-      const text = `${title}\n\n${desc}\n\n🔗 Токен ссылки: \`${token || 'Не указан'}\`\n⏰ Время (Екб): \`${ekbTime}\``;
-
-      const replyMarkup = {
-        inline_keyboard: [
-          [{ text: "⚙️ Открыть админку для выдачи", web_app: { url: 'https://apprestore-ios.ru/admin.html' } }],
-          [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-        ]
-      };
-
-      if (ADMIN_CHAT_ID) {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: ADMIN_CHAT_ID,
-            text,
-            parse_mode: 'Markdown',
-            reply_markup: replyMarkup
-          })
-        });
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200
-      });
-    }
-
     // 2. Уведомление о новом заказе после нажатия «Я оплатил» на сайте
     if (body.action === 'notify_new_order') {
       const { order_id, order_number, app_names, total_price, promo_code, discount } = body
@@ -168,7 +132,7 @@ serve(async (req) => {
       text += `Покупатель нажал «Я оплатил»\n\n`
       text += `📱 *Приложения:*\n${appsList}\n\n`
       if (promo_code) {
-        text += `🏷 *Промокод/Скидка:* \`${promo_code}\` (-${discount || 0} ₽)\n`
+        text += `🏷 *Промокод:* \`${promo_code}\` (-${discount || 0} ₽)\n`
       }
       text += `💰 *Сумма к оплате:* \`${total_price || 0} ₽\`\n`
       text += `⏰ *Время (Екб):* \`${ekbTime}\`\n`
@@ -283,7 +247,6 @@ serve(async (req) => {
               is_used: false,
               activated_at: 0,
               device_id: null,
-              auth_status: "none",
               created_at: Date.now()
             }
             await sbFetch("app_links", {
