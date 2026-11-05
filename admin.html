@@ -735,13 +735,6 @@
                 const promoInfo = order.promo_code ? `<div style="font-size:12px; color:#4ade80; font-weight:600;">Промокод: ${order.promo_code} (-${order.discount || 0} ₽)</div>` : "";
 
                 const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
-                
-                let authBlock = "";
-                if (order.status === "approved" && order.link_token) {
-                    authBlock = `<div id="adminAuthBlock_${order.link_token}" style="margin-top: 6px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; font-size: 12px; color: var(--muted);">Загрузка статуса выдачи...</div>`;
-                    fetchAuthStatusForAdmin(order.link_token);
-                }
-
                 const linkBlock = linkUrl ? `
                     <div class="order-link-box" onclick="copyText('${linkUrl}')">
                         <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;">🔗 ${linkUrl}</span>
@@ -784,7 +777,6 @@
                     </div>
                     <div class="order-apps">${appsNames}</div>
                     ${promoInfo}
-                    ${authBlock}
                     <div class="order-meta">
                         <span style="color:var(--muted);">Сумма:</span>
                         <span class="order-price">${order.total_price || 0} ₽</span>
@@ -793,118 +785,6 @@
                     ${actionsBlock}
                 </div>`;
             }).join('');
-        }
-
-        async function fetchAuthStatusForAdmin(token) {
-            const container = document.getElementById(`adminAuthBlock_${token}`);
-            if (!container) return;
-
-            const res = await sbFetch(`app_links?token=eq.${token}&select=*`);
-            if (!Array.isArray(res) || res.length === 0) {
-                container.innerHTML = `<div style="color: var(--muted);">Заказ ожидает подтверждения оплаты.</div>`;
-                return;
-            }
-            const row = res[0];
-            const status = row.auth_status || "none";
-
-            const activeInputLogin = document.activeElement?.id === `adminLogin_${token}`;
-            const activeInputPass = document.activeElement?.id === `adminPass_${token}`;
-            const activeInput2fa = document.activeElement?.id === `admin2fa_${token}`;
-
-            if (activeInputLogin || activeInputPass || activeInput2fa) return;
-
-            let defaultLogin = localStorage.getItem("apprestore_default_login") || "";
-            let defaultPass = localStorage.getItem("apprestore_default_pass") || "";
-
-            const existingLoginInput = document.getElementById(`adminLogin_${token}`);
-            const existingPassInput = document.getElementById(`adminPass_${token}`);
-            const currentLogin = existingLoginInput ? existingLoginInput.value : defaultLogin;
-            const currentPass = existingPassInput ? existingPassInput.value : defaultPass;
-
-            if (status === "req_creds" || status === "none" || !row.auth_status) {
-                container.innerHTML = `
-                    <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">
-                        ${status === "req_creds" ? "🔔 Клиент запросил логин и пароль!" : "🔑 Выдача данных аккаунта"}
-                    </div>
-                    <input type="text" id="adminLogin_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Логин (Apple ID)" value="${currentLogin}">
-                    <input type="text" id="adminPass_${token}" class="text-input" style="font-size:13px; padding:8px; margin-bottom:6px;" placeholder="Пароль" value="${currentPass}">
-                    <div style="display: flex; gap: 6px; width: 100%;">
-                        <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px; min-height: 36px;" onclick="sendCredsToClient('${token}')">Отправить данные</button>
-                        <button class="btn btn-secondary" style="width: auto; padding: 0 12px; font-size: 11px; min-height: 36px; background: rgba(255,255,255,0.08); box-shadow: none;" onclick="saveDefaultCreds('${token}')">💾 Шаблон</button>
-                    </div>
-                `;
-            } else if (status === "creds_sent") {
-                container.innerHTML = `
-                    <div style="color: #60a5fa; font-weight: 650;">⏳ Логин и пароль отправлены. Ожидание запроса 2FA от клиента...</div>
-                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Выдан: ${row.apple_login || "---"}</div>
-                `;
-            } else if (status === "req_2fa") {
-                container.innerHTML = `
-                    <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">📲 Клиент запросил код 2FA!</div>
-                    <input type="text" inputmode="numeric" id="admin2fa_${token}" class="text-input" style="font-size:15px; padding:8px; margin-bottom:6px; letter-spacing:2px; font-weight:700; color:#4ade80;" placeholder="6 цифр кода">
-                    <button class="btn btn-success" style="padding:8px; font-size:12px; min-height:36px;" onclick="send2FAToClient('${token}')">Отправить код 2FA</button>
-                `;
-            } else if (status === "2fa_sent") {
-                container.innerHTML = `
-                    <div style="color: #4ade80; font-weight: 650;">✅ Код 2FA (${row.two_fa_code || "---"}) успешно отправлен клиенту.</div>
-                `;
-            }
-        }
-
-        function saveDefaultCreds(token) {
-            const login = document.getElementById(`adminLogin_${token}`).value.trim();
-            const pass = document.getElementById(`adminPass_${token}`).value.trim();
-            localStorage.setItem("apprestore_default_login", login);
-            localStorage.setItem("apprestore_default_pass", pass);
-            showToast("Шаблон сохранен по умолчанию!");
-        }
-
-        async function sendCredsToClient(token) {
-            const login = document.getElementById(`adminLogin_${token}`).value.trim();
-            const pass = document.getElementById(`adminPass_${token}`).value.trim();
-            if (!login || !pass) {
-                showToast("Введите логин и пароль!");
-                return;
-            }
-
-            const res = await sbFetch(`app_links?token=eq.${token}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    apple_login: login,
-                    apple_password: pass,
-                    auth_status: "creds_sent"
-                })
-            });
-
-            if (res !== null) {
-                showToast("Данные отправлены клиенту!");
-                loadOrdersList(true);
-            } else {
-                showToast("Ошибка при отправке данных");
-            }
-        }
-
-        async function send2FAToClient(token) {
-            const code = document.getElementById(`admin2fa_${token}`).value.trim();
-            if (!code || code.length < 4) {
-                showToast("Введите корректный код 2FA!");
-                return;
-            }
-
-            const res = await sbFetch(`app_links?token=eq.${token}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    two_fa_code: code,
-                    auth_status: "2fa_sent"
-                })
-            });
-
-            if (res !== null) {
-                showToast("Код 2FA отправлен клиенту!");
-                loadOrdersList(true);
-            } else {
-                showToast("Ошибка при отправке кода");
-            }
         }
 
         async function approveOrderFromAdmin(orderId) {
@@ -924,7 +804,6 @@
                     is_used: false,
                     activated_at: 0,
                     device_id: null,
-                    auth_status: "none",
                     created_at: Date.now()
                 };
 
@@ -1260,7 +1139,6 @@
                     is_used: false,
                     activated_at: 0,
                     device_id: null,
-                    auth_status: "none",
                     created_at: Date.now()
                 })
             });
