@@ -519,7 +519,7 @@
     <div class="auth-box" style="padding: 26px 20px;">
         <div class="auth-title" style="color: #fca5a5; font-size: 22px;">Администратор не получил оплату</div>
         <div class="auth-description" style="text-align: center;">
-            Платеж по вашему заказу не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
+            Платеж по вашей заявке не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -534,7 +534,7 @@
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
-            <button class="cart-back-btn" onclick="switchScreen('mainApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <button class="cart-back-btn" onclick="goBackFromInfo(false)"><span class="sf-icon">&#xECAC;</span></button>
             <div class="auth-title" style="font-size: 20px; margin: 0;">Мои заказы</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">История ваших заказов на этом устройстве</div>
@@ -543,7 +543,7 @@
             <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
         </div>
 
-        <button type="button" class="btn btn-secondary" onclick="switchScreen('mainApp')" style="margin-top: 4px;">Вернуться в каталог</button>
+        <button type="button" class="btn btn-secondary" onclick="goBackFromInfo(false)" style="margin-top: 4px;">Вернуться назад</button>
     </div>
 </div>
 
@@ -634,6 +634,19 @@
 </div>
 
 <script>
+const ALLOWED_WHEN_DISABLED = [
+    "maintenanceApp", 
+    "tokenApp", 
+    "tokenErrorApp", 
+    "guideApp", 
+    "tipsApp", 
+    "policyApp", 
+    "offerApp", 
+    "myOrdersApp",
+    "orderWaitApp",
+    "orderApprovedApp"
+];
+
 const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
@@ -771,8 +784,8 @@ function saveMyLocalOrders() {
 }
 
 const LOCKED_SCREENS = ["tokenErrorApp", "maintenanceApp"];
-const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp"];
 const HISTORY_STACK = [];
+const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp"];
 
 async function loadExternalContent(url, containerId) {
     const container = document.getElementById(containerId);
@@ -804,7 +817,7 @@ function loadFromLocalStorageCache() {
             const alertEl = document.getElementById("top-toast-alert");
             if (!siteEnabled) {
                 if (alertEl) alertEl.classList.add("show");
-                if (currentScreenId !== "maintenanceApp" && currentScreenId !== "tokenApp" && currentScreenId !== "tokenErrorApp") {
+                if (!ALLOWED_WHEN_DISABLED.includes(currentScreenId)) {
                     switchScreen("maintenanceApp");
                 }
             } else {
@@ -855,15 +868,15 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
                 if (newEnabled !== siteEnabled) {
                     siteEnabled = newEnabled;
                     hasChanges = true;
-                    if (!siteEnabled) {
-                        if (alertEl) alertEl.classList.add("show");
-                        switchScreen("maintenanceApp");
-                    } else {
-                        if (alertEl) alertEl.classList.remove("show");
-                        if (currentScreenId === "maintenanceApp") switchScreen("mainApp");
+                }
+                if (!siteEnabled) {
+                    if (alertEl) alertEl.classList.add("show");
+                    if (!ALLOWED_WHEN_DISABLED.includes(currentScreenId)) {
+                        switchScreen("maintenanceApp", false);
                     }
-                } else if (!siteEnabled && alertEl && !alertEl.classList.contains("show")) {
-                    alertEl.classList.add("show");
+                } else {
+                    if (alertEl) alertEl.classList.remove("show");
+                    if (currentScreenId === "maintenanceApp") switchScreen("mainApp", false);
                 }
             }
         }
@@ -1559,6 +1572,10 @@ async function renderMyOrdersList() {
 function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 
 function switchScreen(id, pushHistory = true) {
+    if (!siteEnabled && !ALLOWED_WHEN_DISABLED.includes(id)) {
+        id = "maintenanceApp";
+    }
+
     if (currentScreenId && currentScreenId !== id && pushHistory) HISTORY_STACK.push(currentScreenId);
     if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
         previousScreen = currentScreenId;
@@ -1609,12 +1626,21 @@ function handleBrandClick(event) {
 function handleNavBack(event) {
     if (event) event.preventDefault();
     if (isScreenLocked(currentScreenId)) return;
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
     if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false);
     else goHome();
 }
 
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
+        return;
+    }
     if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false);
     else switchScreen(previousScreen);
     if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
@@ -1627,10 +1653,18 @@ function goHome() {
         switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
         return;
     }
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
     switchScreen("mainApp", false);
 }
 
 function openCatalog() {
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
     sessionStorage.setItem("site_access", "true");
     switchScreen("mainApp");
 }
