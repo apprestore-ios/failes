@@ -1087,6 +1087,14 @@ function generateAppsGrid() {
         const isPrem = price >= 500;
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
+        
+        // Логика отображения цены
+        const basePrice = 290;
+        let priceHtml = `${price} ₽`;
+        if (price < basePrice) {
+            priceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${price} ₽</span>`;
+        }
+
         let mainName = app.name, subName = "";
         let bracketIdx = app.name.indexOf(" (");
         if (bracketIdx !== -1 && app.name.endsWith(")")) {
@@ -1101,7 +1109,7 @@ function generateAppsGrid() {
                     <div class="app-grid-name">${mainName}</div>
                     ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
                     <div class="app-grid-version">${app.ios}</div>
-                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${price} ₽</div>
+                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
             </div>
             <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
@@ -1249,6 +1257,13 @@ function renderCartScreen() {
         const p = getAppPrice(k);
         const isPrem = p >= 500;
         total += p;
+        
+        const basePrice = 290;
+        let priceHtml = `${p} ₽`;
+        if (p < basePrice) {
+            priceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${p} ₽</span>`;
+        }
+
         html += `
         <div class="cart-item-row">
             <div class="cart-item-left">
@@ -1259,7 +1274,7 @@ function renderCartScreen() {
                 </div>
             </div>
             <div class="cart-item-right">
-                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
+                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${priceHtml}</div>
                 <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
             </div>
         </div>`;
@@ -1318,15 +1333,24 @@ function updateCartUI() {
         const btn = document.getElementById("gridBtn_" + app.key);
         const priceTag = document.getElementById("gridPrice_" + app.key);
         const isVisible = isAppVisible(app.key);
+        
         if (card) card.classList.toggle("app-unavailable", !isVisible);
+        
         if (priceTag) {
             const p = getAppPrice(app.key);
-            const expectedPriceStr = p + " ₽";
-            if (priceTag.textContent !== expectedPriceStr) {
-                priceTag.textContent = expectedPriceStr;
+            const basePrice = 290;
+            let expectedPriceHtml = `${p} ₽`;
+            
+            if (p < basePrice) {
+                expectedPriceHtml = `<s style="opacity: 0.55; text-decoration-thickness: 1.5px; margin-right: 4px;">${basePrice} ₽</s> <span style="color: #4ade80;">${p} ₽</span>`;
+            }
+            
+            if (priceTag.innerHTML !== expectedPriceHtml) {
+                priceTag.innerHTML = expectedPriceHtml;
                 priceTag.classList.toggle("premium", p >= 500);
             }
         }
+        
         if (btn) {
             const inCart = cartItems.has(app.key);
             const expectedText = inCart ? "✓ В корзине" : "В корзину";
