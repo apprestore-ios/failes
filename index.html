@@ -120,9 +120,9 @@
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
-          box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease;
+          box-shadow: var(--box-shadow); transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
-          min-height: 140px; /* Фиксированная одинаковая высота под стандарт ВК Мессенджер */
+          min-height: 140px;
           justify-content: space-between;
       }
       .app-grid-card.app-unavailable { display: none !important; }
@@ -145,16 +145,12 @@
           position: absolute;
           top: 8px;
           right: 8px;
-          width: 24px;
-          height: 24px;
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
           background: rgba(30, 41, 59, 0.6);
           border: 1px solid rgba(255, 255, 255, 0.15);
           color: var(--muted);
-          font-size: 13px;
-          font-style: italic;
-          font-family: serif;
-          font-weight: 700;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -163,6 +159,9 @@
           transition: all 0.2s ease;
           backdrop-filter: blur(5px);
           -webkit-backdrop-filter: blur(5px);
+      }
+      .app-info-btn .sf-icon {
+          font-size: 15px;
       }
       .app-info-btn:active {
           transform: scale(0.9);
@@ -190,11 +189,10 @@
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
       
-      /* Класс для диагонального красного зачеркивания */
       .diagonal-strike {
           position: relative;
           display: inline-block;
-          color: #94a3b8; /* Приглушенный цвет старой цены */
+          color: #94a3b8;
           margin-right: 4px;
       }
       .diagonal-strike::after {
@@ -204,7 +202,7 @@
           top: 50%;
           width: calc(100% + 4px);
           height: 1.5px;
-          background-color: #ef4444; /* Красная линия перечеркивания */
+          background-color: #ef4444;
           transform: rotate(-15deg);
       }
 
@@ -298,7 +296,6 @@
       .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
       .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
 
-      /* Стили для карточек в Моих заказах */
       .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
       .my-order-item:last-child { margin-bottom: 0; }
       .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
@@ -378,11 +375,11 @@
         
         <div class="requisites-card" style="margin-top: 12px; width: 100%;">
             <div class="req-row">
-                <span class="req-label">Версия:</span>
+                <span class="req-label">Версия приложения:</span>
                 <div class="req-value-wrap"><span class="req-value" id="infoAppVersion"></span></div>
             </div>
             <div class="req-row">
-                <span class="req-label">Поддержка:</span>
+                <span class="req-label">Версия iOS:</span>
                 <div class="req-value-wrap"><span class="req-value" id="infoAppIos"></span></div>
             </div>
             <div class="req-row">
@@ -612,7 +609,6 @@
     </div>
 </div>
 
-<!-- Экран «Мои заказы» -->
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
@@ -1119,8 +1115,8 @@ function renderTokenAppsList(appKeys) {
                 subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
             }
             container.innerHTML += `
-            <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
-                <button type="button" class="app-info-btn" onclick="event.stopPropagation(); showAppInfo('${app.key}')">i</button>
+            <div class="app-grid-card" data-key="${app.key}">
+                <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
                 <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                     <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                     <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
@@ -1129,7 +1125,7 @@ function renderTokenAppsList(appKeys) {
                         <div class="app-grid-version">${app.ios}</div>
                     </div>
                 </div>
-                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
+                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">Установить</button>
             </div>`;
         }
     });
@@ -1189,8 +1185,8 @@ function generateAppsGrid() {
         }
         
         html += `
-        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
-            <button type="button" class="app-info-btn" onclick="event.stopPropagation(); showAppInfo('${app.key}')">i</button>
+        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
+            <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                 <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
@@ -1200,7 +1196,7 @@ function generateAppsGrid() {
                     <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
             </div>
-            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
+            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
         </div>`;
     });
     container.innerHTML = html;
@@ -1865,7 +1861,24 @@ function clearAppSearch() {
     input.focus({ preventScroll: true });
 }
 
-function showAppInfo(key) {
+// Функция для парсинга версии из plist-файла
+async function fetchAppVersion(plistUrl) {
+    try {
+        const url = plistUrl.startsWith("http") ? plistUrl : (CLIENT_SITE_URL + plistUrl);
+        const res = await fetch(url);
+        if (!res.ok) return "Неизвестно";
+        const text = await res.text();
+        const versionMatch = text.match(/<key>bundle-version<\/key>\s*<string>([^<]+)<\/string>/i);
+        if (versionMatch && versionMatch[1]) {
+            return versionMatch[1];
+        }
+        return "Неизвестно";
+    } catch (e) {
+        return "Ошибка";
+    }
+}
+
+async function showAppInfo(key) {
     const app = appsData.find(a => a.key === key);
     if (!app) return;
     
@@ -1873,12 +1886,17 @@ function showAppInfo(key) {
     document.getElementById('infoAppName').textContent = app.name;
     document.getElementById('infoAppIos').textContent = app.ios;
     
-    document.getElementById('infoAppVersion').textContent = app.version || "Последняя"; 
+    // Временно ставим заглушку загрузки
+    document.getElementById('infoAppVersion').textContent = "Загрузка...";
     
     const price = getAppPrice(app.key);
     document.getElementById('infoAppPrice').textContent = price + ' ₽';
     
     document.getElementById('appInfoModal').classList.add('active');
+
+    // Подгружаем точную версию из plist
+    const version = await fetchAppVersion(app.url);
+    document.getElementById('infoAppVersion').textContent = version;
 }
 
 function closeAppInfo() {
