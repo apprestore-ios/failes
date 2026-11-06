@@ -361,10 +361,7 @@
                 Выберите приложения, укажите сумму скидки и примените её. Для возврата нажмите «Вернуть базовые цены».
             </p>
             
-            <div style="display:flex; gap:8px; margin-bottom:10px; flex-shrink: 0;">
-                 <input type="search" id="promo-search" class="text-input" style="margin-bottom:0; flex:1;" placeholder="Поиск приложения..." oninput="renderPromoList()">
-                 <button class="btn" style="width:auto; padding: 0 14px; background: rgba(255,255,255,0.08); font-size:13px; box-shadow: none;" onclick="selectAllPromo()">Все</button>
-            </div>
+            <button class="btn" style="margin-bottom: 10px; background: rgba(255,255,255,0.08); font-size:13px; box-shadow: none; flex-shrink: 0;" onclick="selectAllPromo()">Выбрать все</button>
             
             <input type="tel" inputmode="numeric" id="promo-discount-input" class="text-input" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 650;" placeholder="Скидка в рублях (например, 50)">
             
