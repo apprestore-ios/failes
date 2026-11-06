@@ -144,14 +144,16 @@
       /* Кнопка информации на карточке приложения */
       .app-info-btn {
           position: absolute;
-          top: 8px;
-          right: 8px;
-          width: 26px;
-          height: 26px;
+          top: 50%;
+          transform: translateY(-50%);
+          right: 12px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          background: rgba(30, 41, 59, 0.6);
-          border: none;
-          color: var(--muted);
+          background: rgba(30, 41, 59, 0.75);
+          border: 1px solid rgba(147, 197, 253, 0.35);
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+          color: #93c5fd;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -162,11 +164,12 @@
           -webkit-backdrop-filter: blur(5px);
       }
       .app-info-btn .sf-icon {
-          font-size: 15px;
+          font-size: 16px;
       }
       .app-info-btn:active {
-          transform: scale(0.9);
-          background: rgba(59, 130, 246, 0.4);
+          transform: translateY(-50%) scale(0.9);
+          background: rgba(59, 130, 246, 0.5);
+          box-shadow: 0 0 14px rgba(59, 130, 246, 0.7);
           color: #fff;
       }
 
@@ -375,12 +378,16 @@
         <div id="infoAppName" style="font-size: 19px; font-weight: 750; color: var(--text); line-height: 1.2;"></div>
         
         <div class="requisites-card" style="margin-top: 12px; width: 100%;">
+            <div class="req-row" id="infoAppSubNameRow" style="display: none;">
+                <span class="req-label">Оригинальное название:</span>
+                <div class="req-value-wrap"><span class="req-value" id="infoAppSubName"></span></div>
+            </div>
             <div class="req-row">
                 <span class="req-label">Версия приложения:</span>
                 <div class="req-value-wrap"><span class="req-value" id="infoAppVersion"></span></div>
             </div>
             <div class="req-row">
-                <span class="req-label">Версия iOS:</span>
+                <span class="req-label">Минимальная версия iOS:</span>
                 <div class="req-value-wrap"><span class="req-value" id="infoAppIos"></span></div>
             </div>
             <div class="req-row">
@@ -1119,7 +1126,7 @@ function renderTokenAppsList(appKeys) {
                 <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
                 <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                     <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; height: 44px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; height: 44px; padding-right: 34px;">
                         <div class="app-grid-name">${mainName}</div>
                     </div>
                 </div>
@@ -1186,7 +1193,7 @@ function generateAppsGrid() {
             <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: space-between; min-width: 0; flex: 1; height: 44px;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: space-between; min-width: 0; flex: 1; height: 44px; padding-right: 34px;">
                     <div class="app-grid-name">${mainName}</div>
                     <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
@@ -1879,7 +1886,6 @@ async function showAppInfo(key) {
     
     document.getElementById('infoAppIcon').src = app.icon;
     
-    // Разделяем название и то, что в скобках
     let mainName = app.name, subName = "";
     let bracketIdx = app.name.indexOf(" (");
     if (bracketIdx !== -1 && app.name.endsWith(")")) {
@@ -1887,13 +1893,18 @@ async function showAppInfo(key) {
         subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
     }
     
-    // Название в скобках на новой строчке для всплывающего окна
-    const nameHtml = subName 
-        ? `${mainName}<br><span style="font-size: 14px; font-weight: 500; color: var(--muted); margin-top: 4px; display: inline-block;">${subName}</span>` 
-        : mainName;
-
-    document.getElementById('infoAppName').innerHTML = nameHtml;
+    // В модалке теперь только основное имя, суб-имя вынесено в таблицу
+    document.getElementById('infoAppName').textContent = mainName;
     document.getElementById('infoAppIos').textContent = app.ios;
+    
+    const subNameRow = document.getElementById('infoAppSubNameRow');
+    const subNameEl = document.getElementById('infoAppSubName');
+    if (subName) {
+        subNameEl.textContent = subName;
+        subNameRow.style.display = "flex";
+    } else {
+        subNameRow.style.display = "none";
+    }
     
     // Временно ставим заглушку загрузки
     document.getElementById('infoAppVersion').textContent = "Загрузка...";
