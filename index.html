@@ -117,13 +117,12 @@
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
       .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
-      
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
-          box-shadow: var(--box-shadow); transition: transform 0.2s ease;
+          box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
-          min-height: 115px;
+          min-height: 140px; /* Фиксированная одинаковая высота под стандарт ВК Мессенджер */
           justify-content: space-between;
       }
       .app-grid-card.app-unavailable { display: none !important; }
@@ -140,39 +139,6 @@
       .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
-      
-      /* Кнопка информации на карточке приложения */
-      .app-info-btn {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          right: 12px;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: rgba(30, 41, 59, 0.75);
-          border: 1px solid rgba(147, 197, 253, 0.35);
-          box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-          color: #93c5fd;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          z-index: 10;
-          transition: all 0.2s ease;
-          backdrop-filter: blur(5px);
-          -webkit-backdrop-filter: blur(5px);
-      }
-      .app-info-btn .sf-icon {
-          font-size: 16px;
-      }
-      .app-info-btn:active {
-          transform: translateY(-50%) scale(0.9);
-          background: rgba(59, 130, 246, 0.5);
-          box-shadow: 0 0 14px rgba(59, 130, 246, 0.7);
-          color: #fff;
-      }
-
       .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
       .cart-items-list::-webkit-scrollbar { width: 4px; }
       .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
@@ -193,10 +159,11 @@
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
       
+      /* Класс для диагонального красного зачеркивания */
       .diagonal-strike {
           position: relative;
           display: inline-block;
-          color: #94a3b8;
+          color: #94a3b8; /* Приглушенный цвет старой цены */
           margin-right: 4px;
       }
       .diagonal-strike::after {
@@ -206,7 +173,7 @@
           top: 50%;
           width: calc(100% + 4px);
           height: 1.5px;
-          background-color: #ef4444;
+          background-color: #ef4444; /* Красная линия перечеркивания */
           transform: rotate(-15deg);
       }
 
@@ -300,6 +267,7 @@
       .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
       .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
 
+      /* Стили для карточек в Моих заказах */
       .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
       .my-order-item:last-child { margin-bottom: 0; }
       .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
@@ -368,35 +336,6 @@
         <a href="https://t.me/dizabled" target="_blank" class="menu-item">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка проекта</span></div><span class="sf-icon">&#xECA2;</span>
         </a>
-    </div>
-</div>
-
-<!-- Модальное окно информации о приложении -->
-<div class="menu-modal" id="appInfoModal" onclick="closeAppInfo()">
-    <div class="menu-sheet" style="padding: 24px 18px; text-align: center; gap: 12px; align-items: center;" onclick="event.stopPropagation()">
-        <img id="infoAppIcon" src="" style="width: 72px; height: 72px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin: 0 auto 8px auto; object-fit: cover;">
-        <div id="infoAppName" style="font-size: 19px; font-weight: 750; color: var(--text); line-height: 1.2;"></div>
-        
-        <div class="requisites-card" style="margin-top: 12px; width: 100%;">
-            <div class="req-row" id="infoAppSubNameRow" style="display: none;">
-                <span class="req-label">Оригинальное название:</span>
-                <div class="req-value-wrap"><span class="req-value" id="infoAppSubName"></span></div>
-            </div>
-            <div class="req-row">
-                <span class="req-label">Версия приложения:</span>
-                <div class="req-value-wrap"><span class="req-value" id="infoAppVersion"></span></div>
-            </div>
-            <div class="req-row">
-                <span class="req-label">Минимальная версия iOS:</span>
-                <div class="req-value-wrap"><span class="req-value" id="infoAppIos"></span></div>
-            </div>
-            <div class="req-row">
-                <span class="req-label">Цена:</span>
-                <div class="req-value-wrap"><span class="req-value" id="infoAppPrice" style="color: #4ade80;"></span></div>
-            </div>
-        </div>
-        
-        <button class="btn btn-secondary" style="margin-top: 14px;" onclick="closeAppInfo()">Закрыть</button>
     </div>
 </div>
 
@@ -617,6 +556,7 @@
     </div>
 </div>
 
+<!-- Экран «Мои заказы» -->
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
@@ -1116,21 +1056,23 @@ function renderTokenAppsList(appKeys) {
         const cleanKey = key.trim();
         const app = appsData.find(a => a.key === cleanKey);
         if (app) {
-            let mainName = app.name;
+            let mainName = app.name, subName = "";
             let bracketIdx = app.name.indexOf(" (");
             if (bracketIdx !== -1 && app.name.endsWith(")")) {
                 mainName = app.name.substring(0, bracketIdx);
+                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
             }
             container.innerHTML += `
-            <div class="app-grid-card" data-key="${app.key}">
-                <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
+            <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
                 <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                     <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: center; min-width: 0; flex: 1; height: 44px; padding-right: 34px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
                         <div class="app-grid-name">${mainName}</div>
+                        ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                        <div class="app-grid-version">${app.ios}</div>
                     </div>
                 </div>
-                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">Установить</button>
+                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
             </div>`;
         }
     });
@@ -1177,10 +1119,11 @@ function generateAppsGrid() {
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
         
-        let mainName = app.name;
+        let mainName = app.name, subName = "";
         let bracketIdx = app.name.indexOf(" (");
         if (bracketIdx !== -1 && app.name.endsWith(")")) {
             mainName = app.name.substring(0, bracketIdx);
+            subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
         }
         
         let priceHtml = `<span class="new-price-bold">${price} ₽</span>`;
@@ -1189,16 +1132,17 @@ function generateAppsGrid() {
         }
         
         html += `
-        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
-            <button type="button" class="app-info-btn" onclick="showAppInfo('${app.key}')"><span class="sf-icon">&#xED3C;</span></button>
+        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: space-between; min-width: 0; flex: 1; height: 44px; padding-right: 34px;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
                     <div class="app-grid-name">${mainName}</div>
+                    ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                    <div class="app-grid-version">${app.ios}</div>
                     <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
             </div>
-            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
+            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
         </div>`;
     });
     container.innerHTML = html;
@@ -1861,66 +1805,6 @@ function clearAppSearch() {
     input.value = "";
     filterApps();
     input.focus({ preventScroll: true });
-}
-
-// Функция для парсинга версии из plist-файла
-async function fetchAppVersion(plistUrl) {
-    try {
-        const url = plistUrl.startsWith("http") ? plistUrl : (CLIENT_SITE_URL + plistUrl);
-        const res = await fetch(url);
-        if (!res.ok) return "Неизвестно";
-        const text = await res.text();
-        const versionMatch = text.match(/<key>bundle-version<\/key>\s*<string>([^<]+)<\/string>/i);
-        if (versionMatch && versionMatch[1]) {
-            return versionMatch[1];
-        }
-        return "Неизвестно";
-    } catch (e) {
-        return "Ошибка";
-    }
-}
-
-async function showAppInfo(key) {
-    const app = appsData.find(a => a.key === key);
-    if (!app) return;
-    
-    document.getElementById('infoAppIcon').src = app.icon;
-    
-    let mainName = app.name, subName = "";
-    let bracketIdx = app.name.indexOf(" (");
-    if (bracketIdx !== -1 && app.name.endsWith(")")) {
-        mainName = app.name.substring(0, bracketIdx);
-        subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
-    }
-    
-    // В модалке теперь только основное имя, суб-имя вынесено в таблицу
-    document.getElementById('infoAppName').textContent = mainName;
-    document.getElementById('infoAppIos').textContent = app.ios;
-    
-    const subNameRow = document.getElementById('infoAppSubNameRow');
-    const subNameEl = document.getElementById('infoAppSubName');
-    if (subName) {
-        subNameEl.textContent = subName;
-        subNameRow.style.display = "flex";
-    } else {
-        subNameRow.style.display = "none";
-    }
-    
-    // Временно ставим заглушку загрузки
-    document.getElementById('infoAppVersion').textContent = "Загрузка...";
-    
-    const price = getAppPrice(app.key);
-    document.getElementById('infoAppPrice').textContent = price + ' ₽';
-    
-    document.getElementById('appInfoModal').classList.add('active');
-
-    // Подгружаем точную версию из plist
-    const version = await fetchAppVersion(app.url);
-    document.getElementById('infoAppVersion').textContent = version;
-}
-
-function closeAppInfo() {
-    document.getElementById('appInfoModal').classList.remove('active');
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
