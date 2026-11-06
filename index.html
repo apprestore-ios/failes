@@ -155,11 +155,22 @@
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
       
-      /* Класс для горизонтального зачеркивания */
-      .old-price-strike {
-          text-decoration: line-through;
-          color: #94a3b8;
+      /* Класс для диагонального красного зачеркивания */
+      .diagonal-strike {
+          position: relative;
+          display: inline-block;
+          color: #94a3b8; /* Приглушенный цвет старой цены */
           margin-right: 4px;
+      }
+      .diagonal-strike::after {
+          content: "";
+          position: absolute;
+          left: -2px;
+          top: 50%;
+          width: calc(100% + 4px);
+          height: 1.5px;
+          background-color: #ef4444; /* Красная линия перечеркивания */
+          transform: rotate(-15deg);
       }
 
       .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -1113,7 +1124,7 @@ function generateAppsGrid() {
         
         let priceHtml = `${price} ₽`;
         if (price < 290) {
-            priceHtml = `<span class="old-price-strike">290</span> <span>${price} ₽</span>`;
+            priceHtml = `<span class="diagonal-strike">290</span> <span>${price} ₽</span>`;
         }
         
         html += `
@@ -1274,7 +1285,7 @@ function renderCartScreen() {
         
         let priceHtml = `${p} ₽`;
         if (p < 290) {
-            priceHtml = `<span class="old-price-strike">290</span> <span>${p} ₽</span>`;
+            priceHtml = `<span class="diagonal-strike">290</span> <span>${p} ₽</span>`;
         }
         
         total += p;
@@ -1353,7 +1364,7 @@ function updateCartUI() {
             const p = getAppPrice(app.key);
             let expectedPriceHtml = `${p} ₽`;
             if (p < 290) {
-                expectedPriceHtml = `<span class="old-price-strike">290</span> <span>${p} ₽</span>`;
+                expectedPriceHtml = `<span class="diagonal-strike">290</span> <span>${p} ₽</span>`;
             }
             if (priceTag.innerHTML !== expectedPriceHtml) {
                 priceTag.innerHTML = expectedPriceHtml;
