@@ -125,8 +125,11 @@
       }
       .app-grid-card.app-unavailable { display: none !important; }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
-      .app-price-tag { font-size: 11px; font-weight: 750; color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
-      .app-price-tag.premium { color: #d8b4fe; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); }
+      
+      /* Изменены стили цены в каталоге */
+      .app-price-tag { font-size: 11px; font-weight: 750; color: #4ade80; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: 3px; }
+      .app-price-tag.premium { color: #4ade80; background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); }
+      
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
@@ -149,8 +152,29 @@
       .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
       .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #d8b4fe; }
-      .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+      
+      /* Изменены стили цены в корзине */
+      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
+      .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
+      
+      /* Новый класс для диагонального зачеркивания старой цены */
+      .diagonal-strike {
+          position: relative;
+          display: inline-block;
+          color: #94a3b8; /* Приглушенный цвет старой цены */
+          margin-right: 4px;
+      }
+      .diagonal-strike::after {
+          content: "";
+          position: absolute;
+          left: -2px;
+          top: 50%;
+          width: calc(100% + 4px);
+          height: 1.5px;
+          background-color: #ef4444; /* Красная линия перечеркивания */
+          transform: rotate(-15deg);
+      }
+
       .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
       .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
       .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
@@ -742,7 +766,7 @@ const appsData = [
   { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
 ];
 
-let siteState = { prices: {}, visibility: {} };
+let siteState = { prices: {}, oldPrices: {}, visibility: {} };
 let siteEnabled = true;
 let bulkDiscountEnabled = true;
 let currentCategory = "all";
@@ -806,10 +830,13 @@ async function loadExternalContent(url, containerId) {
 function loadFromLocalStorageCache() {
     try {
         const pCache = localStorage.getItem("apprestore_prices_cache");
+        const opCache = localStorage.getItem("apprestore_old_prices_cache");
         const vCache = localStorage.getItem("apprestore_visibility_cache");
         const sCache = localStorage.getItem("apprestore_site_enabled_cache");
         const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
+        
         if (pCache) siteState.prices = JSON.parse(pCache);
+        if (opCache) siteState.oldPrices = JSON.parse(opCache);
         if (vCache) siteState.visibility = JSON.parse(vCache);
         if (bCache !== null) bulkDiscountEnabled = bCache === "true";
         if (sCache !== null) {
@@ -837,10 +864,24 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         ]);
 
         let hasChanges = false;
+        
         const newPrices = {};
-        if (Array.isArray(pricesRes)) pricesRes.forEach(row => { newPrices[row.app_key] = String(row.price); });
+        const newOldPrices = {};
+        
+        if (Array.isArray(pricesRes)) {
+            pricesRes.forEach(row => { 
+                newPrices[row.app_key] = String(row.price); 
+                if (row.old_price) newOldPrices[row.app_key] = String(row.old_price);
+            });
+        }
+        
         if (JSON.stringify(newPrices) !== JSON.stringify(siteState.prices)) {
             siteState.prices = newPrices;
+            hasChanges = true;
+        }
+
+        if (JSON.stringify(newOldPrices) !== JSON.stringify(siteState.oldPrices)) {
+            siteState.oldPrices = newOldPrices;
             hasChanges = true;
         }
 
@@ -883,6 +924,7 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
 
         try {
             localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
+            localStorage.setItem("apprestore_old_prices_cache", JSON.stringify(siteState.oldPrices));
             localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
             localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
             localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
@@ -923,6 +965,11 @@ function getOrCreateDeviceId() {
 function getAppPrice(key) {
     if (siteState.prices && siteState.prices[key] !== undefined) return Number(siteState.prices[key]);
     return 290;
+}
+
+function getAppOldPrice(key) {
+    if (siteState.oldPrices && siteState.oldPrices[key] !== undefined) return Number(siteState.oldPrices[key]);
+    return null;
 }
 
 function isAppVisible(key) {
@@ -1084,15 +1131,23 @@ function generateAppsGrid() {
     let html = "";
     appsData.forEach(app => {
         const price = getAppPrice(app.key);
+        const oldPrice = getAppOldPrice(app.key);
         const isPrem = price >= 500;
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
+        
         let mainName = app.name, subName = "";
         let bracketIdx = app.name.indexOf(" (");
         if (bracketIdx !== -1 && app.name.endsWith(")")) {
             mainName = app.name.substring(0, bracketIdx);
             subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
         }
+        
+        let priceHtml = `${price} ₽`;
+        if (oldPrice && oldPrice > price) {
+            priceHtml = `<span class="diagonal-strike">${oldPrice}</span> <span>${price} ₽</span>`;
+        }
+        
         html += `
         <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
             <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; width: 100%;">
@@ -1101,7 +1156,7 @@ function generateAppsGrid() {
                     <div class="app-grid-name">${mainName}</div>
                     ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
                     <div class="app-grid-version">${app.ios}</div>
-                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${price} ₽</div>
+                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
             </div>
             <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
@@ -1247,7 +1302,14 @@ function renderCartScreen() {
         const app = appsData.find(a => a.key === k);
         if (!app) return;
         const p = getAppPrice(k);
+        const op = getAppOldPrice(k);
         const isPrem = p >= 500;
+        
+        let priceHtml = `${p} ₽`;
+        if (op && op > p) {
+            priceHtml = `<span class="diagonal-strike">${op}</span> <span>${p} ₽</span>`;
+        }
+        
         total += p;
         html += `
         <div class="cart-item-row">
@@ -1259,7 +1321,7 @@ function renderCartScreen() {
                 </div>
             </div>
             <div class="cart-item-right">
-                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${p} ₽</div>
+                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${priceHtml}</div>
                 <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
             </div>
         </div>`;
@@ -1319,14 +1381,20 @@ function updateCartUI() {
         const priceTag = document.getElementById("gridPrice_" + app.key);
         const isVisible = isAppVisible(app.key);
         if (card) card.classList.toggle("app-unavailable", !isVisible);
+        
         if (priceTag) {
             const p = getAppPrice(app.key);
-            const expectedPriceStr = p + " ₽";
-            if (priceTag.textContent !== expectedPriceStr) {
-                priceTag.textContent = expectedPriceStr;
+            const op = getAppOldPrice(app.key);
+            let expectedPriceHtml = `${p} ₽`;
+            if (op && op > p) {
+                expectedPriceHtml = `<span class="diagonal-strike">${op}</span> <span>${p} ₽</span>`;
+            }
+            if (priceTag.innerHTML !== expectedPriceHtml) {
+                priceTag.innerHTML = expectedPriceHtml;
                 priceTag.classList.toggle("premium", p >= 500);
             }
         }
+        
         if (btn) {
             const inCart = cartItems.has(app.key);
             const expectedText = inCart ? "✓ В корзине" : "В корзину";
