@@ -122,6 +122,8 @@
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
           box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
+          min-height: 148px; /* Фиксированная одинаковая высота под стандарт ВК Мессенджер */
+          justify-content: space-between;
       }
       .app-grid-card.app-unavailable { display: none !important; }
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
