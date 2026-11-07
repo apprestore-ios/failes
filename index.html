@@ -547,10 +547,13 @@
         <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
             🚀 Начать установку
         </button>
-        <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 2px;">
+        <button type="button" class="btn btn-secondary" onclick="showGuideScreen()" style="margin-top: 4px;">
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xDD;</span> Инструкция по установке
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 4px;">
             Вернуться в каталог
         </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
         </a>
     </div>
@@ -1522,7 +1525,9 @@ async function confirmOrderPaid() {
                     app_names: appNamesArr,
                     total_price: finalTotal,
                     promo_code: currentPromoCode,
-                    discount: totalOrderDiscount
+                    discount: totalOrderDiscount,
+                    promo_discount: currentPromoDiscount || 0,
+                    bulk_discount: getCartBulkDiscount()
                 })
             }).catch(() => {});
 
