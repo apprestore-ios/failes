@@ -291,7 +291,9 @@
       .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      #singleTokenAppContainer .app-grid-card { min-height: 90px; }
+        #singleTokenAppContainer .app-grid-card {
+    min-height: 90px;
+}
     </style>
     <script>
         if ("fonts" in document) {
@@ -473,7 +475,7 @@
             <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
-            Выберите банк для перевода и нажмите <b>«Я оплатил»</b>
+            Переведите точную сумму по реквизитам ниже (СБП) и нажмите <b>«Я оплатил»</b>
         </div>
 
         <div class="requisites-card">
@@ -483,59 +485,37 @@
                     <span class="req-value" id="paymentOrderNum" style="color: var(--text);">#00000</span>
                 </div>
             </div>
-
-            <!-- Выбор банка для быстрой оплаты с новыми словами -->
             <div class="req-row">
-                <span class="req-label">Выберите банк для перевода:</span>
-                <div class="req-value-wrap" style="flex-direction: column; align-items: stretch; gap: 6px;">
-                    <select id="bankSelector" class="app-search" style="height: 42px; padding: 0 12px; font-size: 13.5px;" onchange="onBankSelectionChange()">
-                        <option value="sber">🟢 СберБанк</option>
-                        <option value="tinkoff">🟡 Т-Банк</option>
-                        <option value="alfa">🔴 Альфа-Банк</option>
-                        <option value="otp">🔵 ОТП Банк</option>
-                        <option value="ozon">🟣 Озон Банк</option>
-                        <option value="psb">🟣 ПСБ Банк</option>
-                        <option value="other">⚙️ Другой банк (по реквизитам)</option>
-                    </select>
+                <span class="req-label">Номер телефона (СБП):</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="reqPhoneText">89221194735</span>
+                    <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
                 </div>
             </div>
-
+            <div class="req-row">
+                <span class="req-label">Банк получателя:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">ОТП Банк</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Получатель:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">Артём Е.</span>
+                </div>
+            </div>
             <div class="req-row">
                 <span class="req-label">Сумма к переводу:</span>
                 <div class="req-value-wrap">
                     <span class="req-value" style="color: #60a5fa; font-size: 18px;" id="paymentTotalAmount">0 ₽</span>
                 </div>
             </div>
-
-            <!-- Блок классических реквизитов (скрыт по умолчанию, показывается для "Другого банка") -->
-            <div id="manualRequisitesBox" style="display: none; flex-direction: column; gap: 10px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 10px;">
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Номер телефона (СБП):</span>
-                    <div class="req-value-wrap">
-                        <span class="req-value" id="reqPhoneText">89221194735</span>
-                        <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
-                    </div>
-                </div>
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Банк получателя:</span>
-                    <div class="req-value-wrap"><span class="req-value">ОТП Банк</span></div>
-                </div>
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Получатель:</span>
-                    <div class="req-value-wrap"><span class="req-value">Артём Е.</span></div>
-                </div>
-            </div>
         </div>
 
-        <!-- Кнопка перехода на оплату выбранного банка -->
-        <a href="#" id="dynamicPayBtn" class="btn btn-primary" style="margin-top: 2px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-            ⚡ Открыть приложение банка
-        </a>
-
-        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()" style="margin-top: 4px;">
+        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
             <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил
         </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
         </a>
     </div>
@@ -650,7 +630,7 @@
         <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
         <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
             <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
-            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, выберите ваш банк для перевода или воспользуйтесь реквизитами, после чего нажмите <b>«Я оплатил»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
             <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
             <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
         </div>
@@ -1457,71 +1437,14 @@ function copyRequisite(text, btnId) {
     }
 }
 
-const PAYMENT_PHONE = "79221194735";
-
-function onBankSelectionChange() {
-    const select = document.getElementById("bankSelector");
-    const payBtn = document.getElementById("dynamicPayBtn");
-    const manualBox = document.getElementById("manualRequisitesBox");
-    const finalTotal = getCartFinalTotal();
-    
-    if (!select || !payBtn) return;
-    const choice = select.value;
-
-    if (choice === "other") {
-        payBtn.style.display = "none";
-        if (manualBox) manualBox.style.display = "flex";
-        return;
-    }
-
-    payBtn.style.display = "flex";
-    if (manualBox) manualBox.style.display = "none";
-
-    let link = "#";
-    switch (choice) {
-        case "tinkoff":
-            // Надежная веб-ссылка Т-Банка с поддержкой HTTPS вместо c2c-схем
-            link = `https://www.tinkoff.ru/rm/c2c/${PAYMENT_PHONE}?amount=${finalTotal}`;
-            break;
-        case "sber":
-            // Универсальная безопасная ссылка СБП / СберБанк
-            link = `https://online.sberbank.ru/CSAFront/index.jsp`;
-            break;
-        case "alfa":
-            link = `https://alfabank.ru`;
-            break;
-        case "otp":
-            link = `https://www.otpbank.ru`;
-            break;
-        case "ozon":
-            // Безопасная веб-ссылка на Озон Банк
-            link = `https://finance.ozon.ru/`;
-            break;
-        case "psb":
-            link = `https://www.psbank.ru`;
-            break;
-        default:
-            link = `#`;
-    }
-
-    payBtn.href = link;
-    payBtn.target = "_blank";
-}
-
 function checkoutCart() {
     if (cartItems.size === 0) return;
     if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
     const finalTotal = getCartFinalTotal();
-    
     const orderNumEl = document.getElementById("paymentOrderNum");
     const totalAmountEl = document.getElementById("paymentTotalAmount");
     if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
     if (totalAmountEl) totalAmountEl.textContent = finalTotal + " ₽";
-
-    const select = document.getElementById("bankSelector");
-    if (select) select.value = "sber";
-    
-    onBankSelectionChange();
     switchScreen("paymentApp");
 }
 
@@ -1790,6 +1713,8 @@ function handleNavBack(event) {
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
     
+    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
+    // принудительно запрещаем открывать меню навигации.
     const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
     if (lastScreen === "orderApprovedApp") {
         openMenu = false;
@@ -1811,7 +1736,7 @@ function goBackFromInfo(openMenu = false) {
         document.getElementById("burgerMenuModal")?.classList.add("active");
     }
 }
-
+    
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
