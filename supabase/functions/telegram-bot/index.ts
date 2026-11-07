@@ -121,7 +121,7 @@ serve(async (req) => {
 
     // 2. Уведомление о новом заказе после нажатия «Я оплатил» на сайте
     if (body.action === 'notify_new_order') {
-      const { order_id, order_number, app_names, total_price, promo_code, discount } = body
+      const { order_id, order_number, app_names, total_price, promo_code, discount, promo_discount, bulk_discount } = body
       const appsList = Array.isArray(app_names) && app_names.length > 0
         ? app_names.map((n: string) => `• ${n}`).join('\n')
         : 'Не указаны'
@@ -131,9 +131,19 @@ serve(async (req) => {
       let text = `💳 *Новый заказ ${order_number || ''}!*\n`
       text += `Покупатель нажал «Я оплатил»\n\n`
       text += `📱 *Приложения:*\n${appsList}\n\n`
-      if (promo_code) {
-        text += `🏷 *Промокод:* \`${promo_code}\` (-${discount || 0} ₽)\n`
+      
+      // Раздельный вывод скидок
+      if (promo_code && Number(promo_discount) > 0) {
+        text += `🏷 *Промокод:* \`${promo_code}\` (-${promo_discount} ₽)\n`
       }
+      if (Number(bulk_discount) > 0) {
+        text += `🎁 *Оптовая скидка:* -${bulk_discount} ₽\n`
+      }
+      // Фоллбэк: если старый клиент не передал раздельные скидки, но передал общую
+      if (!promo_code && !Number(bulk_discount) && Number(discount) > 0) {
+        text += `🎁 *Скидка:* -${discount} ₽\n`
+      }
+
       text += `💰 *Сумма к оплате:* \`${total_price || 0} ₽\`\n`
       text += `⏰ *Время (Екб):* \`${ekbTime}\`\n`
       text += `📊 *Статус:* ⏳ Ожидает подтверждения`
