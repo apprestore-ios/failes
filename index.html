@@ -1712,16 +1712,31 @@ function handleNavBack(event) {
 
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
+    
+    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
+    // принудительно запрещаем открывать меню навигации.
+    const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
+    if (lastScreen === "orderApprovedApp") {
+        openMenu = false;
+    }
+
     if (!siteEnabled) {
         switchScreen("maintenanceApp", false);
         if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
         return;
     }
-    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false);
-    else switchScreen(previousScreen);
-    if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
+    
+    if (HISTORY_STACK.length > 0) {
+        switchScreen(HISTORY_STACK.pop(), false);
+    } else {
+        switchScreen(previousScreen);
+    }
+    
+    if (openMenu) {
+        document.getElementById("burgerMenuModal")?.classList.add("active");
+    }
 }
-
+    
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
