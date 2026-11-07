@@ -473,7 +473,7 @@
             <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
-            Выберите ваш банк для быстрой оплаты и нажмите <b>«Я оплатил»</b>
+            Выберите банк для перевода и нажмите <b>«Я оплатил»</b>
         </div>
 
         <div class="requisites-card">
@@ -484,9 +484,9 @@
                 </div>
             </div>
 
-            <!-- Выбор банка для быстрой оплаты -->
+            <!-- Выбор банка для быстрой оплаты с новыми словами -->
             <div class="req-row">
-                <span class="req-label">Ваш банк:</span>
+                <span class="req-label">Выберите банк для перевода:</span>
                 <div class="req-value-wrap" style="flex-direction: column; align-items: stretch; gap: 6px;">
                     <select id="bankSelector" class="app-search" style="height: 42px; padding: 0 12px; font-size: 13.5px;" onchange="onBankSelectionChange()">
                         <option value="sber">🟢 СберБанк</option>
@@ -527,7 +527,7 @@
             </div>
         </div>
 
-        <!-- Кнопка диплинка выбранного банка -->
+        <!-- Кнопка перехода на оплату выбранного банка -->
         <a href="#" id="dynamicPayBtn" class="btn btn-primary" style="margin-top: 2px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
             ⚡ Открыть приложение банка
         </a>
@@ -1480,22 +1480,25 @@ function onBankSelectionChange() {
     let link = "#";
     switch (choice) {
         case "tinkoff":
+            // Надежная веб-ссылка Т-Банка с поддержкой HTTPS вместо c2c-схем
             link = `https://www.tinkoff.ru/rm/c2c/${PAYMENT_PHONE}?amount=${finalTotal}`;
             break;
         case "sber":
-            link = `sberbankonline://sberpay?phone=${PAYMENT_PHONE}&sum=${finalTotal}`;
+            // Универсальная безопасная ссылка СБП / СберБанк
+            link = `https://online.sberbank.ru/CSAFront/index.jsp`;
             break;
         case "alfa":
-            link = `alfabank://c2c?phone=${PAYMENT_PHONE}&amount=${finalTotal}`;
+            link = `https://alfabank.ru`;
             break;
         case "otp":
             link = `https://www.otpbank.ru`;
             break;
         case "ozon":
-            link = `ozonbank://c2c?phone=${PAYMENT_PHONE}&amount=${finalTotal}`;
+            // Безопасная веб-ссылка на Озон Банк
+            link = `https://finance.ozon.ru/`;
             break;
         case "psb":
-            link = `psbank://c2c?phone=${PAYMENT_PHONE}&amount=${finalTotal}`;
+            link = `https://www.psbank.ru`;
             break;
         default:
             link = `#`;
