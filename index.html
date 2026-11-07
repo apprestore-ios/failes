@@ -117,15 +117,27 @@
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
       .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
+      
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
-          display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
-          box-shadow: var(--box-shadow); cursor: pointer; transition: transform 0.2s ease;
+          display: flex; flex-direction: column; gap: 8px;
+          box-shadow: var(--box-shadow); transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
-          min-height: 140px; /* Фиксированная одинаковая высота под стандарт ВК Мессенджер */
+          min-height: 90px;
           justify-content: space-between;
       }
       .app-grid-card.app-unavailable { display: none !important; }
+
+      .app-cart-btn {
+          width: 36px; height: 36px; border-radius: 12px;
+          background: var(--btn-install-bg); border: 1px solid var(--btn-install-border);
+          color: var(--btn-install-color); display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s; padding: 0; flex-shrink: 0;
+      }
+      .app-cart-btn.in-cart {
+          background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80;
+      }
+
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
       
       .app-price-tag { font-size: 13px; font-weight: 750; color: #4ade80; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); padding: 2px 7px; border-radius: 7px; display: inline-block; margin-top: auto; }
@@ -136,9 +148,11 @@
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+      
       .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
+      
       .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
       .cart-items-list::-webkit-scrollbar { width: 4px; }
       .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
@@ -159,11 +173,10 @@
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
       
-      /* Класс для диагонального красного зачеркивания */
       .diagonal-strike {
           position: relative;
           display: inline-block;
-          color: #94a3b8; /* Приглушенный цвет старой цены */
+          color: #94a3b8;
           margin-right: 4px;
       }
       .diagonal-strike::after {
@@ -173,7 +186,7 @@
           top: 50%;
           width: calc(100% + 4px);
           height: 1.5px;
-          background-color: #ef4444; /* Красная линия перечеркивания */
+          background-color: #ef4444;
           transform: rotate(-15deg);
       }
 
@@ -267,7 +280,6 @@
       .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
       .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
 
-      /* Стили для карточек в Моих заказах */
       .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
       .my-order-item:last-child { margin-bottom: 0; }
       .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
@@ -280,7 +292,7 @@
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #singleTokenAppContainer .app-grid-card {
-    min-height: 90px; /* Задайте нужную вам высоту, сейчас по умолчанию 115px */
+    min-height: 90px;
 }
     </style>
     <script>
@@ -559,7 +571,6 @@
     </div>
 </div>
 
-<!-- Экран «Мои заказы» -->
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
@@ -1135,17 +1146,23 @@ function generateAppsGrid() {
         }
         
         html += `
-        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}" onclick="toggleCart('${app.key}')">
+        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                 <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
                     <div class="app-grid-name">${mainName}</div>
                     ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
                     <div class="app-grid-version">${app.ios}</div>
-                    <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}">${priceHtml}</div>
                 </div>
             </div>
-            <button type="button" class="app-grid-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="event.stopPropagation(); toggleCart('${app.key}')">${isInCart ? '✓ В корзине' : 'В корзину'}</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px;">
+                <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}" style="margin-top: 0;">${priceHtml}</div>
+                <button type="button" class="app-cart-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">
+                    ${isInCart 
+                        ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
+                        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'}
+                </button>
+            </div>
         </div>`;
     });
     container.innerHTML = html;
@@ -1381,10 +1398,13 @@ function updateCartUI() {
         
         if (btn) {
             const inCart = cartItems.has(app.key);
-            const expectedText = inCart ? "✓ В корзине" : "В корзину";
-            if (btn.textContent !== expectedText) {
+            const expectedHtml = inCart 
+                ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
+                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+            
+            if (btn.innerHTML.trim() !== expectedHtml.trim()) {
                 btn.classList.toggle("in-cart", inCart);
-                btn.textContent = expectedText;
+                btn.innerHTML = expectedHtml;
             }
         }
     });
@@ -1568,7 +1588,6 @@ function backToPaymentFromRejected() {
     switchScreen("paymentApp", false);
 }
 
-// Функции для экрана «Мои заказы»
 function showMyOrdersScreen() {
     document.getElementById("burgerMenuModal")?.classList.remove("active");
     renderMyOrdersList();
