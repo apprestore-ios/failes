@@ -432,12 +432,11 @@
 
         <div class="cart-items-list" id="cartItemsList"></div>
 
-        <div id="promoToggleBtn" onclick="togglePromoInput()" style="display: none; font-size: 13.5px; color: #60a5fa; cursor: pointer; text-align: left; margin-top: 8px; margin-bottom: 4px; font-weight: 650; padding-left: 4px;">Ввести промокод</div>
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; gap: 8px;">
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; display: flex; gap: 8px;">
             <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
             <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
         </div>
-        <div id="promoMessage" onclick="togglePromoInput()" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 8px; display: none; padding-left: 4px; cursor: pointer;"></div>
+        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
 
         <div class="cart-summary-card" id="cartSummaryCard">
             <div class="cart-summary-row" id="cartOrderNumberRow">
@@ -1188,28 +1187,16 @@ function removeFromCart(key) {
     if (cartItems.size < 2 && isCartListVisible) isCartListVisible = false;
 }
 
-function togglePromoInput() {
-    document.getElementById("promoToggleBtn").style.display = "none";
-    document.getElementById("promoMessage").style.display = "none";
-    document.getElementById("promoInputWrap").style.display = "flex";
-    document.getElementById("promoCodeInput").focus();
-}
-
 async function applyPromoCode() {
     const input = document.getElementById("promoCodeInput");
     const msgEl = document.getElementById("promoMessage");
-    const inputWrap = document.getElementById("promoInputWrap");
-    
     const code = input.value.trim().toUpperCase();
     if (!code) {
         msgEl.style.display = "block";
         msgEl.style.color = "#fca5a5";
-        msgEl.textContent = "Введите промокод (нажмите, чтобы ввести снова)";
-        inputWrap.style.display = "none";
+        msgEl.textContent = "Введите промокод";
         return;
     }
-    
-    inputWrap.style.display = "none";
     msgEl.style.display = "block";
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Проверка...";
@@ -1219,7 +1206,7 @@ async function applyPromoCode() {
         const promo = res[0];
         if (promo.is_used) {
             msgEl.style.color = "#fca5a5";
-            msgEl.textContent = "Промокод уже был использован (нажмите, чтобы изменить)";
+            msgEl.textContent = "Промокод уже использован";
             currentPromoCode = null;
             currentPromoDiscount = 0;
         } else {
@@ -1228,13 +1215,13 @@ async function applyPromoCode() {
                 body: JSON.stringify({ is_used: true })
             });
             msgEl.style.color = "#4ade80";
-            msgEl.textContent = `Промокод на скидку (${promo.discount} ₽) применен!`;
+            msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
             currentPromoCode = promo.code;
             currentPromoDiscount = Number(promo.discount);
         }
     } else {
         msgEl.style.color = "#fca5a5";
-        msgEl.textContent = "Промокод не найден (нажмите, чтобы попробовать снова)";
+        msgEl.textContent = "Промокод не найден";
         currentPromoCode = null;
         currentPromoDiscount = 0;
     }
@@ -1285,8 +1272,6 @@ function renderCartScreen() {
     const msgEl = document.getElementById("promoMessage");
     const toggleListBtn = document.getElementById("cartToggleListBtn");
     const toggleListText = document.getElementById("cartToggleListText");
-    const promoToggleBtn = document.getElementById("promoToggleBtn");
-    
     if (!listEl) return;
 
     cartItems.forEach(k => { if (!isAppVisible(k)) cartItems.delete(k); });
@@ -1300,7 +1285,6 @@ function renderCartScreen() {
         if (summaryCard) summaryCard.style.display = "none";
         if (checkoutBtn) checkoutBtn.style.display = "none";
         if (clearBtn) clearBtn.style.display = "none";
-        if (promoToggleBtn) promoToggleBtn.style.display = "none";
         if (promoInputWrap) promoInputWrap.style.display = "none";
         if (msgEl) msgEl.style.display = "none";
         if (toggleListBtn) toggleListBtn.style.display = "none";
@@ -1316,17 +1300,8 @@ function renderCartScreen() {
     if (summaryCard) summaryCard.style.display = "flex";
     if (checkoutBtn) checkoutBtn.style.display = "flex";
     if (clearBtn) clearBtn.style.display = "flex";
-    
-    const isMsgVisible = msgEl && msgEl.style.display !== "none" && msgEl.textContent !== "";
-    if (currentPromoCode || isMsgVisible) {
-        if (promoToggleBtn) promoToggleBtn.style.display = "none";
-        if (promoInputWrap) promoInputWrap.style.display = "none";
-        if (msgEl) msgEl.style.display = "block";
-    } else {
-        if (promoToggleBtn) promoToggleBtn.style.display = "block";
-        if (promoInputWrap) promoInputWrap.style.display = "none";
-        if (msgEl) msgEl.style.display = "none";
-    }
+    if (promoInputWrap) promoInputWrap.style.display = "flex";
+    if (currentPromoCode && msgEl) msgEl.style.display = "block";
 
     let total = 0, html = "";
     cartItems.forEach(k => {
