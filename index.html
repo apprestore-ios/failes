@@ -5,7 +5,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#0b0f17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -21,383 +21,708 @@
     </script>
     <style>
       :root {
-          --bg: #000000;
-          --text: #ffffff;
-          --muted: #8e8e93;
-          --card-bg: rgba(28, 28, 30, 0.45);
-          --card-border: 1px solid rgba(255, 255, 255, 0.12);
-          --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 8px 30px rgba(0, 0, 0, 0.5);
-          --input-bg: rgba(44, 44, 46, 0.5);
-          --accent: #0a84ff;
-          --accent-bg: rgba(10, 132, 255, 0.15);
-          --success: #30d158;
-          --danger: #ff453a;
+          --bg: #0b0f17; --text: #f8fafc; --muted: #94a3b8;
+          --card-bg: rgba(30, 41, 59, 0.4); --card-border: 1.5px solid rgba(255, 255, 255, 0.12);
+          --box-shadow: 0 20px 50px rgba(0,0,0,0.6); --input-bg: rgba(30,41,59,.4);
+          --btn-install-bg: rgba(59, 130, 246, 0.15); --btn-install-border: rgba(59, 130, 246, 0.5);
+          --btn-install-color: #93c5fd; --nav-bg: rgba(11, 15, 23, 0.4);
           --spring: cubic-bezier(.22,1,.36,1);
       }
       @font-face {
           font-family: "SFSymbols";
-          src: url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff2") format("woff2");
+          src: url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff2") format("woff2"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff") format("woff"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.ttf") format("truetype"),
+               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype");
           font-weight: normal; font-style: normal; font-display: block;
       }
       .sf-icon {
-          font-family: "SFSymbols", sans-serif !important; font-kerning: none; 
-          font-variant-ligatures: none; font-variant-numeric: tabular-nums;
-          display: inline-block; line-height: 1; vertical-align: middle;
+          font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
+          font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
+          text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
+          vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
       }
+      html.fonts-loaded .sf-icon { opacity: 1; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
           min-height: 100dvh;
-          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           color: var(--text); background: var(--bg);
-          display: flex; flex-direction: column; align-items: center;
-          padding: calc(max(12px, env(safe-area-inset-top)) + 70px) 0 max(90px, env(safe-area-inset-bottom));
+          display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+          padding: calc(max(12px, env(safe-area-inset-top)) + 65px) 0 max(40px, env(safe-area-inset-bottom));
           user-select: none; -webkit-user-select: none;
       }
-      input { user-select: text; -webkit-user-select: text; outline: none; }
-
-      /* Продвинутый Mesh Gradient */
-      .mesh-bg { position: fixed; inset: 0; z-index: -10; background: #000; overflow: hidden; pointer-events: none; }
-      .blob { position: absolute; filter: blur(100px); border-radius: 50%; opacity: 0.45; animation: float 18s infinite alternate ease-in-out; }
-      .blob-1 { top: -10%; left: -10%; width: 70vw; height: 70vw; background: #0a84ff; }
-      .blob-2 { bottom: -10%; right: -20%; width: 80vw; height: 80vw; background: #5e5ce6; animation-delay: -6s; }
-      .blob-3 { top: 30%; left: 40%; width: 60vw; height: 60vw; background: #30d158; animation-delay: -12s; opacity: 0.2; }
-      @keyframes float { 100% { transform: translate(50px, 50px) scale(1.1); } }
-
-      /* Динамический остров (Header) */
+      input { user-select: text; -webkit-user-select: text; }
+      .aurora-bg {
+          position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10;
+          background-image: linear-gradient(135deg, rgba(11,15,23,0.4) 0%, rgba(17,24,39,0.6) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png");
+          background-size: cover; background-position: top center; background-repeat: no-repeat; pointer-events: none; transform: translate3d(0,0,0);
+      }
       .top-navbar {
-          position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
-          height: 46px; padding: 0 18px 0 14px; border-radius: 99px;
-          display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 100;
-          background: rgba(28, 28, 30, 0.55); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
-          border: var(--card-border); box-shadow: var(--glass-shadow); cursor: pointer; transition: transform 0.2s;
+          position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+          width: 100%; max-width: 430px; padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+          display: flex; align-items: center; justify-content: space-between; z-index: 100;
+          background: var(--nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(148, 163, 184, 0.1);
       }
-      .top-navbar:active { transform: translateX(-50%) scale(0.96); }
-      .nav-logo { width: 28px; height: 28px; border-radius: 9px; object-fit: cover; }
-      .nav-title { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-
-      /* Нативный нижний Tab Bar */
-      .tab-bar {
-          position: fixed; bottom: 0; left: 0; right: 0;
-          display: flex; justify-content: space-around; align-items: center;
-          padding: 12px 10px calc(12px + env(safe-area-inset-bottom)); z-index: 200;
-          background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-          border-top: 1px solid rgba(255,255,255,0.08);
+      .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); cursor: pointer; }
+      .nav-logo { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
+      .nav-title { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--text) 15%, var(--muted) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .nav-right-actions { display: flex; align-items: center; gap: 8px; }
+      .back-btn, .burger-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); position: relative; }
+      .back-btn { font-size: 20px; font-weight: 700; text-decoration: none; display: none; line-height: 1; padding-bottom: 2px; }
+      .back-btn.visible { display: flex; }
+      .burger-line { width: 18px; height: 2px; background: var(--muted); border-radius: 2px; position: relative; }
+      .burger-line::before, .burger-line::after { content: ""; position: absolute; left: 0; width: 18px; height: 2px; background: var(--muted); border-radius: 2px; }
+      .burger-line::before { top: -6px; }
+      .burger-line::after { top: 6px; }
+      .cart-fab-wrap {
+          position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%;
+          transform: translateX(-50%); width: 100%; max-width: 430px;
+          padding: 0 18px; display: flex; justify-content: flex-end; pointer-events: none; z-index: 200;
       }
-      .tab-item {
-          display: flex; flex-direction: column; align-items: center; gap: 5px;
-          color: var(--muted); cursor: pointer; position: relative; flex: 1;
-          transition: color 0.3s var(--spring), transform 0.2s;
+      .cart-fab-btn {
+          pointer-events: auto; width: 56px; height: 56px; border-radius: 18px;
+          background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1.5px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
+          box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5), 0 4px 12px rgba(0,0,0,0.5);
+          transform: scale(0) translateY(20px); opacity: 0; transition: transform 0.3s var(--spring), opacity 0.25s ease;
       }
-      .tab-item:active { transform: scale(0.92); }
-      .tab-item.active { color: var(--accent); }
-      .tab-icon { font-size: 24px; }
-      .tab-label { font-size: 11px; font-weight: 650; letter-spacing: -0.2px; }
-      .tab-badge {
-          position: absolute; top: -6px; right: calc(50% - 24px); background: var(--danger); color: #fff;
-          font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
-          display: flex; align-items: center; justify-content: center; border: 2.5px solid #1c1c1e;
-          transform: scale(0); transition: transform 0.4s var(--spring); box-shadow: 0 4px 10px rgba(255,69,58,0.4);
+      .cart-fab-btn.visible { transform: scale(1) translateY(0); opacity: 1; }
+      .cart-fab-btn:active { transform: scale(0.93); }
+      .cart-fab-badge {
+          position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px;
+          border-radius: 99px; background: #ef4444; color: #fff; font-size: 11.5px; font-weight: 800;
+          display: flex; align-items: center; justify-content: center; border: 2px solid #0b0f17; box-shadow: 0 3px 8px rgba(0,0,0,0.4);
       }
-      .tab-badge.visible { transform: scale(1); }
-
-      /* Основные контейнеры */
       .container {
-          width: 100%; max-width: 440px; padding: 0 18px; z-index: 2; display: none;
-          flex-direction: column; opacity: 0; transform: translateY(20px) scale(.98); 
-          transition: opacity 0.4s var(--spring), transform 0.4s var(--spring);
+          width: 100%; max-width: 430px; padding: 0 16px; z-index: 2; display: none;
+          flex-direction: column; justify-content: flex-start; flex: 1;
+          opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
+      .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
+      .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .hero-title span { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .hero-desc-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); margin-top: 14px; margin-bottom: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+      .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 500; }
+      .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; width: 100%; }
+      .info-box { background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 14px 12px; text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--box-shadow); transition: border-color 0.3s ease; }
+      .info-box-num { font-size: 20px; font-weight: 800; color: #3b82f6; margin-bottom: 4px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
+      .info-box-label { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+      .catalog-header { display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 16px; background: rgba(30,41,59,0.3); border-radius: 14px; border: 1px solid rgba(148,163,184,0.15); padding: 8px 0; }
+      .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
+      .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
+      .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
+      
+      .app-grid-card {
+          background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
+          display: flex; flex-direction: column; gap: 8px;
+          box-shadow: var(--box-shadow); transition: transform 0.2s ease;
+          width: 100%; min-width: 0; position: relative;
+          min-height: 90px;
+          justify-content: space-between;
+      }
+      .app-grid-card.app-unavailable { display: none !important; }
 
-      /* Заголовки и карточки */
-      .hero-title { font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; letter-spacing: -0.8px; text-align: left; }
-      .hero-title span { color: var(--accent); }
-      .auth-box { 
-          background: var(--card-bg); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-          border: var(--card-border); border-radius: 32px; padding: 30px 22px; 
-          box-shadow: var(--glass-shadow); display: flex; flex-direction: column; gap: 16px; text-align: left;
+      .app-cart-btn {
+          width: 36px; height: 36px; border-radius: 12px;
+          background: var(--btn-install-bg); border: 1px solid var(--btn-install-border);
+          color: var(--btn-install-color); display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s; padding: 0; flex-shrink: 0;
       }
-      
-      /* Поиск */
-      .app-search-wrap { position: relative; margin-bottom: 22px; width: 100%; }
-      .app-search { 
-          width: 100%; height: 48px; padding: 0 44px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); 
-          background: var(--input-bg); color: var(--text); font-size: 16px; font-weight: 500;
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: border 0.3s;
-      }
-      .app-search:focus { border-color: rgba(10, 132, 255, 0.5); }
-      .app-search::placeholder { color: var(--muted); }
-      .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; }
-
-      /* Горизонтальные секции (Apple Vision Style) */
-      .category-block { margin-bottom: 30px; width: 100%; }
-      .category-header { font-size: 22px; font-weight: 750; margin-bottom: 14px; letter-spacing: -0.4px; padding-left: 4px; display: flex; align-items: center; justify-content: space-between; }
-      .category-header span { font-size: 14px; color: var(--accent); font-weight: 600; cursor: pointer; }
-      .horizontal-scroll {
-          display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none;
-          padding: 0 4px 14px 4px; margin: 0 -4px; scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-      }
-      .horizontal-scroll::-webkit-scrollbar { display: none; }
-      
-      .vision-card {
-          min-width: 150px; width: 150px; background: var(--card-bg); border: var(--card-border);
-          border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center;
-          backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: var(--glass-shadow);
-          scroll-snap-align: start; flex-shrink: 0; position: relative; text-align: center;
-      }
-      .vision-icon { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; margin-bottom: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); }
-      .vision-title { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; letter-spacing: -0.2px; }
-      .vision-sub { font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 3px; }
-      
-      .vision-btn {
-          width: 100%; height: 36px; border-radius: 18px; background: rgba(255,255,255,0.12); 
-          color: var(--accent); border: none; font-size: 14px; font-weight: 700; margin-top: 14px; 
-          cursor: pointer; transition: all 0.3s var(--spring); display: flex; align-items: center; justify-content: center;
-      }
-      .vision-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
-      .vision-btn .check-icon { display: none; font-size: 16px; font-weight: 800; }
-      .vision-btn.in-cart { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3); }
-      .vision-btn.in-cart .price-text { display: none; }
-      .vision-btn.in-cart .check-icon { display: inline; }
-      .vision-btn.premium .price-text { color: var(--success); }
-      .vision-btn.in-cart.premium { background: var(--success); box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3); }
-
-      /* Кнопки */
-      .btn {
-          width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px;
-          padding: 12px; border-radius: 18px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; 
-          text-decoration: none; transition: transform .2s var(--spring), opacity .2s; backdrop-filter: blur(10px);
-      }
-      .btn:active { transform: scale(.96); opacity: 0.9; }
-      .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.4); }
-      .btn-success { background: var(--success); color: #fff; box-shadow: 0 8px 24px rgba(48, 209, 88, 0.4); }
-      .btn-secondary { background: rgba(255,255,255,0.12); color: var(--text); }
-      .btn-danger { background: rgba(255,69,58,0.15); color: var(--danger); }
-      
-      /* Список в корзине */
-      .cart-item-row { 
-          background: rgba(0,0,0,0.3); border: var(--card-border); border-radius: 20px; 
-          padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;
-          box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
-      }
-      .cart-item-icon { width: 50px; height: 50px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); }
-      .cart-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-      .cart-item-name { font-size: 16px; font-weight: 650; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; letter-spacing: -0.2px; }
-      .cart-item-remove { 
-          width: 36px; height: 36px; border-radius: 12px; background: rgba(255,69,58,0.15); 
-          color: var(--danger); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
-          font-size: 16px; transition: transform 0.2s;
-      }
-      .cart-item-remove:active { transform: scale(0.9); }
-
-      /* Области прокрутки */
-      .scroll-area { max-height: 60dvh; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 12px; margin-right: -10px; }
-      .scroll-area::-webkit-scrollbar { width: 4px; }
-      .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-      
-      /* Меню (Инфо) */
-      .menu-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-      .menu-item {
-          background: var(--card-bg); border: var(--card-border); border-radius: 20px; padding: 16px 18px;
-          display: flex; align-items: center; justify-content: space-between; color: var(--text);
-          text-decoration: none; backdrop-filter: blur(30px); transition: transform 0.2s var(--spring), background 0.2s;
-          box-shadow: var(--glass-shadow); cursor: pointer;
-      }
-      .menu-item:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
-      .menu-item-left { display: flex; align-items: center; gap: 16px; font-size: 16px; font-weight: 650; letter-spacing: -0.2px; }
-      .menu-icon-wrap { 
-          width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); 
-          display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent); 
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      .app-cart-btn.in-cart {
+          background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80;
       }
 
-      /* Summary Box (Реквизиты и Итоги) */
-      .summary-box { background: rgba(0,0,0,0.3); border: var(--card-border); border-radius: 20px; padding: 18px; margin: 12px 0; font-size: 15px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.05); }
-      .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted); align-items: center; }
-      .summary-row:last-child { margin-bottom: 0; }
-      .summary-row.total { font-size: 18px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 6px; }
+      .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
+      
+      .app-price-tag { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; margin-top: auto; }
+      .app-price-tag.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
+
+      .new-price-bold { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-weight: 800; }
+      
+      .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
+      .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
+      .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+      
+      .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
+      .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
+      .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
+      
+      .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
+      .cart-items-list::-webkit-scrollbar { width: 4px; }
+      .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
+      .cart-items-list.collapsed { display: none !important; }
+      .cart-empty-alert {
+          display: none; width: 100%; padding: 18px 16px; border-radius: 16px;
+          background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.55);
+          color: #fca5a5; font-size: 13.5px; font-weight: 600; line-height: 1.5; text-align: center; margin: 4px 0;
+      }
+      .cart-item-row { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; flex-shrink: 0; }
+      .cart-item-left { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; text-align: left; }
+      .cart-item-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0; }
+      .cart-item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+      .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+      .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
+      .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+      
+      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
+      .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
+      
+      .diagonal-strike {
+          position: relative;
+          display: inline-block;
+          color: #94a3b8;
+          margin-right: 4px;
+      }
+      .diagonal-strike::after {
+          content: "";
+          position: absolute;
+          left: -2px;
+          top: 50%;
+          width: calc(100% + 4px);
+          height: 1.5px;
+          background-color: #ef4444;
+          transform: rotate(-15deg);
+      }
+
+      .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+      .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+      .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
+      .cart-summary-row.total { font-size: 16px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 2px; }
+      .cart-summary-row.total span:last-child { color: #60a5fa; font-size: 18px; font-weight: 800; }
+      .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100%; box-shadow: var(--box-shadow); display: flex; flex-direction: column; gap: 14px; }
+      .auth-title { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+      .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; }
+      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
+      .btn:active { transform: scale(.975); }
+      .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
+      .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 8px 20px rgba(22,163,74,0.35); }
+      .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text); box-shadow: none; }
+      .btn-danger-soft { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: none; }
+      .btn-telegram { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.5); color: #a78bfa; box-shadow: none; }
+      .btn-telegram .sf-icon { font-size: 20px; margin-right: 6px; }
+      .requisites-card {
+          background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(59, 130, 246, 0.35);
+          border-radius: 18px; padding: 16px; width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left;
+      }
+      .req-row { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 10px; }
+      .req-row:last-child { border-bottom: none; padding-bottom: 0; }
+      .req-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+      .req-value-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .req-value { font-size: 15.5px; font-weight: 750; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; text-decoration: none; }
+      .req-value:visited, .req-value:active, .req-value:hover { color: var(--text); }
+      .req-copy-btn {
+          background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.45);
+          color: #93c5fd; border-radius: 9px; padding: 5px 10px; font-size: 11.5px; font-weight: 650; cursor: pointer; flex-shrink: 0;
+      }
+      .req-copy-btn:active { transform: scale(0.95); }
+      .wait-spinner {
+          width: 52px; height: 52px; border-radius: 50%;
+          border: 3.5px solid rgba(59, 130, 246, 0.2); border-top-color: #3b82f6;
+          animation: spin 1s linear infinite; margin: 6px auto 4px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
+      .categories-bar::-webkit-scrollbar { display: none; }
+      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+      .filter-chip .sf-icon { font-size: 18px; }
+      .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
+      .catalog-notice-icon { font-size: 24px; color: #facc15; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: flex; }
+      .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; }
+      .catalog-notice-text b { color: var(--text); font-weight: 650; }
+      .app-search-wrap { position: relative; margin-bottom: 12px; width: 100%; }
+      .app-search { width: 100%; height: 42px; padding: 0 42px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; }
+      .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+      .search-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); display: none; background: none; border: none; color: var(--muted); cursor: pointer; }
+      .search-clear.visible { display: block; }
+      .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
+      .menu-modal.active { display: flex; }
+      .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; }
+      .menu-sheet::-webkit-scrollbar { width: 4px; }
+      .menu-sheet::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .menu-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+      .menu-item { padding: 13px 16px; border-radius: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.7)); border: 1px solid rgba(148,163,184,0.15); color: var(--text); font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%; transition: transform 0.2s ease; }
+      .menu-item:active { transform: scale(0.98); }
+      .menu-item-left { display: flex; align-items: center; gap: 12px; }
+      .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+      .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+      .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
+      .step-text b { color: #60a5fa; }
+      #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box, #myOrdersApp .auth-box {
+          padding: 18px 18px 16px; gap: 10px;
+          max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 80px);
+      }
+      .legal-scroll-area, .info-scroll-area {
+          display: flex; flex-direction: column; gap: 10px; max-height: calc(100dvh - 295px); overflow-y: auto;
+          padding-right: 10px; margin-right: -10px; text-align: left; width: calc(100% + 10px);
+          overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+      }
+      .legal-scroll-area::-webkit-scrollbar, .info-scroll-area::-webkit-scrollbar { width: 4px; }
+      .legal-scroll-area::-webkit-scrollbar-thumb, .info-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .info-scroll-area .step-card { margin-bottom: 0; }
+      .legal-section-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); flex-shrink: 0; }
+      .legal-section-title { font-size: 14.5px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; line-height: 1.35; }
+      .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; }
+      .legal-text:last-child { margin-bottom: 0; }
+      .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }
+      .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
+      .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
+      .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
+      .cart-toggle-btn { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; width: 100%; display: none; align-items: center; justify-content: space-between; cursor: pointer; margin: 6px 0 4px 0; transition: background 0.2s; }
+      .cart-toggle-btn:active { background: rgba(59, 130, 246, 0.25); }
+      .cart-toggle-btn .sf-icon { font-size: 16px; transition: transform 0.3s var(--spring); transform: rotate(90deg); }
+      .cart-toggle-btn.open .sf-icon { transform: rotate(-90deg); }
+
+      .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
+      .my-order-item:last-child { margin-bottom: 0; }
+      .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
+      .my-order-status { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 7px; }
+      .my-order-status.pending { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+      .my-order-status.approved { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+      .my-order-status.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+      .my-order-apps { font-size: 12px; color: var(--muted); line-height: 1.35; }
+      .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
+
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #singleTokenAppContainer .app-grid-card {
+    min-height: 90px;
+}
     </style>
+    <script>
+        if ("fonts" in document) {
+            document.fonts.load('1em "SFSymbols"').then(function() {
+                document.documentElement.classList.add("fonts-loaded");
+            }).catch(function() {
+                document.documentElement.classList.add("fonts-loaded");
+            });
+        } else {
+            document.documentElement.classList.add("fonts-loaded");
+        }
+    </script>
 </head>
 <body>
 
-<div class="mesh-bg">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-</div>
+<div class="aurora-bg"></div>
 
-<header class="top-navbar" onclick="switchScreen('mainApp')">
-    <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" class="nav-logo" alt="logo">
-    <span class="nav-title">AppRestore IOS</span>
+<header class="top-navbar">
+    <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
+        <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" alt="logo" class="nav-logo">
+        <span class="nav-title">AppRestore IOS</span>
+    </a>
+    <div class="nav-right-actions">
+        <a href="#" class="back-btn" id="navBackBtn" onclick="handleNavBack(event)" title="Назад"><span class="sf-icon">&#xECAC;</span></a>
+        <button class="burger-btn" onclick="toggleBurgerMenu()" aria-label="Меню" id="navBurgerBtn">
+            <div class="burger-line"></div>
+        </button>
+    </div>
 </header>
 
-<!-- КАТАЛОГ -->
-<div class="container active-screen" id="mainApp">
-    <div style="margin-top: 10px; margin-bottom: 24px;">
-        <h1 class="hero-title">Лучшие приложения<br>для <span>вашего iPhone</span></h1>
+<div class="menu-modal" id="burgerMenuModal" onclick="toggleBurgerMenu()">
+    <div class="menu-sheet" onclick="event.stopPropagation()">
+        <div class="menu-header">
+            <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
+            <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span>
+        </div>
+        <button class="menu-item" onclick="showMyOrdersScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x0157;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
+        <button class="menu-item" onclick="showGuideScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div><span>Инструкция</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
+        <button class="menu-item" onclick="showTipsScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div><span>Полезные советы</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
+        <button class="menu-item" onclick="showPolicyScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div><span>Политика использования</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
+        <button class="menu-item" onclick="showOfferScreen()">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Публичная оферта</span></div><span class="sf-icon">&#xECA2;</span>
+        </button>
+        <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xFA8E;</span></div><span>AppRestore IOS в Telegram!</span></div><span class="sf-icon">&#xECA2;</span>
+        </a>
+        <a href="https://t.me/dizabled" target="_blank" class="menu-item">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка проекта</span></div><span class="sf-icon">&#xECA2;</span>
+        </a>
     </div>
-    
+</div>
+
+<div class="container" id="maintenanceApp">
+    <div class="auth-box">
+        <div class="auth-title">Система обновляется</div>
+        <div class="auth-description" style="text-align: center;">Каталог временно недоступен в связи с плановым техническим обслуживанием. Пожалуйста, зайдите чуть позже.</div>
+        <button type="button" class="btn btn-secondary" onclick="checkConnection()" style="margin-top: 10px;">Проверить соединение</button>
+    </div>
+</div>
+
+<div class="container" id="welcomeApp">
+    <div class="hero-section">
+        <div class="hero-title">Приложения для <span>iPhone</span> быстро и понятно</div>
+        <div class="hero-desc-box">
+            <p class="hero-desc">Для просмотра списка доступных приложений и оформления заказа нажмите <b>«Перейти к каталогу»</b>.</p>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="openCatalog()" style="margin-bottom: 12px; min-height: 50px; font-size: 15.5px; border-radius: 16px;">
+        Перейти к каталогу
+    </button>
+    <div class="info-grid">
+        <div class="info-box"><div class="info-box-num">55+</div><div class="info-box-label">приложений в каталоге</div></div>
+        <div class="info-box"><div class="info-box-num">5 мин</div><div class="info-box-label">обычно занимает установка</div></div>
+        <div class="info-box"><div class="info-box-num">без ПК</div><div class="info-box-label">нужны только iPhone и Safari</div></div>
+        <div class="info-box"><div class="info-box-num">на сайте</div><div class="info-box-label">быстрый выбор в корзину</div></div>
+        <div class="info-box"><div class="info-box-num">удобно</div><div class="info-box-label">не нужен сертификат разработчика</div></div>
+        <div class="info-box"><div class="info-box-num">100%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от учетной записи Apple ID</div></div>
+    </div>
+</div>
+
+<div class="container" id="mainApp">
+    <div class="catalog-notice">
+        <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div>
+        <div class="catalog-notice-text">Добавьте нужные приложения <b>в корзину</b> и нажмите на кнопку корзины внизу справа.</div>
+    </div>
     <div class="app-search-wrap">
         <span class="search-icon"><span class="sf-icon">&#xFCA6;</span></span>
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
+        <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><span class="sf-icon">&#xECD2;</span></button>
     </div>
-    
-    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:15px; padding:40px 20px;">
-        <span class="sf-icon" style="font-size: 32px; margin-bottom: 10px; display: block;">&#xFCA6;</span>
-        По вашему запросу ничего не найдено
+    <div class="categories-bar">
+        <button type="button" class="filter-chip active" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span>Все</button>
+        <button type="button" class="filter-chip" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span>Банки</button>
+        <button type="button" class="filter-chip" onclick="setCategory('social', this)"><span class="sf-icon">&#x0068;</span>Соцсети</button>
+        <button type="button" class="filter-chip" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span>Инвестиции</button>
+        <button type="button" class="filter-chip" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span>Другие</button>
     </div>
-    <div id="appListContainer" style="width: 100%;"></div>
+    <div class="catalog-header">
+        <div class="catalog-title">Всего приложений: <span id="appCountDisplay">0</span></div>
+    </div>
+    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
+    <div class="apps-grid-container" id="appListContainer"></div>
 </div>
 
-<!-- КОРЗИНА -->
+<div class="cart-fab-wrap">
+    <button type="button" class="cart-fab-btn" id="cartFabBtn" onclick="openCartScreen()" aria-label="Открыть корзину">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-fab-badge" id="cartFabBadge">0</span>
+    </button>
+</div>
+
 <div class="container" id="cartApp">
-    <div class="auth-box">
-        <h2 class="hero-title" style="font-size: 28px; margin-bottom: 0;">Корзина</h2>
-        <p style="color: var(--muted); font-size: 14px; margin: 0 0 12px 0;">Проверьте список приложений перед оплатой</p>
-        
-        <div id="cartEmptyBox" style="padding: 30px 20px; text-align: center; color: var(--muted); background: rgba(0,0,0,0.2); border: var(--card-border); border-radius: 20px;">
-            <span class="sf-icon" style="font-size: 40px; margin-bottom: 12px; display: block; color: rgba(255,255,255,0.2);">&#xF889;</span>
-            Ваша корзина пуста
+    <div class="auth-box" style="padding: 24px 18px;">
+        <div class="cart-header-row">
+            <button class="cart-back-btn" id="cartBackToCatalogBtn" onclick="switchScreen('mainApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" id="cartScreenTitle" style="font-size: 20px; margin: 0;">Ваша корзина</div>
         </div>
-        
-        <div id="cartItemsList" class="scroll-area" style="max-height: 40dvh;"></div>
+        <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>
 
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin: 10px 0 0 0; display: flex; gap: 10px;">
-            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; text-transform: uppercase;" placeholder="Ввести промокод">
-            <button type="button" class="btn btn-secondary" onclick="applyPromoCode()" style="width: auto; padding: 0 20px; min-height: 48px;">Ок</button>
-        </div>
-        <div id="promoMessage" style="font-size: 13px; font-weight: 600; margin-top: 6px; display: none; padding-left: 4px;"></div>
-
-        <div class="summary-box" id="cartSummaryCard" style="display: none;">
-            <div class="summary-row"><span>Приложения (<span id="cartScreenCount">0</span>)</span></div>
-            <div class="summary-row" id="cartBulkDiscountRow" style="display:none; color: var(--success); font-weight: 600;"><span>Скидка (от 3 шт.)</span><span id="cartScreenBulkDiscount">0 ₽</span></div>
-            <div class="summary-row" id="cartPromoRow" style="display:none; color: var(--success); font-weight: 600;"><span>Промокод</span><span id="cartScreenDiscount">0 ₽</span></div>
-            <div class="summary-row total"><span>Итого к оплате</span><span id="cartScreenTotal" style="color: var(--accent);">0 ₽</span></div>
+        <div id="cartEmptyBox" class="cart-empty-alert">
+            Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
         </div>
 
-        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()">
-            <span class="sf-icon">&#xF889;</span> Перейти к оплате
+        <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
+            <span id="cartToggleListText">Выбранные приложения (0)</span>
+            <span class="sf-icon">&#xECA2;</span>
         </button>
-        <button type="button" class="btn btn-danger" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
+
+        <div class="cart-items-list" id="cartItemsList"></div>
+
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; display: flex; gap: 8px;">
+            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
+            <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
+        </div>
+        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
+
+        <div class="cart-summary-card" id="cartSummaryCard">
+            <div class="cart-summary-row" id="cartOrderNumberRow">
+                <span>Номер заказа:</span>
+                <span id="cartScreenOrderNum" style="color: var(--text); font-weight: 650;">#00000</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Выбрано приложений:</span>
+                <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
+            </div>
+            <div class="cart-summary-row" id="cartBulkDiscountRow" style="display: none; color: #4ade80;">
+                <span>Скидка от 3 шт. (-40 ₽/шт.):</span>
+                <span id="cartScreenBulkDiscount">-0 ₽</span>
+            </div>
+            <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
+                <span>Скидка по промокоду:</span>
+                <span id="cartScreenDiscount">-0 ₽</span>
+            </div>
+            <div class="cart-summary-row total">
+                <span>Итого к оплате:</span>
+                <span id="cartScreenTotal">0 ₽</span>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Оплатить
+        </button>
+        <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
     </div>
 </div>
 
-<!-- МЕНЮ И НАВИГАЦИЯ -->
-<div class="container" id="menuApp">
-    <h2 class="hero-title" style="font-size: 32px; margin-bottom: 16px;">Навигация</h2>
-    <div class="menu-grid">
-        <button class="menu-item" onclick="switchScreen('myOrdersApp')">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x0157;</span></div>Мои заказы</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </button>
-        <button class="menu-item" onclick="switchScreen('guideApp')">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div>Инструкция по установке</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </button>
-        <button class="menu-item" onclick="switchScreen('tipsApp')">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div>Полезные советы</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </button>
-        <button class="menu-item" onclick="switchScreen('policyApp'); loadExternalContent(POLICY_URL, 'policyContent');">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div>Политика использования</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </button>
-        <button class="menu-item" onclick="switchScreen('offerApp'); loadExternalContent(OFFER_URL, 'offerContent');">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div>Публичная оферта</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </button>
-        <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap" style="color:#a78bfa; background:rgba(167, 139, 250, 0.15);"><span class="sf-icon">&#xFA8E;</span></div>AppRestore в Telegram</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </a>
-        <a href="https://t.me/dizabled" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap" style="color:#a78bfa; background:rgba(167, 139, 250, 0.15);"><span class="sf-icon">&#xF9E8;</span></div>Поддержка проекта</div>
-            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
-        </a>
-    </div>
-</div>
-
-<!-- ОПЛАТА И СТАТУСЫ ЗАКАЗОВ -->
 <div class="container" id="paymentApp">
-    <div class="auth-box">
-        <h2 class="hero-title" style="font-size: 26px; margin-bottom: 0;">Оплата (СБП)</h2>
-        <p style="color: var(--muted); font-size: 14px;">Переведите точную сумму по реквизитам ниже и нажмите «Я оплатил»</p>
-        <div class="summary-box" style="margin-top: 4px;">
-            <div class="summary-row"><span>Номер заказа</span><span id="paymentOrderNum" style="color:#fff; font-weight:700;">#00000</span></div>
-            <div class="summary-row"><span>Банк получателя</span><span style="color:#fff; font-weight:600;">ОТП Банк</span></div>
-            <div class="summary-row"><span>Получатель</span><span style="color:#fff; font-weight:600;">Артём Е.</span></div>
-            <div class="summary-row">
-                <span>Телефон (СБП)</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="color:#fff; font-weight:700;" id="reqPhoneText">89221194735</span>
-                    <button id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')" style="background:var(--accent-bg); color:var(--accent); border:none; border-radius:8px; font-size:12px; font-weight:700; padding:6px 10px; cursor:pointer; transition:transform 0.2s;">Копия</button>
+    <div class="auth-box" style="padding: 24px 18px;">
+        <div class="cart-header-row">
+            <button class="cart-back-btn" onclick="switchScreen('cartApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
+        </div>
+        <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
+            Переведите точную сумму по реквизитам ниже (СБП) и нажмите <b>«Я оплатил»</b>
+        </div>
+
+        <div class="requisites-card">
+            <div class="req-row">
+                <span class="req-label">Номер заказа:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="paymentOrderNum" style="color: var(--text);">#00000</span>
                 </div>
             </div>
-            <div class="summary-row total"><span>Сумма перевода</span><span id="paymentTotalAmount" style="color:var(--accent);">0 ₽</span></div>
+            <div class="req-row">
+                <span class="req-label">Номер телефона (СБП):</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="reqPhoneText">89221194735</span>
+                    <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Банк получателя:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">ОТП Банк</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Получатель:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">Артём Е.</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Сумма к переводу:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" style="color: #60a5fa; font-size: 18px;" id="paymentTotalAmount">0 ₽</span>
+                </div>
+            </div>
         </div>
+
         <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
-            <span class="sf-icon">&#XECC2;</span> Я оплатил
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил
         </button>
-        <button type="button" class="btn btn-secondary" onclick="switchScreen('cartApp')">Вернуться в корзину</button>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<div class="container" id="orderWaitApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div class="wait-spinner"></div>
+        <div class="auth-title" style="font-size: 20px;">Проверка оплаты</div>
+        <div class="auth-description" style="text-align: center;">
+            Заказ <b id="waitOrderNum" style="color: var(--text);">#00000</b> отправлен на проверку администратору.<br><br>
+            Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится ваша персональная ссылка для установки.
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<div class="container" id="orderApprovedApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div class="auth-title" style="color: #4ade80; font-size: 22px;">Оплата подтверждена!</div>
+        <div class="auth-description" style="text-align: center;">
+            Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
+        </div>
+        <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
+            <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
+            🚀 Начать установку
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="showGuideScreen()" style="margin-top: 4px;">
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xDD;</span> Инструкция по установке
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="openCatalog()" style="margin-top: 4px;">
+            Вернуться в каталог
+        </button>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+    </div>
+</div>
+
+<div class="container" id="orderRejectedApp">
+    <div class="auth-box" style="padding: 26px 20px;">
+        <div class="auth-title" style="color: #fca5a5; font-size: 22px;">Администратор не получил оплату</div>
+        <div class="auth-description" style="text-align: center;">
+            Платеж по вашей заявке не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+            <span class="sf-icon">&#xF9E8;</span> Поддержка
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="backToPaymentFromRejected()">
+            Вернуться к реквизитам
+        </button>
     </div>
 </div>
 
 <div class="container" id="myOrdersApp">
-    <div class="auth-box">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button>
-            <h2 class="hero-title" style="font-size: 26px; margin: 0;">Мои заказы</h2>
+    <div class="auth-box" style="padding: 24px 18px;">
+        <div class="cart-header-row">
+            <button class="cart-back-btn" onclick="goBackFromInfo(false)"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" style="font-size: 20px; margin: 0;">Мои заказы</div>
         </div>
-        <div id="myOrdersListContainer" class="scroll-area" style="width: 100%;"></div>
+        <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">История ваших заказов на этом устройстве</div>
+        
+        <div class="admin-scroll-list" id="myOrdersListContainer" style="max-height: 44dvh; text-align: left; width: 100%;">
+            <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="goBackFromInfo(false)" style="margin-top: 4px;">Вернуться назад</button>
     </div>
 </div>
 
-<div class="container" id="orderWaitApp"><div class="auth-box" style="align-items:center; text-align:center;"><div style="width: 56px; height: 56px; border-radius: 50%; border: 4px solid var(--accent-bg); border-top-color: var(--accent); animation: spin 1s linear infinite; margin-bottom: 10px;"></div><h2 style="font-size: 24px; margin: 0;">Проверка оплаты...</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Заказ <b id="waitOrderNum" style="color:#fff;">#00000</b> отправлен администратору.<br><br>Пожалуйста, <b>не закрывайте страницу</b>. Как только оплата подтвердится, здесь появится ссылка.</p></div></div>
-<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-
-<div class="container" id="orderApprovedApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--success); margin-bottom: 10px;">&#xFC32;</span><h2 style="font-size: 26px; color:var(--success); margin: 0;">Оплата успешна!</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Ваша разовая персональная ссылка готова. Нажмите кнопку ниже, чтобы начать загрузку.</p><button class="btn btn-primary" onclick="startApprovedInstallation()" style="margin-top: 10px; font-size: 18px;">🚀 Начать установку</button></div></div>
-<div class="container" id="orderRejectedApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--danger); margin-bottom: 10px;">&#xFC33;</span><h2 style="font-size: 26px; color:var(--danger); margin: 0;">Оплата не найдена</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Администратор не получил ваш перевод. Если вы его отправляли, напишите в поддержку.</p><a href="https://t.me/dizabled" class="btn btn-primary" style="margin-top: 10px;">Написать в поддержку</a><button class="btn btn-secondary" onclick="switchScreen('paymentApp')">Назад к реквизитам</button></div></div>
-<div class="container" id="maintenanceApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--muted); margin-bottom: 10px;">&#xF882;</span><h2 style="font-size: 26px; margin: 0;">Тех. обслуживание</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Каталог временно недоступен. Зайдите позже.</p><button class="btn btn-primary" onclick="checkConnection()" style="margin-top: 10px;">Обновить страницу</button></div></div>
-
-<!-- Текстовые инфо-экраны -->
-<div class="container" id="guideApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:24px; margin:0;">Инструкция</h2></div><div class="scroll-area"><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">1</div><p style="margin:0; font-size:15px; line-height:1.4;">Выберите нужные приложения в каталоге и откройте корзину.</p></div><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">2</div><p style="margin:0; font-size:15px; line-height:1.4;">Оплатите перевод по СБП и нажмите кнопку «Я оплатил».</p></div><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">3</div><p style="margin:0; font-size:15px; line-height:1.4;">После подтверждения перейдите по персональной ссылке на установку.</p></div></div></div></div>
-<div class="container" id="tipsApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:24px; margin:0;">Советы</h2></div><div class="scroll-area"><p style="font-size:15px; font-weight:700; margin-bottom:4px;">1. Защита от удаления:</p><p style="font-size:14px; color:var(--muted); line-height:1.5; margin:0 0 16px 0;">Настройки ➝ Экранное время ➝ Контент и конфиденциальность ➝ Покупки в App Store ➝ Удаление приложений (Нет).</p><p style="font-size:15px; font-weight:700; margin-bottom:4px;">2. Отключение сгружения:</p><p style="font-size:14px; color:var(--muted); line-height:1.5; margin:0;">Настройки ➝ App Store ➝ Сгружать неиспользуемые (Выкл).</p></div></div></div>
-<div class="container" id="policyApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:22px; margin:0;">Политика</h2></div><div class="scroll-area" id="policyContent" style="font-size: 14px; color: var(--muted); line-height: 1.5;">Загрузка данных...</div></div></div>
-<div class="container" id="offerApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:22px; margin:0;">Оферта</h2></div><div class="scroll-area" id="offerContent" style="font-size: 14px; color: var(--muted); line-height: 1.5;">Загрузка данных...</div></div></div>
-
-<!-- Экраны активации токена (по ссылке) -->
-<div class="container" id="tokenApp"><div class="auth-box"><h2 style="font-size:26px; margin:0;">Установка</h2><p id="tokenHeroDesc" style="font-size:14px; color:var(--muted); line-height:1.4;">Ваша персональная ссылка активирована. Установите приложения до истечения таймера:</p><div style="text-align: center; font-size: 40px; font-weight: 800; color: var(--accent); margin: 10px 0;" id="tokenCountdownDisplay">--:--</div><div id="singleTokenAppContainer" class="scroll-area" style="max-height: 40dvh;"></div></div></div>
-<div class="container" id="tokenErrorApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--danger); margin-bottom: 10px;">&#xFC33;</span><h2 style="font-size:26px; color:var(--danger); margin:0;">Установка недоступна</h2><p style="font-size:15px; color:var(--muted); line-height:1.4; margin-top: 10px;">Срок действия ссылки истёк, либо она была использована на другом устройстве.</p><a href="https://t.me/dizabled" class="btn btn-secondary" style="margin-top: 10px;">Написать продавцу</a></div></div>
-
-<!-- НИЖНИЙ TAB BAR (Главная Навигация) -->
-<nav class="tab-bar">
-    <div class="tab-item active" id="tab_mainApp" onclick="switchScreen('mainApp')">
-        <span class="sf-icon tab-icon">&#xFC05;</span><span class="tab-label">Каталог</span>
+<div class="container" id="tokenApp">
+    <div class="hero-section">
+        <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
+        <div class="hero-desc-box" style="margin-bottom: 14px; margin-top: 10px;">
+            <p class="hero-desc" id="tokenHeroDesc">Персональная ссылка активирована. Данная ссылка действует ограниченное время и только на одном устройстве! Установите приложения и обратитесь к продавцу.</p>
+        </div>
     </div>
-    <div class="tab-item" id="tab_cartApp" onclick="openCartScreen()">
-        <span class="sf-icon tab-icon">&#xF889;</span><span class="tab-label">Корзина</span>
-        <div class="tab-badge" id="cartFabBadge">0</div>
+    <div class="catalog-notice" style="margin-top: 0;">
+        <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div>
+        <div class="catalog-notice-text">Если установка не удалась, <b>обновите страницу и повторите попытку</b>.</div>
     </div>
-    <div class="tab-item" id="tab_myOrdersApp" onclick="switchScreen('myOrdersApp')">
-        <span class="sf-icon tab-icon">&#x0157;</span><span class="tab-label">Заказы</span>
+    <div class="info-grid">
+        <div class="info-box" id="tokenTimerBox">
+            <div class="info-box-num" id="tokenCountdownDisplay">--:--</div>
+            <div class="info-box-label">осталось до сгорания ссылки</div>
+        </div>
+        <a href="https://t.me/dizabled" target="_blank" class="info-box" style="text-decoration: none;">
+            <div class="info-box-num" style="color: #a78bfa; font-size: 22px;"><span class="sf-icon">&#xF9E8;</span></div>
+            <div class="info-box-label">написать в поддержку</div>
+        </a>
     </div>
-    <div class="tab-item" id="tab_menuApp" onclick="switchScreen('menuApp')">
-        <span class="sf-icon tab-icon">&#xDF;</span><span class="tab-label">Меню</span>
+    <div class="catalog-header" style="margin-top: 14px;">
+        <div class="catalog-title">Выбранные приложения:</div>
     </div>
-</nav>
+    <div class="apps-grid-container" id="singleTokenAppContainer"></div>
+</div>
+
+<div class="container" id="tokenErrorApp">
+    <div class="auth-box">
+        <div class="auth-title" style="color: #fca5a5;">Установка недоступна</div>
+        <div class="auth-description" style="text-align: center;">Срок действия ссылки истёк или она уже была использована на другом устройстве. Пожалуйста, обратитесь к продавцу для решения проблемы.</div>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 6px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a>
+    </div>
+</div>
+
+<div class="container" id="guideApp">
+    <div class="auth-box">
+        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
+        <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
+            <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
+    </div>
+</div>
+
+<div class="container" id="tipsApp">
+    <div class="auth-box">
+        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Полезные советы</div>
+        <div class="info-scroll-area">
+            <div class="auth-description" style="text-align: center; font-weight: 600;">1. Отключите сгружение:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
+            <div class="auth-description" style="margin-top: 6px; text-align: center; font-weight: 600;">2. Защита от удаления:</div>
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button>
+    </div>
+</div>
+
+<div class="container" id="policyApp">
+    <div class="auth-box">
+        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Политика использования AppRestore IOS</div>
+        <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 29 октября 2026 года</div>
+        <div class="legal-scroll-area" id="policyContent">
+            <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button>
+    </div>
+</div>
+
+<div class="container" id="offerApp">
+    <div class="auth-box">
+        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18px;">Публичная оферта AppRestore IOS</div>
+        <div class="auth-description" style="text-align: center; font-size: 11.5px; margin-top: -6px; margin-bottom: 2px;">Дата последнего обновления: 29 октября 2026 года</div>
+        <div class="legal-scroll-area" id="offerContent">
+            <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 2px;">Понятно, вернуться назад</button>
+    </div>
+</div>
 
 <script>
-// Оригинальные константы и настройки
-const ALLOWED_WHEN_DISABLED = ["maintenanceApp", "tokenApp", "tokenErrorApp", "guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp", "orderWaitApp", "orderApprovedApp"];
+const ALLOWED_WHEN_DISABLED = [
+    "maintenanceApp", 
+    "tokenApp", 
+    "tokenErrorApp", 
+    "guideApp", 
+    "tipsApp", 
+    "policyApp", 
+    "offerApp", 
+    "myOrdersApp",
+    "orderWaitApp",
+    "orderApprovedApp"
+];
+
 const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html";
 const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";
-const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
 
-// ПОЛНЫЙ МАССИВ ВСЕХ ПРИЛОЖЕНИЙ ИЗ ОРИГИНАЛА
+async function sbFetch(path, options = {}) {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+            ...options,
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+        if (!res.ok) return null;
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
+    } catch (e) { return null; }
+}
+
+document.addEventListener("dblclick", function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener("gesturestart", function(e) { e.preventDefault(); });
+let lastTouchEnd = 0;
+document.addEventListener("touchend", function(e) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) { e.preventDefault(); }
+    lastTouchEnd = now;
+}, { passive: false });
+
+const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
 const appsData = [
   { key: "vk", name: "ВКонтакте (Оригинал)", category: "social", url: "/manifests/vk.plist", icon: L_BASE + "vk.png", ios: "iOS 17.6+" },
   { key: "max", name: "MAX (Оригинал)", category: "social", url: "/manifests/max.plist", icon: L_BASE + "max.png", ios: "iOS 15.5+" },
@@ -411,12 +736,12 @@ const appsData = [
   { key: "okru", name: "Одноклассники (Оригинал)", category: "social", url: "/manifests/okru.plist", icon: L_BASE + "okru.png", ios: "iOS 15.6+" },
   { key: "vkmusic_original", name: "VK Музыка (Оригинал)", category: "social", url: "/manifests/vkmusic_original.plist", icon: L_BASE + "vkmusic_original.png", ios: "iOS 17.6+" },
   { key: "okko", name: "Okko (Оригинал)", category: "other", url: "/manifests/okko.plist", icon: L_BASE + "okko.png", ios: "iOS 16.0+" },
-  { key: "gazprombank_seif", name: "ГазпромБанк (Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
-  { key: "sberfinansy", name: "СберБанк (Финансы)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
+  { key: "gazprombank_seif", name: "ГазпромБанк (Цифровой Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
+  { key: "sberfinansy", name: "СберБанк Онлайн (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
   { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 14.0" },
   { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: L_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
   { key: "avito", name: "Авито (Оригинал)", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" },
-  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "vsekarty.png", ios: "iOS 16.0+" },
+  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "vsekarty.png", ios: "iOS 16.0+" },
   { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: L_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
   { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: L_BASE + "sinoptik.png", ios: "iOS 17.0+" },
   { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: L_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
@@ -433,10 +758,10 @@ const appsData = [
   { key: "azslukoil", name: "АЗС Лукойл (Оригинал)", category: "other", url: "/manifests/azslukoil.plist", icon: L_BASE + "azslukoil.png", ios: "iOS 14.0+" },
   { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: L_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
   { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: L_BASE + "sberkids.png", ios: "iOS 15.0+" },
-  { key: "lenta_bystro", name: "Лента (Быстро)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
+  { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
   { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: L_BASE + "avito_anero.png", ios: "iOS 16.0+" },
   { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: L_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
-  { key: "scbnotes", name: "СовкомБанк (Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: L_BASE + "scbnotes.png", ios: "iOS 17.0+" },
+  { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: L_BASE + "scbnotes.png", ios: "iOS 17.0+" },
   { key: "akbarsbank_vseychteno", name: "АК Барс Банк (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: L_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
   { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: L_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
   { key: "happ_proxy", name: "Happ Proxy (Оригинал)", category: "other", url: "/manifests/happ_proxy.plist", icon: L_BASE + "happ.png", ios: "iOS 15.0+" },
@@ -445,8 +770,8 @@ const appsData = [
   { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: L_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
   { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: L_BASE + "sberinvest.png", ios: "iOS 16.0+" },
   { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: L_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
-  { key: "alfa_invest", name: "Альфа Инвестиции", category: "investments", url: "/manifests/alfa_invest.plist", icon: L_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
-  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: L_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
+  { key: "alfa_invest", name: "Альфа Инвестиции (Ход Вверх!)", category: "investments", url: "/manifests/alfa_invest.plist", icon: L_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: L_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
   { key: "sbpay", name: "СБПэй (Оригинал)", category: "other", url: "/manifests/sbpay.plist", icon: L_BASE + "sbpay.png", ios: "iOS 13.0+" },
   { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: L_BASE + "yota.png", ios: "iOS 15.0+" },
   { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: L_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
@@ -461,182 +786,1190 @@ const appsData = [
 ];
 
 let siteState = { prices: {}, visibility: {} };
-let siteEnabled = true, bulkDiscountEnabled = true, currentScreenId = "mainApp";
-let cartItems = new Set(), currentOrderNumber = null, currentPromoCode = null, currentPromoDiscount = 0, myLocalOrders = [];
+let siteEnabled = true;
+let bulkDiscountEnabled = true;
+let currentCategory = "all";
+let isFromToken = false;
+let isTokenExpired = false;
+let previousScreen = "welcomeApp";
+let currentScreenId = "welcomeApp";
+let tokenCountdownInterval = null;
+let cartItems = new Set();
+let currentOrderNumber = null;
+let currentPromoCode = null;
+let currentPromoDiscount = 0;
+let isCartListVisible = false;
+let activeOrderId = null;
+let activeApprovedLink = "";
+let orderPollingInterval = null;
+let myLocalOrders = [];
 
-// === ЗАГЛУШКИ ДЛЯ БАЗЫ ДАННЫХ ===
-// (Здесь должен быть ваш код для работы с Supabase - sbFetch, загрузка корзины и т.д.)
-function getAppPrice(key) { return siteState.prices[key] ? Number(siteState.prices[key]) : 290; }
-function isAppVisible(key) { return siteState.visibility[key] !== false; }
-function getCartBulkDiscount() { return (bulkDiscountEnabled && cartItems.size >= 3) ? cartItems.size * 40 : 0; }
-function saveCart() { try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch(e){} }
-function copyRequisite(text, btnId) {
-    const btn = document.getElementById(btnId);
-    if(navigator.clipboard) navigator.clipboard.writeText(text);
-    const old = btn.textContent; btn.textContent = "Скопировано";
-    setTimeout(() => { btn.textContent = old; }, 1500);
+try {
+    const savedCart = JSON.parse(localStorage.getItem("apprestore_cart") || "[]");
+    if (Array.isArray(savedCart)) {
+        savedCart.forEach(k => { if (appsData.some(a => a.key === k)) cartItems.add(k); });
+    }
+    const savedOrderId = localStorage.getItem("apprestore_active_order_id");
+    if (savedOrderId) activeOrderId = Number(savedOrderId);
+    const savedOrderNum = localStorage.getItem("apprestore_active_order_num");
+    if (savedOrderNum) currentOrderNumber = savedOrderNum;
+
+    const savedMyOrders = JSON.parse(localStorage.getItem("apprestore_my_orders_history") || "[]");
+    if (Array.isArray(savedMyOrders)) myLocalOrders = savedMyOrders;
+} catch (e) {}
+
+function saveCart() {
+    try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch (e) {}
 }
 
-// === ЛОГИКА ГЕНЕРАЦИИ СЕТКИ КАТАЛОГА ===
-function generateAppsGrid() {
-    const container = document.getElementById("appListContainer");
-    if (!container) return;
-    
-    // Группы
-    const cats = [
-        { id: 'banks', name: 'Банки и Финансы' },
-        { id: 'social', name: 'Социальные сети' },
-        { id: 'investments', name: 'Инвестиции' },
-        { id: 'other', name: 'Другие сервисы' }
-    ];
-    
-    let html = '';
-    cats.forEach(c => {
-        const appsInCat = appsData.filter(a => a.category === c.id);
-        if (appsInCat.length === 0) return;
-        
-        html += `<div class="category-block" id="cat_block_${c.id}">
-                    <div class="category-header">${c.name}</div>
-                    <div class="horizontal-scroll">`;
-                    
-        appsInCat.forEach(app => {
-            const price = getAppPrice(app.key);
-            const isPrem = price >= 500;
-            const isInCart = cartItems.has(app.key);
-            
-            // Разделяем имя и подзаголовок (в скобках)
-            let mainName = app.name, subName = app.ios;
-            if (app.name.includes(" (")) {
-                mainName = app.name.split(" (")[0];
-                subName = app.name.split(" (")[1].replace(")", "");
-            }
-            
-            html += `
-            <div class="vision-card" data-key="${app.key}" data-name="${app.name.toLowerCase()}">
-                <img loading="lazy" src="${app.icon}" class="vision-icon" alt="${app.name}">
-                <div class="vision-title">${mainName}</div>
-                <div class="vision-sub">${subName}</div>
-                <button type="button" class="vision-btn ${isInCart ? 'in-cart' : ''} ${isPrem ? 'premium' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">
-                    <span class="price-text">${price} ₽</span>
-                    <span class="check-icon">✓</span>
-                </button>
-            </div>`;
-        });
-        html += `</div></div>`;
-    });
-    container.innerHTML = html;
+function saveMyLocalOrders() {
+    try { localStorage.setItem("apprestore_my_orders_history", JSON.stringify(myLocalOrders)); } catch (e) {}
 }
 
-// === ПОИСК ===
-function filterApps() {
-    const query = document.getElementById("appSearchInput")?.value.toLowerCase() || "";
-    let totalMatch = 0;
-    document.querySelectorAll(".category-block").forEach(block => {
-        let matchInCat = 0;
-        block.querySelectorAll(".vision-card").forEach(card => {
-            const match = card.getAttribute("data-name").includes(query);
-            card.style.display = match ? "flex" : "none";
-            if (match) { matchInCat++; totalMatch++; }
-        });
-        block.style.display = matchInCat > 0 ? "block" : "none";
-    });
-    document.getElementById("searchEmpty").style.display = totalMatch === 0 ? "block" : "none";
-}
+const LOCKED_SCREENS = ["tokenErrorApp", "maintenanceApp"];
+const HISTORY_STACK = [];
+const INFO_SCREENS = ["guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp"];
 
-// === КОРЗИНА И НАВИГАЦИЯ ===
-function toggleCart(key) {
-    if (cartItems.has(key)) cartItems.delete(key); else cartItems.add(key);
-    saveCart(); updateCartUI();
-}
-
-function updateCartUI() {
-    appsData.forEach(app => {
-        const btn = document.getElementById("gridBtn_" + app.key);
-        if (btn) btn.classList.toggle("in-cart", cartItems.has(app.key));
-    });
-    const badge = document.getElementById("cartFabBadge");
-    if (badge) {
-        badge.textContent = cartItems.size;
-        badge.classList.toggle("visible", cartItems.size > 0);
+async function loadExternalContent(url, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container || container.dataset.loaded === "true") return;
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            container.innerHTML = await res.text();
+            container.dataset.loaded = "true";
+        } else {
+            container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки документа.</div>';
+        }
+    } catch (e) {
+        container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка сети.</div>';
     }
 }
 
-function switchScreen(id) {
-    document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
-    document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
-    
-    const screen = document.getElementById(id);
-    if(screen) screen.classList.add("active-screen");
-    
-    // Подсветка таба (если экран привязан к табу)
-    let tabId = id;
-    if (["guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) tabId = "menuApp";
-    if (["paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp"].includes(id)) tabId = "cartApp";
-    
-    const tab = document.getElementById("tab_" + tabId);
-    if(tab) tab.classList.add("active");
-    
-    currentScreenId = id;
-    window.scrollTo(0,0);
+function loadFromLocalStorageCache() {
+    try {
+        const pCache = localStorage.getItem("apprestore_prices_cache");
+        const vCache = localStorage.getItem("apprestore_visibility_cache");
+        const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+        const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
+        
+        if (pCache) siteState.prices = JSON.parse(pCache);
+        if (vCache) siteState.visibility = JSON.parse(vCache);
+        if (bCache !== null) bulkDiscountEnabled = bCache === "true";
+        if (sCache !== null) {
+            siteEnabled = sCache === "true";
+            const alertEl = document.getElementById("top-toast-alert");
+            if (!siteEnabled) {
+                if (alertEl) alertEl.classList.add("show");
+                if (!ALLOWED_WHEN_DISABLED.includes(currentScreenId)) {
+                    switchScreen("maintenanceApp");
+                }
+            } else {
+                if (alertEl) alertEl.classList.remove("show");
+                if (currentScreenId === "maintenanceApp") switchScreen("mainApp");
+            }
+        }
+    } catch(e) {}
+}
+
+async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
+    try {
+        const [pricesRes, visRes, settingsRes] = await Promise.all([
+            sbFetch("app_prices?select=*"),
+            sbFetch("app_visibility?select=*"),
+            sbFetch("site_settings?select=*")
+        ]);
+
+        let hasChanges = false;
+        
+        const newPrices = {};
+        if (Array.isArray(pricesRes)) {
+            pricesRes.forEach(row => { newPrices[row.app_key] = String(row.price); });
+        }
+        
+        if (JSON.stringify(newPrices) !== JSON.stringify(siteState.prices)) {
+            siteState.prices = newPrices;
+            hasChanges = true;
+        }
+
+        const newVis = {};
+        if (Array.isArray(visRes)) visRes.forEach(row => { newVis[row.app_key] = row.is_visible; });
+        if (JSON.stringify(newVis) !== JSON.stringify(siteState.visibility)) {
+            siteState.visibility = newVis;
+            hasChanges = true;
+        }
+
+        if (Array.isArray(settingsRes)) {
+            const bulkSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
+            if (bulkSetting) {
+                const newBulkDiscountEnabled = bulkSetting.value === "true";
+                if (newBulkDiscountEnabled !== bulkDiscountEnabled) {
+                    bulkDiscountEnabled = newBulkDiscountEnabled;
+                    hasChanges = true;
+                }
+            }
+
+            const s = settingsRes.find(x => x.key === "site_enabled");
+            if (s) {
+                const newEnabled = s.value === "true";
+                const alertEl = document.getElementById("top-toast-alert");
+                if (newEnabled !== siteEnabled) {
+                    siteEnabled = newEnabled;
+                    hasChanges = true;
+                }
+                if (!siteEnabled) {
+                    if (alertEl) alertEl.classList.add("show");
+                    if (!ALLOWED_WHEN_DISABLED.includes(currentScreenId)) {
+                        switchScreen("maintenanceApp", false);
+                    }
+                } else {
+                    if (alertEl) alertEl.classList.remove("show");
+                    if (currentScreenId === "maintenanceApp") switchScreen("mainApp", false);
+                }
+            }
+        }
+
+        try {
+            localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
+            localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
+            localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+            localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
+        } catch(e) {}
+
+        if (hasChanges || forceUpdateUI) {
+            updateCartUI();
+            filterApps();
+        }
+    } catch (e) {}
+}
+
+async function checkConnection() {
+    const alertEl = document.getElementById("top-toast-alert");
+    await fetchSiteDataFromSupabase(true);
+    if (siteEnabled) {
+        if (alertEl) alertEl.classList.remove("show");
+        switchScreen("mainApp");
+    } else {
+        if (alertEl) alertEl.classList.add("show");
+    }
+}
+
+setInterval(() => { fetchSiteDataFromSupabase(false); }, 1000);
+
+function getOrCreateDeviceId() {
+    let devId = "";
+    try {
+        devId = localStorage.getItem("apprestore_device_id");
+        if (!devId) {
+            devId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem("apprestore_device_id", devId);
+        }
+    } catch (e) { devId = 'dev_fallback_' + Date.now(); }
+    return devId;
+}
+
+function getAppPrice(key) {
+    if (siteState.prices && siteState.prices[key] !== undefined) return Number(siteState.prices[key]);
+    return 290;
+}
+
+function isAppVisible(key) {
+    if (siteState.visibility && siteState.visibility[key] !== undefined) return siteState.visibility[key] !== false;
+    return true;
+}
+
+function getCartBulkDiscount() {
+    if (!bulkDiscountEnabled) return 0;
+    let visibleCount = 0;
+    cartItems.forEach(k => { if (isAppVisible(k)) visibleCount++; });
+    return visibleCount >= 3 ? visibleCount * 40 : 0;
+}
+
+function getCartFinalTotal() {
+    let total = 0;
+    cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
+    let finalTotal = total - getCartBulkDiscount() - currentPromoDiscount;
+    return finalTotal < 0 ? 0 : finalTotal;
+}
+
+function extractTokenFromLocation() {
+    const rawSearch = window.location.search.replace("?", "").split("&")[0].trim();
+    if (/^\d{6,16}$/.test(rawSearch)) return rawSearch;
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get("token");
+    if (qToken) return qToken.trim();
+    const path = window.location.pathname.replace(/\/+$/, "");
+    const installMatch = path.match(/^\/(?:install|get|i)\/([A-Za-z0-9_-]{4,32})$/i);
+    if (installMatch) return installMatch[1];
+    const directNumMatch = path.match(/^\/(\d{6,16})$/);
+    if (directNumMatch) return directNumMatch[1];
+    return null;
+}
+
+function estimateIPhoneModel() {
+    const width = Math.min(window.screen.width, window.screen.height);
+    const height = Math.max(window.screen.width, window.screen.height);
+    const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
+    const resolution = `${Math.round(width)}x${Math.round(height)}`;
+    const modelByScreenAndDpr = {
+        "375x667@2": "iPhone 6 / 7 / 8 / SE (2-го или 3-го поколения)",
+        "375x812@3": "iPhone X / XS / 11 Pro",
+        "390x844@3": "iPhone 12 / 13 / 14",
+        "393x852@3": "iPhone 15 / 16 / 16e",
+        "402x874@3": "iPhone 16 Pro / 17 Pro",
+        "414x896@2": "iPhone XR / 11",
+        "414x896@3": "iPhone XS Max / 11 Pro Max",
+        "428x926@3": "iPhone 12 Pro Max / 13 Pro Max / 14 Plus",
+        "430x932@3": "iPhone 14 Pro Max / 15 Plus / 15 Pro Max",
+        "440x956@3": "iPhone 16 Plus / 16 Pro Max / 17 Pro Max"
+    };
+    let model = modelByScreenAndDpr[`${resolution}@${Math.round(dpr)}`];
+    if (!model) {
+        if (width >= 440) model = "iPhone большого размера (Plus / Pro Max)";
+        else if (width >= 420) model = "iPhone Pro Max / Plus";
+        else if (width >= 400) model = "iPhone крупного размера";
+        else if (width >= 390) model = "iPhone стандартного размера";
+        else if (width >= 375) model = "iPhone компактного размера";
+        else model = "iPhone (модель не определена)";
+    }
+    if (dpr < 1.5 || dpr > 4) return "iPhone (модель не определена)";
+    return model;
+}
+
+function notifyActivationOnce(token, appKeys) {
+    if (!token) return;
+    const notificationKey = `apprestore_activation_notified_${token}`;
+    try {
+        if (localStorage.getItem(notificationKey) === "1") return;
+        localStorage.setItem(notificationKey, "1");
+    } catch (e) {}
+    const deviceModel = estimateIPhoneModel();
+    fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: "notify_activation",
+            token: token,
+            app_keys: appKeys,
+            device_name: deviceModel,
+            device_model: deviceModel
+        })
+    }).catch(() => {});
+}
+
+function updateTokenHeroText(ttlMinutes) {
+    const descEl = document.getElementById("tokenHeroDesc");
+    if (!descEl) return;
+    const m = Number(ttlMinutes) || 15;
+    const word = (m === 1) ? "1 минуту" : (m >= 2 && m <= 4 ? m + " минуты" : m + " минут");
+    descEl.textContent = "Персональная ссылка активирована. Данная ссылка действует " + word + " и только на одном устройстве! Установите приложения и обратитесь к продавцу.";
+}
+
+function renderTokenAppsList(appKeys) {
+    const container = document.getElementById("singleTokenAppContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    appKeys.forEach(key => {
+        const cleanKey = key.trim();
+        const app = appsData.find(a => a.key === cleanKey);
+        if (app) {
+            let mainName = app.name, subName = "";
+            let bracketIdx = app.name.indexOf(" (");
+            if (bracketIdx !== -1 && app.name.endsWith(")")) {
+                mainName = app.name.substring(0, bracketIdx);
+                subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+            }
+            container.innerHTML += `
+            <div class="app-grid-card" data-key="${app.key}" onclick="installFromToken('${app.key}', '${app.url}')">
+                <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
+                    <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
+                        <div class="app-grid-name">${mainName}</div>
+                        ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                        <div class="app-grid-version">${app.ios}</div>
+                    </div>
+                </div>
+                <button type="button" class="app-grid-btn" id="tokenBtn_${app.key}" onclick="event.stopPropagation(); installFromToken('${app.key}', '${app.url}')">Установить</button>
+            </div>`;
+        }
+    });
+}
+
+function startTokenCountdown(expiresAtTimestamp) {
+    const display = document.getElementById("tokenCountdownDisplay");
+    const box = document.getElementById("tokenTimerBox");
+    if (!display) return;
+    if (tokenCountdownInterval) clearInterval(tokenCountdownInterval);
+
+    function updateTimer() {
+        const diff = Math.max(0, expiresAtTimestamp - Date.now());
+        const totalSecs = Math.ceil(diff / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        display.textContent = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+        if (totalSecs <= 60 && totalSecs > 0) {
+            display.style.color = "#f87171";
+            if (box) box.style.borderColor = "rgba(239, 68, 68, 0.45)";
+        } else {
+            display.style.color = "#3b82f6";
+            if (box) box.style.borderColor = "rgba(255, 255, 255, 0.12)";
+        }
+        if (diff <= 0) {
+            clearInterval(tokenCountdownInterval);
+            isTokenExpired = true;
+            display.textContent = "ИСТЕКЛО";
+            display.style.color = "#ef4444";
+            switchScreen("tokenErrorApp");
+        }
+    }
+    updateTimer();
+    tokenCountdownInterval = setInterval(updateTimer, 1000);
+}
+
+function generateAppsGrid() {
+    const container = document.getElementById("appListContainer");
+    if (!container) return;
+    let html = "";
+    appsData.forEach(app => {
+        const price = getAppPrice(app.key);
+        const isPrem = price >= 500;
+        const isInCart = cartItems.has(app.key);
+        const isVisible = isAppVisible(app.key);
+        
+        let mainName = app.name, subName = "";
+        let bracketIdx = app.name.indexOf(" (");
+        if (bracketIdx !== -1 && app.name.endsWith(")")) {
+            mainName = app.name.substring(0, bracketIdx);
+            subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
+        }
+        
+        let priceHtml = `<span class="new-price-bold">${price} ₽</span>`;
+        if (price < 290) {
+            priceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${price} ₽</span>`;
+        }
+        
+        html += `
+        <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
+            <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
+                <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
+                    <div class="app-grid-name">${mainName}</div>
+                    ${subName ? '<div class="app-grid-subname">' + subName + '</div>' : ''}
+                    <div class="app-grid-version">${app.ios}</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px;">
+                <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}" style="margin-top: 0;">${priceHtml}</div>
+                <button type="button" class="app-cart-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">
+                    ${isInCart 
+                        ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
+                        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'}
+                </button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+    filterApps();
+}
+
+function toggleCart(key) {
+    if (!isAppVisible(key)) return;
+    if (cartItems.has(key)) cartItems.delete(key);
+    else cartItems.add(key);
+    saveCart();
+    updateCartUI();
+}
+
+function removeFromCart(key) {
+    cartItems.delete(key);
+    saveCart();
+    updateCartUI();
+    if (cartItems.size < 2 && isCartListVisible) isCartListVisible = false;
+}
+
+async function applyPromoCode() {
+    const input = document.getElementById("promoCodeInput");
+    const msgEl = document.getElementById("promoMessage");
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+        msgEl.style.display = "block";
+        msgEl.style.color = "#fca5a5";
+        msgEl.textContent = "Введите промокод";
+        return;
+    }
+    msgEl.style.display = "block";
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Проверка...";
+
+    const res = await sbFetch(`promo_codes?code=eq.${code}&select=*`);
+    if (res && Array.isArray(res) && res.length > 0) {
+        const promo = res[0];
+        if (promo.is_used) {
+            msgEl.style.color = "#fca5a5";
+            msgEl.textContent = "Промокод уже использован";
+            currentPromoCode = null;
+            currentPromoDiscount = 0;
+        } else {
+            await sbFetch(`promo_codes?code=eq.${code}`, {
+                method: "PATCH",
+                body: JSON.stringify({ is_used: true })
+            });
+            msgEl.style.color = "#4ade80";
+            msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
+            currentPromoCode = promo.code;
+            currentPromoDiscount = Number(promo.discount);
+        }
+    } else {
+        msgEl.style.color = "#fca5a5";
+        msgEl.textContent = "Промокод не найден";
+        currentPromoCode = null;
+        currentPromoDiscount = 0;
+    }
+    renderCartScreen();
+}
+
+function clearCart() {
+    cartItems.clear();
+    currentOrderNumber = null;
+    currentPromoCode = null;
+    currentPromoDiscount = 0;
+    isCartListVisible = false;
+    const input = document.getElementById('promoCodeInput');
+    if (input) input.value = '';
+    const msg = document.getElementById('promoMessage');
+    if (msg) msg.style.display = 'none';
+    saveCart();
+    updateCartUI();
+}
+
+function toggleCartList() {
+    isCartListVisible = !isCartListVisible;
+    renderCartScreen();
 }
 
 function openCartScreen() {
+    isCartListVisible = false;
     renderCartScreen();
-    switchScreen('cartApp');
+    switchScreen("cartApp");
+    window.scrollTo(0, 0);
 }
 
 function renderCartScreen() {
+    const titleEl = document.getElementById("cartScreenTitle");
+    const subtitleEl = document.getElementById("cartScreenSubtitle");
     const listEl = document.getElementById("cartItemsList");
     const emptyEl = document.getElementById("cartEmptyBox");
     const summaryCard = document.getElementById("cartSummaryCard");
     const checkoutBtn = document.getElementById("cartCheckoutBtn");
     const clearBtn = document.getElementById("cartClearAllBtn");
-    const promoWrap = document.getElementById("promoInputWrap");
-    
+    const countEl = document.getElementById("cartScreenCount");
+    const totalEl = document.getElementById("cartScreenTotal");
+    const orderNumEl = document.getElementById("cartScreenOrderNum");
+    const bulkRow = document.getElementById("cartBulkDiscountRow");
+    const bulkDiscountEl = document.getElementById("cartScreenBulkDiscount");
+    const promoRow = document.getElementById("cartPromoRow");
+    const promoInputWrap = document.getElementById("promoInputWrap");
+    const msgEl = document.getElementById("promoMessage");
+    const toggleListBtn = document.getElementById("cartToggleListBtn");
+    const toggleListText = document.getElementById("cartToggleListText");
+    if (!listEl) return;
+
+    cartItems.forEach(k => { if (!isAppVisible(k)) cartItems.delete(k); });
+    saveCart();
+
     if (cartItems.size === 0) {
-        listEl.innerHTML = ""; emptyEl.style.display = "block"; summaryCard.style.display = "none";
-        checkoutBtn.style.display = "none"; clearBtn.style.display = "none"; promoWrap.style.display = "none";
+        if (titleEl) titleEl.textContent = "Корзина пуста";
+        if (subtitleEl) subtitleEl.style.display = "none";
+        listEl.style.display = "none";
+        if (emptyEl) emptyEl.style.display = "block";
+        if (summaryCard) summaryCard.style.display = "none";
+        if (checkoutBtn) checkoutBtn.style.display = "none";
+        if (clearBtn) clearBtn.style.display = "none";
+        if (promoInputWrap) promoInputWrap.style.display = "none";
+        if (msgEl) msgEl.style.display = "none";
+        if (toggleListBtn) toggleListBtn.style.display = "none";
         return;
     }
-    
-    emptyEl.style.display = "none"; summaryCard.style.display = "block";
-    checkoutBtn.style.display = "flex"; clearBtn.style.display = "flex"; promoWrap.style.display = "flex";
-    
+
+    if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
+
+    if (titleEl) titleEl.textContent = "Ваша корзина";
+    if (subtitleEl) subtitleEl.style.display = "block";
+    if (emptyEl) emptyEl.style.display = "none";
+    listEl.style.display = "flex";
+    if (summaryCard) summaryCard.style.display = "flex";
+    if (checkoutBtn) checkoutBtn.style.display = "flex";
+    if (clearBtn) clearBtn.style.display = "flex";
+    if (promoInputWrap) promoInputWrap.style.display = "flex";
+    if (currentPromoCode && msgEl) msgEl.style.display = "block";
+
     let total = 0, html = "";
     cartItems.forEach(k => {
         const app = appsData.find(a => a.key === k);
         if (!app) return;
         const p = getAppPrice(k);
+        const isPrem = p >= 500;
+        
+        let priceHtml = `<span class="new-price-bold">${p} ₽</span>`;
+        if (p < 290) {
+            priceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${p} ₽</span>`;
+        }
+        
         total += p;
         html += `
         <div class="cart-item-row">
-            <img src="${app.icon}" class="cart-item-icon">
-            <div class="cart-item-info">
-                <div class="cart-item-name">${app.name}</div>
-                <div style="font-size: 14px; color: var(--accent); font-weight: 700;">${p} ₽</div>
+            <div class="cart-item-left">
+                <img src="${app.icon}" class="cart-item-icon" alt="${app.name}">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${app.name}</div>
+                    <div class="cart-item-ios">${app.ios}</div>
+                </div>
             </div>
-            <button class="cart-item-remove" onclick="toggleCart('${k}'); renderCartScreen();">✕</button>
+            <div class="cart-item-right">
+                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${priceHtml}</div>
+                <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
+            </div>
         </div>`;
     });
+
     listEl.innerHTML = html;
-    
-    document.getElementById("cartScreenCount").textContent = cartItems.size + " шт.";
-    let bulk = getCartBulkDiscount();
-    document.getElementById("cartScreenBulkDiscount").textContent = "-" + bulk + " ₽";
-    document.getElementById("cartBulkDiscountRow").style.display = bulk > 0 ? "flex" : "none";
-    
-    document.getElementById("cartScreenTotal").textContent = Math.max(0, total - bulk - currentPromoDiscount) + " ₽";
+
+    if (cartItems.size >= 2) {
+        if (toggleListBtn) toggleListBtn.style.display = "flex";
+        if (toggleListText) toggleListText.textContent = `Выбранные приложения (${cartItems.size})`;
+        if (isCartListVisible) {
+            listEl.classList.remove("collapsed");
+            if (toggleListBtn) toggleListBtn.classList.add("open");
+        } else {
+            listEl.classList.add("collapsed");
+            if (toggleListBtn) toggleListBtn.classList.remove("open");
+        }
+    } else {
+        if (toggleListBtn) toggleListBtn.style.display = "none";
+        listEl.classList.remove("collapsed");
+    }
+
+    if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
+    if (countEl) countEl.textContent = cartItems.size + " шт.";
+
+    const bulkDiscount = getCartBulkDiscount();
+    const totalDiscount = bulkDiscount + currentPromoDiscount;
+    let finalTotal = total - totalDiscount;
+    if (finalTotal < 0) finalTotal = 0;
+
+    if (bulkDiscount > 0) {
+        if (bulkRow) bulkRow.style.display = "flex";
+        if (bulkDiscountEl) bulkDiscountEl.textContent = "-" + bulkDiscount + " ₽";
+    } else {
+        if (bulkRow) bulkRow.style.display = "none";
+    }
+
+    if (currentPromoDiscount > 0) {
+        if (promoRow) promoRow.style.display = "flex";
+        const discountEl = document.getElementById("cartScreenDiscount");
+        if (discountEl) discountEl.textContent = "-" + currentPromoDiscount + " ₽";
+    } else {
+        if (promoRow) promoRow.style.display = "none";
+    }
+
+    if (totalDiscount > 0) {
+        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
+    } else {
+        if (totalEl) totalEl.textContent = finalTotal + " ₽";
+    }
 }
 
-function checkoutCart() { switchScreen('paymentApp'); }
-function clearCart() { cartItems.clear(); saveCart(); updateCartUI(); renderCartScreen(); }
-function loadExternalContent(url, target) { document.getElementById(target).innerHTML = "Контент загружен."; }
-function checkConnection() { location.reload(); }
+function updateCartUI() {
+    appsData.forEach(app => {
+        const card = document.getElementById("appCard_" + app.key);
+        const btn = document.getElementById("gridBtn_" + app.key);
+        const priceTag = document.getElementById("gridPrice_" + app.key);
+        const isVisible = isAppVisible(app.key);
+        if (card) card.classList.toggle("app-unavailable", !isVisible);
+        
+        if (priceTag) {
+            const p = getAppPrice(app.key);
+            let expectedPriceHtml = `<span class="new-price-bold">${p} ₽</span>`;
+            if (p < 290) {
+                expectedPriceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${p} ₽</span>`;
+            }
+            if (priceTag.innerHTML !== expectedPriceHtml) {
+                priceTag.innerHTML = expectedPriceHtml;
+                priceTag.classList.toggle("premium", p >= 500);
+            }
+        }
+        
+        if (btn) {
+            const inCart = cartItems.has(app.key);
+            const expectedHtml = inCart 
+                ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
+                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+            
+            if (btn.innerHTML.trim() !== expectedHtml.trim()) {
+                btn.classList.toggle("in-cart", inCart);
+                btn.innerHTML = expectedHtml;
+            }
+        }
+    });
 
-// Инициализация при загрузке
-document.addEventListener("DOMContentLoaded", () => {
-    generateAppsGrid();
+    const fabBtn = document.getElementById("cartFabBtn");
+    const fabBadge = document.getElementById("cartFabBadge");
+    if (fabBadge && fabBadge.textContent !== String(cartItems.size)) fabBadge.textContent = cartItems.size;
+    if (fabBtn) {
+        const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
+        if (fabBtn.classList.contains("visible") !== shouldShow) fabBtn.classList.toggle("visible", shouldShow);
+    }
+    if (currentScreenId === "cartApp") renderCartScreen();
+}
+
+function copyRequisite(text, btnId) {
+    const btn = document.getElementById(btnId);
+    const done = () => {
+        if (!btn) return;
+        const old = btn.textContent;
+        btn.textContent = "Скопировано ✓";
+        setTimeout(() => { btn.textContent = old; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(done);
+    } else {
+        done();
+    }
+}
+
+function checkoutCart() {
+    if (cartItems.size === 0) return;
+    if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
+    const finalTotal = getCartFinalTotal();
+    const orderNumEl = document.getElementById("paymentOrderNum");
+    const totalAmountEl = document.getElementById("paymentTotalAmount");
+    if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
+    if (totalAmountEl) totalAmountEl.textContent = finalTotal + " ₽";
+    switchScreen("paymentApp");
+}
+
+async function confirmOrderPaid() {
+    if (cartItems.size === 0 && !activeOrderId) return;
+    const btn = document.getElementById("btnConfirmPaid");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> ⏳ Отправка...';
+    }
+
+    const appKeysArr = Array.from(cartItems);
+    const appNamesArr = appKeysArr.map(k => {
+        const a = appsData.find(x => x.key === k);
+        return a ? a.name : k;
+    });
+    const finalTotal = getCartFinalTotal();
+    const totalOrderDiscount = getCartBulkDiscount() + (currentPromoDiscount || 0);
+    const deviceId = getOrCreateDeviceId();
+
+    if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
+
+    try {
+        let orderRow = null;
+        const existing = await sbFetch(`orders?order_number=eq.${encodeURIComponent(currentOrderNumber)}&select=*`);
+        if (Array.isArray(existing) && existing.length > 0) {
+            orderRow = existing[0];
+            await sbFetch(`orders?id=eq.${orderRow.id}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "pending",
+                    total_price: finalTotal,
+                    discount: totalOrderDiscount,
+                    app_keys: appKeysArr.length > 0 ? appKeysArr : orderRow.app_keys,
+                    app_names: appNamesArr.length > 0 ? appNamesArr : orderRow.app_names,
+                    updated_at: new Date().toISOString()
+                })
+            });
+        } else {
+            const inserted = await sbFetch("orders", {
+                method: "POST",
+                headers: { "Prefer": "return=representation" },
+                body: JSON.stringify({
+                    order_number: currentOrderNumber,
+                    app_keys: appKeysArr,
+                    app_names: appNamesArr,
+                    total_price: finalTotal,
+                    promo_code: currentPromoCode || null,
+                    discount: totalOrderDiscount,
+                    status: "pending",
+                    device_id: deviceId
+                })
+            });
+            if (Array.isArray(inserted) && inserted.length > 0) orderRow = inserted[0];
+        }
+
+        if (orderRow && orderRow.id) {
+            activeOrderId = orderRow.id;
+            
+            if (!myLocalOrders.some(o => o.id === orderRow.id)) {
+                myLocalOrders.unshift({ id: orderRow.id, order_number: currentOrderNumber });
+                saveMyLocalOrders();
+            }
+
+            try {
+                localStorage.setItem("apprestore_active_order_id", String(activeOrderId));
+                localStorage.setItem("apprestore_active_order_num", currentOrderNumber);
+            } catch (e) {}
+
+            await fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "notify_new_order",
+                    order_id: orderRow.id,
+                    order_number: currentOrderNumber,
+                    app_keys: appKeysArr,
+                    app_names: appNamesArr,
+                    total_price: finalTotal,
+                    promo_code: currentPromoCode,
+                    discount: totalOrderDiscount,
+                    promo_discount: currentPromoDiscount || 0,
+                    bulk_discount: getCartBulkDiscount()
+                })
+            }).catch(() => {});
+
+            const waitOrderEl = document.getElementById("waitOrderNum");
+            if (waitOrderEl) waitOrderEl.textContent = currentOrderNumber;
+
+            switchScreen("orderWaitApp");
+            startOrderStatusPolling(orderRow.id);
+        }
+    } catch (e) {} finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил';
+        }
+    }
+}
+
+function startOrderStatusPolling(orderId) {
+    if (!orderId) return;
+    if (orderPollingInterval) clearInterval(orderPollingInterval);
+
+    async function checkStatus() {
+        const res = await sbFetch(`orders?id=eq.${orderId}&select=*`);
+        if (!Array.isArray(res) || res.length === 0) return;
+        const order = res[0];
+
+        if (order.status === "approved" && order.link_token) {
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
+            activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
+            const linkEl = document.getElementById("approvedLinkText");
+            if (linkEl) linkEl.textContent = activeApprovedLink;
+
+            cartItems.clear();
+            currentOrderNumber = null;
+            currentPromoCode = null;
+            currentPromoDiscount = 0;
+            saveCart();
+            try {
+                localStorage.removeItem("apprestore_active_order_id");
+                localStorage.removeItem("apprestore_active_order_num");
+            } catch (e) {}
+            updateCartUI();
+
+            switchScreen("orderApprovedApp", false);
+        } else if (order.status === "rejected") {
+            clearInterval(orderPollingInterval);
+            orderPollingInterval = null;
+            switchScreen("orderRejectedApp", false);
+        }
+    }
+
+    checkStatus();
+    orderPollingInterval = setInterval(checkStatus, 2000);
+}
+
+function startApprovedInstallation() {
+    if (!activeApprovedLink) return;
+    window.location.href = activeApprovedLink;
+}
+
+function backToPaymentFromRejected() {
+    switchScreen("paymentApp", false);
+}
+
+function showMyOrdersScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    renderMyOrdersList();
+    switchScreen("myOrdersApp");
+    window.scrollTo(0, 0);
+}
+
+async function renderMyOrdersList() {
+    const container = document.getElementById("myOrdersListContainer");
+    if (!container) return;
+
+    if (myLocalOrders.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--muted); font-size: 13.5px;">У вас пока нет сохраненных заказов на этом устройстве.</div>';
+        return;
+    }
+
+    container.innerHTML = '<div style="text-align:center; padding: 10px; color: var(--muted); font-size: 12px;">Загрузка данных...</div>';
+
+    let html = "";
+    for (const item of myLocalOrders) {
+        const res = await sbFetch(`orders?id=eq.${item.id}&select=*`);
+        if (Array.isArray(res) && res.length > 0) {
+            const ord = res[0];
+            let statusBadge = `<span class="my-order-status pending">⏳ Ожидает</span>`;
+            if (ord.status === "approved") statusBadge = `<span class="my-order-status approved">✅ Оплачен</span>`;
+            else if (ord.status === "rejected") statusBadge = `<span class="my-order-status rejected">❌ Отклонен</span>`;
+
+            const appsStr = Array.isArray(ord.app_names) ? ord.app_names.join(", ") : "Приложения";
+            
+            let actionBtn = "";
+            if (ord.status === "approved" && ord.link_token) {
+                const link = `${CLIENT_SITE_URL}/?${ord.link_token}`;
+                actionBtn = `<button type="button" class="btn btn-primary" style="margin-top: 6px; min-height: 38px; font-size: 13px;" onclick="window.location.href='${link}'">Получить ссылку / Установить</button>`;
+            }
+
+            html += `
+            <div class="my-order-item">
+                <div class="my-order-top">
+                    <span>Заказ ${ord.order_number}</span>
+                    ${statusBadge}
+                </div>
+                <div class="my-order-apps">${appsStr}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                    <span class="my-order-price">${ord.total_price} ₽</span>
+                </div>
+                ${actionBtn}
+            </div>`;
+        }
+    }
+    container.innerHTML = html || '<div style="text-align:center; padding: 20px; color: var(--muted);">Заказы не найдены в базе.</div>';
+}
+
+function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
+
+function switchScreen(id, pushHistory = true) {
+    if (!siteEnabled && !ALLOWED_WHEN_DISABLED.includes(id)) {
+        id = "maintenanceApp";
+    }
+
+    if (currentScreenId && currentScreenId !== id && pushHistory) HISTORY_STACK.push(currentScreenId);
+    if (INFO_SCREENS.includes(id) && !INFO_SCREENS.includes(currentScreenId)) {
+        previousScreen = currentScreenId;
+        sessionStorage.setItem("previousScreen", previousScreen);
+    }
+    currentScreenId = id;
+    sessionStorage.setItem("currentScreenId", currentScreenId);
+
+    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+        document.body.style.overflow = "hidden";
+        window.scrollTo(0, 0);
+    } else {
+        document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll(".container").forEach(el => el.classList.remove("active-screen"));
+    document.getElementById(id)?.classList.add("active-screen");
+
+    if (id === "myOrdersApp") {
+        renderMyOrdersList();
+    }
+
+    const backBtn = document.getElementById("navBackBtn");
+    const burgerBtn = document.getElementById("navBurgerBtn");
     updateCartUI();
+
+    if (isScreenLocked(id)) {
+        if (backBtn) backBtn.classList.remove("visible");
+        if (burgerBtn) burgerBtn.style.display = "flex";
+        return;
+    }
+    if (burgerBtn) burgerBtn.style.display = "flex";
+    if (backBtn) {
+        if (id === "welcomeApp" || id === "maintenanceApp" || id === "tokenApp" || id === "orderWaitApp" || id === "orderApprovedApp") {
+            backBtn.classList.remove("visible");
+        } else {
+            backBtn.classList.add("visible");
+        }
+    }
+}
+
+function handleBrandClick(event) {
+    if (event) event.preventDefault();
+    if (isScreenLocked(currentScreenId)) return;
+    goHome();
+}
+
+function handleNavBack(event) {
+    if (event) event.preventDefault();
+    if (isScreenLocked(currentScreenId)) return;
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
+    if (HISTORY_STACK.length > 0) switchScreen(HISTORY_STACK.pop(), false);
+    else goHome();
+}
+
+function goBackFromInfo(openMenu = false) {
+    if (isScreenLocked(currentScreenId)) return;
+    
+    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
+    // принудительно запрещаем открывать меню навигации.
+    const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
+    if (lastScreen === "orderApprovedApp") {
+        openMenu = false;
+    }
+
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
+        return;
+    }
+    
+    if (HISTORY_STACK.length > 0) {
+        switchScreen(HISTORY_STACK.pop(), false);
+    } else {
+        switchScreen(previousScreen);
+    }
+    
+    if (openMenu) {
+        document.getElementById("burgerMenuModal")?.classList.add("active");
+    }
+}
+    
+function goHome() {
+    if (isScreenLocked(currentScreenId)) return;
+    HISTORY_STACK.length = 0;
+    if (isFromToken) {
+        switchScreen(isTokenExpired ? "tokenErrorApp" : "tokenApp", false);
+        return;
+    }
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
+    switchScreen("mainApp", false);
+}
+
+function openCatalog() {
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
+    sessionStorage.setItem("site_access", "true");
+    switchScreen("mainApp");
+}
+
+function showGuideScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("guideApp");
+    window.scrollTo(0, 0);
+}
+
+function showTipsScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("tipsApp");
+    window.scrollTo(0, 0);
+}
+
+function showPolicyScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("policyApp");
+    window.scrollTo(0, 0);
+    loadExternalContent(POLICY_URL, 'policyContent');
+}
+
+function showOfferScreen() {
+    document.getElementById("burgerMenuModal")?.classList.remove("active");
+    switchScreen("offerApp");
+    window.scrollTo(0, 0);
+    loadExternalContent(OFFER_URL, 'offerContent');
+}
+
+function toggleBurgerMenu() {
+    document.getElementById("burgerMenuModal")?.classList.toggle("active");
+}
+
+function installFromToken(key, appUrl) {
+    if (isTokenExpired) { switchScreen("tokenErrorApp"); return; }
+    const cleanUrl = appUrl.endsWith(".plist") ? appUrl : (appUrl + ".plist");
+    const fullPlistUrl = cleanUrl.startsWith("http") ? cleanUrl : (CLIENT_SITE_URL + cleanUrl);
+    const installUrl = "itms-services://?action=download-manifest&url=" + encodeURIComponent(fullPlistUrl);
+
+    const btn = document.getElementById("tokenBtn_" + key);
+    if (btn) {
+        const originalText = btn.textContent;
+        btn.classList.add("installed");
+        btn.innerHTML = "✓";
+        setTimeout(() => {
+            btn.classList.remove("installed");
+            btn.textContent = originalText;
+        }, 2000);
+    }
+    window.location.href = installUrl;
+}
+
+function setCategory(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
+    btn.classList.add("active");
+    filterApps();
+}
+
+function filterApps() {
+    const searchInput = document.getElementById("appSearchInput");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    document.getElementById("searchClear")?.classList.toggle("visible", query.length > 0);
+    let count = 0;
+
+    document.querySelectorAll("#appListContainer .app-grid-card").forEach(card => {
+        const key = card.getAttribute("data-key");
+        if (!isAppVisible(key)) {
+            card.style.display = "none";
+            return;
+        }
+        const name = card.querySelector(".app-grid-name").textContent.toLowerCase() + " " + (card.querySelector(".app-grid-subname")?.textContent.toLowerCase() || "");
+        const cat = card.getAttribute("data-category");
+        const match = name.includes(query) && (currentCategory === "all" || cat === currentCategory);
+        card.style.display = match ? "flex" : "none";
+        if (match) count++;
+    });
+
+    const emptyEl = document.getElementById("searchEmpty");
+    if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
+    const countEl = document.getElementById("appCountDisplay");
+    if (countEl) countEl.textContent = count;
+}
+
+function clearAppSearch() {
+    const input = document.getElementById("appSearchInput");
+    if (!input) return;
+    input.value = "";
+    filterApps();
+    input.focus({ preventScroll: true });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    loadFromLocalStorageCache();
+    generateAppsGrid();
+    await fetchSiteDataFromSupabase(true);
+
+    const token = extractTokenFromLocation();
+    if (token) {
+        isFromToken = true;
+        const ua = navigator.userAgent || "";
+        if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) return;
+
+        const currentDevice = getOrCreateDeviceId();
+        let isValidToken = false, sessionTtlMinutes = 15, sessionExpiresAt = 0, sessionAppKeys = [];
+
+        try {
+            const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
+            if (Array.isArray(linkRes) && linkRes.length > 0) {
+                const row = linkRes[0];
+                const ttlMins = Number(row.ttl_minutes) || 15;
+                const ttlMs = ttlMins * 60 * 1000;
+                const now = Date.now();
+
+                if (row.device_id && row.device_id !== currentDevice) {
+                    isTokenExpired = true;
+                    switchScreen("tokenErrorApp");
+                    return;
+                }
+
+                let activatedAt = Number(row.activated_at) || 0;
+                if (!row.is_used || !activatedAt) {
+                    activatedAt = now;
+                    await sbFetch(`app_links?token=eq.${token}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ is_used: true, activated_at: activatedAt, device_id: currentDevice })
+                    });
+                }
+
+                const expiresAt = activatedAt + ttlMs;
+                if (now < expiresAt) {
+                    isValidToken = true;
+                    sessionTtlMinutes = ttlMins;
+                    sessionExpiresAt = expiresAt;
+                    sessionAppKeys = row.app_keys || [];
+                }
+            } else {
+                isTokenExpired = true;
+                switchScreen("tokenErrorApp");
+                return;
+            }
+        } catch (e) {
+            isTokenExpired = true;
+            switchScreen("tokenErrorApp");
+            return;
+        }
+
+        if (isValidToken && sessionAppKeys.length > 0) {
+            notifyActivationOnce(token, sessionAppKeys.map(appKey => (appsData.find(app => app.key === appKey) || {}).name || appKey));
+            updateTokenHeroText(sessionTtlMinutes);
+            renderTokenAppsList(sessionAppKeys);
+            startTokenCountdown(sessionExpiresAt);
+            switchScreen("tokenApp");
+            return;
+        }
+        isTokenExpired = true;
+        switchScreen("tokenErrorApp");
+        return;
+    }
+
+    if (activeOrderId) {
+        const checkRes = await sbFetch(`orders?id=eq.${activeOrderId}&select=*`);
+        if (Array.isArray(checkRes) && checkRes.length > 0) {
+            const activeOrder = checkRes[0];
+            if (activeOrder.status === "pending") {
+                const waitOrderEl = document.getElementById("waitOrderNum");
+                if (waitOrderEl) waitOrderEl.textContent = activeOrder.order_number || "";
+                switchScreen("orderWaitApp", false);
+                startOrderStatusPolling(activeOrder.id);
+                return;
+            } else if (activeOrder.status === "approved" && activeOrder.link_token) {
+                activeApprovedLink = `${CLIENT_SITE_URL}/?${activeOrder.link_token}`;
+                const linkEl = document.getElementById("approvedLinkText");
+                if (linkEl) linkEl.textContent = activeApprovedLink;
+                try {
+                    localStorage.removeItem("apprestore_active_order_id");
+                    localStorage.removeItem("apprestore_active_order_num");
+                } catch (e) {}
+                switchScreen("orderApprovedApp", false);
+                return;
+            } else if (activeOrder.status === "rejected") {
+                switchScreen("orderRejectedApp", false);
+                return;
+            }
+        }
+    }
+
+    let lastScreen = sessionStorage.getItem("currentScreenId");
+    let hasEntered = sessionStorage.getItem("site_access") === "true";
+    if (hasEntered) {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "mainApp";
+            switchScreen(lastScreen);
+            if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
+            if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
+        } else if (lastScreen === "cartApp") {
+            renderCartScreen();
+            switchScreen("cartApp");
+        } else if (lastScreen === "paymentApp" && cartItems.size > 0) {
+            checkoutCart();
+        } else {
+            switchScreen("mainApp");
+        }
+    } else {
+        if (INFO_SCREENS.includes(lastScreen)) {
+            previousScreen = sessionStorage.getItem("previousScreen") || "welcomeApp";
+            switchScreen(lastScreen);
+            if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
+            if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
+        } else {
+            switchScreen("welcomeApp");
+        }
+    }
 });
 </script>
 </body>
