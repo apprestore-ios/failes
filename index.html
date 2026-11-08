@@ -24,10 +24,10 @@
           --bg: #000000;
           --text: #ffffff;
           --muted: #8e8e93;
-          --card-bg: rgba(28, 28, 30, 0.55);
-          --card-border: 1px solid rgba(255, 255, 255, 0.1);
-          --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
-          --input-bg: rgba(44, 44, 46, 0.6);
+          --card-bg: rgba(28, 28, 30, 0.45);
+          --card-border: 1px solid rgba(255, 255, 255, 0.12);
+          --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 8px 30px rgba(0, 0, 0, 0.5);
+          --input-bg: rgba(44, 44, 46, 0.5);
           --accent: #0a84ff;
           --accent-bg: rgba(10, 132, 255, 0.15);
           --success: #30d158;
@@ -51,154 +51,172 @@
           font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
           color: var(--text); background: var(--bg);
           display: flex; flex-direction: column; align-items: center;
-          padding: calc(max(12px, env(safe-area-inset-top)) + 65px) 0 max(80px, env(safe-area-inset-bottom));
+          padding: calc(max(12px, env(safe-area-inset-top)) + 70px) 0 max(90px, env(safe-area-inset-bottom));
           user-select: none; -webkit-user-select: none;
       }
-      input { user-select: text; -webkit-user-select: text; }
+      input { user-select: text; -webkit-user-select: text; outline: none; }
 
-      /* Mesh Gradient Background */
+      /* Продвинутый Mesh Gradient */
       .mesh-bg { position: fixed; inset: 0; z-index: -10; background: #000; overflow: hidden; pointer-events: none; }
-      .blob { position: absolute; filter: blur(90px); border-radius: 50%; opacity: 0.5; animation: float 15s infinite alternate ease-in-out; }
-      .blob-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: #0a84ff; }
-      .blob-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: #5e5ce6; animation-delay: -5s; }
-      .blob-3 { top: 40%; left: 30%; width: 50vw; height: 50vw; background: #30d158; animation-delay: -10s; opacity: 0.25; }
-      @keyframes float { 100% { transform: translate(40px, 40px) scale(1.15); } }
+      .blob { position: absolute; filter: blur(100px); border-radius: 50%; opacity: 0.45; animation: float 18s infinite alternate ease-in-out; }
+      .blob-1 { top: -10%; left: -10%; width: 70vw; height: 70vw; background: #0a84ff; }
+      .blob-2 { bottom: -10%; right: -20%; width: 80vw; height: 80vw; background: #5e5ce6; animation-delay: -6s; }
+      .blob-3 { top: 30%; left: 40%; width: 60vw; height: 60vw; background: #30d158; animation-delay: -12s; opacity: 0.2; }
+      @keyframes float { 100% { transform: translate(50px, 50px) scale(1.1); } }
 
-      /* Dynamic Island Navbar */
+      /* Динамический остров (Header) */
       .top-navbar {
-          position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
-          height: 44px; padding: 0 16px; border-radius: 99px;
+          position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+          height: 46px; padding: 0 18px 0 14px; border-radius: 99px;
           display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 100;
-          background: rgba(28, 28, 30, 0.65); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%);
-          border: var(--card-border); box-shadow: var(--glass-shadow);
+          background: rgba(28, 28, 30, 0.55); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
+          border: var(--card-border); box-shadow: var(--glass-shadow); cursor: pointer; transition: transform 0.2s;
       }
-      .nav-logo { width: 26px; height: 26px; border-radius: 8px; object-fit: cover; }
-      .nav-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.2px; }
+      .top-navbar:active { transform: translateX(-50%) scale(0.96); }
+      .nav-logo { width: 28px; height: 28px; border-radius: 9px; object-fit: cover; }
+      .nav-title { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
 
-      /* Bottom Tab Bar */
+      /* Нативный нижний Tab Bar */
       .tab-bar {
-          position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-          width: 100%; max-width: 430px; display: flex; justify-content: space-around;
+          position: fixed; bottom: 0; left: 0; right: 0;
+          display: flex; justify-content: space-around; align-items: center;
           padding: 12px 10px calc(12px + env(safe-area-inset-bottom)); z-index: 200;
-          background: rgba(18, 18, 18, 0.75); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
-          border-top: 1px solid rgba(255,255,255,0.1);
+          background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+          border-top: 1px solid rgba(255,255,255,0.08);
       }
       .tab-item {
-          display: flex; flex-direction: column; align-items: center; gap: 4px;
-          color: var(--muted); cursor: pointer; position: relative; width: 60px;
-          transition: color 0.2s;
+          display: flex; flex-direction: column; align-items: center; gap: 5px;
+          color: var(--muted); cursor: pointer; position: relative; flex: 1;
+          transition: color 0.3s var(--spring), transform 0.2s;
       }
+      .tab-item:active { transform: scale(0.92); }
       .tab-item.active { color: var(--accent); }
-      .tab-icon { font-size: 22px; }
-      .tab-label { font-size: 10px; font-weight: 600; }
+      .tab-icon { font-size: 24px; }
+      .tab-label { font-size: 11px; font-weight: 650; letter-spacing: -0.2px; }
       .tab-badge {
-          position: absolute; top: -4px; right: 8px; background: var(--danger); color: #fff;
-          font-size: 10px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%;
-          display: flex; align-items: center; justify-content: center; border: 2px solid #1c1c1e;
-          transform: scale(0); transition: transform 0.3s var(--spring);
+          position: absolute; top: -6px; right: calc(50% - 24px); background: var(--danger); color: #fff;
+          font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
+          display: flex; align-items: center; justify-content: center; border: 2.5px solid #1c1c1e;
+          transform: scale(0); transition: transform 0.4s var(--spring); box-shadow: 0 4px 10px rgba(255,69,58,0.4);
       }
       .tab-badge.visible { transform: scale(1); }
 
-      /* Layout & Containers */
+      /* Основные контейнеры */
       .container {
-          width: 100%; max-width: 430px; padding: 0 16px; z-index: 2; display: none;
-          flex-direction: column; opacity: 0; transform: translateY(16px) scale(.98); 
-          transition: opacity 0.3s var(--spring), transform 0.3s var(--spring);
+          width: 100%; max-width: 440px; padding: 0 18px; z-index: 2; display: none;
+          flex-direction: column; opacity: 0; transform: translateY(20px) scale(.98); 
+          transition: opacity 0.4s var(--spring), transform 0.4s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
 
-      /* Hero Sections & Text */
-      .hero-title { font-size: 28px; font-weight: 800; line-height: 1.15; margin-bottom: 8px; letter-spacing: -0.5px; text-align: left; }
+      /* Заголовки и карточки */
+      .hero-title { font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; letter-spacing: -0.8px; text-align: left; }
       .hero-title span { color: var(--accent); }
       .auth-box { 
-          background: var(--card-bg); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
-          border: var(--card-border); border-radius: 28px; padding: 28px 20px; 
-          box-shadow: var(--glass-shadow); display: flex; flex-direction: column; gap: 14px; text-align: left;
+          background: var(--card-bg); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+          border: var(--card-border); border-radius: 32px; padding: 30px 22px; 
+          box-shadow: var(--glass-shadow); display: flex; flex-direction: column; gap: 16px; text-align: left;
       }
       
-      /* Search */
-      .app-search-wrap { position: relative; margin-bottom: 16px; width: 100%; }
+      /* Поиск */
+      .app-search-wrap { position: relative; margin-bottom: 22px; width: 100%; }
       .app-search { 
-          width: 100%; height: 44px; padding: 0 42px; border-radius: 14px; border: none; 
-          background: var(--input-bg); color: var(--text); font-size: 15px; 
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+          width: 100%; height: 48px; padding: 0 44px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); 
+          background: var(--input-bg); color: var(--text); font-size: 16px; font-weight: 500;
+          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: border 0.3s;
       }
+      .app-search:focus { border-color: rgba(10, 132, 255, 0.5); }
       .app-search::placeholder { color: var(--muted); }
-      .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; }
+      .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; }
 
-      /* Catalog Horizontal Sections (App Store Style) */
-      .category-block { margin-bottom: 24px; width: 100%; }
-      .category-header { font-size: 20px; font-weight: 750; margin-bottom: 12px; letter-spacing: -0.3px; padding-left: 4px; }
+      /* Горизонтальные секции (Apple Vision Style) */
+      .category-block { margin-bottom: 30px; width: 100%; }
+      .category-header { font-size: 22px; font-weight: 750; margin-bottom: 14px; letter-spacing: -0.4px; padding-left: 4px; display: flex; align-items: center; justify-content: space-between; }
+      .category-header span { font-size: 14px; color: var(--accent); font-weight: 600; cursor: pointer; }
       .horizontal-scroll {
-          display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none;
-          padding: 0 4px 10px 4px; margin: 0 -4px; scroll-snap-type: x mandatory;
+          display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none;
+          padding: 0 4px 14px 4px; margin: 0 -4px; scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
       }
       .horizontal-scroll::-webkit-scrollbar { display: none; }
       
       .vision-card {
-          min-width: 140px; width: 140px; background: var(--card-bg); border: var(--card-border);
-          border-radius: 20px; padding: 14px; display: flex; flex-direction: column; align-items: center;
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--glass-shadow);
+          min-width: 150px; width: 150px; background: var(--card-bg); border: var(--card-border);
+          border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center;
+          backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: var(--glass-shadow);
           scroll-snap-align: start; flex-shrink: 0; position: relative; text-align: center;
       }
-      .vision-icon { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-      .vision-title { font-size: 14px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-      .vision-sub { font-size: 11px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 2px; }
+      .vision-icon { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; margin-bottom: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); }
+      .vision-title { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; letter-spacing: -0.2px; }
+      .vision-sub { font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 3px; }
       
       .vision-btn {
-          width: 100%; height: 32px; border-radius: 16px; background: rgba(255,255,255,0.1); 
-          color: var(--accent); border: none; font-size: 13px; font-weight: 700; margin-top: 12px; 
-          cursor: pointer; transition: all 0.2s var(--spring); display: flex; align-items: center; justify-content: center;
+          width: 100%; height: 36px; border-radius: 18px; background: rgba(255,255,255,0.12); 
+          color: var(--accent); border: none; font-size: 14px; font-weight: 700; margin-top: 14px; 
+          cursor: pointer; transition: all 0.3s var(--spring); display: flex; align-items: center; justify-content: center;
       }
-      .vision-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
-      .vision-btn .check-icon { display: none; font-size: 15px; font-weight: 800; }
-      .vision-btn.in-cart { background: var(--accent); color: #fff; }
+      .vision-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+      .vision-btn .check-icon { display: none; font-size: 16px; font-weight: 800; }
+      .vision-btn.in-cart { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3); }
       .vision-btn.in-cart .price-text { display: none; }
       .vision-btn.in-cart .check-icon { display: inline; }
       .vision-btn.premium .price-text { color: var(--success); }
-      .vision-btn.in-cart.premium { background: var(--success); }
+      .vision-btn.in-cart.premium { background: var(--success); box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3); }
 
-      /* Buttons */
+      /* Кнопки */
       .btn {
-          width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; 
-          padding: 12px; border-radius: 16px; border: none; font-size: 15px; font-weight: 650; cursor: pointer; 
+          width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px;
+          padding: 12px; border-radius: 18px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; 
           text-decoration: none; transition: transform .2s var(--spring), opacity .2s; backdrop-filter: blur(10px);
       }
-      .btn:active { transform: scale(.97); opacity: 0.9; }
-      .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 20px rgba(10, 132, 255, 0.4); }
-      .btn-success { background: var(--success); color: #fff; box-shadow: 0 8px 20px rgba(48, 209, 88, 0.4); }
-      .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text); }
+      .btn:active { transform: scale(.96); opacity: 0.9; }
+      .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 24px rgba(10, 132, 255, 0.4); }
+      .btn-success { background: var(--success); color: #fff; box-shadow: 0 8px 24px rgba(48, 209, 88, 0.4); }
+      .btn-secondary { background: rgba(255,255,255,0.12); color: var(--text); }
+      .btn-danger { background: rgba(255,69,58,0.15); color: var(--danger); }
       
-      /* Cart List */
+      /* Список в корзине */
       .cart-item-row { 
-          background: rgba(0,0,0,0.2); border: var(--card-border); border-radius: 18px; 
-          padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px;
+          background: rgba(0,0,0,0.3); border: var(--card-border); border-radius: 20px; 
+          padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;
+          box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
       }
-      .cart-item-icon { width: 46px; height: 46px; border-radius: 12px; }
-      .cart-item-info { flex: 1; min-width: 0; }
-      .cart-item-name { font-size: 15px; font-weight: 650; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+      .cart-item-icon { width: 50px; height: 50px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); }
+      .cart-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+      .cart-item-name { font-size: 16px; font-weight: 650; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; letter-spacing: -0.2px; }
       .cart-item-remove { 
-          width: 34px; height: 34px; border-radius: 10px; background: rgba(255,69,58,0.15); 
+          width: 36px; height: 36px; border-radius: 12px; background: rgba(255,69,58,0.15); 
           color: var(--danger); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
+          font-size: 16px; transition: transform 0.2s;
       }
+      .cart-item-remove:active { transform: scale(0.9); }
 
-      /* Scroll areas for info */
-      .legal-scroll-area { max-height: 60dvh; overflow-y: auto; padding-right: 10px; }
+      /* Области прокрутки */
+      .scroll-area { max-height: 60dvh; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 12px; margin-right: -10px; }
+      .scroll-area::-webkit-scrollbar { width: 4px; }
+      .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
       
-      .menu-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+      /* Меню (Инфо) */
+      .menu-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
       .menu-item {
-          background: var(--card-bg); border: var(--card-border); border-radius: 16px; padding: 16px;
+          background: var(--card-bg); border: var(--card-border); border-radius: 20px; padding: 16px 18px;
           display: flex; align-items: center; justify-content: space-between; color: var(--text);
-          text-decoration: none; backdrop-filter: blur(20px); transition: transform 0.2s;
+          text-decoration: none; backdrop-filter: blur(30px); transition: transform 0.2s var(--spring), background 0.2s;
+          box-shadow: var(--glass-shadow); cursor: pointer;
       }
-      .menu-item:active { transform: scale(0.97); }
-      .menu-item-left { display: flex; align-items: center; gap: 14px; font-size: 15px; font-weight: 600; }
-      .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent); }
+      .menu-item:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
+      .menu-item-left { display: flex; align-items: center; gap: 16px; font-size: 16px; font-weight: 650; letter-spacing: -0.2px; }
+      .menu-icon-wrap { 
+          width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); 
+          display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent); 
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      }
 
-      /* Summary Box */
-      .summary-box { background: rgba(0,0,0,0.2); border-radius: 16px; padding: 16px; margin: 10px 0; font-size: 14px; }
-      .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--muted); }
-      .summary-row.total { font-size: 18px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-bottom: 0; }
+      /* Summary Box (Реквизиты и Итоги) */
+      .summary-box { background: rgba(0,0,0,0.3); border: var(--card-border); border-radius: 20px; padding: 18px; margin: 12px 0; font-size: 15px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.05); }
+      .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted); align-items: center; }
+      .summary-row:last-child { margin-bottom: 0; }
+      .summary-row.total { font-size: 18px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -209,15 +227,15 @@
     <div class="blob blob-3"></div>
 </div>
 
-<header class="top-navbar" onclick="goHome()">
+<header class="top-navbar" onclick="switchScreen('mainApp')">
     <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" class="nav-logo" alt="logo">
-    <span class="nav-title">AppRestore</span>
+    <span class="nav-title">AppRestore IOS</span>
 </header>
 
-<!-- MAIN CATALOG -->
+<!-- КАТАЛОГ -->
 <div class="container active-screen" id="mainApp">
-    <div style="margin-top: 10px; margin-bottom: 20px;">
-        <h1 class="hero-title">Приложения для<br><span>iPhone</span> за 5 минут</h1>
+    <div style="margin-top: 10px; margin-bottom: 24px;">
+        <h1 class="hero-title">Лучшие приложения<br>для <span>вашего iPhone</span></h1>
     </div>
     
     <div class="app-search-wrap">
@@ -225,103 +243,134 @@
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
     </div>
     
-    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:14px; padding:30px;">Ничего не найдено</div>
+    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:15px; padding:40px 20px;">
+        <span class="sf-icon" style="font-size: 32px; margin-bottom: 10px; display: block;">&#xFCA6;</span>
+        По вашему запросу ничего не найдено
+    </div>
     <div id="appListContainer" style="width: 100%;"></div>
 </div>
 
-<!-- CART SCREEN -->
+<!-- КОРЗИНА -->
 <div class="container" id="cartApp">
     <div class="auth-box">
-        <h2 class="hero-title" style="font-size: 24px; margin-bottom: 0;">Корзина</h2>
-        <p style="color: var(--muted); font-size: 13px; margin: 0 0 10px 0;">Проверьте список перед оплатой</p>
+        <h2 class="hero-title" style="font-size: 28px; margin-bottom: 0;">Корзина</h2>
+        <p style="color: var(--muted); font-size: 14px; margin: 0 0 12px 0;">Проверьте список приложений перед оплатой</p>
         
-        <div id="cartEmptyBox" style="padding: 20px; text-align: center; color: var(--muted); background: rgba(255,255,255,0.05); border-radius: 16px;">Корзина пуста</div>
-        
-        <div id="cartItemsList" style="display: flex; flex-direction: column;"></div>
-
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin: 10px 0 0 0; display: flex; gap: 8px;">
-            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; text-transform: uppercase;" placeholder="Промокод">
-            <button type="button" class="btn btn-secondary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 44px;">Ок</button>
+        <div id="cartEmptyBox" style="padding: 30px 20px; text-align: center; color: var(--muted); background: rgba(0,0,0,0.2); border: var(--card-border); border-radius: 20px;">
+            <span class="sf-icon" style="font-size: 40px; margin-bottom: 12px; display: block; color: rgba(255,255,255,0.2);">&#xF889;</span>
+            Ваша корзина пуста
         </div>
-        <div id="promoMessage" style="font-size: 12px; margin-top: 4px; display: none;"></div>
+        
+        <div id="cartItemsList" class="scroll-area" style="max-height: 40dvh;"></div>
+
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin: 10px 0 0 0; display: flex; gap: 10px;">
+            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; text-transform: uppercase;" placeholder="Ввести промокод">
+            <button type="button" class="btn btn-secondary" onclick="applyPromoCode()" style="width: auto; padding: 0 20px; min-height: 48px;">Ок</button>
+        </div>
+        <div id="promoMessage" style="font-size: 13px; font-weight: 600; margin-top: 6px; display: none; padding-left: 4px;"></div>
 
         <div class="summary-box" id="cartSummaryCard" style="display: none;">
             <div class="summary-row"><span>Приложения (<span id="cartScreenCount">0</span>)</span></div>
-            <div class="summary-row" id="cartBulkDiscountRow" style="display:none; color: var(--success);"><span>Скидка от 3 шт.</span><span id="cartScreenBulkDiscount">0 ₽</span></div>
-            <div class="summary-row" id="cartPromoRow" style="display:none; color: var(--success);"><span>Промокод</span><span id="cartScreenDiscount">0 ₽</span></div>
-            <div class="summary-row total"><span>Итого</span><span id="cartScreenTotal" style="color: var(--accent);">0 ₽</span></div>
+            <div class="summary-row" id="cartBulkDiscountRow" style="display:none; color: var(--success); font-weight: 600;"><span>Скидка (от 3 шт.)</span><span id="cartScreenBulkDiscount">0 ₽</span></div>
+            <div class="summary-row" id="cartPromoRow" style="display:none; color: var(--success); font-weight: 600;"><span>Промокод</span><span id="cartScreenDiscount">0 ₽</span></div>
+            <div class="summary-row total"><span>Итого к оплате</span><span id="cartScreenTotal" style="color: var(--accent);">0 ₽</span></div>
         </div>
 
-        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()">Перейти к оплате</button>
-        <button type="button" class="btn btn-secondary" id="cartClearAllBtn" onclick="clearCart()" style="color: var(--danger);">Очистить корзину</button>
+        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()">
+            <span class="sf-icon">&#xF889;</span> Перейти к оплате
+        </button>
+        <button type="button" class="btn btn-danger" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
     </div>
 </div>
 
-<!-- INFO / MENU SCREEN (Replaces Burger) -->
-<div class="container" id="infoApp">
-    <h2 class="hero-title" style="font-size: 28px; margin-bottom: 10px;">Инфо</h2>
+<!-- МЕНЮ И НАВИГАЦИЯ -->
+<div class="container" id="menuApp">
+    <h2 class="hero-title" style="font-size: 32px; margin-bottom: 16px;">Навигация</h2>
     <div class="menu-grid">
+        <button class="menu-item" onclick="switchScreen('myOrdersApp')">
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x0157;</span></div>Мои заказы</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+        </button>
         <button class="menu-item" onclick="switchScreen('guideApp')">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div>Инструкция</div><span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div>Инструкция по установке</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
         </button>
         <button class="menu-item" onclick="switchScreen('tipsApp')">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div>Советы</div><span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div>Полезные советы</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
         </button>
         <button class="menu-item" onclick="switchScreen('policyApp'); loadExternalContent(POLICY_URL, 'policyContent');">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div>Политика</div><span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div>Политика использования</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
         </button>
         <button class="menu-item" onclick="switchScreen('offerApp'); loadExternalContent(OFFER_URL, 'offerContent');">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div>Оферта</div><span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div>Публичная оферта</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
         </button>
+        <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
+            <div class="menu-item-left"><div class="menu-icon-wrap" style="color:#a78bfa; background:rgba(167, 139, 250, 0.15);"><span class="sf-icon">&#xFA8E;</span></div>AppRestore в Telegram</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+        </a>
         <a href="https://t.me/dizabled" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div>Поддержка</div><span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap" style="color:#a78bfa; background:rgba(167, 139, 250, 0.15);"><span class="sf-icon">&#xF9E8;</span></div>Поддержка проекта</div>
+            <span class="sf-icon" style="color:var(--muted)">&#xECA2;</span>
         </a>
     </div>
 </div>
 
-<!-- PAYMENT / ORDERS ETC (Keeping existing logic structures visually updated) -->
+<!-- ОПЛАТА И СТАТУСЫ ЗАКАЗОВ -->
 <div class="container" id="paymentApp">
     <div class="auth-box">
-        <h2 class="hero-title" style="font-size: 22px; margin-bottom: 0;">Оплата (СБП)</h2>
-        <p style="color: var(--muted); font-size: 13px;">Переведите точную сумму и нажмите «Я оплатил»</p>
-        <div class="summary-box" style="margin-top: 0;">
-            <div class="summary-row"><span>Номер заказа</span><span id="paymentOrderNum" style="color:#fff;">#00000</span></div>
-            <div class="summary-row"><span>Банк</span><span style="color:#fff;">ОТП Банк</span></div>
-            <div class="summary-row"><span>Получатель</span><span style="color:#fff;">Артём Е.</span></div>
-            <div class="summary-row" style="align-items: center;">
-                <span>Телефон</span>
-                <div style="display:flex; gap:8px;">
-                    <span style="color:#fff;" id="reqPhoneText">89221194735</span>
-                    <button id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')" style="background:var(--accent-bg); color:var(--accent); border:none; border-radius:6px; font-size:11px; padding:4px 8px; cursor:pointer;">Копия</button>
+        <h2 class="hero-title" style="font-size: 26px; margin-bottom: 0;">Оплата (СБП)</h2>
+        <p style="color: var(--muted); font-size: 14px;">Переведите точную сумму по реквизитам ниже и нажмите «Я оплатил»</p>
+        <div class="summary-box" style="margin-top: 4px;">
+            <div class="summary-row"><span>Номер заказа</span><span id="paymentOrderNum" style="color:#fff; font-weight:700;">#00000</span></div>
+            <div class="summary-row"><span>Банк получателя</span><span style="color:#fff; font-weight:600;">ОТП Банк</span></div>
+            <div class="summary-row"><span>Получатель</span><span style="color:#fff; font-weight:600;">Артём Е.</span></div>
+            <div class="summary-row">
+                <span>Телефон (СБП)</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="color:#fff; font-weight:700;" id="reqPhoneText">89221194735</span>
+                    <button id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')" style="background:var(--accent-bg); color:var(--accent); border:none; border-radius:8px; font-size:12px; font-weight:700; padding:6px 10px; cursor:pointer; transition:transform 0.2s;">Копия</button>
                 </div>
             </div>
-            <div class="summary-row total"><span>Сумма</span><span id="paymentTotalAmount" style="color:var(--accent);">0 ₽</span></div>
+            <div class="summary-row total"><span>Сумма перевода</span><span id="paymentTotalAmount" style="color:var(--accent);">0 ₽</span></div>
         </div>
-        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">Я оплатил</button>
+        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
+            <span class="sf-icon">&#XECC2;</span> Я оплатил
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="switchScreen('cartApp')">Вернуться в корзину</button>
     </div>
 </div>
 
 <div class="container" id="myOrdersApp">
-    <h2 class="hero-title" style="font-size: 28px; margin-bottom: 10px;">Заказы</h2>
-    <div id="myOrdersListContainer" style="width: 100%; display: flex; flex-direction: column; gap: 10px;"></div>
+    <div class="auth-box">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button>
+            <h2 class="hero-title" style="font-size: 26px; margin: 0;">Мои заказы</h2>
+        </div>
+        <div id="myOrdersListContainer" class="scroll-area" style="width: 100%;"></div>
+    </div>
 </div>
 
-<div class="container" id="orderWaitApp"><div class="auth-box" style="align-items:center; text-align:center;"><h2 style="font-size: 20px;">Проверка оплаты...</h2><p style="color:var(--muted); font-size:14px;">Пожалуйста, не закрывайте страницу. Ожидаем подтверждения заказа <b id="waitOrderNum">#00000</b>.</p></div></div>
-<div class="container" id="orderApprovedApp"><div class="auth-box" style="align-items:center; text-align:center;"><h2 style="font-size: 22px; color:var(--success);">Оплата успешна!</h2><p style="color:var(--muted); font-size:14px;">Ссылка готова. Нажмите кнопку ниже для установки.</p><button class="btn btn-primary" onclick="startApprovedInstallation()">🚀 Начать установку</button></div></div>
-<div class="container" id="orderRejectedApp"><div class="auth-box" style="align-items:center; text-align:center;"><h2 style="font-size: 22px; color:var(--danger);">Платеж не найден</h2><button class="btn btn-secondary" onclick="switchScreen('paymentApp')">Назад к реквизитам</button></div></div>
-<div class="container" id="maintenanceApp"><div class="auth-box" style="align-items:center; text-align:center;"><h2 style="font-size: 22px;">Обслуживание</h2><p style="color:var(--muted); font-size:14px;">Каталог временно недоступен.</p><button class="btn btn-primary" onclick="checkConnection()">Проверить</button></div></div>
+<div class="container" id="orderWaitApp"><div class="auth-box" style="align-items:center; text-align:center;"><div style="width: 56px; height: 56px; border-radius: 50%; border: 4px solid var(--accent-bg); border-top-color: var(--accent); animation: spin 1s linear infinite; margin-bottom: 10px;"></div><h2 style="font-size: 24px; margin: 0;">Проверка оплаты...</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Заказ <b id="waitOrderNum" style="color:#fff;">#00000</b> отправлен администратору.<br><br>Пожалуйста, <b>не закрывайте страницу</b>. Как только оплата подтвердится, здесь появится ссылка.</p></div></div>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
-<!-- Simple Text Info Screens -->
-<div class="container" id="guideApp"><div class="auth-box"><h2 style="font-size:20px; margin:0;">Инструкция</h2><div class="legal-scroll-area"><p style="font-size:14px; color:var(--muted);">1. Выберите приложения<br>2. Оплатите в корзине<br>3. Перейдите по ссылке<br>4. Напишите поддержке для активации</p></div><button class="btn btn-secondary" onclick="switchScreen('infoApp')">Назад</button></div></div>
-<div class="container" id="tipsApp"><div class="auth-box"><h2 style="font-size:20px; margin:0;">Советы</h2><div class="legal-scroll-area"><p style="font-size:14px; color:var(--muted);">Отключите сгружение в Настройках App Store и запретите удаление приложений в Экранном времени.</p></div><button class="btn btn-secondary" onclick="switchScreen('infoApp')">Назад</button></div></div>
-<div class="container" id="policyApp"><div class="auth-box"><h2 style="font-size:20px; margin:0;">Политика</h2><div class="legal-scroll-area" id="policyContent">Загрузка...</div><button class="btn btn-secondary" onclick="switchScreen('infoApp')">Назад</button></div></div>
-<div class="container" id="offerApp"><div class="auth-box"><h2 style="font-size:20px; margin:0;">Оферта</h2><div class="legal-scroll-area" id="offerContent">Загрузка...</div><button class="btn btn-secondary" onclick="switchScreen('infoApp')">Назад</button></div></div>
+<div class="container" id="orderApprovedApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--success); margin-bottom: 10px;">&#xFC32;</span><h2 style="font-size: 26px; color:var(--success); margin: 0;">Оплата успешна!</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Ваша разовая персональная ссылка готова. Нажмите кнопку ниже, чтобы начать загрузку.</p><button class="btn btn-primary" onclick="startApprovedInstallation()" style="margin-top: 10px; font-size: 18px;">🚀 Начать установку</button></div></div>
+<div class="container" id="orderRejectedApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--danger); margin-bottom: 10px;">&#xFC33;</span><h2 style="font-size: 26px; color:var(--danger); margin: 0;">Оплата не найдена</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Администратор не получил ваш перевод. Если вы его отправляли, напишите в поддержку.</p><a href="https://t.me/dizabled" class="btn btn-primary" style="margin-top: 10px;">Написать в поддержку</a><button class="btn btn-secondary" onclick="switchScreen('paymentApp')">Назад к реквизитам</button></div></div>
+<div class="container" id="maintenanceApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--muted); margin-bottom: 10px;">&#xF882;</span><h2 style="font-size: 26px; margin: 0;">Тех. обслуживание</h2><p style="color:var(--muted); font-size:15px; line-height: 1.4;">Каталог временно недоступен. Зайдите позже.</p><button class="btn btn-primary" onclick="checkConnection()" style="margin-top: 10px;">Обновить страницу</button></div></div>
 
-<!-- Token apps -->
-<div class="container" id="tokenApp"><div class="auth-box"><h2 style="font-size:20px;">Ваша ссылка</h2><p id="tokenHeroDesc" style="font-size:13px; color:var(--muted);">Ссылка активна временно. До сгорания: <b id="tokenCountdownDisplay" style="color:var(--accent);">--:--</b></p><div id="singleTokenAppContainer" style="display:flex; flex-direction:column; gap:10px;"></div></div></div>
-<div class="container" id="tokenErrorApp"><div class="auth-box" style="text-align:center;"><h2 style="font-size:20px; color:var(--danger);">Ссылка истекла</h2><a href="https://t.me/dizabled" class="btn btn-secondary">Поддержка</a></div></div>
+<!-- Текстовые инфо-экраны -->
+<div class="container" id="guideApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:24px; margin:0;">Инструкция</h2></div><div class="scroll-area"><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">1</div><p style="margin:0; font-size:15px; line-height:1.4;">Выберите нужные приложения в каталоге и откройте корзину.</p></div><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">2</div><p style="margin:0; font-size:15px; line-height:1.4;">Оплатите перевод по СБП и нажмите кнопку «Я оплатил».</p></div><div style="background: rgba(0,0,0,0.3); border: var(--card-border); padding: 16px; border-radius: 16px; display: flex; gap: 14px;"><div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">3</div><p style="margin:0; font-size:15px; line-height:1.4;">После подтверждения перейдите по персональной ссылке на установку.</p></div></div></div></div>
+<div class="container" id="tipsApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:24px; margin:0;">Советы</h2></div><div class="scroll-area"><p style="font-size:15px; font-weight:700; margin-bottom:4px;">1. Защита от удаления:</p><p style="font-size:14px; color:var(--muted); line-height:1.5; margin:0 0 16px 0;">Настройки ➝ Экранное время ➝ Контент и конфиденциальность ➝ Покупки в App Store ➝ Удаление приложений (Нет).</p><p style="font-size:15px; font-weight:700; margin-bottom:4px;">2. Отключение сгружения:</p><p style="font-size:14px; color:var(--muted); line-height:1.5; margin:0;">Настройки ➝ App Store ➝ Сгружать неиспользуемые (Выкл).</p></div></div></div>
+<div class="container" id="policyApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:22px; margin:0;">Политика</h2></div><div class="scroll-area" id="policyContent" style="font-size: 14px; color: var(--muted); line-height: 1.5;">Загрузка данных...</div></div></div>
+<div class="container" id="offerApp"><div class="auth-box"><div style="display: flex; align-items: center; gap: 12px;"><button class="btn btn-secondary" onclick="switchScreen('menuApp')" style="width: 44px; min-height: 44px; padding: 0; border-radius: 14px;"><span class="sf-icon">&#xECAC;</span></button><h2 style="font-size:22px; margin:0;">Оферта</h2></div><div class="scroll-area" id="offerContent" style="font-size: 14px; color: var(--muted); line-height: 1.5;">Загрузка данных...</div></div></div>
 
-<!-- BOTTOM TAB BAR -->
+<!-- Экраны активации токена (по ссылке) -->
+<div class="container" id="tokenApp"><div class="auth-box"><h2 style="font-size:26px; margin:0;">Установка</h2><p id="tokenHeroDesc" style="font-size:14px; color:var(--muted); line-height:1.4;">Ваша персональная ссылка активирована. Установите приложения до истечения таймера:</p><div style="text-align: center; font-size: 40px; font-weight: 800; color: var(--accent); margin: 10px 0;" id="tokenCountdownDisplay">--:--</div><div id="singleTokenAppContainer" class="scroll-area" style="max-height: 40dvh;"></div></div></div>
+<div class="container" id="tokenErrorApp"><div class="auth-box" style="align-items:center; text-align:center;"><span class="sf-icon" style="font-size: 56px; color: var(--danger); margin-bottom: 10px;">&#xFC33;</span><h2 style="font-size:26px; color:var(--danger); margin:0;">Установка недоступна</h2><p style="font-size:15px; color:var(--muted); line-height:1.4; margin-top: 10px;">Срок действия ссылки истёк, либо она была использована на другом устройстве.</p><a href="https://t.me/dizabled" class="btn btn-secondary" style="margin-top: 10px;">Написать продавцу</a></div></div>
+
+<!-- НИЖНИЙ TAB BAR (Главная Навигация) -->
 <nav class="tab-bar">
     <div class="tab-item active" id="tab_mainApp" onclick="switchScreen('mainApp')">
         <span class="sf-icon tab-icon">&#xFC05;</span><span class="tab-label">Каталог</span>
@@ -330,56 +379,117 @@
         <span class="sf-icon tab-icon">&#xF889;</span><span class="tab-label">Корзина</span>
         <div class="tab-badge" id="cartFabBadge">0</div>
     </div>
-    <div class="tab-item" id="tab_myOrdersApp" onclick="showMyOrdersScreen()">
+    <div class="tab-item" id="tab_myOrdersApp" onclick="switchScreen('myOrdersApp')">
         <span class="sf-icon tab-icon">&#x0157;</span><span class="tab-label">Заказы</span>
     </div>
-    <div class="tab-item" id="tab_infoApp" onclick="switchScreen('infoApp')">
-        <span class="sf-icon tab-icon">&#xF9E8;</span><span class="tab-label">Инфо</span>
+    <div class="tab-item" id="tab_menuApp" onclick="switchScreen('menuApp')">
+        <span class="sf-icon tab-icon">&#xDF;</span><span class="tab-label">Меню</span>
     </div>
 </nav>
 
 <script>
-// ВАША ОРИГИНАЛЬНАЯ ЛОГИКА (Настройки БД и переменные)
+// Оригинальные константы и настройки
 const ALLOWED_WHEN_DISABLED = ["maintenanceApp", "tokenApp", "tokenErrorApp", "guideApp", "tipsApp", "policyApp", "offerApp", "myOrdersApp", "orderWaitApp", "orderApprovedApp"];
 const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg";
 const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html";
 const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";
-
 const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
-// Я оставил несколько приложений для краткости кода, вы можете вставить сюда ВЕСЬ ваш оригинальный массив appsData
+
+// ПОЛНЫЙ МАССИВ ВСЕХ ПРИЛОЖЕНИЙ ИЗ ОРИГИНАЛА
 const appsData = [
   { key: "vk", name: "ВКонтакте (Оригинал)", category: "social", url: "/manifests/vk.plist", icon: L_BASE + "vk.png", ios: "iOS 17.6+" },
+  { key: "max", name: "MAX (Оригинал)", category: "social", url: "/manifests/max.plist", icon: L_BASE + "max.png", ios: "iOS 15.5+" },
+  { key: "vk_video", name: "VK Видео (Оригинал)", category: "social", url: "/manifests/vk_video.plist", icon: L_BASE + "vkvideo.png", ios: "iOS 17.6+" },
+  { key: "vk_clips", name: "VK Клипы (Оригинал)", category: "social", url: "/manifests/vk_clips.plist", icon: L_BASE + "vkclips.png", ios: "iOS 17.6+" },
+  { key: "vk_massanger", name: "VK Me (Оригинал)", category: "social", url: "/manifests/vk_massanger.plist", icon: L_BASE + "vkmessenger.png", ios: "iOS 17.6+" },
+  { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: L_BASE + "vkmusic_tropa.png", ios: "iOS 16.6+" },
+  { key: "incy", name: "INCY (Оригинал)", category: "other", url: "/manifests/incy.plist", icon: L_BASE + "incy.png", ios: "iOS 15.0+" },
+  { key: "mailru", name: "Почта Mail (Оригинал)", category: "other", url: "/manifests/mailru.plist", icon: L_BASE + "mailru.png", ios: "iOS 16.0+" },
+  { key: "oblakomail", name: "Облако Mail (Оригинал)", category: "other", url: "/manifests/oblakomail.plist", icon: L_BASE + "oblakomail.png", ios: "iOS 15.0+" },
+  { key: "okru", name: "Одноклассники (Оригинал)", category: "social", url: "/manifests/okru.plist", icon: L_BASE + "okru.png", ios: "iOS 15.6+" },
+  { key: "vkmusic_original", name: "VK Музыка (Оригинал)", category: "social", url: "/manifests/vkmusic_original.plist", icon: L_BASE + "vkmusic_original.png", ios: "iOS 17.6+" },
+  { key: "okko", name: "Okko (Оригинал)", category: "other", url: "/manifests/okko.plist", icon: L_BASE + "okko.png", ios: "iOS 16.0+" },
+  { key: "gazprombank_seif", name: "ГазпромБанк (Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
   { key: "sberfinansy", name: "СберБанк (Финансы)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
+  { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 14.0" },
+  { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: L_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
+  { key: "avito", name: "Авито (Оригинал)", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" },
+  { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "vsekarty.png", ios: "iOS 16.0+" },
   { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: L_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
-  { key: "sberinvest", name: "СберИнвестиции", category: "investments", url: "/manifests/sberinvest.plist", icon: L_BASE + "sberinvest.png", ios: "iOS 16.0+" },
-  { key: "avito", name: "Авито (Оригинал)", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" }
+  { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: L_BASE + "sinoptik.png", ios: "iOS 17.0+" },
+  { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: L_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
+  { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: L_BASE + "tbank.png", ios: "iOS 16.0+" },
+  { key: "lenta_original", name: "Лента (Оригинал)", category: "other", url: "/manifests/lenta_original.plist", icon: L_BASE + "lenta.png", ios: "iOS 14.4+" },
+  { key: "yandex_pay", name: "Яндекс Пэй (Оригинал)", category: "banks", url: "/manifests/yandex_pay.plist", icon: L_BASE + "yandexpay.png", ios: "iOS 15.0+" },
+  { key: "2gis", name: "2ГИС (Оригинал)", category: "other", url: "/manifests/2gis.plist", icon: L_BASE + "2gis.png", ios: "iOS 16.0+" },
+  { key: "yla", name: "Юла (Оригинал)", category: "other", url: "/manifests/yla.plist", icon: L_BASE + "youla.png", ios: "iOS 15.6+" },
+  { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: L_BASE + "psb.png", ios: "iOS 15.0+" },
+  { key: "kuper", name: "Купер (Оригинал)", category: "other", url: "/manifests/kuper.plist", icon: L_BASE + "kuper.png", ios: "iOS 15.0+" },
+  { key: "rutube", name: "Rutube (Starship Battle)", category: "other", url: "/manifests/rutube.plist", icon: L_BASE + "rutube.png", ios: "iOS 16.0+" },
+  { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: L_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
+  { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: L_BASE + "tmobile.png", ios: "iOS 16.0+" },
+  { key: "azslukoil", name: "АЗС Лукойл (Оригинал)", category: "other", url: "/manifests/azslukoil.plist", icon: L_BASE + "azslukoil.png", ios: "iOS 14.0+" },
+  { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: L_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
+  { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: L_BASE + "sberkids.png", ios: "iOS 15.0+" },
+  { key: "lenta_bystro", name: "Лента (Быстро)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
+  { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.plist", icon: L_BASE + "avito_anero.png", ios: "iOS 16.0+" },
+  { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: L_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
+  { key: "scbnotes", name: "СовкомБанк (Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: L_BASE + "scbnotes.png", ios: "iOS 17.0+" },
+  { key: "akbarsbank_vseychteno", name: "АК Барс Банк (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: L_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+  { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: L_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
+  { key: "happ_proxy", name: "Happ Proxy (Оригинал)", category: "other", url: "/manifests/happ_proxy.plist", icon: L_BASE + "happ.png", ios: "iOS 15.0+" },
+  { key: "chatgpt", name: "ChatGPT (Оригинал)", category: "other", url: "/manifests/chatgpt.plist", icon: L_BASE + "chatgpt.png", ios: "iOS 16.0+" },
+  { key: "gemini", name: "Google Gemini (Оригинал)", category: "other", url: "/manifests/gemini.plist", icon: L_BASE + "gemini.png", ios: "iOS 14.0+" },
+  { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: L_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+  { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: L_BASE + "sberinvest.png", ios: "iOS 16.0+" },
+  { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: L_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
+  { key: "alfa_invest", name: "Альфа Инвестиции", category: "investments", url: "/manifests/alfa_invest.plist", icon: L_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+  { key: "gazprominvest_billfo", name: "ГазпромИнвестиции", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: L_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
+  { key: "sbpay", name: "СБПэй (Оригинал)", category: "other", url: "/manifests/sbpay.plist", icon: L_BASE + "sbpay.png", ios: "iOS 13.0+" },
+  { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: L_BASE + "yota.png", ios: "iOS 15.0+" },
+  { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: L_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+  { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: L_BASE + "novikombank.png", ios: "iOS 12.0+" },
+  { key: "rshb_gysi", name: "РСХБ (Любовь и Гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: L_BASE + "rshb.png", ios: "iOS 15.5+" },
+  { key: "mtsdengi", name: "МТС Деньги (Оригинал)", category: "banks", url: "/manifests/mtsdengi.plist", icon: L_BASE + "mtsbank.png", ios: "iOS 14.0+" },
+  { key: "domrf_roomassist", name: "Дом.РФ (Room Assist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: L_BASE + "domrf_roomassist.png", ios: "iOS 16.0+" },
+  { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОСкорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: L_BASE + "moidomru_proskorost.png", ios: "iOS 18.0+" },
+  { key: "movix_kinodom", name: "Movix (Кинодом)", category: "other", url: "/manifests/movix_kinodom.plist", icon: L_BASE + "movix_kinodom.png", ios: "iOS 16.0+" },
+  { key: "mibank_avkgid", name: "МеталлинвестБанк (АВК Гид)", category: "banks", url: "/manifests/mibank_avkgid.plist", icon: L_BASE + "mibank_avkgid.png", ios: "iOS 15.0+" },
+  { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
 ];
 
 let siteState = { prices: {}, visibility: {} };
-let siteEnabled = true, bulkDiscountEnabled = true, currentCategory = "all";
-let isFromToken = false, isTokenExpired = false, currentScreenId = "mainApp";
+let siteEnabled = true, bulkDiscountEnabled = true, currentScreenId = "mainApp";
 let cartItems = new Set(), currentOrderNumber = null, currentPromoCode = null, currentPromoDiscount = 0, myLocalOrders = [];
-let activeOrderId = null, activeApprovedLink = "", orderPollingInterval = null;
 
-// Функции-обертки (заглушки) из вашего старого кода
-async function sbFetch(path, opts={}) { return null; /* Подключите сюда вашу логику supabase из прошлого файла */ }
+// === ЗАГЛУШКИ ДЛЯ БАЗЫ ДАННЫХ ===
+// (Здесь должен быть ваш код для работы с Supabase - sbFetch, загрузка корзины и т.д.)
 function getAppPrice(key) { return siteState.prices[key] ? Number(siteState.prices[key]) : 290; }
 function isAppVisible(key) { return siteState.visibility[key] !== false; }
 function getCartBulkDiscount() { return (bulkDiscountEnabled && cartItems.size >= 3) ? cartItems.size * 40 : 0; }
-function saveCart() { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); }
+function saveCart() { try { localStorage.setItem("apprestore_cart", JSON.stringify(Array.from(cartItems))); } catch(e){} }
+function copyRequisite(text, btnId) {
+    const btn = document.getElementById(btnId);
+    if(navigator.clipboard) navigator.clipboard.writeText(text);
+    const old = btn.textContent; btn.textContent = "Скопировано";
+    setTimeout(() => { btn.textContent = old; }, 1500);
+}
 
-// --- НОВАЯ ЛОГИКА ГЕНЕРАЦИИ UI КАТАЛОГА (Apple Vision Style) ---
+// === ЛОГИКА ГЕНЕРАЦИИ СЕТКИ КАТАЛОГА ===
 function generateAppsGrid() {
     const container = document.getElementById("appListContainer");
     if (!container) return;
+    
+    // Группы
     const cats = [
-        { id: 'banks', name: 'Банки' },
+        { id: 'banks', name: 'Банки и Финансы' },
         { id: 'social', name: 'Социальные сети' },
         { id: 'investments', name: 'Инвестиции' },
-        { id: 'other', name: 'Другие приложения' }
+        { id: 'other', name: 'Другие сервисы' }
     ];
+    
     let html = '';
     cats.forEach(c => {
         const appsInCat = appsData.filter(a => a.category === c.id);
@@ -388,15 +498,19 @@ function generateAppsGrid() {
         html += `<div class="category-block" id="cat_block_${c.id}">
                     <div class="category-header">${c.name}</div>
                     <div class="horizontal-scroll">`;
+                    
         appsInCat.forEach(app => {
             const price = getAppPrice(app.key);
             const isPrem = price >= 500;
             const isInCart = cartItems.has(app.key);
+            
+            // Разделяем имя и подзаголовок (в скобках)
             let mainName = app.name, subName = app.ios;
             if (app.name.includes(" (")) {
                 mainName = app.name.split(" (")[0];
                 subName = app.name.split(" (")[1].replace(")", "");
             }
+            
             html += `
             <div class="vision-card" data-key="${app.key}" data-name="${app.name.toLowerCase()}">
                 <img loading="lazy" src="${app.icon}" class="vision-icon" alt="${app.name}">
@@ -413,6 +527,7 @@ function generateAppsGrid() {
     container.innerHTML = html;
 }
 
+// === ПОИСК ===
 function filterApps() {
     const query = document.getElementById("appSearchInput")?.value.toLowerCase() || "";
     let totalMatch = 0;
@@ -428,18 +543,17 @@ function filterApps() {
     document.getElementById("searchEmpty").style.display = totalMatch === 0 ? "block" : "none";
 }
 
+// === КОРЗИНА И НАВИГАЦИЯ ===
 function toggleCart(key) {
     if (cartItems.has(key)) cartItems.delete(key); else cartItems.add(key);
     saveCart(); updateCartUI();
 }
 
 function updateCartUI() {
-    // Обновляем кнопки в каталоге
     appsData.forEach(app => {
         const btn = document.getElementById("gridBtn_" + app.key);
         if (btn) btn.classList.toggle("in-cart", cartItems.has(app.key));
     });
-    // Обновляем бейдж на таб-баре
     const badge = document.getElementById("cartFabBadge");
     if (badge) {
         badge.textContent = cartItems.size;
@@ -454,7 +568,12 @@ function switchScreen(id) {
     const screen = document.getElementById(id);
     if(screen) screen.classList.add("active-screen");
     
-    const tab = document.getElementById("tab_" + id);
+    // Подсветка таба (если экран привязан к табу)
+    let tabId = id;
+    if (["guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) tabId = "menuApp";
+    if (["paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp"].includes(id)) tabId = "cartApp";
+    
+    const tab = document.getElementById("tab_" + tabId);
     if(tab) tab.classList.add("active");
     
     currentScreenId = id;
@@ -494,14 +613,14 @@ function renderCartScreen() {
             <img src="${app.icon}" class="cart-item-icon">
             <div class="cart-item-info">
                 <div class="cart-item-name">${app.name}</div>
-                <div style="font-size: 13px; color: var(--accent); font-weight: 700;">${p} ₽</div>
+                <div style="font-size: 14px; color: var(--accent); font-weight: 700;">${p} ₽</div>
             </div>
             <button class="cart-item-remove" onclick="toggleCart('${k}'); renderCartScreen();">✕</button>
         </div>`;
     });
     listEl.innerHTML = html;
     
-    document.getElementById("cartScreenCount").textContent = cartItems.size;
+    document.getElementById("cartScreenCount").textContent = cartItems.size + " шт.";
     let bulk = getCartBulkDiscount();
     document.getElementById("cartScreenBulkDiscount").textContent = "-" + bulk + " ₽";
     document.getElementById("cartBulkDiscountRow").style.display = bulk > 0 ? "flex" : "none";
@@ -509,13 +628,12 @@ function renderCartScreen() {
     document.getElementById("cartScreenTotal").textContent = Math.max(0, total - bulk - currentPromoDiscount) + " ₽";
 }
 
-function showMyOrdersScreen() { switchScreen('myOrdersApp'); /* Вставьте вашу логику рендера заказов */ }
 function checkoutCart() { switchScreen('paymentApp'); }
 function clearCart() { cartItems.clear(); saveCart(); updateCartUI(); renderCartScreen(); }
-function copyRequisite(text, btnId) { /* Ваша логика */ }
-function goHome() { switchScreen('mainApp'); }
 function loadExternalContent(url, target) { document.getElementById(target).innerHTML = "Контент загружен."; }
+function checkConnection() { location.reload(); }
 
+// Инициализация при загрузке
 document.addEventListener("DOMContentLoaded", () => {
     generateAppsGrid();
     updateCartUI();
