@@ -43,7 +43,7 @@
           vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
       }
       html.fonts-loaded .sf-icon { opacity: 1; }
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 400; touch-action: manipulation; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
           min-height: 100dvh;
@@ -53,7 +53,7 @@
           padding: calc(max(12px, env(safe-area-inset-top)) + 65px) 0 max(40px, env(safe-area-inset-bottom));
           user-select: none; -webkit-user-select: none;
       }
-      input { user-select: text; -webkit-user-select: text; }
+      input { user-select: text; -webkit-user-select: text; font-weight: 400; }
       .aurora-bg {
           position: fixed; top: -50px; left: -50px; width: calc(100vw + 100px); height: calc(100lvh + 100px); z-index: -10;
           background-image: linear-gradient(135deg, rgba(11,15,23,0.4) 0%, rgba(17,24,39,0.6) 100%), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png");
@@ -68,10 +68,10 @@
       }
       .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); cursor: pointer; }
       .nav-logo { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
-      .nav-title { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--text) 15%, var(--muted) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .nav-title { font-size: 16px; font-weight: 800; background: linear-gradient(135deg, var(--text) 15%, var(--muted) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .nav-right-actions { display: flex; align-items: center; gap: 8px; }
       .back-btn, .burger-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); position: relative; }
-      .back-btn { font-size: 20px; font-weight: 700; text-decoration: none; display: none; line-height: 1; padding-bottom: 2px; }
+      .back-btn { font-size: 20px; font-weight: 600; text-decoration: none; display: none; line-height: 1; padding-bottom: 2px; }
       .back-btn.visible { display: flex; }
       .burger-line { width: 18px; height: 2px; background: var(--muted); border-radius: 2px; position: relative; }
       .burger-line::before, .burger-line::after { content: ""; position: absolute; left: 0; width: 18px; height: 2px; background: var(--muted); border-radius: 2px; }
@@ -102,26 +102,26 @@
           opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
-      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
-      .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .hero-title { font-size: 23px; font-weight: 800; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .hero-title span { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .hero-desc-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); margin-top: 14px; margin-bottom: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-      .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 500; }
+      .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 400; }
       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; width: 100%; }
       .info-box { background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 14px 12px; text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--box-shadow); transition: border-color 0.3s ease; }
       .info-box-num { font-size: 20px; font-weight: 800; color: #3b82f6; margin-bottom: 4px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
-      .info-box-label { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+      .info-box-label { font-size: 11.5px; color: var(--muted); line-height: 1.35; font-weight: 400; }
       .catalog-header { display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 16px; background: rgba(30,41,59,0.3); border-radius: 14px; border: 1px solid rgba(148,163,184,0.15); padding: 8px 0; }
-      .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
+      .catalog-title { font-size: 15px; font-weight: 600; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
       .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
       
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; gap: 8px;
-          box-shadow: var(--box-shadow); transition: transform 0.2s ease;
+          box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), var(--box-shadow); transition: transform 0.2s ease;
           width: 100%; min-width: 0; position: relative;
           min-height: 90px;
           justify-content: space-between;
@@ -137,19 +137,21 @@
       .app-cart-btn.in-cart {
           background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80;
       }
+      .app-cart-btn svg, .app-cart-btn span { transition: transform 0.3s var(--spring); }
+      .app-cart-btn:active svg, .app-cart-btn:active span { transform: scale(0.6); }
 
-      .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
+      .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6); flex-shrink: 0; }
       
-      .app-price-tag { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; margin-top: auto; }
+      .app-price-tag { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 800; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; margin-top: auto; }
       .app-price-tag.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
 
       .new-price-bold { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-weight: 800; }
       
-      .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
-      .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
-      .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+      .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
+      .app-grid-subname { font-size: 10px; font-weight: 400; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
+      .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 400; color: var(--muted); margin-top: 2px; line-height: 1.2; }
       
-      .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
+      .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 600; margin-top: 0; cursor: pointer; transition: all 0.2s; }
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
       
@@ -164,13 +166,13 @@
       }
       .cart-item-row { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; flex-shrink: 0; }
       .cart-item-left { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; text-align: left; }
-      .cart-item-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0; }
+      .cart-item-icon { width: 42px; height: 42px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6); flex-shrink: 0; }
       .cart-item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-      .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
-      .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
+      .cart-item-name { font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+      .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 400; }
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
       
-      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
+      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 800; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
       
       .diagonal-strike {
@@ -190,15 +192,15 @@
           transform: rotate(-15deg);
       }
 
-      .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+      .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }
       .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
       .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
-      .cart-summary-row.total { font-size: 16px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 2px; }
+      .cart-summary-row.total { font-size: 16px; font-weight: 800; color: var(--text); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 2px; }
       .cart-summary-row.total span:last-child { color: #60a5fa; font-size: 18px; font-weight: 800; }
-      .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100%; box-shadow: var(--box-shadow); display: flex; flex-direction: column; gap: 14px; }
-      .auth-title { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
-      .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; }
-      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
+      .auth-box { background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-radius: 28px; padding: 28px 20px 22px; text-align: center; width: 100%; box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), var(--box-shadow); display: flex; flex-direction: column; gap: 14px; }
+      .auth-title { font-size: 21px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+      .auth-description { font-size: 13.5px; color: var(--muted); line-height: 1.55; text-align: left; font-weight: 400; }
+      .btn { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; border: none; background: #334155; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform .2s var(--spring); }
       .btn:active { transform: scale(.975); }
       .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
       .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 8px 20px rgba(22,163,74,0.35); }
@@ -212,13 +214,13 @@
       }
       .req-row { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 10px; }
       .req-row:last-child { border-bottom: none; padding-bottom: 0; }
-      .req-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+      .req-label { font-size: 11.5px; color: var(--muted); font-weight: 400; }
       .req-value-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-      .req-value { font-size: 15.5px; font-weight: 750; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; text-decoration: none; }
+      .req-value { font-size: 15.5px; font-weight: 800; color: var(--text); letter-spacing: 0.2px; user-select: text; -webkit-user-select: text; text-decoration: none; }
       .req-value:visited, .req-value:active, .req-value:hover { color: var(--text); }
       .req-copy-btn {
           background: rgba(59, 130, 246, 0.18); border: 1px solid rgba(59, 130, 246, 0.45);
-          color: #93c5fd; border-radius: 9px; padding: 5px 10px; font-size: 11.5px; font-weight: 650; cursor: pointer; flex-shrink: 0;
+          color: #93c5fd; border-radius: 9px; padding: 5px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer; flex-shrink: 0;
       }
       .req-copy-btn:active { transform: scale(0.95); }
       .wait-spinner {
@@ -227,22 +229,28 @@
           animation: spin 1s linear infinite; margin: 6px auto 4px;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
-      .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
+      
+      .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; position: sticky; top: 65px; z-index: 90; padding-top: 10px; background: rgba(11, 15, 23, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); margin-top: -10px; }
       .categories-bar::-webkit-scrollbar { display: none; }
       .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
       .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
       .filter-chip .sf-icon { font-size: 18px; }
+      
       .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
       .catalog-notice-icon { font-size: 24px; color: #facc15; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: flex; }
-      .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; }
-      .catalog-notice-text b { color: var(--text); font-weight: 650; }
+      .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; font-weight: 400; }
+      .catalog-notice-text b { color: var(--text); font-weight: 600; }
       .app-search-wrap { position: relative; margin-bottom: 12px; width: 100%; }
-      .app-search { width: 100%; height: 42px; padding: 0 42px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; }
+      .app-search { width: 100%; height: 42px; padding: 0 42px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; font-weight: 400; }
       .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
       .search-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); display: none; background: none; border: none; color: var(--muted); cursor: pointer; }
       .search-clear.visible { display: block; }
+      
+      /* Menu & Bottom Sheet Modal */
       .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
       .menu-modal.active { display: flex; }
+      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+      .menu-modal.active .menu-sheet { animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
       .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; }
       .menu-sheet::-webkit-scrollbar { width: 4px; }
       .menu-sheet::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
@@ -251,10 +259,11 @@
       .menu-item:active { transform: scale(0.98); }
       .menu-item-left { display: flex; align-items: center; gap: 12px; }
       .menu-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+      
       .step-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
-      .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; }
-      .step-text b { color: #60a5fa; }
+      .step-icon { background: #3b82f6; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+      .step-text { font-size: 13.5px; color: var(--text); line-height: 1.5; padding-top: 4px; font-weight: 400; }
+      .step-text b { color: #60a5fa; font-weight: 600; }
       #guideApp .auth-box, #tipsApp .auth-box, #policyApp .auth-box, #offerApp .auth-box, #myOrdersApp .auth-box {
           padding: 18px 18px 16px; gap: 10px;
           max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 80px);
@@ -268,10 +277,12 @@
       .legal-scroll-area::-webkit-scrollbar-thumb, .info-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
       .info-scroll-area .step-card { margin-bottom: 0; }
       .legal-section-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; text-align: left; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); flex-shrink: 0; }
-      .legal-section-title { font-size: 14.5px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; line-height: 1.35; }
-      .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; }
+      .legal-section-title { font-size: 14.5px; font-weight: 800; color: #60a5fa; margin-bottom: 8px; line-height: 1.35; }
+      .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; font-weight: 400; }
       .legal-text:last-child { margin-bottom: 0; }
-      .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }
+      .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 600; }
+      
+      /* Карточки корзины в Bottom Sheet */
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
       .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
@@ -282,18 +293,16 @@
 
       .my-order-item { background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
       .my-order-item:last-child { margin-bottom: 0; }
-      .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
-      .my-order-status { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 7px; }
+      .my-order-top { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; }
+      .my-order-status { font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 7px; }
       .my-order-status.pending { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
       .my-order-status.approved { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
       .my-order-status.rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
-      .my-order-apps { font-size: 12px; color: var(--muted); line-height: 1.35; }
-      .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
+      .my-order-apps { font-size: 12px; color: var(--muted); line-height: 1.35; font-weight: 400; }
+      .my-order-price { font-size: 13.5px; font-weight: 800; color: #60a5fa; }
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #singleTokenAppContainer .app-grid-card {
-    min-height: 90px;
-}
+      #singleTokenAppContainer .app-grid-card { min-height: 90px; }
     </style>
     <script>
         if ("fonts" in document) {
@@ -328,7 +337,7 @@
     <div class="menu-sheet" onclick="event.stopPropagation()">
         <div class="menu-header">
             <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
-            <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span>
+            <span style="font-size: 15px; font-weight: 800; color: var(--text);">Навигация</span>
         </div>
         <button class="menu-item" onclick="showMyOrdersScreen()">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x0157;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
@@ -351,6 +360,62 @@
         <a href="https://t.me/dizabled" target="_blank" class="menu-item">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка проекта</span></div><span class="sf-icon">&#xECA2;</span>
         </a>
+    </div>
+</div>
+
+<!-- Модальная шторка корзины (Bottom Sheet) -->
+<div class="menu-modal" id="cartModal" onclick="closeCartScreen()">
+    <div class="menu-sheet cart-sheet" onclick="event.stopPropagation()" style="padding: 24px 18px; max-height: 85dvh; display: flex; flex-direction: column; gap: 12px; background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: 1.5px solid rgba(255, 255, 255, 0.12); border-bottom: none;">
+        <div class="cart-header-row" style="margin-bottom: 4px;">
+            <button class="cart-back-btn" id="cartBackToCatalogBtn" onclick="closeCartScreen()"><span class="sf-icon">&#xECAC;</span></button>
+            <div class="auth-title" id="cartScreenTitle" style="font-size: 20px; margin: 0; font-weight: 800;">Ваша корзина</div>
+        </div>
+        <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 13px; margin-top: -6px; color: var(--muted);">Проверьте выбранные приложения перед оформлением заказа</div>
+        
+        <div id="cartEmptyBox" class="cart-empty-alert">
+            Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
+        </div>
+
+        <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
+            <span id="cartToggleListText">Выбранные приложения (0)</span>
+            <span class="sf-icon">&#xECA2;</span>
+        </button>
+
+        <div class="cart-items-list" id="cartItemsList"></div>
+
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 4px; margin-bottom: 0; display: flex; gap: 8px;">
+            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
+            <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
+        </div>
+        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 0; display: none; padding-left: 4px;"></div>
+
+        <div class="cart-summary-card" id="cartSummaryCard">
+            <div class="cart-summary-row" id="cartOrderNumberRow">
+                <span>Номер заказа:</span>
+                <span id="cartScreenOrderNum" style="color: var(--text); font-weight: 600;">#00000</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Выбрано приложений:</span>
+                <span id="cartScreenCount" style="color: var(--text); font-weight: 600;">0 шт.</span>
+            </div>
+            <div class="cart-summary-row" id="cartBulkDiscountRow" style="display: none; color: #4ade80;">
+                <span>Скидка от 3 шт. (-40 ₽/шт.):</span>
+                <span id="cartScreenBulkDiscount">-0 ₽</span>
+            </div>
+            <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
+                <span>Скидка по промокоду:</span>
+                <span id="cartScreenDiscount">-0 ₽</span>
+            </div>
+            <div class="cart-summary-row total">
+                <span>Итого к оплате:</span>
+                <span id="cartScreenTotal" style="font-weight: 800;">0 ₽</span>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 4px;">
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Оплатить
+        </button>
+        <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
     </div>
 </div>
 
@@ -378,7 +443,7 @@
         <div class="info-box"><div class="info-box-num">без ПК</div><div class="info-box-label">нужны только iPhone и Safari</div></div>
         <div class="info-box"><div class="info-box-num">на сайте</div><div class="info-box-label">быстрый выбор в корзину</div></div>
         <div class="info-box"><div class="info-box-num">удобно</div><div class="info-box-label">не нужен сертификат разработчика</div></div>
-        <div class="info-box"><div class="info-box-num">100%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от учетной записи Apple ID</div></div>
+        <div class="info-box"><div class="info-box-num">100%</div><div class="info-box-label">безопасно для iOS: не нужен пароль от Apple ID</div></div>
     </div>
 </div>
 
@@ -404,6 +469,9 @@
     </div>
     <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
+    <div style="text-align: center; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="clearAppSearch(); window.scrollTo({top: 0, behavior: 'smooth'});" style="display: inline-flex; width: auto; padding: 10px 20px;">Вернуться наверх</button>
+    </div>
 </div>
 
 <div class="cart-fab-wrap">
@@ -413,65 +481,10 @@
     </button>
 </div>
 
-<div class="container" id="cartApp">
-    <div class="auth-box" style="padding: 24px 18px;">
-        <div class="cart-header-row">
-            <button class="cart-back-btn" id="cartBackToCatalogBtn" onclick="switchScreen('mainApp')"><span class="sf-icon">&#xECAC;</span></button>
-            <div class="auth-title" id="cartScreenTitle" style="font-size: 20px; margin: 0;">Ваша корзина</div>
-        </div>
-        <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>
-
-        <div id="cartEmptyBox" class="cart-empty-alert">
-            Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
-        </div>
-
-        <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
-            <span id="cartToggleListText">Выбранные приложения (0)</span>
-            <span class="sf-icon">&#xECA2;</span>
-        </button>
-
-        <div class="cart-items-list" id="cartItemsList"></div>
-
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; display: flex; gap: 8px;">
-            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
-            <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
-        </div>
-        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
-
-        <div class="cart-summary-card" id="cartSummaryCard">
-            <div class="cart-summary-row" id="cartOrderNumberRow">
-                <span>Номер заказа:</span>
-                <span id="cartScreenOrderNum" style="color: var(--text); font-weight: 650;">#00000</span>
-            </div>
-            <div class="cart-summary-row">
-                <span>Выбрано приложений:</span>
-                <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
-            </div>
-            <div class="cart-summary-row" id="cartBulkDiscountRow" style="display: none; color: #4ade80;">
-                <span>Скидка от 3 шт. (-40 ₽/шт.):</span>
-                <span id="cartScreenBulkDiscount">-0 ₽</span>
-            </div>
-            <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
-                <span>Скидка по промокоду:</span>
-                <span id="cartScreenDiscount">-0 ₽</span>
-            </div>
-            <div class="cart-summary-row total">
-                <span>Итого к оплате:</span>
-                <span id="cartScreenTotal">0 ₽</span>
-            </div>
-        </div>
-
-        <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Оплатить
-        </button>
-        <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
-    </div>
-</div>
-
 <div class="container" id="paymentApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
-            <button class="cart-back-btn" onclick="switchScreen('cartApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <button class="cart-back-btn" onclick="goBackToCart()"><span class="sf-icon">&#xECAC;</span></button>
             <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
@@ -542,7 +555,7 @@
             Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
         </div>
         <div class="requisites-card" style="padding: 12px 14px; text-align: center; border-color: rgba(74, 222, 128, 0.4);">
-            <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
+            <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 800; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
         </div>
         <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
             🚀 Начать установку
@@ -1174,6 +1187,9 @@ function generateAppsGrid() {
 
 function toggleCart(key) {
     if (!isAppVisible(key)) return;
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
     if (cartItems.has(key)) cartItems.delete(key);
     else cartItems.add(key);
     saveCart();
@@ -1218,6 +1234,9 @@ async function applyPromoCode() {
             msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
             currentPromoCode = promo.code;
             currentPromoDiscount = Number(promo.discount);
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
         }
     } else {
         msgEl.style.color = "#fca5a5";
@@ -1240,6 +1259,7 @@ function clearCart() {
     if (msg) msg.style.display = 'none';
     saveCart();
     updateCartUI();
+    closeCartScreen();
 }
 
 function toggleCartList() {
@@ -1250,8 +1270,20 @@ function toggleCartList() {
 function openCartScreen() {
     isCartListVisible = false;
     renderCartScreen();
-    switchScreen("cartApp");
-    window.scrollTo(0, 0);
+    document.getElementById("cartModal").classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function closeCartScreen() {
+    document.getElementById("cartModal").classList.remove("active");
+    if (!["welcomeApp", "maintenanceApp", "tokenErrorApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(currentScreenId)) {
+        document.body.style.overflow = "";
+    }
+}
+
+function goBackToCart() {
+    switchScreen('mainApp', false);
+    openCartScreen();
 }
 
 function renderCartScreen() {
@@ -1373,7 +1405,7 @@ function renderCartScreen() {
     }
 
     if (totalDiscount > 0) {
-        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 500; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
+        if (totalEl) totalEl.innerHTML = `<s style="color: var(--muted); font-size: 13.5px; font-weight: 600; margin-right: 6px;">${total} ₽</s> ${finalTotal} ₽`;
     } else {
         if (totalEl) totalEl.textContent = finalTotal + " ₽";
     }
@@ -1419,7 +1451,11 @@ function updateCartUI() {
         const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
         if (fabBtn.classList.contains("visible") !== shouldShow) fabBtn.classList.toggle("visible", shouldShow);
     }
-    if (currentScreenId === "cartApp") renderCartScreen();
+    
+    // Обновляем UI в модальном окне корзины, если оно сейчас открыто
+    if (document.getElementById("cartModal")?.classList.contains("active")) {
+        renderCartScreen();
+    }
 }
 
 function copyRequisite(text, btnId) {
@@ -1428,6 +1464,9 @@ function copyRequisite(text, btnId) {
         if (!btn) return;
         const old = btn.textContent;
         btn.textContent = "Скопировано ✓";
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
         setTimeout(() => { btn.textContent = old; }, 1600);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1445,6 +1484,8 @@ function checkoutCart() {
     const totalAmountEl = document.getElementById("paymentTotalAmount");
     if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
     if (totalAmountEl) totalAmountEl.textContent = finalTotal + " ₽";
+    
+    closeCartScreen();
     switchScreen("paymentApp");
 }
 
@@ -1571,7 +1612,10 @@ function startOrderStatusPolling(orderId) {
                 localStorage.removeItem("apprestore_active_order_num");
             } catch (e) {}
             updateCartUI();
-
+            
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
             switchScreen("orderApprovedApp", false);
         } else if (order.status === "rejected") {
             clearInterval(orderPollingInterval);
@@ -1660,7 +1704,7 @@ function switchScreen(id, pushHistory = true) {
     currentScreenId = id;
     sessionStorage.setItem("currentScreenId", currentScreenId);
 
-    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
         document.body.style.overflow = "hidden";
         window.scrollTo(0, 0);
     } else {
@@ -1713,8 +1757,6 @@ function handleNavBack(event) {
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
     
-    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
-    // принудительно запрещаем открывать меню навигации.
     const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
     if (lastScreen === "orderApprovedApp") {
         openMenu = false;
@@ -1810,6 +1852,9 @@ function installFromToken(key, appUrl) {
 }
 
 function setCategory(cat, btn) {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
     currentCategory = cat;
     document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
     btn.classList.add("active");
@@ -1952,9 +1997,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             switchScreen(lastScreen);
             if (lastScreen === "policyApp") loadExternalContent(POLICY_URL, 'policyContent');
             if (lastScreen === "offerApp") loadExternalContent(OFFER_URL, 'offerContent');
-        } else if (lastScreen === "cartApp") {
-            renderCartScreen();
-            switchScreen("cartApp");
         } else if (lastScreen === "paymentApp" && cartItems.size > 0) {
             checkoutCart();
         } else {
