@@ -291,20 +291,9 @@
       .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
 
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      #singleTokenAppContainer .app-grid-card { min-height: 90px; }
-
-      /* Стили для слайдера сторис-инструкции */
-      .stories-slider { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; width: 100%; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-      .stories-slider::-webkit-scrollbar { display: none; }
-      .story-card { flex: 0 0 100%; scroll-snap-align: center; background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px 40px 20px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); position: relative; min-height: 180px; }
-      .story-icon { font-size: 44px; color: #3b82f6; }
-      .story-title { font-size: 16.5px; font-weight: 750; color: #fff; }
-      .story-desc { font-size: 13.5px; color: var(--muted); line-height: 1.45; }
-      .story-next-arrow { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 18px; cursor: pointer; transition: background 0.2s; }
-      .story-next-arrow:active { background: rgba(255,255,255,0.15); }
-      .story-dots { display: flex; gap: 6px; justify-content: center; margin-top: 2px; }
-      .story-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.3s var(--spring); }
-      .story-dot.active { background: #3b82f6; width: 20px; }
+        #singleTokenAppContainer .app-grid-card {
+    min-height: 90px;
+}
     </style>
     <script>
         if ("fonts" in document) {
@@ -436,16 +425,6 @@
             Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
         </div>
 
-        <!-- Прогресс бар скидки -->
-        <div class="cart-progress-wrap" id="cartProgressWrap" style="display: none; margin-bottom: 12px; text-align: left;">
-            <div id="cartProgressText" style="font-size: 13px; color: var(--text); margin-bottom: 6px; font-weight: 500;">
-                До скидки на весь заказ еще <b>3</b> приложения
-            </div>
-            <div class="progress-bar-bg" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                <div id="cartProgressBar" style="height: 100%; width: 0%; background: #3b82f6; transition: width 0.3s ease;"></div>
-            </div>
-        </div>
-
         <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
             <span id="cartToggleListText">Выбранные приложения (0)</span>
             <span class="sf-icon">&#xECA2;</span>
@@ -453,18 +432,12 @@
 
         <div class="cart-items-list" id="cartItemsList"></div>
 
-        <!-- Кнопка и поле промокода -->
-        <div id="promoToggleWrap" style="text-align: left; margin-top: 8px;">
-            <button type="button" id="promoToggleBtn" style="background: none; border: none; color: #60a5fa; font-size: 13px; font-weight: 600; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="togglePromoField()">
-                <span class="sf-icon">&#xFC41;</span> Ввести промокод
-            </button>
-        </div>
-
+        <div id="promoToggleBtn" onclick="togglePromoInput()" style="display: none; font-size: 13.5px; color: #60a5fa; cursor: pointer; text-align: left; margin-top: 8px; margin-bottom: 4px; font-weight: 650; padding-left: 4px;">Ввести промокод</div>
         <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; gap: 8px;">
             <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
             <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
         </div>
-        <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
+        <div id="promoMessage" onclick="togglePromoInput()" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 8px; display: none; padding-left: 4px; cursor: pointer;"></div>
 
         <div class="cart-summary-card" id="cartSummaryCard">
             <div class="cart-summary-row" id="cartOrderNumberRow">
@@ -503,7 +476,7 @@
             <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
-            Выберите банк для перевода и нажмите <b>«Я оплатил»</b>
+            Переведите точную сумму по реквизитам ниже (СБП) и нажмите <b>«Я оплатил»</b>
         </div>
 
         <div class="requisites-card">
@@ -513,57 +486,37 @@
                     <span class="req-value" id="paymentOrderNum" style="color: var(--text);">#00000</span>
                 </div>
             </div>
-
-            <!-- Выбор банка для быстрой оплаты -->
             <div class="req-row">
-                <span class="req-label">Выберите банк для перевода:</span>
-                <div class="req-value-wrap" style="flex-direction: column; align-items: stretch; gap: 6px;">
-                    <select id="bankSelector" class="app-search" style="height: 42px; padding: 0 12px; font-size: 13.5px;" onchange="onBankSelectionChange()">
-                        <option value="sber">🟢 СберБанк</option>
-                        <option value="tinkoff">🟡 Т-Банк</option>
-                        <option value="alfa">🔴 Альфа-Банк</option>
-                        <option value="otp">🔵 ОТП Банк</option>
-                        <option value="ozon">🟣 Озон Банк</option>
-                        <option value="psb">🟣 ПСБ Банк</option>
-                        <option value="other">⚙️ Другой банк (по реквизитам)</option>
-                    </select>
+                <span class="req-label">Номер телефона (СБП):</span>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="reqPhoneText">89221194735</span>
+                    <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
                 </div>
             </div>
-
+            <div class="req-row">
+                <span class="req-label">Банк получателя:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">ОТП Банк</span>
+                </div>
+            </div>
+            <div class="req-row">
+                <span class="req-label">Получатель:</span>
+                <div class="req-value-wrap">
+                    <span class="req-value">Артём Е.</span>
+                </div>
+            </div>
             <div class="req-row">
                 <span class="req-label">Сумма к переводу:</span>
                 <div class="req-value-wrap">
                     <span class="req-value" style="color: #60a5fa; font-size: 18px;" id="paymentTotalAmount">0 ₽</span>
                 </div>
             </div>
-
-            <div id="manualRequisitesBox" style="display: none; flex-direction: column; gap: 10px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 10px;">
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Номер телефона (СБП):</span>
-                    <div class="req-value-wrap">
-                        <span class="req-value" id="reqPhoneText">89221194735</span>
-                        <button type="button" class="req-copy-btn" id="copyPhoneBtn" onclick="copyRequisite('89221194735', 'copyPhoneBtn')">Скопировать</button>
-                    </div>
-                </div>
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Банк получателя:</span>
-                    <div class="req-value-wrap"><span class="req-value">ОТП Банк</span></div>
-                </div>
-                <div class="req-row" style="border-bottom: none; padding-bottom: 0;">
-                    <span class="req-label">Получатель:</span>
-                    <div class="req-value-wrap"><span class="req-value">Артём Е.</span></div>
-                </div>
-            </div>
         </div>
 
-        <a href="#" id="dynamicPayBtn" class="btn btn-primary" style="margin-top: 2px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-            ⚡ Открыть приложение банка
-        </a>
-
-        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()" style="margin-top: 4px;">
+        <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
             <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил
         </button>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
         </a>
     </div>
@@ -675,62 +628,14 @@
 
 <div class="container" id="guideApp">
     <div class="auth-box">
-        <div class="auth-title" style="text-align: center; margin-bottom: 8px; font-size: 18.5px;">Инструкция по установке</div>
-        
-        <div class="stories-slider" id="storiesSlider" onscroll="updateStoryDots()">
-            <!-- Шаг 1 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xFC05;</span></div>
-                <div class="story-title">Шаг 1</div>
-                <div class="story-desc">Выбор приложений</div>
-                <div class="story-next-arrow" onclick="nextStory(1)"><span class="sf-icon">&#xEA61;</span></div>
-            </div>
-            <!-- Шаг 2 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xF172;</span></div>
-                <div class="story-title">Шаг 2</div>
-                <div class="story-desc">Проверка выбранных приложений, ввод промокода при наличии</div>
-                <div class="story-next-arrow" onclick="nextStory(2)"><span class="sf-icon">&#xEA61;</span></div>
-            </div>
-            <!-- Шаг 3 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xF889;</span></div>
-                <div class="story-title">Шаг 3</div>
-                <div class="story-desc">Оплата</div>
-                <div class="story-next-arrow" onclick="nextStory(3)"><span class="sf-icon">&#xEA61;</span></div>
-            </div>
-            <!-- Шаг 4 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xEF72;</span></div>
-                <div class="story-title">Шаг 4</div>
-                <div class="story-desc">Ожидание подтверждения</div>
-                <div class="story-next-arrow" onclick="nextStory(4)"><span class="sf-icon">&#xEA61;</span></div>
-            </div>
-            <!-- Шаг 5 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xED76;</span></div>
-                <div class="story-title">Шаг 5</div>
-                <div class="story-desc">Установка</div>
-                <div class="story-next-arrow" onclick="nextStory(5)"><span class="sf-icon">&#xEA61;</span></div>
-            </div>
-            <!-- Шаг 6 -->
-            <div class="story-card">
-                <div class="story-icon"><span class="sf-icon">&#xF9E8;</span></div>
-                <div class="story-title">Шаг 6</div>
-                <div class="story-desc">После установки активация.<br><a href="https://t.me/dizabled" target="_blank" style="color: #60a5fa; text-decoration: underline; font-weight: 700; display: inline-block; margin-top: 6px;">Напишите нам</a></div>
-            </div>
+        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
+        <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
+            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
+            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
+            <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
+            <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
         </div>
-        
-        <div class="story-dots" id="storyDots">
-            <div class="story-dot active"></div>
-            <div class="story-dot"></div>
-            <div class="story-dot"></div>
-            <div class="story-dot"></div>
-            <div class="story-dot"></div>
-            <div class="story-dot"></div>
-        </div>
-
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 14px;">Понятно, вернуться назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -895,7 +800,6 @@ let currentOrderNumber = null;
 let currentPromoCode = null;
 let currentPromoDiscount = 0;
 let isCartListVisible = false;
-let isPromoFieldVisible = false;
 let activeOrderId = null;
 let activeApprovedLink = "";
 let orderPollingInterval = null;
@@ -1284,21 +1188,28 @@ function removeFromCart(key) {
     if (cartItems.size < 2 && isCartListVisible) isCartListVisible = false;
 }
 
-function togglePromoField() {
-    isPromoFieldVisible = !isPromoFieldVisible;
-    renderCartScreen();
+function togglePromoInput() {
+    document.getElementById("promoToggleBtn").style.display = "none";
+    document.getElementById("promoMessage").style.display = "none";
+    document.getElementById("promoInputWrap").style.display = "flex";
+    document.getElementById("promoCodeInput").focus();
 }
 
 async function applyPromoCode() {
     const input = document.getElementById("promoCodeInput");
     const msgEl = document.getElementById("promoMessage");
+    const inputWrap = document.getElementById("promoInputWrap");
+    
     const code = input.value.trim().toUpperCase();
     if (!code) {
         msgEl.style.display = "block";
         msgEl.style.color = "#fca5a5";
-        msgEl.textContent = "Введите промокод";
+        msgEl.textContent = "Введите промокод (нажмите, чтобы ввести снова)";
+        inputWrap.style.display = "none";
         return;
     }
+    
+    inputWrap.style.display = "none";
     msgEl.style.display = "block";
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Проверка...";
@@ -1308,7 +1219,7 @@ async function applyPromoCode() {
         const promo = res[0];
         if (promo.is_used) {
             msgEl.style.color = "#fca5a5";
-            msgEl.textContent = "Промокод уже использован";
+            msgEl.textContent = "Промокод уже был использован (нажмите, чтобы изменить)";
             currentPromoCode = null;
             currentPromoDiscount = 0;
         } else {
@@ -1317,13 +1228,13 @@ async function applyPromoCode() {
                 body: JSON.stringify({ is_used: true })
             });
             msgEl.style.color = "#4ade80";
-            msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
+            msgEl.textContent = `Промокод на скидку (${promo.discount} ₽) применен!`;
             currentPromoCode = promo.code;
             currentPromoDiscount = Number(promo.discount);
         }
     } else {
         msgEl.style.color = "#fca5a5";
-        msgEl.textContent = "Промокод не найден";
+        msgEl.textContent = "Промокод не найден (нажмите, чтобы попробовать снова)";
         currentPromoCode = null;
         currentPromoDiscount = 0;
     }
@@ -1336,7 +1247,6 @@ function clearCart() {
     currentPromoCode = null;
     currentPromoDiscount = 0;
     isCartListVisible = false;
-    isPromoFieldVisible = false;
     const input = document.getElementById('promoCodeInput');
     if (input) input.value = '';
     const msg = document.getElementById('promoMessage');
@@ -1372,15 +1282,11 @@ function renderCartScreen() {
     const bulkDiscountEl = document.getElementById("cartScreenBulkDiscount");
     const promoRow = document.getElementById("cartPromoRow");
     const promoInputWrap = document.getElementById("promoInputWrap");
-    const promoToggleWrap = document.getElementById("promoToggleWrap");
     const msgEl = document.getElementById("promoMessage");
     const toggleListBtn = document.getElementById("cartToggleListBtn");
     const toggleListText = document.getElementById("cartToggleListText");
+    const promoToggleBtn = document.getElementById("promoToggleBtn");
     
-    const progressWrap = document.getElementById("cartProgressWrap");
-    const progressText = document.getElementById("cartProgressText");
-    const progressBar = document.getElementById("cartProgressBar");
-
     if (!listEl) return;
 
     cartItems.forEach(k => { if (!isAppVisible(k)) cartItems.delete(k); });
@@ -1394,11 +1300,10 @@ function renderCartScreen() {
         if (summaryCard) summaryCard.style.display = "none";
         if (checkoutBtn) checkoutBtn.style.display = "none";
         if (clearBtn) clearBtn.style.display = "none";
+        if (promoToggleBtn) promoToggleBtn.style.display = "none";
         if (promoInputWrap) promoInputWrap.style.display = "none";
-        if (promoToggleWrap) promoToggleWrap.style.display = "none";
         if (msgEl) msgEl.style.display = "none";
         if (toggleListBtn) toggleListBtn.style.display = "none";
-        if (progressWrap) progressWrap.style.display = "none";
         return;
     }
 
@@ -1411,43 +1316,17 @@ function renderCartScreen() {
     if (summaryCard) summaryCard.style.display = "flex";
     if (checkoutBtn) checkoutBtn.style.display = "flex";
     if (clearBtn) clearBtn.style.display = "flex";
-
-    // Управление прогресс-баром скидки
-    if (bulkDiscountEnabled) {
-        let visibleCount = 0;
-        cartItems.forEach(k => { if (isAppVisible(k)) visibleCount++; });
-        let needed = 3 - visibleCount;
-        if (progressWrap) progressWrap.style.display = "block";
-        
-        if (needed > 0) {
-            let text = "приложений";
-            if (needed === 1) text = "приложение";
-            else if (needed === 2) text = "приложения";
-            if (progressText) progressText.innerHTML = `До скидки на весь заказ еще <b>${needed}</b> ${text}`;
-            if (progressBar) {
-                progressBar.style.width = (visibleCount / 3 * 100) + "%";
-                progressBar.style.background = "#3b82f6";
-            }
-        } else {
-            if (progressText) progressText.innerHTML = `🎉 Скидка на весь заказ <b>активирована!</b>`;
-            if (progressBar) {
-                progressBar.style.width = "100%";
-                progressBar.style.background = "#4ade80";
-            }
-        }
-    } else {
-        if (progressWrap) progressWrap.style.display = "none";
-    }
-
-    // Управление полем промокода
-    if (currentPromoCode || isPromoFieldVisible) {
-        if (promoInputWrap) promoInputWrap.style.display = "flex";
-        if (promoToggleWrap) promoToggleWrap.style.display = "none";
-    } else {
+    
+    const isMsgVisible = msgEl && msgEl.style.display !== "none" && msgEl.textContent !== "";
+    if (currentPromoCode || isMsgVisible) {
+        if (promoToggleBtn) promoToggleBtn.style.display = "none";
         if (promoInputWrap) promoInputWrap.style.display = "none";
-        if (promoToggleWrap) promoToggleWrap.style.display = "block";
+        if (msgEl) msgEl.style.display = "block";
+    } else {
+        if (promoToggleBtn) promoToggleBtn.style.display = "block";
+        if (promoInputWrap) promoInputWrap.style.display = "none";
+        if (msgEl) msgEl.style.display = "none";
     }
-    if (currentPromoCode && msgEl) msgEl.style.display = "block";
 
     let total = 0, html = "";
     cartItems.forEach(k => {
@@ -1583,51 +1462,14 @@ function copyRequisite(text, btnId) {
     }
 }
 
-const PAYMENT_PHONE = "79221194735";
-
-function onBankSelectionChange() {
-    const select = document.getElementById("bankSelector");
-    const payBtn = document.getElementById("dynamicPayBtn");
-    const manualBox = document.getElementById("manualRequisitesBox");
-    const finalTotal = getCartFinalTotal();
-    
-    if (!select || !payBtn) return;
-    const choice = select.value;
-
-    if (choice === "other") {
-        payBtn.style.display = "none";
-        if (manualBox) manualBox.style.display = "flex";
-        return;
-    }
-
-    payBtn.style.display = "flex";
-    if (manualBox) manualBox.style.display = "none";
-
-    let sbpBaseUrl = "https://qr.nspk.ru/YOUR_SBP_QR_ID_HERE"; 
-    let link = `${sbpBaseUrl}?sum=${finalTotal}&phone=${PAYMENT_PHONE}&cur=RUB`;
-
-    if (choice === "tinkoff") {
-        link = `https://www.tinkoff.ru/rm/c2c/${PAYMENT_PHONE}?amount=${finalTotal}`;
-    }
-
-    payBtn.href = link;
-    payBtn.target = "_blank";
-}
-
 function checkoutCart() {
     if (cartItems.size === 0) return;
     if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
     const finalTotal = getCartFinalTotal();
-    
     const orderNumEl = document.getElementById("paymentOrderNum");
     const totalAmountEl = document.getElementById("paymentTotalAmount");
     if (orderNumEl) orderNumEl.textContent = currentOrderNumber;
     if (totalAmountEl) totalAmountEl.textContent = finalTotal + " ₽";
-
-    const select = document.getElementById("bankSelector");
-    if (select) select.value = "sber";
-    
-    onBankSelectionChange();
     switchScreen("paymentApp");
 }
 
@@ -1896,6 +1738,8 @@ function handleNavBack(event) {
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
     
+    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
+    // принудительно запрещаем открывать меню навигации.
     const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
     if (lastScreen === "orderApprovedApp") {
         openMenu = false;
@@ -2028,25 +1872,6 @@ function clearAppSearch() {
     input.value = "";
     filterApps();
     input.focus({ preventScroll: true });
-}
-
-// Логика слайдера
-function nextStory(index) {
-    const slider = document.getElementById('storiesSlider');
-    const cards = slider.querySelectorAll('.story-card');
-    if (index < cards.length) {
-        cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-}
-
-function updateStoryDots() {
-    const slider = document.getElementById('storiesSlider');
-    const dots = document.querySelectorAll('.story-dot');
-    const index = Math.round(slider.scrollLeft / slider.clientWidth);
-    dots.forEach((dot, i) => {
-        if (i === index) dot.classList.add('active');
-        else dot.classList.remove('active');
-    });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
