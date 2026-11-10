@@ -128,6 +128,28 @@
       }
       .app-grid-card.app-unavailable { display: none !important; }
 
+      .app-new-badge {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          background: linear-gradient(135deg, #ec4899, #8b5cf6);
+          color: #ffffff;
+          font-size: 9.5px;
+          font-weight: 800;
+          padding: 3px 7px;
+          border-radius: 99px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          box-shadow: 0 4px 10px rgba(236, 72, 153, 0.45);
+          border: 1.5px solid #0b0f17;
+          z-index: 5;
+          pointer-events: none;
+          display: none;
+      }
+      .app-new-badge.visible {
+          display: inline-block;
+      }
+
       .app-cart-btn {
           width: 36px; height: 36px; border-radius: 12px;
           background: var(--btn-install-bg); border: 1px solid var(--btn-install-border);
@@ -787,7 +809,7 @@ const appsData = [
   { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
 ];
 
-let siteState = { prices: {}, visibility: {} };
+let siteState = { prices: {}, visibility: {}, newApps: {} };
 let siteEnabled = true;
 let bulkDiscountEnabled = true;
 let currentCategory = "all";
@@ -852,11 +874,13 @@ function loadFromLocalStorageCache() {
     try {
         const pCache = localStorage.getItem("apprestore_prices_cache");
         const vCache = localStorage.getItem("apprestore_visibility_cache");
+        const nCache = localStorage.getItem("apprestore_new_apps_cache");
         const sCache = localStorage.getItem("apprestore_site_enabled_cache");
         const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
         
         if (pCache) siteState.prices = JSON.parse(pCache);
         if (vCache) siteState.visibility = JSON.parse(vCache);
+        if (nCache) siteState.newApps = JSON.parse(nCache);
         if (bCache !== null) bulkDiscountEnabled = bCache === "true";
         if (sCache !== null) {
             siteEnabled = sCache === "true";
@@ -895,9 +919,19 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         }
 
         const newVis = {};
-        if (Array.isArray(visRes)) visRes.forEach(row => { newVis[row.app_key] = row.is_visible; });
+        const newAppsObj = {};
+        if (Array.isArray(visRes)) {
+            visRes.forEach(row => {
+                newVis[row.app_key] = row.is_visible;
+                newAppsObj[row.app_key] = Boolean(row.is_new);
+            });
+        }
         if (JSON.stringify(newVis) !== JSON.stringify(siteState.visibility)) {
             siteState.visibility = newVis;
+            hasChanges = true;
+        }
+        if (JSON.stringify(newAppsObj) !== JSON.stringify(siteState.newApps)) {
+            siteState.newApps = newAppsObj;
             hasChanges = true;
         }
 
@@ -934,6 +968,7 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         try {
             localStorage.setItem("apprestore_prices_cache", JSON.stringify(siteState.prices));
             localStorage.setItem("apprestore_visibility_cache", JSON.stringify(siteState.visibility));
+            localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(siteState.newApps));
             localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
             localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
         } catch(e) {}
@@ -978,6 +1013,10 @@ function getAppPrice(key) {
 function isAppVisible(key) {
     if (siteState.visibility && siteState.visibility[key] !== undefined) return siteState.visibility[key] !== false;
     return true;
+}
+
+function isAppNew(key) {
+    return Boolean(siteState.newApps && siteState.newApps[key]);
 }
 
 function getCartBulkDiscount() {
@@ -1137,6 +1176,7 @@ function generateAppsGrid() {
         const isPrem = price >= 500;
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
+        const isNew = isAppNew(app.key);
         
         let mainName = app.name, subName = "";
         let bracketIdx = app.name.indexOf(" (");
@@ -1152,6 +1192,7 @@ function generateAppsGrid() {
         
         html += `
         <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
+            <span class="app-new-badge ${isNew ? 'visible' : ''}" id="gridNew_${app.key}">NEW</span>
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                 <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
@@ -1386,8 +1427,10 @@ function updateCartUI() {
         const card = document.getElementById("appCard_" + app.key);
         const btn = document.getElementById("gridBtn_" + app.key);
         const priceTag = document.getElementById("gridPrice_" + app.key);
+        const newBadge = document.getElementById("gridNew_" + app.key);
         const isVisible = isAppVisible(app.key);
         if (card) card.classList.toggle("app-unavailable", !isVisible);
+        if (newBadge) newBadge.classList.toggle("visible", isAppNew(app.key));
         
         if (priceTag) {
             const p = getAppPrice(app.key);
