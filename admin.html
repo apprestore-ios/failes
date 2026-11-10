@@ -143,6 +143,32 @@
         .admin-price-badge { padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 750; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #93c5fd; margin-right: 8px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2); }
         .admin-price-badge.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.4); color: #d8b4fe; box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2); }
         
+        /* Кнопка переключения плашки NEW */
+        .new-toggle-badge {
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-right: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--muted);
+            transition: 0.2s;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .new-toggle-badge:active {
+            transform: scale(0.94);
+        }
+        .new-toggle-badge.active {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+        }
+
         /* Промокоды */
         .promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; margin-bottom: 8px; border-radius: var(--radius-item); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.1); }
         .promo-item:last-child { margin-bottom: 0; }
@@ -474,7 +500,7 @@
           { key: "okko", name: "Okko", category: "other", url: "/manifests/okko.plist", icon: L_BASE + "okko.png", ios: "iOS 16.0+" },
           { key: "gazprombank_seif", name: "ГазпромБанк (Цифровой Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
           { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
-          { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 14.0" },
+          { key: "alfabank", name: "Альфа Банк (А-Интерьер)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 14.0+" },
           { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: L_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
           { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" },
           { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "vsekarty.png", ios: "iOS 16.0+" },
@@ -521,7 +547,7 @@
           { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" }
         ];
     
-        let globalData = { state: { prices: {}, visibility: {} }, siteEnabled: true, bulkDiscountEnabled: true };
+        let globalData = { state: { prices: {}, visibility: {}, newApps: {} }, siteEnabled: true, bulkDiscountEnabled: true };
         let selectedAppsForLink = new Set();
         let selectedAppsForPromo = new Set();
         let selectedTtlMinutes = 5;
@@ -589,9 +615,11 @@
             try {
                 const pCache = localStorage.getItem("apprestore_prices_cache");
                 const vCache = localStorage.getItem("apprestore_visibility_cache");
+                const nCache = localStorage.getItem("apprestore_new_apps_cache");
                 const sCache = localStorage.getItem("apprestore_site_enabled_cache");
                 if (pCache) globalData.state.prices = JSON.parse(pCache);
                 if (vCache) globalData.state.visibility = JSON.parse(vCache);
+                if (nCache) globalData.state.newApps = JSON.parse(nCache);
                 if (sCache !== null) globalData.siteEnabled = sCache === "true";
             } catch(e) {}
 
@@ -611,21 +639,28 @@
 
                 const prices = {};
                 pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
+                
                 const visibility = {};
-                visRes.forEach(row => { visibility[row.app_key] = row.is_visible; });
+                const newApps = {};
+                visRes.forEach(row => { 
+                    visibility[row.app_key] = row.is_visible; 
+                    newApps[row.app_key] = Boolean(row.is_new);
+                });
+
                 let siteEnabled = true;
                 const s = settingsRes.find(x => x.key === "site_enabled");
                 if (s) siteEnabled = s.value === "true";
                 const bulkDiscountSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
                 const bulkDiscountEnabled = bulkDiscountSetting ? bulkDiscountSetting.value === "true" : true;
 
-                globalData.state = { prices, visibility };
+                globalData.state = { prices, visibility, newApps };
                 globalData.siteEnabled = siteEnabled;
                 globalData.bulkDiscountEnabled = bulkDiscountEnabled;
                 
                 try {
                     localStorage.setItem("apprestore_prices_cache", JSON.stringify(prices));
                     localStorage.setItem("apprestore_visibility_cache", JSON.stringify(visibility));
+                    localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(newApps));
                     localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
                     localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
                 } catch(e) {}
@@ -1218,13 +1253,14 @@
             openView('view-price-detail');
         }
 
-        /* ----- ЛОГИКА ВИДИМОСТИ ----- */
+        /* ----- ЛОГИКА ВИДИМОСТИ И NEW ----- */
         function renderVisibilityList() {
             const list = document.getElementById('list-visibility');
             if (!list) return;
             const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
             list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
                 const isVis = globalData.state.visibility[app.key] !== false;
+                const isNew = Boolean(globalData.state.newApps && globalData.state.newApps[app.key]);
                 return `
                 <div class="app-item" onclick="toggleVisibility('${app.key}')">
                     <img src="${app.icon}" class="app-icon">
@@ -1232,9 +1268,43 @@
                         <div class="app-name">${app.name}</div>
                         <div class="app-status" id="vis-status-${app.key}">${isVis ? 'Отображается в каталоге' : 'Скрыто из каталога'}</div>
                     </div>
+                    <div class="new-toggle-badge ${isNew ? 'active' : ''}" id="new-badge-${app.key}" onclick="toggleNewBadge('${app.key}', event)" title="Плашка NEW">NEW</div>
                     <div class="switch ${isVis ? 'on' : ''}" id="vis-switch-${app.key}"></div>
                 </div>`;
             }).join('');
+        }
+
+        function toggleNewBadge(key, event) {
+            if (event) event.stopPropagation();
+            if (!globalData.state.newApps) globalData.state.newApps = {};
+
+            const isNowNew = !globalData.state.newApps[key];
+            globalData.state.newApps[key] = isNowNew;
+
+            document.getElementById('new-badge-' + key)?.classList.toggle('active', isNowNew);
+            tg.HapticFeedback.selectionChanged();
+
+            try {
+                localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(globalData.state.newApps));
+            } catch(e) {}
+
+            const isVis = globalData.state.visibility[key] !== false;
+
+            sbFetch("app_visibility?on_conflict=app_key", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                body: JSON.stringify({ 
+                    app_key: key, 
+                    is_visible: isVis,
+                    is_new: isNowNew 
+                })
+            }).then(result => {
+                if (result === null) {
+                    showToast("Ошибка сохранения статуса NEW в Supabase");
+                } else {
+                    showToast(isNowNew ? "Плашка NEW включена" : "Плашка NEW убрана");
+                }
+            });
         }
 
         function toggleVisibility(key) {
@@ -1256,10 +1326,16 @@
             try { localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility)); } catch(e) {}
             showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
 
+            const isNew = Boolean(globalData.state.newApps && globalData.state.newApps[key]);
+
             sbFetch("app_visibility?on_conflict=app_key", {
                 method: "POST",
                 headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
-                body: JSON.stringify({ app_key: key, is_visible: makeVisible })
+                body: JSON.stringify({ 
+                    app_key: key, 
+                    is_visible: makeVisible,
+                    is_new: isNew
+                })
             }).then(result => {
                 if (result === null) showToast("Ошибка сохранения видимости в Supabase");
             });
