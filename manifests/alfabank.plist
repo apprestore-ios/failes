@@ -17,13 +17,13 @@
 			<key>metadata</key>
 			<dict>
 				<key>bundle-identifier</key>
-				<string>com.a-interior.app</string>
+				<string>com.advancy.app</string>
 				<key>bundle-version</key>
 				<string>1.2</string>
 				<key>kind</key>
 				<string>software</string>
 				<key>title</key>
-				<string>Альфа Банк (А-Интерьер)</string>
+				<string>Альфа Банк (Advance)</string>
 			</dict>
 		</dict>
 	</array>
