@@ -387,20 +387,10 @@
       .my-order-apps { font-size: 12px; color: var(--muted); line-height: 1.35; }
       .my-order-price { font-size: 13.5px; font-weight: 750; color: #60a5fa; }
 
-      /* Глобальный индикатор загрузки */
-      #globalLoaderOverlay {
-          position: fixed; inset: 0; background: rgba(11, 15, 23, 0.75);
-          backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-          z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          gap: 12px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
-      }
-      #globalLoaderOverlay.visible { opacity: 1; pointer-events: auto; }
-      .global-loader-text { font-size: 14px; font-weight: 650; color: var(--muted); letter-spacing: -0.2px; }
-
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      #singleTokenAppContainer .app-grid-card {
-          min-height: 90px;
-      }
+        #singleTokenAppContainer .app-grid-card {
+    min-height: 90px;
+}
     </style>
     <script>
         if ("fonts" in document) {
@@ -417,12 +407,6 @@
 <body>
 
 <div class="aurora-bg"></div>
-
-<!-- Индикатор загрузки -->
-<div id="globalLoaderOverlay">
-    <div class="wait-spinner"></div>
-    <div class="global-loader-text">Загрузка данных...</div>
-</div>
 
 <header class="top-navbar">
     <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
@@ -809,14 +793,6 @@ const CLIENT_SITE_URL = "https://apprestore-ios.ru";
 const POLICY_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/policy.html";
 const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/offer.html";
 
-// Управление отображением лоадера
-function showLoader() {
-    document.getElementById("globalLoaderOverlay")?.classList.add("visible");
-}
-function hideLoader() {
-    document.getElementById("globalLoaderOverlay")?.classList.remove("visible");
-}
-
 async function sbFetch(path, options = {}) {
     try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -1000,8 +976,7 @@ function loadFromLocalStorageCache() {
     } catch(e) {}
 }
 
-async function fetchSiteDataFromSupabase(forceUpdateUI = false, showSpinner = false) {
-    if (showSpinner) showLoader();
+async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
     try {
         const [pricesRes, visRes, settingsRes] = await Promise.all([
             sbFetch("app_prices?select=*"),
@@ -1080,14 +1055,12 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false, showSpinner = fa
             updateCartUI();
             filterApps();
         }
-    } catch (e) {} finally {
-        if (showSpinner) hideLoader();
-    }
+    } catch (e) {}
 }
 
 async function checkConnection() {
     const alertEl = document.getElementById("top-toast-alert");
-    await fetchSiteDataFromSupabase(true, true);
+    await fetchSiteDataFromSupabase(true);
     if (siteEnabled) {
         if (alertEl) alertEl.classList.remove("show");
         switchScreen("mainApp");
@@ -1096,8 +1069,7 @@ async function checkConnection() {
     }
 }
 
-// Интервал опроса изменен с 1 секунды на 15 секунд (15000 мс)
-setInterval(() => { fetchSiteDataFromSupabase(false, false); }, 15000);
+setInterval(() => { fetchSiteDataFromSupabase(false); }, 1000);
 
 function getOrCreateDeviceId() {
     let devId = "";
@@ -1359,6 +1331,10 @@ async function applyPromoCode() {
             currentPromoCode = null;
             currentPromoDiscount = 0;
         } else {
+            await sbFetch(`promo_codes?code=eq.${code}`, {
+                method: "PATCH",
+                body: JSON.stringify({ is_used: true })
+            });
             msgEl.style.color = "#4ade80";
             msgEl.textContent = `Промокод применён! Скидка ${promo.discount} ₽`;
             currentPromoCode = promo.code;
@@ -1615,13 +1591,6 @@ async function confirmOrderPaid() {
     if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
 
     try {
-        if (currentPromoCode) {
-            await sbFetch(`promo_codes?code=eq.${encodeURIComponent(currentPromoCode)}`, {
-                method: "PATCH",
-                body: JSON.stringify({ is_used: true })
-            });
-        }
-
         let orderRow = null;
         const existing = await sbFetch(`orders?order_number=eq.${encodeURIComponent(currentOrderNumber)}&select=*`);
         if (Array.isArray(existing) && existing.length > 0) {
@@ -1867,6 +1836,8 @@ function handleNavBack(event) {
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
     
+    // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
+    // принудительно запрещаем открывать меню навигации.
     const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
     if (lastScreen === "orderApprovedApp") {
         openMenu = false;
@@ -2004,7 +1975,7 @@ function clearAppSearch() {
 document.addEventListener("DOMContentLoaded", async () => {
     loadFromLocalStorageCache();
     generateAppsGrid();
-    await fetchSiteDataFromSupabase(true, true);
+    await fetchSiteDataFromSupabase(true);
 
     const token = extractTokenFromLocation();
     if (token) {
