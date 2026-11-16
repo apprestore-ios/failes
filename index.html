@@ -288,6 +288,15 @@
       }
 
       .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+      .bulk-progress { width: 100%; margin-top: 4px; display: none; flex-direction: column; gap: 8px; }
+      .bulk-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .bulk-progress-title { font-size: 13px; font-weight: 700; color: var(--text); }
+      .bulk-progress-status { font-size: 12px; font-weight: 750; color: #93c5fd; white-space: nowrap; transition: color 0.3s ease; }
+      .bulk-progress-segments { display: flex; gap: 6px; width: 100%; }
+      .bulk-seg { flex: 1; height: 8px; border-radius: 999px; background: rgba(148, 163, 184, 0.2); transition: background 0.35s ease, box-shadow 0.35s ease; }
+      .bulk-seg.on { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+      .bulk-progress.done .bulk-seg.on { background: linear-gradient(90deg, #22c55e, #4ade80); box-shadow: 0 0 10px rgba(74, 222, 128, 0.45); }
+      .bulk-progress.done .bulk-progress-status { color: #4ade80; }
       .cart-summary-card { background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
       .cart-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--muted); }
       .cart-summary-row.total { font-size: 16px; font-weight: 750; color: var(--text); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; margin-top: 2px; }
@@ -520,6 +529,16 @@
 
         <div id="cartEmptyBox" class="cart-empty-alert">
             Ваша корзина пуста! Пожалуйста выберите приложения в каталоге и вернитесь в корзину снова!
+        </div>
+
+        <div class="bulk-progress" id="bulkProgress">
+            <div class="bulk-progress-head">
+                <div class="bulk-progress-title">Скидка -40 ₽ от 3 приложений</div>
+                <div class="bulk-progress-status" id="bulkProgressStatus"></div>
+            </div>
+            <div class="bulk-progress-segments">
+                <div class="bulk-seg"></div><div class="bulk-seg"></div><div class="bulk-seg"></div>
+            </div>
         </div>
 
         <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
@@ -1104,6 +1123,23 @@ function getCartBulkDiscount() {
     return visibleCount >= 3 ? visibleCount * 40 : 0;
 }
 
+function updateBulkProgress() {
+    const box = document.getElementById("bulkProgress");
+    if (!box) return;
+    if (!bulkDiscountEnabled || cartItems.size === 0) {
+        box.style.display = "none";
+        return;
+    }
+    let count = 0;
+    cartItems.forEach(k => { if (isAppVisible(k)) count++; });
+    const statusEl = document.getElementById("bulkProgressStatus");
+    const left = 3 - count;
+    box.style.display = "flex";
+    box.classList.toggle("done", left <= 0);
+    box.querySelectorAll(".bulk-seg").forEach((seg, i) => seg.classList.toggle("on", i < count));
+    if (statusEl) statusEl.textContent = left <= 0 ? "Активна ✓" : "ещё " + left;
+}
+
 function getCartFinalTotal() {
     let total = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
@@ -1409,6 +1445,7 @@ function renderCartScreen() {
         if (promoInputWrap) promoInputWrap.style.display = "none";
         if (msgEl) msgEl.style.display = "none";
         if (toggleListBtn) toggleListBtn.style.display = "none";
+        updateBulkProgress();
         return;
     }
 
@@ -1477,6 +1514,7 @@ function renderCartScreen() {
     const totalDiscount = bulkDiscount + currentPromoDiscount;
     let finalTotal = total - totalDiscount;
     if (finalTotal < 0) finalTotal = 0;
+    updateBulkProgress();
 
     if (bulkDiscount > 0) {
         if (bulkRow) bulkRow.style.display = "flex";
