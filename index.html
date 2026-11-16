@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script>
         (function() {
             if (window.location.pathname.toLowerCase().startsWith("/admin")) {
@@ -796,23 +795,15 @@ const OFFER_URL = "https://raw.githubusercontent.com/apprestore-ios/failes/main/
 
 async function sbFetch(path, options = {}) {
     try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 6000);
-        let res;
-        try {
-            res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-                ...options,
-                signal: ctrl.signal,
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${SUPABASE_KEY}`,
-                    "Content-Type": "application/json",
-                    ...(options.headers || {})
-                }
-            });
-        } finally {
-            clearTimeout(timer);
-        }
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+            ...options,
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
         if (!res.ok) return null;
         const text = await res.text();
         return text ? JSON.parse(text) : null;
@@ -1078,49 +1069,7 @@ async function checkConnection() {
     }
 }
 
-// ===== Realtime: обновления приходят от Supabase, опрос — только запасной =====
-let realtimeConnected = false;
-let realtimeDebounce = null;
-let sbClient = null;
-
-function scheduleSiteDataRefresh() {
-    clearTimeout(realtimeDebounce);
-    realtimeDebounce = setTimeout(() => fetchSiteDataFromSupabase(false), 250);
-}
-
-function initRealtime() {
-    try {
-        if (!window.supabase || !window.supabase.createClient) return;
-        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const sb = sbClient;
-        const channel = sb.channel("site-data");
-        ["app_prices", "app_visibility", "site_settings"].forEach(table => {
-            channel.on("postgres_changes", { event: "*", schema: "public", table }, scheduleSiteDataRefresh);
-        });
-        channel.subscribe(status => {
-            if (status === "SUBSCRIBED") {
-                realtimeConnected = true;
-                scheduleSiteDataRefresh(); // добираем изменения, пропущенные за время обрыва
-            } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
-                realtimeConnected = false;
-            }
-        });
-    } catch (e) { realtimeConnected = false; }
-}
-initRealtime();
-
-// Запасной опрос: часто, если realtime не подключён, и редко, если подключён
-let fallbackTick = 0;
-setInterval(() => {
-    if (document.hidden) return;
-    fallbackTick++;
-    if (!realtimeConnected || fallbackTick % 6 === 0) fetchSiteDataFromSupabase(false);
-}, 5000);
-
-// При возврате на вкладку сразу обновляем данные
-document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) fetchSiteDataFromSupabase(false);
-});
+setInterval(() => { fetchSiteDataFromSupabase(false); }, 1000);
 
 function getOrCreateDeviceId() {
     let devId = "";
@@ -1719,12 +1668,6 @@ async function confirmOrderPaid() {
     }
 }
 
-let orderChannel = null;
-function stopOrderRealtime() {
-    if (orderChannel && sbClient) { try { sbClient.removeChannel(orderChannel); } catch (e) {} }
-    orderChannel = null;
-}
-
 function startOrderStatusPolling(orderId) {
     if (!orderId) return;
     if (orderPollingInterval) clearInterval(orderPollingInterval);
@@ -1737,7 +1680,6 @@ function startOrderStatusPolling(orderId) {
         if (order.status === "approved" && order.link_token) {
             clearInterval(orderPollingInterval);
             orderPollingInterval = null;
-            stopOrderRealtime();
             activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
             const linkEl = document.getElementById("approvedLinkText");
             if (linkEl) linkEl.textContent = activeApprovedLink;
@@ -1757,25 +1699,12 @@ function startOrderStatusPolling(orderId) {
         } else if (order.status === "rejected") {
             clearInterval(orderPollingInterval);
             orderPollingInterval = null;
-            stopOrderRealtime();
             switchScreen("orderRejectedApp", false);
         }
     }
 
     checkStatus();
-
-    stopOrderRealtime();
-    if (sbClient) {
-        try {
-            orderChannel = sbClient.channel("order-" + orderId)
-                .on("postgres_changes",
-                    { event: "*", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
-                    () => checkStatus())
-                .subscribe(status => { if (status === "SUBSCRIBED") checkStatus(); });
-        } catch (e) { orderChannel = null; }
-    }
-    // Запасной опрос: редкий при работающем realtime, частый без него
-    orderPollingInterval = setInterval(checkStatus, orderChannel ? 10000 : 2000);
+    orderPollingInterval = setInterval(checkStatus, 2000);
 }
 
 function startApprovedInstallation() {
@@ -1794,36 +1723,16 @@ function showMyOrdersScreen() {
     window.scrollTo(0, 0);
 }
 
-let myOrdersChannel = null;
-let myOrdersChannelKey = "";
-function watchMyOrders() {
-    if (!sbClient) return;
-    const ids = myLocalOrders.map(o => o.id).filter(Boolean);
-    const key = ids.join(",");
-    if (key === myOrdersChannelKey) return;
-    if (myOrdersChannel) { try { sbClient.removeChannel(myOrdersChannel); } catch (e) {} myOrdersChannel = null; }
-    myOrdersChannelKey = key;
-    if (!ids.length) return;
-    try {
-        myOrdersChannel = sbClient.channel("my-orders")
-            .on("postgres_changes",
-                { event: "*", schema: "public", table: "orders", filter: `id=in.(${key})` },
-                () => { if (currentScreenId === "myOrdersApp") renderMyOrdersList(true); })
-            .subscribe();
-    } catch (e) { myOrdersChannel = null; }
-}
-
-async function renderMyOrdersList(silent = false) {
+async function renderMyOrdersList() {
     const container = document.getElementById("myOrdersListContainer");
     if (!container) return;
-    watchMyOrders();
 
     if (myLocalOrders.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--muted); font-size: 13.5px;">У вас пока нет сохраненных заказов на этом устройстве.</div>';
         return;
     }
 
-    if (!silent) container.innerHTML = '<div style="text-align:center; padding: 10px; color: var(--muted); font-size: 12px;">Загрузка данных...</div>';
+    container.innerHTML = '<div style="text-align:center; padding: 10px; color: var(--muted); font-size: 12px;">Загрузка данных...</div>';
 
     let html = "";
     for (const item of myLocalOrders) {
@@ -2066,23 +1975,9 @@ function clearAppSearch() {
 document.addEventListener("DOMContentLoaded", async () => {
     loadFromLocalStorageCache();
     generateAppsGrid();
-
-    const token = extractTokenFromLocation();
-
-    // Сразу показываем экран по локальным данным, не дожидаясь базы
-    if (!token && !activeOrderId && siteEnabled) {
-        const earlyScreen = sessionStorage.getItem("currentScreenId");
-        const earlyEntered = sessionStorage.getItem("site_access") === "true";
-        if (earlyEntered && (!earlyScreen || earlyScreen === "mainApp" || earlyScreen === "welcomeApp")) {
-            switchScreen("mainApp", false);
-        } else if (!earlyEntered && (!earlyScreen || earlyScreen === "welcomeApp")) {
-            switchScreen("welcomeApp", false);
-        }
-    }
-
-    // Данные обновляются в фоне, без await
     fetchSiteDataFromSupabase(true);
 
+    const token = extractTokenFromLocation();
     if (token) {
         isFromToken = true;
         const ua = navigator.userAgent || "";
