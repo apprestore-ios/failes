@@ -1069,7 +1069,8 @@ async function checkConnection() {
     }
 }
 
-setInterval(() => { fetchSiteDataFromSupabase(false); }, 1000);
+/* Интервал изменен с 1000мс (1 секунды) на 20000мс (20 секунд) */
+setInterval(() => { fetchSiteDataFromSupabase(false); }, 20000);
 
 function getOrCreateDeviceId() {
     let devId = "";
