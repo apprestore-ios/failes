@@ -288,6 +288,11 @@
       }
 
       .cart-item-remove { width: 32px; height: 32px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+      .bulk-banner { width: 100%; margin-bottom: 12px; padding: 11px 14px; border-radius: 14px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(59, 130, 246, 0.12)); border: 1.5px solid rgba(34, 197, 94, 0.35); display: none; align-items: center; gap: 12px; box-shadow: var(--box-shadow); }
+      .bulk-banner-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: 11px; background: rgba(34, 197, 94, 0.2); color: #4ade80; display: flex; align-items: center; justify-content: center; }
+      .bulk-banner-title { font-size: 13.5px; font-weight: 750; color: var(--text); line-height: 1.25; }
+      .bulk-banner-title b { color: #4ade80; font-weight: 800; }
+      .bulk-banner-sub { font-size: 11.5px; font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.25; }
       .bulk-progress { width: 100%; margin-top: 4px; display: none; flex-direction: column; gap: 8px; }
       .bulk-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
       .bulk-progress-title { font-size: 13px; font-weight: 700; color: var(--text); }
@@ -493,6 +498,15 @@
         <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div>
         <div class="catalog-notice-text">Добавьте нужные приложения <b>в корзину</b> и нажмите на кнопку корзины внизу справа.</div>
     </div>
+    <div class="bulk-banner" id="bulkBanner">
+        <div class="bulk-banner-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        </div>
+        <div>
+            <div class="bulk-banner-title">Скидка <b>-40 ₽</b> на каждое приложение</div>
+            <div class="bulk-banner-sub">При покупке от 3 приложений</div>
+        </div>
+    </div>
     <div class="app-search-wrap">
         <span class="search-icon"><span class="sf-icon">&#xFCA6;</span></span>
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
@@ -533,7 +547,7 @@
 
         <div class="bulk-progress" id="bulkProgress">
             <div class="bulk-progress-head">
-                <div class="bulk-progress-title">Скидка на заказ от 3 приложений</div>
+                <div class="bulk-progress-title">Скидка -40 ₽ от 3 приложений</div>
                 <div class="bulk-progress-status" id="bulkProgressStatus"></div>
             </div>
             <div class="bulk-progress-segments">
@@ -564,7 +578,7 @@
                 <span id="cartScreenCount" style="color: var(--text); font-weight: 650;">0 шт.</span>
             </div>
             <div class="cart-summary-row" id="cartBulkDiscountRow" style="display: none; color: #4ade80;">
-                <span>Скидка от 3 приложений:</span>
+                <span>Скидка от 3 шт. (-40 ₽/шт.):</span>
                 <span id="cartScreenBulkDiscount">-0 ₽</span>
             </div>
             <div class="cart-summary-row" id="cartPromoRow" style="display: none; color: #4ade80;">
@@ -1123,6 +1137,11 @@ function getCartBulkDiscount() {
     return visibleCount >= 3 ? visibleCount * 40 : 0;
 }
 
+function updateBulkBanner() {
+    const banner = document.getElementById("bulkBanner");
+    if (banner) banner.style.display = bulkDiscountEnabled ? "flex" : "none";
+}
+
 function updateBulkProgress() {
     const box = document.getElementById("bulkProgress");
     if (!box) return;
@@ -1539,6 +1558,7 @@ function renderCartScreen() {
 }
 
 function updateCartUI() {
+    updateBulkBanner();
     appsData.forEach(app => {
         const card = document.getElementById("appCard_" + app.key);
         const btn = document.getElementById("gridBtn_" + app.key);
@@ -2013,6 +2033,7 @@ function clearAppSearch() {
 document.addEventListener("DOMContentLoaded", async () => {
     loadFromLocalStorageCache();
     generateAppsGrid();
+    updateBulkBanner();
     fetchSiteDataFromSupabase(true);
 
     const token = extractTokenFromLocation();
