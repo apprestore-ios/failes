@@ -463,7 +463,7 @@
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Публичная оферта</span></div><span class="sf-icon">&#xECA2;</span>
         </button>
         <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xFA8E;</span></div><span>AppRestore IOS в Telegram!</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x01AF;</span></div><span>AppRestore IOS в Telegram!</span></div><span class="sf-icon">&#xECA2;</span>
         </a>
         <a href="https://t.me/dizabled" target="_blank" class="menu-item">
             <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка проекта</span></div><span class="sf-icon">&#xECA2;</span>
@@ -483,7 +483,7 @@
     <div class="hero-section">
         <div class="hero-title">Приложения для <span>iPhone</span> быстро и понятно</div>
         <div class="hero-links">
-            <a href="https://t.me/apprestore_ios" target="_blank" class="hero-link"><span class="sf-icon">&#xFA8E;</span>Мы в Telegram</a>
+            <a href="https://t.me/apprestore_ios" target="_blank" class="hero-link"><span class="sf-icon">&#x01AF;</span>Мы в Telegram</a>
             <a href="https://t.me/dizabled" target="_blank" class="hero-link"><span class="sf-icon">&#xF9E8;</span>Поддержка</a>
         </div>
     </div>
@@ -2157,6 +2157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             switchScreen("cartApp");
         } else if (lastScreen === "paymentApp" && cartItems.size > 0) {
             checkoutCart();
+        } else if (lastScreen === "welcomeApp") {
+            switchScreen("welcomeApp");
         } else {
             switchScreen("mainApp");
         }
