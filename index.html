@@ -184,6 +184,12 @@
       .hero-title span { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .hero-desc-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); margin-top: 14px; margin-bottom: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
       .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 500; }
+      .hero-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; margin-bottom: 2px; width: 100%; }
+      .hero-link { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: 18px; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: var(--text); text-decoration: none; font-size: 13px; font-weight: 650; line-height: 1.3; text-align: center; -webkit-tap-highlight-color: transparent; }
+      .hero-link:active { opacity: 0.7; }
+      .hero-link .sf-icon { font-size: 26px; color: #3b82f6; }
+      .promo-toggle-link { display: none; width: 100%; margin-top: 8px; padding: 6px 0; background: none; border: none; color: #60a5fa; font-size: 13px; font-weight: 650; text-align: center; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+      .promo-toggle-link:active { opacity: 0.6; }
       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; width: 100%; }
       .info-box { background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 14px 12px; text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: var(--box-shadow); transition: border-color 0.3s ease; }
       .info-box-num { font-size: 20px; font-weight: 800; color: #3b82f6; margin-bottom: 4px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
@@ -476,8 +482,9 @@
 <div class="container" id="welcomeApp">
     <div class="hero-section">
         <div class="hero-title">Приложения для <span>iPhone</span> быстро и понятно</div>
-        <div class="hero-desc-box">
-            <p class="hero-desc">Для просмотра списка доступных приложений и оформления заказа нажмите <b>«Перейти к каталогу»</b>.</p>
+        <div class="hero-links">
+            <a href="https://t.me/apprestore_ios" target="_blank" class="hero-link"><span class="sf-icon">&#xFA8E;</span>Мы в Telegram</a>
+            <a href="https://t.me/dizabled" target="_blank" class="hero-link"><span class="sf-icon">&#xF9E8;</span>Поддержка</a>
         </div>
     </div>
     <button type="button" class="btn btn-primary" onclick="openCatalog()" style="margin-bottom: 12px; min-height: 50px; font-size: 15.5px; border-radius: 16px;">
@@ -494,10 +501,6 @@
 </div>
 
 <div class="container" id="mainApp">
-    <div class="catalog-notice">
-        <div class="catalog-notice-icon"><span class="sf-icon">&#xED3C;</span></div>
-        <div class="catalog-notice-text">Добавьте нужные приложения <b>в корзину</b> и нажмите на кнопку корзины внизу справа.</div>
-    </div>
     <div class="bulk-banner" id="bulkBanner">
         <div class="bulk-banner-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
@@ -562,9 +565,10 @@
 
         <div class="cart-items-list" id="cartItemsList"></div>
 
-        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 8px; margin-bottom: 0; display: flex; gap: 8px;">
-            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; padding-left: 16px; text-transform: uppercase;" placeholder="Промокод">
-            <button type="button" class="btn btn-primary" onclick="applyPromoCode()" style="width: auto; padding: 0 16px; min-height: 42px; border-radius: 14px;">Применить</button>
+        <button type="button" class="promo-toggle-link" id="promoToggleLink" onclick="openPromoInput()">У меня есть промокод</button>
+        <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 6px; margin-bottom: 0; gap: 6px;">
+            <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; height: 36px; padding: 0 12px; border-radius: 12px; font-size: 13px; text-transform: uppercase;" placeholder="Промокод">
+            <button type="button" class="btn btn-primary promo-apply-btn" onclick="applyPromoCode()" aria-label="Применить" style="width: 36px; min-height: 36px; padding: 0; border-radius: 12px; flex-shrink: 0;"><span class="sf-icon" style="font-size: 18px;">&#xECC2;</span></button>
         </div>
         <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
 
@@ -592,7 +596,7 @@
         </div>
 
         <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xF889;</span> Оплатить
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xEA40;</span> Оплатить
         </button>
         <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
     </div>
@@ -643,7 +647,7 @@
         </div>
 
         <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил
+            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> Я оплатил
         </button>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
             <span class="sf-icon">&#xF9E8;</span> Поддержка
@@ -932,6 +936,7 @@ let tokenCountdownInterval = null;
 let cartItems = new Set();
 let currentOrderNumber = null;
 let currentPromoCode = null;
+let promoInputOpen = false;
 let currentPromoDiscount = 0;
 let isCartListVisible = false;
 let activeOrderId = null;
@@ -1404,11 +1409,19 @@ async function applyPromoCode() {
     renderCartScreen();
 }
 
+function openPromoInput() {
+    promoInputOpen = true;
+    renderCartScreen();
+    const input = document.getElementById("promoCodeInput");
+    if (input) input.focus({ preventScroll: true });
+}
+
 function clearCart() {
     cartItems.clear();
     currentOrderNumber = null;
     currentPromoCode = null;
     currentPromoDiscount = 0;
+    promoInputOpen = false;
     isCartListVisible = false;
     const input = document.getElementById('promoCodeInput');
     if (input) input.value = '';
@@ -1462,6 +1475,8 @@ function renderCartScreen() {
         if (checkoutBtn) checkoutBtn.style.display = "none";
         if (clearBtn) clearBtn.style.display = "none";
         if (promoInputWrap) promoInputWrap.style.display = "none";
+        const promoLinkEmpty = document.getElementById("promoToggleLink");
+        if (promoLinkEmpty) promoLinkEmpty.style.display = "none";
         if (msgEl) msgEl.style.display = "none";
         if (toggleListBtn) toggleListBtn.style.display = "none";
         updateBulkProgress();
@@ -1477,7 +1492,10 @@ function renderCartScreen() {
     if (summaryCard) summaryCard.style.display = "flex";
     if (checkoutBtn) checkoutBtn.style.display = "flex";
     if (clearBtn) clearBtn.style.display = "flex";
-    if (promoInputWrap) promoInputWrap.style.display = "flex";
+    const promoVisible = promoInputOpen || !!currentPromoCode;
+    if (promoInputWrap) promoInputWrap.style.display = promoVisible ? "flex" : "none";
+    const promoLink = document.getElementById("promoToggleLink");
+    if (promoLink) promoLink.style.display = promoVisible ? "none" : "block";
     if (currentPromoCode && msgEl) msgEl.style.display = "block";
 
     let total = 0, html = "";
@@ -1634,7 +1652,7 @@ async function confirmOrderPaid() {
     const btn = document.getElementById("btnConfirmPaid");
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> ⏳ Отправка...';
+        btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> ⏳ Отправка...';
     }
 
     const appKeysArr = Array.from(cartItems);
@@ -1721,7 +1739,7 @@ async function confirmOrderPaid() {
     } catch (e) {} finally {
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#XECC2;</span> Я оплатил';
+            btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> Я оплатил';
         }
     }
 }
