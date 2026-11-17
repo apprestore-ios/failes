@@ -844,7 +844,7 @@
     </div>
     <div class="catalog-notice" style="margin-top: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
         <div class="order-num-pill" id="tokenOrderNumBox" style="display: none; margin-bottom: 2px;">Номер заказа: <b id="tokenOrderNum">#00000</b></div>
-        <div class="catalog-notice-text">Установите все приложения в течении 15 минут! После установки приложений обратитесь в поддержку для их активации!</div>
+        <div class="catalog-notice-text">Установите все приложения в течении <b style="color: #4ade80; font-weight: 750;">15 минут!</b> После установки приложений обратитесь в поддержку для их активации!</div>
         <button type="button" class="btn btn-secondary" onclick="showActivationGuideScreen()" style="margin: 0; max-width: 260px;">Инструкция по активации</button>
     </div>
     <div class="info-grid">
@@ -905,7 +905,7 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
+        <button type="button" class="btn btn-primary" onclick="returnFromActivationGuide()">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -2139,6 +2139,7 @@ let storyTotal = 0;
 let storyInited = false;
 let activationGuideMode = false;
 let regularGuideTrackHTML = "";
+let activationGuideReturnScreen = null;
 
 function initStories() {
     if (storyInited) return;
@@ -2289,6 +2290,7 @@ function showGuideScreen() {
 }
 
 function showActivationGuideScreen() {
+    activationGuideReturnScreen = currentScreenId || (isFromToken ? "tokenApp" : "mainApp");
     document.getElementById("burgerMenuModal")?.classList.remove("active");
     initStories();
     const track = document.getElementById("storyTrack");
@@ -2320,6 +2322,19 @@ function showActivationGuideScreen() {
     document.querySelector("#guideApp .auth-title").textContent = "Инструкция по активации";
     goToStory(0);
     switchScreen("guideApp");
+    window.scrollTo(0, 0);
+}
+
+function returnFromActivationGuide() {
+    const target = activationGuideReturnScreen || (isFromToken ? "tokenApp" : "mainApp");
+    activationGuideReturnScreen = null;
+    if (!siteEnabled && !ALLOWED_WHEN_DISABLED.includes(target)) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
+    // Возвращаемся именно на экран, с которого открыли инструкцию, без открытия меню.
+    if (HISTORY_STACK.length && HISTORY_STACK[HISTORY_STACK.length - 1] === target) HISTORY_STACK.pop();
+    switchScreen(target, false);
     window.scrollTo(0, 0);
 }
 
