@@ -43,7 +43,8 @@
           vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
       }
       html.fonts-loaded .sf-icon { opacity: 1; }
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: 500; touch-action: manipulation; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+      body, button, input, select, textarea { font-weight: 500; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
       body {
           min-height: 100dvh;
@@ -153,23 +154,31 @@
       .burger-line::before { top: -5px; }
       .burger-line::after { top: 5px; }
       .cart-fab-wrap {
-          position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%;
+          position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); left: 50%;
           transform: translateX(-50%); width: 100%; max-width: 430px;
-          padding: 0 18px; display: flex; justify-content: flex-end; pointer-events: none; z-index: 200;
+          padding: 0 14px; display: flex; justify-content: center; pointer-events: none; z-index: 200;
       }
       .cart-fab-btn {
-          pointer-events: auto; width: 56px; height: 56px; border-radius: 18px;
-          background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1.5px solid rgba(255, 255, 255, 0.22);
-          color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
-          box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5), 0 4px 12px rgba(0,0,0,0.5);
-          transform: scale(0) translateY(20px); opacity: 0; transition: transform 0.3s var(--spring), opacity 0.25s ease;
+          pointer-events: none; width: 100%; min-height: 64px; padding: 8px 8px 8px 18px; border-radius: 22px;
+          background: rgba(17, 24, 39, 0.78);
+          backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          cursor: pointer; font-family: inherit; text-align: left;
+          box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          transform: translateY(24px); opacity: 0; transition: transform 0.3s var(--spring), opacity 0.25s ease;
       }
-      .cart-fab-btn.visible { transform: scale(1) translateY(0); opacity: 1; }
-      .cart-fab-btn:active { transform: scale(0.93); }
-      .cart-fab-badge {
-          position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px;
-          border-radius: 99px; background: #ef4444; color: #fff; font-size: 11.5px; font-weight: 800;
-          display: flex; align-items: center; justify-content: center; border: 2px solid #0b0f17; box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+      .cart-fab-btn.visible { pointer-events: auto; transform: translateY(0); opacity: 1; }
+      .cart-fab-btn:active { transform: scale(0.98); }
+      .cart-bar-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .cart-bar-count { font-size: 12px; color: var(--muted); line-height: 1.2; white-space: nowrap; }
+      .cart-bar-total { font-size: 20px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .cart-bar-action {
+          flex-shrink: 0; min-height: 48px; padding: 0 20px; border-radius: 16px;
+          display: inline-flex; align-items: center; gap: 8px;
+          background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1.5px solid rgba(255, 255, 255, 0.22);
+          box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+          font-size: 15px; font-weight: 750; color: #ffffff;
       }
       .container {
           width: 100%; max-width: 430px; padding: 0 16px; z-index: 2; display: none;
@@ -197,7 +206,7 @@
       .catalog-header { display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 16px; background: rgba(30,41,59,0.3); border-radius: 14px; border: 1px solid rgba(148,163,184,0.15); padding: 8px 0; }
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
-      .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
+      .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 100px; }
       
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
@@ -215,7 +224,7 @@
           right: -6px;
           background: linear-gradient(135deg, #ec4899, #8b5cf6);
           color: #ffffff;
-          font-size: 9.5px;
+          font-size: 11px;
           font-weight: 800;
           padding: 3px 7px;
           border-radius: 99px;
@@ -248,9 +257,9 @@
 
       .new-price-bold { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-weight: 800; }
       
-      .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
-      .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
-      .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+      .app-grid-name { font-size: clamp(11.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
+      .app-grid-subname { font-size: 11px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
+      .app-grid-version { font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
       
       .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
@@ -349,6 +358,10 @@
       .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
       .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
       .filter-chip .sf-icon { font-size: 18px; }
+      .catalog-filters { position: sticky; top: calc(max(10px, env(safe-area-inset-top)) + 54px); z-index: 20; display: flex; align-items: center; gap: 8px; width: calc(100% + 32px); margin: 0 -16px 12px; padding: 8px 16px 4px; background: rgba(11, 15, 23, 0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+      .catalog-filters .categories-bar { flex: 1; min-width: 0; width: auto; margin-bottom: 0; padding: 2px 0 4px; }
+      .catalog-count { flex-shrink: 0; font-size: 12px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+      .catalog-count span { color: var(--text); font-weight: 750; }
       .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
       .catalog-notice-icon { font-size: 24px; color: #facc15; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: flex; }
       .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; }
@@ -468,7 +481,7 @@
       .wf-ico.c5 { background: linear-gradient(160deg, #4ade80, #16a34a); }
       .wf-ico.c6 { background: linear-gradient(160deg, #818cf8, #4f46e5); }
       .wf-num { font-size: clamp(16px, 2.7dvh, 21px); font-weight: 800; line-height: 1.15; color: #fff; font-variant-numeric: tabular-nums; }
-      .wf-label { font-size: clamp(10px, 1.5dvh, 12px); color: var(--muted); line-height: 1.25; }
+      .wf-label { font-size: clamp(11px, 1.5dvh, 12px); color: var(--muted); line-height: 1.25; }
 
       .wl-bar { width: 100%; display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; flex-shrink: 0; margin-top: auto; background: rgba(30,41,59,0.45); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); overflow: hidden; }
       .wl-div { background: rgba(255,255,255,0.1); margin: 9px 0; }
@@ -480,15 +493,15 @@
       .wl-ico.sp { background: rgba(167,139,250,0.2); color: #a78bfa; }
       .wl-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
       .wl-text b { font-size: 13px; font-weight: 700; white-space: nowrap; }
-      .wl-text small { font-size: 10.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+      .wl-text small { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
       @media (max-height: 700px) {
           #welcomeApp { gap: 10px; }
           #welcomeApp .hero-title { margin-bottom: 0; }
           .wf-card { padding: 5px 8px; border-radius: 16px; gap: 1px; }
-          .wf-label { font-size: clamp(10px, 1.65dvh, 11.5px); line-height: 1.2; }
+          .wf-label { font-size: clamp(11px, 1.65dvh, 11.5px); line-height: 1.2; }
           .wl-ico { width: 30px; height: 30px; }
       }
-      @media (max-height: 600px) { #welcomeApp { gap: 8px; } .ticker-row.reverse { display: none; } .wl-text small { display: none; } .wf-label { font-size: 9.5px; } }
+      @media (max-height: 600px) { #welcomeApp { gap: 8px; } .ticker-row.reverse { display: none; } .wl-text small { display: none; } .wf-label { font-size: 11px; } }
       @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none !important; } }
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
@@ -619,6 +632,7 @@
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
         <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><span class="sf-icon">&#xECD2;</span></button>
     </div>
+    <div class="catalog-filters">
     <div class="categories-bar">
         <button type="button" class="filter-chip active" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span>Все</button>
         <button type="button" class="filter-chip" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span>Банки</button>
@@ -626,8 +640,7 @@
         <button type="button" class="filter-chip" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span>Инвестиции</button>
         <button type="button" class="filter-chip" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span>Другие</button>
     </div>
-    <div class="catalog-header">
-        <div class="catalog-title">Всего приложений: <span id="appCountDisplay">0</span></div>
+    <div class="catalog-count" title="Приложений в списке"><span id="appCountDisplay">0</span> шт.</div>
     </div>
     <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
@@ -635,8 +648,11 @@
 
 <div class="cart-fab-wrap">
     <button type="button" class="cart-fab-btn" id="cartFabBtn" onclick="openCartScreen()" aria-label="Открыть корзину">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <span class="cart-fab-badge" id="cartFabBadge">0</span>
+        <span class="cart-bar-info">
+            <span class="cart-bar-count" id="cartBarCount">0 приложений</span>
+            <span class="cart-bar-total" id="cartBarTotal">0 ₽</span>
+        </span>
+        <span class="cart-bar-action"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>В корзину</span>
     </button>
 </div>
 
@@ -784,7 +800,7 @@
             <span id="approvedLinkText" style="font-size: 13.5px; font-weight: 700; color: #60a5fa; word-break: break-all; user-select: text; -webkit-user-select: text;">https://apprestore-ios.ru/?00000000</span>
         </div>
         <button type="button" class="btn btn-primary" onclick="startApprovedInstallation()" style="min-height: 52px; font-size: 15.5px;">
-            🚀 Начать установку
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; flex-shrink: 0;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Начать установку
         </button>
         <button type="button" class="btn btn-secondary" onclick="showGuideScreen()" style="margin-top: 4px;">
             <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xDD;</span> Инструкция по установке
@@ -1653,7 +1669,7 @@ function renderCartScreen() {
             </div>
             <div class="cart-item-right">
                 <div class="cart-item-price ${isPrem ? 'premium' : ''}">${priceHtml}</div>
-                <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать">✕</button>
+                <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             </div>
         </div>`;
     });
@@ -1743,8 +1759,18 @@ function updateCartUI() {
     });
 
     const fabBtn = document.getElementById("cartFabBtn");
-    const fabBadge = document.getElementById("cartFabBadge");
-    if (fabBadge && fabBadge.textContent !== String(cartItems.size)) fabBadge.textContent = cartItems.size;
+    const barCount = document.getElementById("cartBarCount");
+    const barTotal = document.getElementById("cartBarTotal");
+    if (barCount && barTotal) {
+        let barN = 0;
+        cartItems.forEach(k => { if (isAppVisible(k)) barN++; });
+        const m10 = barN % 10, m100 = barN % 100;
+        const word = (m10 === 1 && m100 !== 11) ? "приложение" : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) ? "приложения" : "приложений";
+        const countText = barN + " " + word;
+        const totalText = getCartFinalTotal() + " ₽";
+        if (barCount.textContent !== countText) barCount.textContent = countText;
+        if (barTotal.textContent !== totalText) barTotal.textContent = totalText;
+    }
     if (fabBtn) {
         const shouldShow = cartItems.size > 0 && currentScreenId === "mainApp";
         if (fabBtn.classList.contains("visible") !== shouldShow) fabBtn.classList.toggle("visible", shouldShow);
@@ -2222,7 +2248,7 @@ function closeStoryZoom() { document.getElementById("zoomOverlay").classList.rem
 function initStoryZoom() {
     document.body.insertAdjacentHTML("beforeend", `
         <div class="zoom-overlay" id="zoomOverlay">
-            <button type="button" class="zoom-close" id="zoomClose" aria-label="Закрыть">✕</button>
+            <button type="button" class="zoom-close" id="zoomClose" aria-label="Закрыть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             <img id="zoomImg" alt="" draggable="false">
             <div class="zoom-hint">Нажмите на фото, чтобы приблизить · смахните вниз, чтобы закрыть</div>
         </div>`);
