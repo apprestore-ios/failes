@@ -524,6 +524,169 @@
         #singleTokenAppContainer .app-grid-card {
     min-height: 90px;
 }
+
+      /* ===== APPRESTORE IOS · refined Apple-inspired visual system ===== */
+      :root {
+          --bg: #070b12;
+          --text: #f5f7fb;
+          --muted: #9aa8ba;
+          --card-bg: rgba(20, 29, 43, .62);
+          --card-border: 1px solid rgba(205, 222, 245, .105);
+          --box-shadow: 0 14px 38px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+          --input-bg: rgba(14, 22, 35, .78);
+          --btn-install-bg: rgba(69, 145, 255, .12);
+          --btn-install-border: rgba(94, 164, 255, .28);
+          --btn-install-color: #a9ceff;
+          --nav-bg: rgba(9, 15, 25, .78);
+          --accent: #69adff;
+          --accent-soft: rgba(91, 157, 255, .15);
+          --spring: cubic-bezier(.2,.8,.2,1);
+      }
+      body { background-color: var(--bg); letter-spacing: -.12px; }
+      .aurora-bg { opacity: .78; filter: saturate(.78) brightness(.76); }
+
+      /* 01. Cleaner hero hierarchy */
+      #welcomeApp .hero-section { margin-top: 8px; }
+      .hero-title { font-size: clamp(25px, 6vw, 29px); letter-spacing: -1.05px; line-height: 1.13; margin-bottom: 9px; }
+      .hero-title span { background-image: linear-gradient(110deg,#9bcaff,#5a9dff 58%,#8bbcff); }
+      .hero-desc-box { background: linear-gradient(145deg,rgba(24,37,56,.72),rgba(13,21,34,.62)); border-color: rgba(157,193,238,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.045); border-radius: 20px; padding: 15px 16px; }
+      .hero-desc { color: #c8d3e1; font-size: 13px; line-height: 1.52; }
+
+      /* 02. Restrained blue ambient glow */
+      #welcomeApp::before { content:""; position:absolute; width:250px; height:170px; top:3%; left:50%; transform:translateX(-50%); background:radial-gradient(ellipse,rgba(52,126,235,.16),transparent 70%); filter:blur(18px); pointer-events:none; z-index:-1; }
+
+      /* 03. Advantage tiles: less visual noise */
+      .wf-cards { column-gap: 12px; row-gap: 14px; margin-top: 10px; grid-template-rows: repeat(2,minmax(88px,102px)); }
+      .wf-card { border-radius: 18px; border: 1px solid rgba(176,202,235,.12); background: linear-gradient(145deg,rgba(22,33,50,.86),rgba(12,20,32,.78)); box-shadow: inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px rgba(0,0,0,.16); }
+      .wf-card::before { content:""; position:absolute; inset:0; border-radius:inherit; background:radial-gradient(circle at 50% 0,rgba(96,165,250,.09),transparent 65%); pointer-events:none; }
+      .wf-num { font-size: clamp(17px,2.8dvh,22px); letter-spacing:-.45px; }
+      .wf-label { color:#aab8ca; }
+
+      /* 04. App icon ticker: quieter, consistent */
+      .ticker-item { border-radius: 13px; border-color:rgba(255,255,255,.10); box-shadow:0 5px 14px rgba(0,0,0,.28); }
+      .icon-ticker { opacity:.88; }
+
+      /* 05. Primary welcome CTA */
+      .welcome-cta, .btn-primary { background:linear-gradient(180deg,#3989f7,#1766d8); border:1px solid rgba(169,207,255,.22); box-shadow:0 8px 22px rgba(28,105,220,.24),inset 0 1px 0 rgba(255,255,255,.18); font-weight:700; letter-spacing:-.15px; }
+
+      /* 06. App cards: App Store-like surface */
+      .app-grid-card { background:linear-gradient(150deg,rgba(24,35,52,.88),rgba(13,21,34,.82)); border:1px solid rgba(196,215,241,.105); border-radius:20px; padding:13px 11px 11px; gap:9px; box-shadow:0 8px 24px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.045); transition:transform .22s var(--spring),border-color .22s ease,box-shadow .22s ease; }
+      .app-grid-card:active { transform:scale(.975); border-color:rgba(112,174,255,.32); box-shadow:0 5px 16px rgba(0,0,0,.24); }
+
+      /* 07. App icons: softer corners and cleaner edge */
+      .app-grid-icon { width:46px; height:46px; border-radius:14px; border:1px solid rgba(255,255,255,.12); box-shadow:0 5px 13px rgba(0,0,0,.25); }
+
+      /* 08. Price tags: clear but not loud */
+      .app-price-tag,.app-price-tag.premium { color:#a9d2ff; background:rgba(75,145,240,.105); border:1px solid rgba(101,168,255,.20); border-radius:9px; padding:4px 8px; font-size:14px; letter-spacing:-.2px; }
+
+      /* 09. App name typography */
+      .app-grid-name { font-size:13px; font-weight:680; letter-spacing:-.28px; line-height:1.24; }
+      .app-grid-subname { color:#b2bfd0; font-size:10.8px; }
+      .app-grid-version { color:#8494a9; font-size:10.5px; }
+
+      /* 10. Category controls: segmented, compact */
+      .categories-bar { gap:7px; padding:3px 1px 7px; margin-bottom:10px; }
+      .filter-chip { border-radius:999px; padding:8px 14px; background:rgba(19,29,44,.72); border:1px solid rgba(190,210,238,.10); color:#9eacc0; font-size:12px; transition:background .2s,border-color .2s,color .2s,transform .2s; }
+      .filter-chip.active { background:rgba(67,137,235,.19); border-color:rgba(100,166,255,.34); color:#c5ddff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
+      .filter-chip:active { transform:scale(.96); }
+
+      /* 11. Search: native-feeling field */
+      .app-search-wrap { background:rgba(13,22,35,.84); border:1px solid rgba(183,207,239,.12); border-radius:15px; box-shadow:inset 0 1px 0 rgba(255,255,255,.035); min-height:48px; }
+      .app-search { color:#f4f7fc; }
+      .app-search::placeholder { color:#7f8fa5; }
+      .app-search-wrap:focus-within { border-color:rgba(102,169,255,.52); box-shadow:0 0 0 3px rgba(76,143,239,.10); }
+
+      /* 12. New badge: subtle, compact */
+      .app-new-badge { background:rgba(65,137,235,.94); border:1px solid rgba(255,255,255,.2); box-shadow:0 3px 9px rgba(0,0,0,.22); font-size:9px; letter-spacing:.35px; padding:3px 7px; }
+
+      /* 13. Add-to-cart feedback */
+      .app-cart-btn,.app-grid-btn { transition:transform .18s var(--spring),background .2s,border-color .2s,color .2s; }
+      .app-cart-btn:active,.app-grid-btn:active { transform:scale(.94); }
+      .app-cart-btn.in-cart,.app-grid-btn.in-cart,.app-grid-btn.installed { background:rgba(38,174,119,.13); border-color:rgba(71,207,151,.32); color:#83e3b7; }
+
+      /* 14. Sticky cart bar: larger, more legible */
+      .cart-fab-wrap { padding:0 12px; bottom:max(12px,env(safe-area-inset-bottom)); }
+      .cart-fab-btn { min-height:72px; padding:10px 10px 10px 19px; border-radius:23px; background:rgba(12,20,32,.91); border:1px solid rgba(172,203,241,.18); box-shadow:0 15px 38px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08); gap:15px; }
+      .cart-bar-info { gap:5px; }
+      .cart-bar-count { color:#a6b5c9; font-size:12px; }
+      .cart-bar-total { font-size:22px; letter-spacing:-.55px; }
+      .cart-bar-action { min-height:51px; border-radius:17px; padding:0 18px; background:linear-gradient(180deg,#3989f7,#1766d8); box-shadow:0 5px 16px rgba(31,107,222,.25),inset 0 1px 0 rgba(255,255,255,.16); }
+
+      /* 15. Cart discount progress spacing */
+      .bulk-progress { gap:10px; margin-top:8px; margin-bottom:7px; }
+      .bulk-progress-head { margin-bottom:2px; }
+      .bulk-progress-title { font-size:12.5px; color:#cbd8e8; }
+      .bulk-progress-segments { gap:7px; }
+      .bulk-seg { height:7px; background:rgba(149,169,196,.16); }
+
+      /* 16. Cart price summary hierarchy */
+      .cart-summary-card { margin-top:9px; padding:16px; gap:10px; background:linear-gradient(145deg,rgba(19,32,50,.9),rgba(12,20,33,.88)); border:1px solid rgba(112,166,235,.19); border-radius:19px; }
+      .cart-summary-row { font-size:13px; color:#aab8ca; }
+      .cart-summary-row.total { padding-top:11px; margin-top:3px; font-size:14px; border-top-color:rgba(210,225,245,.11); }
+      .cart-summary-row.total span:last-child { color:#b9d8ff; font-size:20px; letter-spacing:-.4px; }
+
+      /* 17. Cart list rows */
+      .cart-items-list { gap:9px; margin-top:8px; margin-bottom:8px; }
+      .cart-item-row { background:rgba(22,33,49,.8); border-color:rgba(193,213,240,.10); border-radius:17px; padding:11px 12px; }
+      .cart-item-icon { border-radius:13px; border-color:rgba(255,255,255,.12); }
+      .cart-item-price,.cart-item-price.premium { background:rgba(75,145,240,.11); border-color:rgba(101,168,255,.20); color:#b8d7ff; }
+      .diagonal-strike { color:#9eacc0; opacity:.95; }
+      .diagonal-strike::after { height:1.7px; background:#ff777e; }
+
+      /* 18. Navigation: floating liquid-glass capsule */
+      .top-navbar { background:rgba(10,17,28,.82); border-color:rgba(193,214,242,.14); border-radius:23px; box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.075); }
+      .nav-logo { border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.24); }
+      .back-btn,.burger-btn,.cart-back-btn { background:rgba(255,255,255,.055); border-color:rgba(203,220,242,.12); }
+
+      /* 19. Menu and secondary surfaces */
+      .auth-box { background:linear-gradient(150deg,rgba(22,33,49,.91),rgba(11,19,31,.91)); border:1px solid rgba(190,211,239,.13); border-radius:25px; box-shadow:0 18px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.055); }
+      .requisites-card,.cart-summary-card { backdrop-filter:blur(22px) saturate(145%); -webkit-backdrop-filter:blur(22px) saturate(145%); }
+
+      /* 20. Consistent button language */
+      .btn { min-height:50px; border-radius:16px; font-size:14px; font-weight:680; letter-spacing:-.1px; box-shadow:none; }
+      .btn-secondary { background:rgba(255,255,255,.055); border:1px solid rgba(193,213,240,.13); }
+      .btn-success { background:linear-gradient(180deg,#20a879,#16845f); box-shadow:0 7px 18px rgba(22,132,95,.18); }
+      .btn-danger-soft { background:rgba(230,83,93,.09); border-color:rgba(245,115,123,.22); color:#ffadb2; }
+      button:focus-visible,a:focus-visible { outline:2px solid rgba(116,178,255,.8); outline-offset:3px; }
+
+      /* 21. Unified status and notification styling */
+      .bulk-banner { background:linear-gradient(110deg,rgba(28,132,104,.12),rgba(45,113,190,.10)); border:1px solid rgba(82,190,151,.20); border-radius:17px; box-shadow:none; }
+      .bulk-banner-icon { background:rgba(51,181,137,.13); color:#7de0b6; }
+      .bulk-banner-title b { color:#8de4bd; }
+      .order-num-pill { background:rgba(66,135,222,.12); border-color:rgba(105,168,245,.22); color:#aabbd0; }
+      .my-order-status { border-radius:999px; padding:4px 9px; }
+
+      /* 22. Loading states: calm shimmer */
+      .wait-spinner { border-color:rgba(105,173,255,.16); border-top-color:#69adff; }
+      .story-img-wrap { background:linear-gradient(100deg,rgba(22,34,51,.7) 25%,rgba(48,67,92,.55) 50%,rgba(22,34,51,.7) 75%); }
+
+      /* 23. Guide stories: refined cards and controls */
+      .story-slide.text-slide { background:linear-gradient(145deg,rgba(23,35,53,.9),rgba(12,20,33,.9)); border-color:rgba(190,211,239,.11); border-radius:20px; }
+      .story-num { background:linear-gradient(145deg,#4b9cff,#2369d6); box-shadow:0 5px 14px rgba(47,119,220,.22); }
+      .story-bar.done,.story-bar.active { background:#70b2ff; }
+      .story-arrow { background:rgba(75,145,240,.12); border-color:rgba(105,168,245,.25); color:#b5d5ff; }
+
+      /* 24. Order history cards and timeline feel */
+      .my-order-item { background:linear-gradient(145deg,rgba(23,34,51,.88),rgba(12,20,32,.86)); border-color:rgba(190,211,239,.11); border-radius:18px; padding:14px; box-shadow:inset 0 1px 0 rgba(255,255,255,.035); }
+      .my-order-price { color:#b6d6ff; }
+
+      /* 25. Global rhythm, motion and accessibility */
+      .container { transition:opacity .24s var(--spring),transform .24s var(--spring); }
+      .info-box,.hero-link,.catalog-header { background:linear-gradient(145deg,rgba(22,33,50,.78),rgba(12,20,32,.72)); border-color:rgba(190,211,239,.10); box-shadow:0 8px 22px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035); }
+      .info-box { border-radius:19px; padding:15px 12px; }
+      .info-box-num { color:#8fc2ff; letter-spacing:-.45px; }
+      .hero-link { border-radius:19px; }
+      .catalog-header { border-radius:15px; }
+      .app-grid-card,.info-box,.hero-link,.btn,.cart-fab-btn,.filter-chip { -webkit-font-smoothing:antialiased; }
+      @media (prefers-reduced-motion: reduce) {
+          *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+      }
+      @media (max-width:360px) {
+          .cart-fab-btn { padding-left:14px; gap:8px; }
+          .cart-bar-action { padding:0 12px; font-size:13px; }
+          .app-grid-card { padding:11px 9px 10px; }
+      }
+
     </style>
     <script>
         if ("fonts" in document) {
