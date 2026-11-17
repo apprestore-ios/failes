@@ -389,6 +389,57 @@
       .legal-text { font-size: 13px; color: var(--text); line-height: 1.55; margin: 0 0 8px 0; }
       .legal-text:last-child { margin-bottom: 0; }
       .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }
+
+      /* ===== Инструкция в виде историй ===== */
+      #guideApp .auth-box { padding: 12px 14px 14px; gap: 8px; }
+      #guideApp .auth-title { font-size: 17px; }
+      .story-bars { display: flex; gap: 4px; width: 100%; flex-shrink: 0; }
+      .story-bar { flex: 1; height: 3.5px; border-radius: 99px; background: rgba(148,163,184,0.28); transition: background .25s ease; cursor: pointer; }
+      .story-bar.done, .story-bar.active { background: #3b82f6; }
+      .story-viewport { position: relative; width: 100%; overflow: hidden; border-radius: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; flex-shrink: 0; }
+      .story-track { display: flex; width: 100%; transition: transform .32s cubic-bezier(.4,0,.2,1); will-change: transform; align-items: flex-start; }
+      .story-slide { flex: 0 0 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; text-align: center; }
+      .story-slide.text-slide { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 20px 16px; gap: 12px; justify-content: center; min-height: clamp(140px, calc(100dvh - 330px), 520px); max-height: calc(clamp(140px, calc(100dvh - 330px), 520px) + 46px); overflow-y: auto; }
+      .story-num { background: #3b82f6; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 750; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
+      .story-slide-title { font-size: 16px; font-weight: 750; color: var(--text); line-height: 1.3; }
+      .story-slide-text { font-size: 13.5px; color: var(--text); line-height: 1.55; text-align: left; width: 100%; }
+      .story-slide-text p { margin: 0 0 9px 0; }
+      .story-slide-text p:last-child { margin-bottom: 0; }
+      .story-slide-text b { color: #60a5fa; }
+      .story-img-wrap { width: 100%; height: clamp(140px, calc(100dvh - 330px), 520px); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; overflow: hidden; position: relative; background: linear-gradient(100deg, rgba(30,41,59,0.6) 30%, rgba(71,85,105,0.5) 50%, rgba(30,41,59,0.6) 70%); background-size: 200% 100%; animation: storyShimmer 1.3s linear infinite; }
+      .story-img-wrap.ready { animation: none; background: #0b1220; }
+      @keyframes storyShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+      .story-img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; opacity: 0; transition: opacity .3s ease; -webkit-user-drag: none; pointer-events: none; }
+      .story-img.loaded { opacity: 1; }
+      .story-caption { font-size: 13px; color: var(--text); line-height: 1.4; padding: 0 4px; }
+      .story-caption b { color: #60a5fa; }
+      .story-tap { position: absolute; top: 0; bottom: 0; z-index: 2; cursor: pointer; }
+      .story-tap.left { left: 0; width: 32%; }
+      .story-tap.right { right: 0; width: 68%; }
+      .story-zoom { position: absolute; top: 10px; right: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; display: none; align-items: center; justify-content: center; padding: 0; background: rgba(15,23,42,0.78); border: 1px solid rgba(255,255,255,0.28); color: #fff; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+      .story-zoom svg { width: 17px; height: 17px; }
+      .story-nav { display: flex; align-items: center; justify-content: center; gap: 14px; flex-shrink: 0; }
+      .story-counter { font-size: 11.5px; color: var(--muted); text-align: center; min-width: 44px; }
+      .story-arrow { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: #93c5fd; cursor: pointer; transition: opacity .2s ease, transform .15s ease; }
+      .story-arrow:active { transform: scale(0.9); }
+      .story-arrow:disabled { opacity: 0.28; cursor: default; }
+      .story-arrow svg { width: 16px; height: 16px; }
+      #guideApp .btn { min-height: 44px; flex-shrink: 0; }
+      .zoom-overlay { position: fixed; inset: 0; z-index: 650; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; touch-action: none; }
+      .zoom-overlay.active { opacity: 1; pointer-events: auto; }
+      .zoom-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s cubic-bezier(.22,1,.36,1); -webkit-user-drag: none; }
+      .zoom-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; }
+      .zoom-hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); pointer-events: none; }
+      @media (max-height: 640px) {
+          .story-slide.text-slide { padding: 12px 12px; gap: 8px; }
+          .story-slide-text { font-size: 12px; line-height: 1.4; }
+          .story-slide-text p { margin-bottom: 6px; }
+          .story-slide-title { font-size: 14.5px; }
+          .story-num { display: none; }
+          .story-caption { font-size: 12px; }
+      }
+      .order-num-pill { display: inline-flex; align-items: center; gap: 6px; align-self: center; padding: 7px 14px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: var(--muted); font-size: 12.5px; font-weight: 600; user-select: text; -webkit-user-select: text; }
+      .order-num-pill b { color: #fff; font-size: 14px; font-weight: 750; letter-spacing: .3px; }
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
       .cart-back-btn .sf-icon { font-size: 18px; padding-bottom: 2px; }
@@ -672,6 +723,7 @@
 <div class="container" id="orderApprovedApp">
     <div class="auth-box" style="padding: 26px 20px;">
         <div class="auth-title" style="color: #4ade80; font-size: 22px;">Оплата подтверждена!</div>
+        <div class="order-num-pill">Номер заказа: <b id="approvedOrderNum">#00000</b></div>
         <div class="auth-description" style="text-align: center;">
             Ваша персональная ссылка на установку приложений готова. Она действует 15 минут после открытия. После установки приложений обратитесь в поддержку для их активации!
         </div>
@@ -728,6 +780,7 @@
     <div class="hero-section">
         <div class="hero-title">Ваши <span>выбранные</span> приложения</div>
         <div class="hero-desc-box" style="margin-bottom: 14px; margin-top: 10px;">
+            <div class="order-num-pill" id="tokenOrderNumBox" style="display: none; margin-bottom: 10px;">Номер заказа: <b id="tokenOrderNum">#00000</b></div>
             <p class="hero-desc" id="tokenHeroDesc">Персональная ссылка активирована. Данная ссылка действует ограниченное время и только на одном устройстве! Установите приложения и обратитесь к продавцу.</p>
         </div>
     </div>
@@ -761,12 +814,37 @@
 
 <div class="container" id="guideApp">
     <div class="auth-box">
-        <div class="auth-title" style="text-align: center; margin-bottom: 0; font-size: 18.5px;">Инструкция по заказу и установке</div>
-        <div class="info-scroll-area" style="max-height: calc(100dvh - 320px);">
-            <div class="step-card"><div class="step-icon">1</div><div class="step-text">Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</div></div>
-            <div class="step-card"><div class="step-icon">2</div><div class="step-text">Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</div></div>
-            <div class="step-card"><div class="step-icon">3</div><div class="step-text">После подтверждения оплаты нажмите <b>«Начать установку»</b> для перехода по разовой ссылке в Safari.</div></div>
-            <div class="step-card"><div class="step-icon">4</div><div class="step-text">Дождитесь загрузки на главном экране iPhone и свяжитесь с продавцом для активации.</div></div>
+        <div class="auth-title" style="text-align: center; margin-bottom: 0;">Инструкция</div>
+        <div class="story-bars" id="storyBars"></div>
+        <div class="story-viewport" id="storyViewport">
+            <div class="story-track" id="storyTrack">
+                <div class="story-slide text-slide">
+                    <div class="story-num">1</div>
+                    <div class="story-slide-title">Выбор приложений и оплата</div>
+                    <div class="story-slide-text">
+                        <p>Выберите нужные приложения в каталоге, нажав <b>«В корзину»</b>, и откройте корзину кнопкой в правом нижнем углу.</p>
+                        <p>Нажмите <b>«Оплатить»</b>, переведите сумму по указанным реквизитам и нажмите <b>«Я оплатил»</b>.</p>
+                        <p>Номер вашего заказа отображается на каждом этапе — при обращении в поддержку сообщите его.</p>
+                    </div>
+                </div>
+                <div class="story-slide text-slide">
+                    <div class="story-num">2</div>
+                    <div class="story-slide-title">Установка после подтверждения заказа</div>
+                    <div class="story-slide-text">
+                        <p>После подтверждения оплаты нажмите <b>«Начать установку»</b> — откроется разовая ссылка в Safari.</p>
+                        <p>Дождитесь загрузки приложений на главный экран iPhone и свяжитесь с продавцом для активации.</p>
+                        <p>Далее — как зайти в другой аккаунт в разделе «Контент и покупки» (на фото).</p>
+                    </div>
+                </div>
+            </div>
+            <div class="story-tap left" id="storyTapLeft"></div>
+            <div class="story-tap right" id="storyTapRight"></div>
+            <button type="button" class="story-zoom" id="storyZoomBtn" aria-label="Увеличить фото"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
+        </div>
+        <div class="story-nav">
+            <button type="button" class="story-arrow" id="storyArrowPrev" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"></polyline></svg></button>
+            <div class="story-counter" id="storyCounter"></div>
+            <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
         <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)">Понятно, вернуться назад</button>
     </div>
@@ -1759,6 +1837,7 @@ function startOrderStatusPolling(orderId) {
             activeApprovedLink = `${CLIENT_SITE_URL}/?${order.link_token}`;
             const linkEl = document.getElementById("approvedLinkText");
             if (linkEl) linkEl.textContent = activeApprovedLink;
+            setApprovedOrderNum(order.order_number || currentOrderNumber);
 
             cartItems.clear();
             currentOrderNumber = null;
@@ -1959,8 +2038,168 @@ function openCatalog() {
     switchScreen("mainApp");
 }
 
+// ===== Номер заказа на экране подтверждения и на странице разовой ссылки =====
+function setApprovedOrderNum(num) {
+    const el = document.getElementById("approvedOrderNum");
+    if (el && num) el.textContent = num;
+}
+
+function setTokenOrderNum(num) {
+    if (!num) return;
+    const box = document.getElementById("tokenOrderNumBox");
+    const el = document.getElementById("tokenOrderNum");
+    if (el) el.textContent = num;
+    if (box) box.style.display = "inline-flex";
+}
+
+async function loadTokenOrderNumber(token, knownNum) {
+    if (knownNum) { setTokenOrderNum(knownNum); return; }
+    try {
+        const res = await sbFetch(`orders?link_token=eq.${encodeURIComponent(token)}&select=order_number`);
+        if (Array.isArray(res) && res.length > 0 && res[0].order_number) setTokenOrderNum(res[0].order_number);
+    } catch (e) {}
+}
+
+// ===== Инструкция в формате историй =====
+// Фото лежат в релизе «Инструкция» того же репозитория: inc1.png ... inc7.png
+const GUIDE_IMG_BASE = "https://github.com/apprestore-ios/failes/releases/download/Инструкция/";
+const GUIDE_IMAGES = [
+    { file: "inc1.png", caption: "Откройте <b>«Настройки»</b> и нажмите на своё имя в самом верху." },
+    { file: "inc2.png", caption: "Выберите раздел <b>«Контент и покупки»</b>." },
+    { file: "inc3.png", caption: "Нажмите <b>«Просмотреть»</b> и при необходимости подтвердите вход." },
+    { file: "inc4.png", caption: "Нажмите <b>«Выйти»</b>, чтобы выйти из текущего аккаунта покупок." },
+    { file: "inc5.png", caption: "Подтвердите выход из аккаунта." },
+    { file: "inc6.png", caption: "Войдите в <b>другой аккаунт</b>, введя его Apple ID и пароль." },
+    { file: "inc7.png", caption: "Готово — аккаунт для покупок изменён. Вернитесь к установке." }
+];
+
+let storyIndex = 0;
+let storyTotal = 0;
+let storyInited = false;
+
+function initStories() {
+    if (storyInited) return;
+    const track = document.getElementById("storyTrack");
+    const bars = document.getElementById("storyBars");
+    const vp = document.getElementById("storyViewport");
+    if (!track || !bars || !vp) return;
+    storyInited = true;
+
+    GUIDE_IMAGES.forEach((item, i) => {
+        const slide = document.createElement("div");
+        slide.className = "story-slide";
+        slide.innerHTML = `
+            <div class="story-img-wrap">
+                <img class="story-img" src="${GUIDE_IMG_BASE + item.file}" alt="Шаг ${i + 3}" draggable="false"
+                     onload="this.classList.add('loaded'); this.parentNode.classList.add('ready')"
+                     onerror="this.replaceWith(Object.assign(document.createElement('div'), {style: 'padding:30px 14px;color:#94a3b8;font-size:12.5px;', textContent: 'Фото не загрузилось'})); this.parentNode.classList.add('ready')">
+            </div>
+            <div class="story-caption">${item.caption}</div>`;
+        track.appendChild(slide);
+    });
+
+    storyTotal = track.children.length;
+    bars.innerHTML = "";
+    for (let i = 0; i < storyTotal; i++) {
+        const b = document.createElement("div");
+        b.className = "story-bar";
+        b.addEventListener("click", () => goToStory(i));
+        bars.appendChild(b);
+    }
+
+    const bindArrow = (id, step) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener("click", () => goToStory(storyIndex + step));
+        btn.addEventListener("touchend", (e) => { e.preventDefault(); e.stopPropagation(); goToStory(storyIndex + step); }, { passive: false });
+    };
+    bindArrow("storyArrowPrev", -1);
+    bindArrow("storyArrowNext", 1);
+
+    document.getElementById("storyTapLeft").addEventListener("click", () => goToStory(storyIndex - 1));
+    document.getElementById("storyTapRight").addEventListener("click", () => goToStory(storyIndex + 1));
+
+    let sx = 0, sy = 0;
+    vp.addEventListener("touchstart", (e) => {
+        const t = e.touches[0];
+        sx = t.clientX; sy = t.clientY;
+    }, { passive: true });
+    vp.addEventListener("touchend", (e) => {
+        const t = e.changedTouches[0];
+        const dx = t.clientX - sx, dy = t.clientY - sy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            e.preventDefault();
+            goToStory(storyIndex + (dx < 0 ? 1 : -1));
+        }
+    }, { passive: false });
+
+    initStoryZoom();
+}
+
+function goToStory(i) {
+    if (i < 0 || i >= storyTotal) return;
+    storyIndex = i;
+    const track = document.getElementById("storyTrack");
+    if (track) track.style.transform = `translateX(-${i * 100}%)`;
+    document.querySelectorAll("#storyBars .story-bar").forEach((b, idx) => {
+        b.classList.toggle("done", idx < i);
+        b.classList.toggle("active", idx === i);
+    });
+    const zb = document.getElementById("storyZoomBtn");
+    if (zb) zb.style.display = i >= 2 ? "flex" : "none";
+    const nextImg = GUIDE_IMAGES[i - 1];
+    if (nextImg) { const pre = new Image(); pre.src = GUIDE_IMG_BASE + nextImg.file; }
+    const c = document.getElementById("storyCounter");
+    if (c) c.textContent = (i + 1) + " / " + storyTotal;
+    const pv = document.getElementById("storyArrowPrev"), nx = document.getElementById("storyArrowNext");
+    if (pv) pv.disabled = i === 0;
+    if (nx) nx.disabled = i === storyTotal - 1;
+}
+
+// ---- Фото на весь экран ----
+function openStoryZoom() {
+    const slide = document.getElementById("storyTrack").children[storyIndex];
+    const img = slide && slide.querySelector("img");
+    if (!img) return;
+    const zi = document.getElementById("zoomImg");
+    zi.src = img.src; zi.style.transform = ""; zi.dataset.zoomed = "0";
+    document.getElementById("zoomOverlay").classList.add("active");
+}
+function closeStoryZoom() { document.getElementById("zoomOverlay").classList.remove("active"); }
+function initStoryZoom() {
+    document.body.insertAdjacentHTML("beforeend", `
+        <div class="zoom-overlay" id="zoomOverlay">
+            <button type="button" class="zoom-close" id="zoomClose" aria-label="Закрыть">✕</button>
+            <img id="zoomImg" alt="" draggable="false">
+            <div class="zoom-hint">Нажмите на фото, чтобы приблизить · смахните вниз, чтобы закрыть</div>
+        </div>`);
+    const ov = document.getElementById("zoomOverlay"), zi = document.getElementById("zoomImg");
+    document.getElementById("zoomClose").addEventListener("click", closeStoryZoom);
+    ov.addEventListener("click", (e) => { if (e.target === ov) closeStoryZoom(); });
+    zi.addEventListener("click", () => {
+        const z = zi.dataset.zoomed === "1";
+        zi.style.transform = z ? "" : "scale(2.2)";
+        zi.dataset.zoomed = z ? "0" : "1";
+    });
+    let sy = 0, dy = 0;
+    ov.addEventListener("touchstart", (e) => { sy = e.touches[0].clientY; dy = 0; }, { passive: true });
+    ov.addEventListener("touchmove", (e) => {
+        if (zi.dataset.zoomed === "1") return;
+        dy = e.touches[0].clientY - sy;
+        if (dy > 0) zi.style.transform = `translateY(${dy}px)`;
+    }, { passive: true });
+    ov.addEventListener("touchend", () => {
+        if (zi.dataset.zoomed === "1") return;
+        if (dy > 90) closeStoryZoom();
+        zi.style.transform = ""; dy = 0;
+    });
+    document.getElementById("storyZoomBtn").addEventListener("click", openStoryZoom);
+}
+
 function showGuideScreen() {
     document.getElementById("burgerMenuModal")?.classList.remove("active");
+    initStories();
+    goToStory(0);
     switchScreen("guideApp");
     window.scrollTo(0, 0);
 }
@@ -2061,7 +2300,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (/TelegramBot|WhatsApp|Twitterbot|facebookexternalhit|vkShare/i.test(ua)) return;
 
         const currentDevice = getOrCreateDeviceId();
-        let isValidToken = false, sessionTtlMinutes = 15, sessionExpiresAt = 0, sessionAppKeys = [];
+        let isValidToken = false, sessionTtlMinutes = 15, sessionExpiresAt = 0, sessionAppKeys = [], sessionOrderNum = "";
 
         try {
             const linkRes = await sbFetch(`app_links?token=eq.${token}&select=*`);
@@ -2092,6 +2331,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     sessionTtlMinutes = ttlMins;
                     sessionExpiresAt = expiresAt;
                     sessionAppKeys = row.app_keys || [];
+                    sessionOrderNum = row.order_number || "";
                 }
             } else {
                 isTokenExpired = true;
@@ -2109,6 +2349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             updateTokenHeroText(sessionTtlMinutes);
             renderTokenAppsList(sessionAppKeys);
             startTokenCountdown(sessionExpiresAt);
+            loadTokenOrderNumber(token, sessionOrderNum);
             switchScreen("tokenApp");
             return;
         }
@@ -2131,6 +2372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 activeApprovedLink = `${CLIENT_SITE_URL}/?${activeOrder.link_token}`;
                 const linkEl = document.getElementById("approvedLinkText");
                 if (linkEl) linkEl.textContent = activeApprovedLink;
+                setApprovedOrderNum(activeOrder.order_number);
                 try {
                     localStorage.removeItem("apprestore_active_order_id");
                     localStorage.removeItem("apprestore_active_order_num");
