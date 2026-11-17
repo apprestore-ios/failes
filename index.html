@@ -444,7 +444,7 @@
       /* ===== Главная: бегущие строки, панель преимуществ, ссылки ===== */
       #welcomeApp { justify-content: flex-start; gap: clamp(10px, 1.8dvh, 16px); margin-bottom: -28px; overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
       #welcomeApp .hero-section { margin-bottom: 0; margin-top: 4px; }
-      #welcomeApp .welcome-cta { min-height: clamp(44px, 6.2dvh, 50px) !important; margin: 0 0 clamp(6px, 1.5dvh, 14px) 0 !important; flex-shrink: 0; }
+      #welcomeApp .welcome-cta { min-height: clamp(44px, 6.2dvh, 50px) !important; margin: clamp(4px, 0.8dvh, 8px) 0 clamp(8px, 1.6dvh, 15px) 0 !important; flex-shrink: 0; }
       .icon-ticker { width: calc(100% + 32px); margin: 0 -16px clamp(6px, 1.5dvh, 14px); display: flex; flex-direction: column; gap: clamp(7px, 1.3dvh, 10px); overflow: hidden; flex-shrink: 0;
           -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%); }
       .ticker-row { overflow: hidden; }
@@ -454,7 +454,7 @@
       @keyframes tickerLeft { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       @keyframes tickerRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 
-      .wf-cards { width: 100%; flex: 1 0 auto; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, minmax(auto, 1fr)); gap: clamp(6px, 1.1dvh, 10px); }
+      .wf-cards { width: 100%; flex: 1 0 auto; margin-top: clamp(3px, 0.6dvh, 6px); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, minmax(auto, 1fr)); gap: clamp(9px, 1.5dvh, 14px); }
       .wf-card { --ac: #60a5fa; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(2px, 0.5dvh, 5px); text-align: center; padding: clamp(6px, 1.2dvh, 12px) 10px; border-radius: 20px; border: 1.5px solid transparent;
           background: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)) padding-box, linear-gradient(145deg, var(--ac) 0%, rgba(255,255,255,0.07) 42%, rgba(255,255,255,0.07) 62%, var(--ac) 100%) border-box;
           box-shadow: 0 0 22px -6px var(--ac), inset 0 1px 0 rgba(255,255,255,0.07); min-width: 0; }
@@ -589,7 +589,7 @@
         <div class="ticker-row reverse"><div class="ticker-track" id="tickerTrack2"></div></div>
     </div>
     <button type="button" class="btn btn-primary welcome-cta" onclick="openCatalog()" style="font-size: 15.5px; border-radius: 16px;">
-        Перейти к каталогу
+        Выбрать приложения
     </button>
     <div class="wf-cards">
         <div class="wf-card" style="--ac: #60a5fa;"><div class="wf-head"><span class="wf-ico c1"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg></span><div class="wf-num">60+</div></div><div class="wf-label">приложений в каталоге</div></div>
