@@ -404,15 +404,15 @@
       .legal-link { color: #60a5fa; text-decoration: underline; font-weight: 650; }
 
       /* ===== Инструкция в виде историй ===== */
-      #guideApp .auth-box { padding: 10px 14px 12px; gap: 6px; }
+      #guideApp .auth-box { padding: 12px 14px 14px; gap: 6px; }
       #guideApp .auth-title { font-size: 17px; }
       .story-bars { display: flex; gap: 4px; width: 100%; flex-shrink: 0; }
       .story-bar { flex: 1; height: 3.5px; border-radius: 99px; background: rgba(148,163,184,0.28); transition: background .25s ease; cursor: pointer; }
       .story-bar.done, .story-bar.active { background: #3b82f6; }
-      .story-viewport { position: relative; width: 100%; overflow: hidden; border-radius: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; flex-shrink: 0; }
+      .story-viewport { position: relative; width: 100%; overflow: hidden; border-radius: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; flex-shrink: 0; transition: height 0.3s cubic-bezier(.22,1,.36,1); }
       .story-track { display: flex; width: 100%; transition: transform .32s cubic-bezier(.4,0,.2,1); will-change: transform; align-items: flex-start; }
       .story-slide { flex: 0 0 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; text-align: center; }
-      .story-slide.text-slide { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 14px 14px; gap: 8px; justify-content: flex-start; min-height: 0; max-height: calc(100dvh - 260px); overflow-y: auto; }
+      .story-slide.text-slide { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 14px 14px; gap: 8px; justify-content: flex-start; min-height: 0; max-height: none; overflow-y: visible; }
       .story-num { background: #3b82f6; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 750; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
       .story-slide-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; }
       .story-slide-text { font-size: 13px; color: var(--text); line-height: 1.5; text-align: left; width: 100%; }
@@ -431,14 +431,12 @@
       .story-tap.right { right: 0; width: 68%; }
       .story-zoom { position: absolute; top: 10px; right: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; display: none; align-items: center; justify-content: center; padding: 0; background: rgba(15,23,42,0.78); border: 1px solid rgba(255,255,255,0.28); color: #fff; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
       .story-zoom svg { width: 17px; height: 17px; }
-      .story-nav { display: flex; align-items: center; justify-content: center; gap: 14px; flex-shrink: 0; margin-top: 8px; }
-      #guideApp .story-nav + .btn { margin-top: 10px !important; }
+      .story-nav { display: flex; align-items: center; justify-content: center; gap: 14px; flex-shrink: 0; margin-top: 6px; }
       .story-counter { font-size: 11.5px; color: var(--muted); text-align: center; min-width: 44px; }
       .story-arrow { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: #93c5fd; cursor: pointer; transition: opacity .2s ease, transform .15s ease; }
       .story-arrow:active { transform: scale(0.9); }
       .story-arrow:disabled { opacity: 0.28; cursor: default; }
       .story-arrow svg { width: 16px; height: 16px; }
-      #guideApp .btn { min-height: 42px; flex-shrink: 0; }
       .zoom-overlay { position: fixed; inset: 0; z-index: 650; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; touch-action: none; }
       .zoom-overlay.active { opacity: 1; pointer-events: auto; }
       .zoom-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s cubic-bezier(.22,1,.36,1); -webkit-user-drag: none; }
@@ -874,7 +872,11 @@
 
 <div class="container" id="guideApp">
     <div class="auth-box">
-        <div class="auth-title" style="text-align: center; margin-bottom: 0;">Инструкция</div>
+        <div style="display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; width: 100%; margin-bottom: 2px;">
+            <div></div>
+            <div class="auth-title" style="font-size: 18px; margin: 0; text-align: center;">Инструкция</div>
+            <button class="cart-back-btn" style="position: static; transform: none;" onclick="returnFromActivationGuide()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
+        </div>
         <div class="story-bars" id="storyBars"></div>
         <div class="story-viewport" id="storyViewport">
             <div class="story-track" id="storyTrack">
@@ -906,7 +908,6 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary" onclick="returnFromActivationGuide()" style="margin-top: 2px;">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -2019,6 +2020,9 @@ function switchScreen(id, pushHistory = true) {
     if (id === "myOrdersApp") {
         renderMyOrdersList();
     }
+    if (id === "guideApp") {
+        setTimeout(updateStoryHeight, 50);
+    }
 
     const backBtn = document.getElementById("navBackBtn");
     const burgerBtn = document.getElementById("navBurgerBtn");
@@ -2137,6 +2141,14 @@ let activationGuideMode = false;
 let regularGuideTrackHTML = "";
 let activationGuideReturnScreen = null;
 
+function updateStoryHeight() {
+    const track = document.getElementById("storyTrack");
+    const viewport = document.getElementById("storyViewport");
+    if (track && viewport && track.children[storyIndex]) {
+        viewport.style.height = track.children[storyIndex].offsetHeight + "px";
+    }
+}
+
 function initStories() {
     if (storyInited) return;
     const track = document.getElementById("storyTrack");
@@ -2151,8 +2163,8 @@ function initStories() {
         slide.innerHTML = `
             <div class="story-img-wrap">
                 <img class="story-img" src="${GUIDE_IMG_BASE + item.file}" alt="Шаг ${i + 3}" draggable="false"
-                     onload="this.classList.add('loaded'); this.parentNode.classList.add('ready')"
-                     onerror="this.replaceWith(Object.assign(document.createElement('div'), {style: 'padding:30px 14px;color:#94a3b8;font-size:12.5px;', textContent: 'Фото не загрузилось'})); this.parentNode.classList.add('ready')">
+                     onload="this.classList.add('loaded'); this.parentNode.classList.add('ready'); updateStoryHeight();"
+                     onerror="this.replaceWith(Object.assign(document.createElement('div'), {style: 'padding:30px 14px;color:#94a3b8;font-size:12.5px;', textContent: 'Фото не загрузилось'})); this.parentNode.classList.add('ready'); updateStoryHeight();">
             </div>
             <div class="story-caption">${item.caption}</div>`;
         track.appendChild(slide);
@@ -2194,13 +2206,18 @@ function initStories() {
     }, { passive: false });
 
     initStoryZoom();
+    updateStoryHeight();
 }
 
 function goToStory(i) {
     if (i < 0 || i >= storyTotal) return;
     storyIndex = i;
     const track = document.getElementById("storyTrack");
+    const viewport = document.getElementById("storyViewport");
     if (track) track.style.transform = `translateX(-${i * 100}%)`;
+    if (viewport && track.children[i]) {
+        viewport.style.height = track.children[i].offsetHeight + "px";
+    }
     document.querySelectorAll("#storyBars .story-bar").forEach((b, idx) => {
         b.classList.toggle("done", idx < i);
         b.classList.toggle("active", idx === i);
@@ -2282,6 +2299,7 @@ function showGuideScreen() {
     document.querySelector("#guideApp .auth-title").textContent = "Инструкция";
     switchScreen("guideApp");
     window.scrollTo(0, 0);
+    setTimeout(updateStoryHeight, 50);
 }
 
 function showActivationGuideScreen() {
@@ -2306,8 +2324,8 @@ function showActivationGuideScreen() {
         slide.innerHTML = `
             <div class="story-img-wrap">
                 <img class="story-img" src="${GUIDE_IMG_BASE + item.file}" alt="Шаг ${i + 2}" draggable="false"
-                     onload="this.classList.add('loaded'); this.parentNode.classList.add('ready')"
-                     onerror="this.replaceWith(Object.assign(document.createElement('div'), {style: 'padding:30px 14px;color:#94a3b8;font-size:12.5px;', textContent: 'Фото не загрузилось'})); this.parentNode.classList.add('ready')">
+                     onload="this.classList.add('loaded'); this.parentNode.classList.add('ready'); updateStoryHeight();"
+                     onerror="this.replaceWith(Object.assign(document.createElement('div'), {style: 'padding:30px 14px;color:#94a3b8;font-size:12.5px;', textContent: 'Фото не загрузилось'})); this.parentNode.classList.add('ready'); updateStoryHeight();">
             </div>
             <div class="story-caption">${item.caption}</div>`;
         track.appendChild(slide);
@@ -2318,6 +2336,7 @@ function showActivationGuideScreen() {
     goToStory(0);
     switchScreen("guideApp");
     window.scrollTo(0, 0);
+    setTimeout(updateStoryHeight, 50);
 }
 
 function returnFromActivationGuide() {
