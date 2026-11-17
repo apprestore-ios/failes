@@ -905,7 +905,7 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary" onclick="returnFromActivationGuide()">Понятно, вернуться назад</button>
+        <button type="button" class="btn btn-primary" onclick="returnFromActivationGuide()" style="margin-top: 10px;">Понятно, вернуться назад</button>
     </div>
 </div>
 
@@ -2127,11 +2127,11 @@ const GUIDE_IMG_BASE = "https://github.com/apprestore-ios/failes/releases/downlo
 const GUIDE_IMAGES = [
     { file: "inc1.png", caption: "Откройте <b>«Настройки»</b> и нажмите на своё имя в самом верху." },
     { file: "inc2.png", caption: "Выберите раздел <b>«Контент и покупки»</b>." },
-    { file: "inc3.png", caption: "Нажмите <b>«Просмотреть»</b> и при необходимости подтвердите вход." },
-    { file: "inc4.png", caption: "Нажмите <b>«Выйти»</b>, чтобы выйти из текущего аккаунта покупок." },
-    { file: "inc5.png", caption: "Подтвердите выход из аккаунта." },
-    { file: "inc6.png", caption: "Войдите в <b>другой аккаунт</b>, введя его Apple ID и пароль." },
-    { file: "inc7.png", caption: "Готово — аккаунт для покупок изменён. Вернитесь к установке." }
+    { file: "inc3.png", caption: "Нажмите <b>«Выйти»</b> в правом верхнем углу или пролистайте страницу <b>в самый низ</b> и нажмите <b>«Выйти»</b>." },
+    { file: "inc4.png", caption: "Подтвердите выход из раздела <b>«Контент и покупки»</b>." },
+    { file: "inc5.png", caption: "Заново откройте раздел <b>«Контент и покупки»</b>." },
+    { file: "inc6.png", caption: "Нажмите <b>вторую кнопку</b> — не <b>«Ваше имя и фамилия»</b>." },
+    { file: "inc7.png", caption: "Введите <b>данные, выданные администратором</b>, и откройте приложения. После их успешной загрузки <b>выйдите из аккаунта</b> в разделе <b>«Контент и покупки»</b> и <b>вернитесь в свой аккаунт</b>." }
 ];
 
 let storyIndex = 0;
