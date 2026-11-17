@@ -84,8 +84,7 @@
           gap: 11px;
           text-decoration: none;
           color: var(--text);
-          pointer-events: none;
-          user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+          cursor: pointer;
       }
       .nav-logo {
           width: 38px;
@@ -211,16 +210,25 @@
       .app-grid-card.app-unavailable { display: none !important; }
 
       .app-new-badge {
-          display: none; position: absolute; top: -1px; right: -1px; width: 54px; height: 54px;
-          overflow: hidden; border-top-right-radius: 18px; pointer-events: none; z-index: 5;
-      }
-      .app-new-badge.visible { display: block; }
-      .app-new-badge i {
-          position: absolute; top: 9px; right: -24px; width: 80px; padding: 2.5px 0;
-          transform: rotate(45deg); text-align: center;
-          font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: 0.8px; color: #fff;
+          position: absolute;
+          top: -6px;
+          right: -6px;
           background: linear-gradient(135deg, #ec4899, #8b5cf6);
-          box-shadow: 0 2px 6px rgba(236, 72, 153, 0.45);
+          color: #ffffff;
+          font-size: 9.5px;
+          font-weight: 800;
+          padding: 3px 7px;
+          border-radius: 99px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          box-shadow: 0 4px 10px rgba(236, 72, 153, 0.45);
+          border: 1.5px solid #0b0f17;
+          z-index: 5;
+          pointer-events: none;
+          display: none;
+      }
+      .app-new-badge.visible {
+          display: inline-block;
       }
 
       .app-cart-btn {
@@ -522,10 +530,10 @@
 <div class="aurora-bg"></div>
 
 <header class="top-navbar">
-    <div class="nav-brand">
-        <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" alt="logo" class="nav-logo" draggable="false">
+    <a href="#" class="nav-brand" id="navBrandLink" onclick="handleBrandClick(event)">
+        <img src="https://github.com/apprestore-ios/failes/releases/download/Логотипы/logo_site.png" alt="logo" class="nav-logo">
         <span class="nav-title">AppRestore IOS</span>
-    </div>
+    </a>
     <div class="nav-right-actions">
         <a href="#" class="back-btn" id="navBackBtn" onclick="handleNavBack(event)" title="Назад"><span class="sf-icon">&#xECAC;</span></a>
         <button class="burger-btn" onclick="toggleBurgerMenu()" aria-label="Меню" id="navBurgerBtn">
@@ -1453,7 +1461,7 @@ function generateAppsGrid() {
         
         html += `
         <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
-            <span class="app-new-badge ${isNew ? 'visible' : ''}" id="gridNew_${app.key}"><i>NEW</i></span>
+            <span class="app-new-badge ${isNew ? 'visible' : ''}" id="gridNew_${app.key}">NEW</span>
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
                 <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; overflow: hidden; width: 100%; justify-content: flex-start; min-width: 0; flex: 1;">
@@ -2014,6 +2022,12 @@ function switchScreen(id, pushHistory = true) {
             backBtn.classList.add("visible");
         }
     }
+}
+
+function handleBrandClick(event) {
+    if (event) event.preventDefault();
+    if (isScreenLocked(currentScreenId)) return;
+    goHome();
 }
 
 function handleNavBack(event) {
