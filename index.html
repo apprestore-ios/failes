@@ -160,7 +160,7 @@
           padding: 0 14px; display: flex; justify-content: center; pointer-events: none; z-index: 200;
       }
       .cart-fab-btn {
-          pointer-events: none; width: 100%; height: 64px; min-height: 64px; padding: 6px 8px 8px 18px; border-radius: 22px; position: relative;
+          pointer-events: none; width: 100%; height: 76px; min-height: 76px; padding: 8px 8px 13px 18px; border-radius: 23px; position: relative;
           background: rgba(17, 24, 39, 0.78);
           backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
           border: 1px solid rgba(255, 255, 255, 0.14);
@@ -171,15 +171,15 @@
       }
       .cart-fab-btn.visible { pointer-events: auto; transform: translateY(0); opacity: 1; }
       .cart-fab-btn:active { transform: scale(0.98); }
-      .cart-bar-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; padding-bottom: 4px; }
-      .cart-bar-count { font-size: 10.5px; color: #aab8cc; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .cart-bar-total { font-size: 19px; font-weight: 800; line-height: 1.08; font-variant-numeric: tabular-nums; white-space: nowrap; }
-      .cart-bar-progress { position: absolute; left: 18px; right: 18px; bottom: 4px; height: 3px; display: flex; gap: 4px; pointer-events: none; }
+      .cart-bar-info { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; padding-bottom: 7px; }
+      .cart-bar-count { font-size: 11px; font-weight: 600; color: #b9c6d9; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .cart-bar-total { font-size: 20px; font-weight: 850; line-height: 1.08; letter-spacing: -.25px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .cart-bar-progress { position: absolute; left: 18px; right: 18px; bottom: 6px; height: 4px; display: flex; gap: 4px; pointer-events: none; }
       .cart-bar-progress i { flex: 1; border-radius: 99px; background: rgba(148,163,184,.22); transition: background .25s ease, box-shadow .25s ease; }
       .cart-bar-progress i.on { background: linear-gradient(90deg,#72a7ff,#b7a2ff); }
       .cart-bar-progress.done i.on { background: linear-gradient(90deg,#65d6bd,#9be7d5); box-shadow: 0 0 7px rgba(101,214,189,.35); }
       .cart-bar-action {
-          flex-shrink: 0; min-height: 44px; padding: 0 17px; border-radius: 15px;
+          flex-shrink: 0; min-height: 48px; padding: 0 18px; border-radius: 16px;
           display: inline-flex; align-items: center; gap: 8px;
           background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1.5px solid rgba(255, 255, 255, 0.22);
           box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
@@ -289,6 +289,8 @@
       
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
+      .cart-item-price .diagonal-strike { color: #d6deeb; font-size: 12.5px; font-weight: 850; opacity: 1; text-shadow: 0 0 5px rgba(226,232,240,.18); }
+      .cart-item-price .diagonal-strike::after { height: 2px; background: #ff6474; box-shadow: 0 0 3px rgba(255,100,116,.45); }
       
       .diagonal-strike {
           position: relative;
@@ -1761,8 +1763,8 @@ function updateCartUI() {
         const word = (m10 === 1 && m100 !== 11) ? "приложение" : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) ? "приложения" : "приложений";
         const bulkDiscount = getCartBulkDiscount();
         const countText = barN >= 3
-            ? `${barN} ${word} · скидка −${bulkDiscount} ₽`
-            : `${barN} ${word} · до скидки ещё ${Math.max(0, 3 - barN)}`;
+            ? `${barN} ${word} · ваша скидка −${bulkDiscount} ₽`
+            : `До скидки: выберите ещё ${3 - barN} ${3 - barN === 1 ? "приложение" : "приложения"}`;
         const totalText = getCartFinalTotal() + " ₽";
         if (barCount.textContent !== countText) barCount.textContent = countText;
         if (barTotal.textContent !== totalText) barTotal.textContent = totalText;
