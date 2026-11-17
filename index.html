@@ -177,13 +177,17 @@
           opacity: 0; transform: translateY(16px) scale(.97); transition: opacity 0.25s var(--spring), transform 0.25s var(--spring);
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
-      #welcomeApp, #maintenanceApp, #tokenErrorApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
       .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .hero-title span { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .hero-desc-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); margin-top: 14px; margin-bottom: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
       .hero-desc { font-size: 13.5px; color: var(--text); line-height: 1.4; margin: 0; font-weight: 500; }
+      .hero-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; margin-bottom: 2px; width: 100%; }
+      .hero-link { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: 18px; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: var(--text); text-decoration: none; font-size: 13px; font-weight: 650; line-height: 1.3; text-align: center; -webkit-tap-highlight-color: transparent; }
+      .hero-link:active { opacity: 0.7; }
+      .hero-link .sf-icon { font-size: 26px; color: #3b82f6; }
       .promo-toggle-link { display: none; width: 100%; margin-top: 8px; padding: 6px 0; background: none; border: none; color: #60a5fa; font-size: 13px; font-weight: 650; text-align: center; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
       .promo-toggle-link:active { opacity: 0.6; }
       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; width: 100%; }
@@ -194,7 +198,7 @@
       .catalog-title { font-size: 15px; font-weight: 650; color: var(--text); }
       .catalog-title span { color: #3b82f6; font-size: 16px; font-weight: 800; padding-left: 4px; }
       .apps-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding-bottom: 50px; }
-
+      
       .app-grid-card {
           background: var(--card-bg); border: var(--card-border); border-radius: 18px; padding: 12px 10px;
           display: flex; flex-direction: column; gap: 8px;
@@ -238,20 +242,20 @@
       }
 
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
-
+      
       .app-price-tag { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; margin-top: auto; }
       .app-price-tag.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
 
       .new-price-bold { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-weight: 800; }
-
+      
       .app-grid-name { font-size: clamp(8.5px, 15cqi, 13.5px); font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; letter-spacing: -0.2px; }
       .app-grid-subname { font-size: 10px; font-weight: 500; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; margin-top: 2px; letter-spacing: -0.2px; }
       .app-grid-version { font-size: clamp(7.5px, 12cqi, 10.5px); font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.2; }
-
+      
       .app-grid-btn { width: 100%; padding: 7px 4px; border-radius: 10px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: var(--btn-install-color); font-size: 11.5px; font-weight: 650; margin-top: 0; cursor: pointer; transition: all 0.2s; }
       .app-grid-btn.in-cart { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; }
       .app-grid-btn.installed { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #4ade80; font-size: 14px; font-weight: 800; }
-
+      
       .cart-items-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0; max-height: 38dvh; overflow-y: auto; padding-right: 10px; margin-right: -10px; }
       .cart-items-list::-webkit-scrollbar { width: 4px; }
       .cart-items-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
@@ -268,10 +272,10 @@
       .cart-item-name { font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
       .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
+      
       .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
       .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
-
+      
       .diagonal-strike {
           position: relative;
           display: inline-block;
@@ -816,7 +820,7 @@
             <div class="auth-title" style="font-size: 20px; margin: 0;">Мои заказы</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">История ваших заказов на этом устройстве</div>
-
+        
         <div class="admin-scroll-list" id="myOrdersListContainer" style="max-height: 44dvh; text-align: left; width: 100%;">
             <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
         </div>
@@ -939,13 +943,13 @@
 
 <script>
 const ALLOWED_WHEN_DISABLED = [
-    "maintenanceApp",
-    "tokenApp",
-    "tokenErrorApp",
-    "guideApp",
-    "tipsApp",
-    "policyApp",
-    "offerApp",
+    "maintenanceApp", 
+    "tokenApp", 
+    "tokenErrorApp", 
+    "guideApp", 
+    "tipsApp", 
+    "policyApp", 
+    "offerApp", 
     "myOrdersApp",
     "orderWaitApp",
     "orderApprovedApp"
@@ -1120,7 +1124,7 @@ function loadFromLocalStorageCache() {
         const nCache = localStorage.getItem("apprestore_new_apps_cache");
         const sCache = localStorage.getItem("apprestore_site_enabled_cache");
         const bCache = localStorage.getItem("apprestore_bulk_discount_enabled_cache");
-
+        
         if (pCache) siteState.prices = JSON.parse(pCache);
         if (vCache) siteState.visibility = JSON.parse(vCache);
         if (nCache) siteState.newApps = JSON.parse(nCache);
@@ -1150,12 +1154,12 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         ]);
 
         let hasChanges = false;
-
+        
         const newPrices = {};
         if (Array.isArray(pricesRes)) {
             pricesRes.forEach(row => { newPrices[row.app_key] = String(row.price); });
         }
-
+        
         if (JSON.stringify(newPrices) !== JSON.stringify(siteState.prices)) {
             siteState.prices = newPrices;
             hasChanges = true;
@@ -1442,19 +1446,19 @@ function generateAppsGrid() {
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
         const isNew = isAppNew(app.key);
-
+        
         let mainName = app.name, subName = "";
         let bracketIdx = app.name.indexOf(" (");
         if (bracketIdx !== -1 && app.name.endsWith(")")) {
             mainName = app.name.substring(0, bracketIdx);
             subName = app.name.substring(bracketIdx + 2, app.name.length - 1);
         }
-
+        
         let priceHtml = `<span class="new-price-bold">${price} ₽</span>`;
         if (price < 290) {
             priceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${price} ₽</span>`;
         }
-
+        
         html += `
         <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
             <span class="app-new-badge ${isNew ? 'visible' : ''}" id="gridNew_${app.key}">NEW</span>
@@ -1469,8 +1473,8 @@ function generateAppsGrid() {
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px;">
                 <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}" style="margin-top: 0;">${priceHtml}</div>
                 <button type="button" class="app-cart-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}')">
-                    ${isInCart
-                        ? '<span style="font-size: 16px; font-weight: 800;">✓</span>'
+                    ${isInCart 
+                        ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
                         : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'}
                 </button>
             </div>
@@ -1631,12 +1635,12 @@ function renderCartScreen() {
         if (!app) return;
         const p = getAppPrice(k);
         const isPrem = p >= 500;
-
+        
         let priceHtml = `<span class="new-price-bold">${p} ₽</span>`;
         if (p < 290) {
             priceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${p} ₽</span>`;
         }
-
+        
         total += p;
         html += `
         <div class="cart-item-row">
@@ -1712,7 +1716,7 @@ function updateCartUI() {
         const isVisible = isAppVisible(app.key);
         if (card) card.classList.toggle("app-unavailable", !isVisible);
         if (newBadge) newBadge.classList.toggle("visible", isAppNew(app.key));
-
+        
         if (priceTag) {
             const p = getAppPrice(app.key);
             let expectedPriceHtml = `<span class="new-price-bold">${p} ₽</span>`;
@@ -1724,13 +1728,13 @@ function updateCartUI() {
                 priceTag.classList.toggle("premium", p >= 500);
             }
         }
-
+        
         if (btn) {
             const inCart = cartItems.has(app.key);
-            const expectedHtml = inCart
-                ? '<span style="font-size: 16px; font-weight: 800;">✓</span>'
+            const expectedHtml = inCart 
+                ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
                 : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
-
+            
             if (btn.innerHTML.trim() !== expectedHtml.trim()) {
                 btn.classList.toggle("in-cart", inCart);
                 btn.innerHTML = expectedHtml;
@@ -1829,7 +1833,7 @@ async function confirmOrderPaid() {
 
         if (orderRow && orderRow.id) {
             activeOrderId = orderRow.id;
-
+            
             if (!myLocalOrders.some(o => o.id === orderRow.id)) {
                 myLocalOrders.unshift({ id: orderRow.id, order_number: currentOrderNumber });
                 saveMyLocalOrders();
@@ -1948,7 +1952,7 @@ async function renderMyOrdersList() {
             else if (ord.status === "rejected") statusBadge = `<span class="my-order-status rejected">❌ Отклонен</span>`;
 
             const appsStr = Array.isArray(ord.app_names) ? ord.app_names.join(", ") : "Приложения";
-
+            
             let actionBtn = "";
             if (ord.status === "approved" && ord.link_token) {
                 const link = `${CLIENT_SITE_URL}/?${ord.link_token}`;
@@ -2039,7 +2043,7 @@ function handleNavBack(event) {
 
 function goBackFromInfo(openMenu = false) {
     if (isScreenLocked(currentScreenId)) return;
-
+    
     // Проверяем прошлый экран. Если мы пришли с экрана подтвержденной оплаты,
     // принудительно запрещаем открывать меню навигации.
     const lastScreen = HISTORY_STACK.length > 0 ? HISTORY_STACK[HISTORY_STACK.length - 1] : previousScreen;
@@ -2052,18 +2056,18 @@ function goBackFromInfo(openMenu = false) {
         if (openMenu) document.getElementById("burgerMenuModal")?.classList.add("active");
         return;
     }
-
+    
     if (HISTORY_STACK.length > 0) {
         switchScreen(HISTORY_STACK.pop(), false);
     } else {
         switchScreen(previousScreen);
     }
-
+    
     if (openMenu) {
         document.getElementById("burgerMenuModal")?.classList.add("active");
     }
 }
-
+    
 function goHome() {
     if (isScreenLocked(currentScreenId)) return;
     HISTORY_STACK.length = 0;
