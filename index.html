@@ -442,10 +442,10 @@
       .order-num-pill b { color: #fff; font-size: 14px; font-weight: 750; letter-spacing: .3px; }
 
       /* ===== Главная: бегущие строки, панель преимуществ, ссылки ===== */
-      #welcomeApp { justify-content: flex-start; overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
+      #welcomeApp { justify-content: flex-start; gap: clamp(9px, 1.8dvh, 16px); overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
       #welcomeApp .hero-section { margin-bottom: 0; margin-top: 4px; }
-      #welcomeApp .welcome-cta { min-height: clamp(44px, 6.4dvh, 50px) !important; margin-bottom: clamp(8px, 1.5dvh, 12px) !important; flex-shrink: 0; }
-      .icon-ticker { width: calc(100% + 32px); margin: clamp(6px, 1.4dvh, 12px) -16px clamp(10px, 2dvh, 16px); display: flex; flex-direction: column; gap: clamp(7px, 1.3dvh, 10px); overflow: hidden; flex-shrink: 0;
+      #welcomeApp .welcome-cta { min-height: clamp(44px, 6.4dvh, 50px) !important; margin: 0 !important; flex-shrink: 0; }
+      .icon-ticker { width: calc(100% + 32px); margin: 0 -16px; display: flex; flex-direction: column; gap: clamp(7px, 1.3dvh, 10px); overflow: hidden; flex-shrink: 0;
           -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%); }
       .ticker-row { overflow: hidden; }
       .ticker-track { display: flex; width: max-content; animation: tickerLeft 46s linear infinite; will-change: transform; }
@@ -470,7 +470,7 @@
       .wf-num { font-size: clamp(16px, 2.7dvh, 21px); font-weight: 800; line-height: 1.15; color: #fff; font-variant-numeric: tabular-nums; }
       .wf-label { font-size: clamp(10px, 1.5dvh, 12px); color: var(--muted); line-height: 1.25; }
 
-      .wl-bar { width: 100%; display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; flex-shrink: 0; margin-top: clamp(7px, 1.3dvh, 10px); background: rgba(30,41,59,0.45); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); overflow: hidden; }
+      .wl-bar { width: 100%; display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; flex-shrink: 0; margin-top: 0; background: rgba(30,41,59,0.45); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); overflow: hidden; }
       .wl-div { background: rgba(255,255,255,0.1); margin: 9px 0; }
       .wl-item { display: flex; align-items: center; gap: 10px; padding: clamp(7px, 1.4dvh, 11px) 12px; text-decoration: none; color: var(--text); text-align: left; transition: background .2s ease; min-width: 0; }
       .wl-item:active { background: rgba(255,255,255,0.07); }
@@ -482,7 +482,8 @@
       .wl-text b { font-size: 13px; font-weight: 700; white-space: nowrap; }
       .wl-text small { font-size: 10.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
       @media (max-height: 700px) {
-          #welcomeApp .hero-title { margin-bottom: 2px; }
+          #welcomeApp { gap: 8px; }
+          #welcomeApp .hero-title { margin-bottom: 0; }
           .wf-card { padding: 5px 8px; border-radius: 16px; gap: 1px; }
           .wf-ico { display: none; }
           .wf-label { font-size: 10px; line-height: 1.2; }
