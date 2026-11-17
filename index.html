@@ -442,7 +442,7 @@
       .order-num-pill b { color: #fff; font-size: 14px; font-weight: 750; letter-spacing: .3px; }
 
       /* ===== Главная: бегущие строки, панель преимуществ, ссылки ===== */
-      #welcomeApp { justify-content: flex-start; gap: clamp(9px, 1.8dvh, 16px); overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
+      #welcomeApp { justify-content: flex-start; gap: clamp(12px, 2.2dvh, 20px); margin-bottom: -28px; overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
       #welcomeApp .hero-section { margin-bottom: 0; margin-top: 4px; }
       #welcomeApp .welcome-cta { min-height: clamp(44px, 6.4dvh, 50px) !important; margin: 0 !important; flex-shrink: 0; }
       .icon-ticker { width: calc(100% + 32px); margin: 0 -16px; display: flex; flex-direction: column; gap: clamp(7px, 1.3dvh, 10px); overflow: hidden; flex-shrink: 0;
@@ -482,14 +482,13 @@
       .wl-text b { font-size: 13px; font-weight: 700; white-space: nowrap; }
       .wl-text small { font-size: 10.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
       @media (max-height: 700px) {
-          #welcomeApp { gap: 8px; }
+          #welcomeApp { gap: 12px; }
           #welcomeApp .hero-title { margin-bottom: 0; }
           .wf-card { padding: 5px 8px; border-radius: 16px; gap: 1px; }
-          .wf-ico { display: none; }
-          .wf-label { font-size: 10px; line-height: 1.2; }
+          .wf-label { font-size: clamp(10px, 1.65dvh, 11.5px); line-height: 1.2; }
           .wl-ico { width: 30px; height: 30px; }
       }
-      @media (max-height: 600px) { .ticker-row.reverse { display: none; } .wl-text small { display: none; } .wf-label { font-size: 9.5px; } }
+      @media (max-height: 600px) { #welcomeApp { gap: 8px; } .ticker-row.reverse { display: none; } .wl-text small { display: none; } .wf-label { font-size: 9.5px; } }
       @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none !important; } }
       .cart-header-row { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
       .cart-back-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--muted); cursor: pointer; text-decoration: none; }
