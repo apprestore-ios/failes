@@ -354,23 +354,37 @@
           animation: spin 1s linear infinite; margin: 6px auto 4px;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
-      .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; width: 100%; }
-      .categories-bar::-webkit-scrollbar { display: none; }
-      .filter-chip { padding: 7px 14px; border-radius: 12px; background: var(--card-bg); border: var(--card-border); color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
-      .filter-chip.active { background: #2563eb; border-color: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-      .filter-chip .sf-icon { font-size: 18px; }
-      .apps-total { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 9px 12px 9px 16px; border-radius: 14px; background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(148, 163, 184, 0.15); }
-      .apps-total-label { font-size: 13.5px; font-weight: 600; color: var(--text); }
-      .apps-total-num { min-width: 34px; padding: 3px 10px; border-radius: 99px; background: rgba(34, 197, 94, 0.16); border: 1px solid rgba(34, 197, 94, 0.45); color: #4ade80; font-size: 13.5px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
       .catalog-notice { background: var(--card-bg); border: 1.5px solid rgba(251, 191, 36, 0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--box-shadow); width: 100%; min-height: 54px; }
       .catalog-notice-icon { font-size: 24px; color: #facc15; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: flex; }
       .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; }
       .catalog-notice-text b { color: var(--text); font-weight: 650; }
+      .apps-info { width: 100%; margin-bottom: 12px; padding: 9px 12px 9px 14px; border-radius: 14px; background: var(--card-bg); border: var(--card-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; gap: 12px; box-shadow: var(--box-shadow); }
+      .apps-info-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: 11px; background: var(--btn-install-bg); color: #93c5fd; display: flex; align-items: center; justify-content: center; }
+      .apps-info-icon svg { width: 19px; height: 19px; }
+      .apps-info-text { flex: 1; min-width: 0; }
+      .apps-info-title { font-size: 13.5px; font-weight: 750; color: var(--text); line-height: 1.25; }
+      .apps-info-num.bump { animation: numBump 0.28s ease; }
+      @keyframes numBump { 0% { transform: scale(0.85); opacity: 0.5; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+      .apps-info-num { min-width: 42px; padding: 5px 12px; border-radius: 11px; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); color: #93c5fd; font-size: 16px; font-weight: 800; text-align: center; line-height: 1.1; font-variant-numeric: tabular-nums; }
       .app-search-wrap { position: relative; margin-bottom: 12px; width: 100%; }
-      .app-search { width: 100%; height: 42px; padding: 0 42px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; }
+      .app-search { width: 100%; height: 42px; padding: 0 84px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; }
       .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
-      .search-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); display: none; background: none; border: none; color: var(--muted); cursor: pointer; }
+      .search-clear { position: absolute; right: 50px; top: 50%; transform: translateY(-50%); display: none; background: none; border: none; color: var(--muted); cursor: pointer; }
       .search-clear.visible { display: block; }
+      .filter-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 10px; border: none; background: rgba(148,163,184,0.14); color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s ease, color 0.2s ease; -webkit-tap-highlight-color: transparent; }
+      .filter-btn svg { width: 18px; height: 18px; }
+      .filter-btn.open, .filter-btn.has-filter { background: rgba(37,99,235,0.2); color: #60a5fa; }
+      .filter-dot { display: none; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; border: 1.5px solid #0b0f17; }
+      .filter-btn.has-filter .filter-dot { display: block; }
+      .cat-menu { position: absolute; top: 48px; right: 0; min-width: 190px; padding: 6px; border-radius: 16px; background: rgba(22,30,44,0.96); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 60; opacity: 0; transform: translateY(-6px) scale(0.98); transform-origin: top right; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; }
+      .cat-menu.open { opacity: 1; transform: none; pointer-events: auto; }
+      .cat-item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 10px; border: none; border-radius: 11px; background: none; color: var(--text); font-size: 14px; font-weight: 550; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+      .cat-item:active { background: rgba(148,163,184,0.14); }
+      .cat-item .sf-icon { font-size: 18px; color: var(--muted); width: 22px; text-align: center; }
+      .cat-name { flex: 1; }
+      .cat-check { opacity: 0; color: #60a5fa; font-weight: 800; }
+      .cat-item.active .cat-check { opacity: 1; }
+      .cat-item.active .sf-icon { color: #60a5fa; }
       .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
       .menu-modal.active { display: flex; }
       .menu-sheet { width: 100%; max-width: 430px; background: #111827; border-top: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; }
@@ -626,21 +640,28 @@
             <div class="bulk-banner-sub">При покупке от 3 приложений</div>
         </div>
     </div>
+    <div class="apps-info">
+        <div class="apps-info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg></div>
+        <div class="apps-info-text">
+            <div class="apps-info-title">Всего приложений</div>
+        </div>
+        <span class="apps-info-num" id="appCountDisplay">0</span>
+    </div>
     <div class="app-search-wrap">
         <span class="search-icon"><span class="sf-icon">&#xFCA6;</span></span>
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
         <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><span class="sf-icon">&#xECD2;</span></button>
-    </div>
-    <div class="apps-total">
-        <span class="apps-total-label">Всего приложений</span>
-        <span class="apps-total-num" id="appCountDisplay">0</span>
-    </div>
-    <div class="categories-bar">
-        <button type="button" class="filter-chip active" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span>Все</button>
-        <button type="button" class="filter-chip" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span>Банки</button>
-        <button type="button" class="filter-chip" onclick="setCategory('social', this)"><span class="sf-icon">&#x0068;</span>Соцсети</button>
-        <button type="button" class="filter-chip" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span>Инвестиции</button>
-        <button type="button" class="filter-chip" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span>Другие</button>
+        <button type="button" id="filterBtn" class="filter-btn" onclick="toggleCatMenu(event)" aria-label="Категории" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+            <span class="filter-dot"></span>
+        </button>
+        <div class="cat-menu" id="catMenu">
+            <button type="button" class="cat-item active" data-cat="all" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span><span class="cat-name">Все</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="banks" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span><span class="cat-name">Банки</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="social" onclick="setCategory('social', this)"><span class="sf-icon">&#x0068;</span><span class="cat-name">Соцсети</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="investments" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span><span class="cat-name">Инвестиции</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="other" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span><span class="cat-name">Другие</span><span class="cat-check">&#10003;</span></button>
+        </div>
     </div>
     <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
@@ -2439,10 +2460,33 @@ function installFromToken(key, appUrl) {
 
 function setCategory(cat, btn) {
     currentCategory = cat;
-    document.querySelectorAll(".filter-chip").forEach(o => o.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll(".cat-item").forEach(o => o.classList.toggle("active", o.dataset.cat === cat));
+    document.getElementById("filterBtn")?.classList.toggle("has-filter", cat !== "all");
+    closeCatMenu();
     filterApps();
 }
+
+function toggleCatMenu(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById("catMenu");
+    const btn = document.getElementById("filterBtn");
+    if (!menu || !btn) return;
+    const open = !menu.classList.contains("open");
+    menu.classList.toggle("open", open);
+    btn.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", String(open));
+}
+
+function closeCatMenu() {
+    document.getElementById("catMenu")?.classList.remove("open");
+    const btn = document.getElementById("filterBtn");
+    if (btn) { btn.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }
+}
+
+document.addEventListener("click", e => {
+    if (!e.target.closest("#catMenu") && !e.target.closest("#filterBtn")) closeCatMenu();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeCatMenu(); });
 
 // ===== Умный поиск =====
 // Группы синонимов. Слова ДО "|" — названия бренда: по ним группа привязывается к приложению.
@@ -2648,7 +2692,15 @@ function filterApps() {
     const emptyEl = document.getElementById("searchEmpty");
     if (emptyEl) emptyEl.style.display = count === 0 ? "block" : "none";
     const countEl = document.getElementById("appCountDisplay");
-    if (countEl) countEl.textContent = count;
+    if (countEl) {
+        const prev = countEl.textContent;
+        countEl.textContent = count;
+        if (prev !== String(count)) {
+            countEl.classList.remove("bump");
+            void countEl.offsetWidth;
+            countEl.classList.add("bump");
+        }
+    }
 }
 
 function clearAppSearch() {
