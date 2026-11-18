@@ -54,6 +54,28 @@ function parseDeviceName(ua: string): string {
   return "Мобильное устройство";
 }
 
+// Убираем символы, ломающие Markdown в Telegram (иначе sendMessage вернёт 400)
+function cleanText(value: unknown, maxLen = 100): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[`*_\[\]]/g, '').replace(/\s+/g, ' ').trim().slice(0, maxLen);
+}
+
+// Определяем текст про устройство из данных, которые передал сайт.
+// Частоту экрана, браузер и размер экрана в уведомление не выводим — они нужны только для сужения вариантов на сайте.
+function buildDeviceText(body: Record<string, unknown>): string {
+  const supplied = cleanText(body.device_model) || cleanText(body.device_name);
+  const candidates = Array.isArray(body.device_candidates)
+    ? (body.device_candidates as unknown[]).map((c) => cleanText(c, 60)).filter(Boolean).slice(0, 8)
+    : [];
+
+  // Точная модель либо список подходящих вариантов через « / »
+  let model = (supplied || parseDeviceName('')).split(' · ')[0].slice(0, 160);
+  if (body.device_exact === false && candidates.length > 1) {
+    model = candidates.join(' / ');
+  }
+  return model;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
@@ -69,19 +91,12 @@ serve(async (req) => {
 
     // 1. Уведомление об активации разовой ссылки
     if (body.action === 'notify_activation') {
-      const { token, app_keys, device_name, device_model } = body
+      const { token, app_keys } = body
       const appsList = Array.isArray(app_keys) ? app_keys.join(', ') : (app_keys || 'Не указаны')
 
       const ekbTime = new Date().toLocaleTimeString("ru-RU", { timeZone: "Asia/Yekaterinburg", hour: '2-digit', minute: '2-digit' });
 
-      const suppliedDeviceModel =
-        typeof device_model === 'string' && device_model.trim()
-          ? device_model.trim()
-          : (typeof device_name === 'string' && device_name.trim() ? device_name.trim() : '');
-
-      const deviceFormatted = (suppliedDeviceModel || parseDeviceName(''))
-        .split(' · ')[0]
-        .slice(0, 100);
+      const deviceFormatted = buildDeviceText(body);
 
       const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n\n🔑 Токен: \`${token || 'Не указан'}\`\n\n⏰ Время (Екб): \`${ekbTime}\`\n\n📱 Устройство: \`${deviceFormatted}\``
 
