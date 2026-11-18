@@ -283,8 +283,8 @@
       .cart-item-ios { font-size: 11px; color: var(--muted); margin-top: 2px; }
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
       
-      .cart-item-price { padding: 5px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 750; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.45); color: #4ade80; }
-      .cart-item-price.premium { background: rgba(168, 85, 247, 0.18); border-color: rgba(168, 85, 247, 0.45); color: #4ade80; }
+      .cart-item-price { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; white-space: nowrap; }
+      .cart-item-price.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
       
       .diagonal-strike {
           position: relative;
@@ -808,6 +808,7 @@
 <div class="container" id="orderRejectedApp">
     <div class="auth-box" style="padding: 26px 20px;">
         <div class="auth-title" style="color: #fca5a5; font-size: 22px;">Администратор не получил оплату</div>
+        <div class="order-num-pill" id="rejectedOrderNumBox" style="display: none;">Номер заказа: <b id="rejectedOrderNum">#00000</b></div>
         <div class="auth-description" style="text-align: center;">
             Платеж по вашей заявке не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
         </div>
@@ -1950,6 +1951,7 @@ function startOrderStatusPolling(orderId) {
         } else if (order.status === "rejected") {
             clearInterval(orderPollingInterval);
             orderPollingInterval = null;
+            setRejectedOrderNum(order.order_number || currentOrderNumber);
             switchScreen("orderRejectedApp", false);
         }
     }
@@ -2024,6 +2026,12 @@ function isScreenLocked(screenId) { return LOCKED_SCREENS.includes(screenId); }
 function switchScreen(id, pushHistory = true) {
     if (!siteEnabled && !ALLOWED_WHEN_DISABLED.includes(id)) {
         id = "maintenanceApp";
+    }
+
+    if (id === "orderRejectedApp") {
+        let num = currentOrderNumber;
+        if (!num) { try { num = localStorage.getItem("apprestore_active_order_num"); } catch (e) {} }
+        setRejectedOrderNum(num);
     }
 
     if (currentScreenId && currentScreenId !== id && pushHistory) HISTORY_STACK.push(currentScreenId);
@@ -2127,6 +2135,14 @@ function openCatalog() {
     }
     sessionStorage.setItem("site_access", "true");
     switchScreen("mainApp");
+}
+
+function setRejectedOrderNum(num) {
+    const box = document.getElementById("rejectedOrderNumBox");
+    const el = document.getElementById("rejectedOrderNum");
+    if (!num) return;
+    if (el) el.textContent = num;
+    if (box) box.style.display = "inline-flex";
 }
 
 function setApprovedOrderNum(num) {
@@ -2734,6 +2750,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 switchScreen("orderApprovedApp", false);
                 return;
             } else if (activeOrder.status === "rejected") {
+                setRejectedOrderNum(activeOrder.order_number || currentOrderNumber);
                 switchScreen("orderRejectedApp", false);
                 return;
             }
