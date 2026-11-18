@@ -451,6 +451,17 @@
       .story-arrow:active { transform: scale(0.9); }
       .story-arrow:disabled { opacity: 0.28; cursor: default; }
       .story-arrow svg { width: 16px; height: 16px; }
+      .guide-catalog-back {
+          width: 100%; min-height: 44px; margin-top: 6px; padding: 9px 14px;
+          display: flex; align-items: center; justify-content: center; gap: 9px;
+          border-radius: 13px; background: rgba(59,130,246,0.20);
+          border: 1px solid rgba(59,130,246,0.55); color: #bfdbfe;
+          font-family: inherit; font-size: 13px; font-weight: 700;
+          box-shadow: 0 5px 16px rgba(37,99,235,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+          cursor: pointer; transition: transform .15s ease, background .2s ease;
+      }
+      .guide-catalog-back:active { transform: scale(.97); background: rgba(59,130,246,0.30); }
+      .guide-catalog-back .sf-icon { font-size: 21px; color: #93c5fd; }
       .zoom-overlay { position: fixed; inset: 0; z-index: 650; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; touch-action: none; }
       .zoom-overlay.active { opacity: 1; pointer-events: auto; }
       .zoom-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s cubic-bezier(.22,1,.36,1); -webkit-user-drag: none; }
@@ -897,7 +908,7 @@
         <div style="display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; width: 100%; margin-bottom: 2px;">
             <div></div>
             <div class="auth-title" style="font-size: 18px; margin: 0; text-align: center;">Инструкция</div>
-            <button class="cart-back-btn" style="position: static; transform: none;" onclick="returnFromActivationGuide()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
+
         </div>
         <div class="story-bars" id="storyBars"></div>
         <div class="story-viewport" id="storyViewport">
@@ -930,6 +941,10 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
+        <button type="button" class="guide-catalog-back" onclick="returnToCatalog()">
+            <span class="sf-icon">&#xECAC;</span>
+            <span>Назад в каталог</span>
+        </button>
     </div>
 </div>
 
@@ -2401,6 +2416,17 @@ function showActivationGuideScreen() {
     switchScreen("guideApp");
     window.scrollTo(0, 0);
     setTimeout(updateStoryHeight, 50);
+}
+
+function returnToCatalog() {
+    activationGuideReturnScreen = null;
+    if (!siteEnabled) {
+        switchScreen("maintenanceApp", false);
+        return;
+    }
+    HISTORY_STACK.length = 0;
+    switchScreen("mainApp", false);
+    window.scrollTo(0, 0);
 }
 
 function returnFromActivationGuide() {
