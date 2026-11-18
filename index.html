@@ -2093,6 +2093,11 @@ function switchScreen(id, pushHistory = true) {
         renderMyOrdersList();
     }
     if (id === "guideApp") {
+        // При восстановлении инструкции после перезагрузки экран может открыться
+        // напрямую через switchScreen, минуя showGuideScreen(). Поэтому
+        // гарантируем инициализацию обработчиков перелистывания и свайпов.
+        initStories();
+        if (storyTotal > 0) goToStory(Math.min(storyIndex, storyTotal - 1));
         setTimeout(updateStoryHeight, 50);
     }
 
