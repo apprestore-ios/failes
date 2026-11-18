@@ -93,14 +93,19 @@
         .menu-row-sub { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .menu-row-chevron { flex-shrink: 0; color: rgba(255,255,255,0.35); display: flex; }
         .menu-row-chevron svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
-        .menu-grid .menu-row { display: grid; grid-template-columns: 36px 1fr; column-gap: 10px; row-gap: 7px; align-items: center; align-content: center; padding: 12px; }
-        .menu-grid .menu-row-icon { grid-row: 1; grid-column: 1; width: 36px; height: 36px; border-radius: 11px; }
-        .menu-grid .menu-row-icon svg { width: 20px; height: 20px; }
-        .menu-grid .menu-row-text { display: contents; }
-        .menu-grid .menu-row-title { grid-row: 1; grid-column: 2; font-size: 13.5px; line-height: 1.15; }
-        .menu-grid .menu-row-sub { grid-row: 2; grid-column: 1 / -1; margin: 0; font-size: 10.5px; line-height: 1.25; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
+        .menu-grid .menu-row { flex-direction: column; align-items: center; text-align: center; gap: 0; padding: 20px 12px 16px; border-radius: 26px; box-shadow: 0 16px 36px rgba(0,0,0,0.45); }
+        .menu-grid .menu-row-icon { width: 56px; height: 56px; border-radius: 18px; margin-bottom: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.08); }
+        .menu-grid .menu-row-icon svg { width: 28px; height: 28px; }
+        .menu-grid .menu-row-text { flex: 0 0 auto; width: 100%; }
+        .menu-grid .menu-row-title { font-size: 14.5px; line-height: 1.2; margin-bottom: 4px; }
+        .menu-grid .menu-row-sub { font-size: 11px; line-height: 1.3; margin: 0; white-space: normal; min-height: 2.6em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .menu-grid .menu-row-chevron { display: none; }
+        @media (max-height: 700px) {
+            .menu-grid .menu-row { padding: 14px 10px 12px; }
+            .menu-grid .menu-row-icon { width: 48px; height: 48px; margin-bottom: 8px; }
+            .menu-grid .menu-row-icon svg { width: 24px; height: 24px; }
+        }
         .menu-wide { width: 100%; margin-top: 12px; }
         .menu-badge {
             position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px;
