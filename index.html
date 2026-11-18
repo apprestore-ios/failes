@@ -443,8 +443,9 @@
       .story-tap { position: absolute; top: 0; bottom: 0; z-index: 2; cursor: pointer; }
       .story-tap.left { left: 0; width: 32%; }
       .story-tap.right { right: 0; width: 68%; }
-      .story-zoom { position: absolute; top: 10px; right: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; display: none; align-items: center; justify-content: center; padding: 0; background: rgba(15,23,42,0.78); border: 1px solid rgba(255,255,255,0.28); color: #fff; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-      .story-zoom svg { width: 17px; height: 17px; }
+      .story-zoom { position: absolute; top: 10px; right: 10px; z-index: 3; width: 40px; height: 40px; border-radius: 50%; display: none; align-items: center; justify-content: center; padding: 0; background: rgba(120, 82, 18, 0.88); border: 1.5px solid rgba(251, 191, 36, 0.9); color: #fff1b8; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 0 0 3px rgba(251,191,36,0.12), 0 5px 18px rgba(245,158,11,0.38), inset 0 1px 0 rgba(255,255,255,0.22); transition: transform .15s ease, background .2s ease; }
+      .story-zoom:active { transform: scale(.92); background: rgba(146, 94, 10, 0.96); }
+      .story-zoom svg { width: 21px; height: 21px; }
       .story-nav { display: flex; align-items: center; justify-content: center; gap: 14px; flex-shrink: 0; margin-top: 6px; }
       .story-counter { font-size: 11.5px; color: var(--muted); text-align: center; min-width: 44px; }
       .story-arrow { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: #93c5fd; cursor: pointer; transition: opacity .2s ease, transform .15s ease; }
@@ -452,16 +453,16 @@
       .story-arrow:disabled { opacity: 0.28; cursor: default; }
       .story-arrow svg { width: 16px; height: 16px; }
       .guide-catalog-back {
-          width: 100%; min-height: 44px; margin-top: 6px; padding: 9px 14px;
+          width: 100%; min-height: 44px; margin-top: 18px; padding: 9px 14px;
           display: flex; align-items: center; justify-content: center; gap: 9px;
-          border-radius: 13px; background: rgba(59,130,246,0.20);
-          border: 1px solid rgba(59,130,246,0.55); color: #bfdbfe;
+          border-radius: 13px; background: rgba(126, 74, 190, 0.22);
+          border: 1px solid rgba(192, 132, 252, 0.68); color: #e9d5ff;
           font-family: inherit; font-size: 13px; font-weight: 700;
-          box-shadow: 0 5px 16px rgba(37,99,235,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+          box-shadow: 0 5px 18px rgba(147,51,234,0.25), 0 0 0 2px rgba(192,132,252,0.08), inset 0 1px 0 rgba(255,255,255,0.12);
           cursor: pointer; transition: transform .15s ease, background .2s ease;
       }
-      .guide-catalog-back:active { transform: scale(.97); background: rgba(59,130,246,0.30); }
-      .guide-catalog-back .sf-icon { font-size: 21px; color: #93c5fd; }
+      .guide-catalog-back:active { transform: scale(.97); background: rgba(147, 51, 234, 0.34); }
+      .guide-catalog-back .sf-icon { font-size: 21px; color: #d8b4fe; }
       .zoom-overlay { position: fixed; inset: 0; z-index: 650; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; touch-action: none; }
       .zoom-overlay.active { opacity: 1; pointer-events: auto; }
       .zoom-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s cubic-bezier(.22,1,.36,1); -webkit-user-drag: none; }
