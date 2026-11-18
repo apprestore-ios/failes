@@ -1325,35 +1325,144 @@ function extractTokenFromLocation() {
     return null;
 }
 
-function estimateIPhoneModel() {
-    const width = Math.min(window.screen.width, window.screen.height);
-    const height = Math.max(window.screen.width, window.screen.height);
-    const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
-    const resolution = `${Math.round(width)}x${Math.round(height)}`;
-    const modelByScreenAndDpr = {
-        "375x667@2": "iPhone 6 / 7 / 8 / SE (2-го или 3-го поколения)",
-        "375x812@3": "iPhone X / XS / 11 Pro",
-        "390x844@3": "iPhone 12 / 13 / 14",
-        "393x852@3": "iPhone 15 / 16 / 16e",
-        "402x874@3": "iPhone 16 Pro / 17 Pro",
-        "414x896@2": "iPhone XR / 11",
-        "414x896@3": "iPhone XS Max / 11 Pro Max",
-        "428x926@3": "iPhone 12 Pro Max / 13 Pro Max / 14 Plus",
-        "430x932@3": "iPhone 14 Pro Max / 15 Plus / 15 Pro Max",
-        "440x956@3": "iPhone 16 Plus / 16 Pro Max / 17 Pro Max"
-    };
-    let model = modelByScreenAndDpr[`${resolution}@${Math.round(dpr)}`];
-    if (!model) {
-        if (width >= 440) model = "iPhone большого размера (Plus / Pro Max)";
-        else if (width >= 420) model = "iPhone Pro Max / Plus";
-        else if (width >= 400) model = "iPhone крупного размера";
-        else if (width >= 390) model = "iPhone стандартного размера";
-        else if (width >= 375) model = "iPhone компактного размера";
-        else model = "iPhone (модель не определена)";
-    }
-    if (dpr < 1.5 || dpr > 4) return "iPhone (модель не определена)";
-    return model;
+// ===== Определение устройства =====
+// Браузер не отдаёт точную модель, поэтому собираем несколько признаков:
+// размер экрана + плотность пикселей даёт группу моделей, частота экрана (120 Гц) отсекает часть вариантов,
+// а окончательный выбор покупатель подтверждает одним тапом.
+const IPHONE_SCREEN_GROUPS = {
+    "375x667@2": [["iPhone 6", 0], ["iPhone 6s", 0], ["iPhone 7", 0], ["iPhone 8", 0], ["iPhone SE (2020)", 0], ["iPhone SE (2022)", 0]],
+    "414x736@3": [["iPhone 6 Plus / 6s Plus", 0], ["iPhone 7 Plus", 0], ["iPhone 8 Plus", 0]],
+    "375x812@3": [["iPhone X", 0], ["iPhone XS", 0], ["iPhone 11 Pro", 0], ["iPhone 12 mini", 0], ["iPhone 13 mini", 0]],
+    "414x896@2": [["iPhone XR", 0], ["iPhone 11", 0]],
+    "414x896@3": [["iPhone XS Max", 0], ["iPhone 11 Pro Max", 0]],
+    "390x844@3": [["iPhone 12", 0], ["iPhone 12 Pro", 0], ["iPhone 13", 0], ["iPhone 13 Pro", 1], ["iPhone 14", 0], ["iPhone 16e", 0]],
+    "393x852@3": [["iPhone 14 Pro", 1], ["iPhone 15", 0], ["iPhone 15 Pro", 1], ["iPhone 16", 0]],
+    "402x874@3": [["iPhone 16 Pro", 1], ["iPhone 17", 1], ["iPhone 17 Pro", 1]],
+    "420x912@3": [["iPhone Air", 1]],
+    "428x926@3": [["iPhone 12 Pro Max", 0], ["iPhone 13 Pro Max", 1], ["iPhone 14 Plus", 0]],
+    "430x932@3": [["iPhone 14 Pro Max", 1], ["iPhone 15 Plus", 0], ["iPhone 15 Pro Max", 1], ["iPhone 16 Plus", 0]],
+    "440x956@3": [["iPhone 16 Pro Max", 1], ["iPhone 17 Pro Max", 1]]
+};
+
+function detectPlatform() {
+    const ua = navigator.userAgent || "";
+    if (/iPhone|iPod/i.test(ua)) return "iphone";
+    if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && (navigator.maxTouchPoints || 0) > 1)) return "ipad";
+    if (/Android/i.test(ua)) return "android";
+    return "other";
 }
+
+function detectBrowserName() {
+    const ua = navigator.userAgent || "";
+    if (/Telegram/i.test(ua) || (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData)) return "Telegram";
+    if (/CriOS/i.test(ua)) return "Chrome";
+    if (/FxiOS/i.test(ua)) return "Firefox";
+    if (/EdgiOS/i.test(ua)) return "Edge";
+    if (/YaBrowser/i.test(ua)) return "Яндекс Браузер";
+    if (/OPiOS|OPT\//i.test(ua)) return "Opera";
+    if (/Safari/i.test(ua)) return "Safari";
+    return "другой";
+}
+
+function detectIOSVersion() {
+    const m = (navigator.userAgent || "").match(/OS (\d+)[_.](\d+)(?:[_.](\d+))?/);
+    return m ? `${m[1]}.${m[2]}${m[3] ? "." + m[3] : ""}` : "";
+}
+
+// Измеряем частоту обновления экрана: ~120 Гц у моделей с ProMotion, ~60 Гц у остальных
+function measureRefreshRate(durationMs = 700) {
+    return new Promise(resolve => {
+        if (typeof requestAnimationFrame !== "function") return resolve(null);
+        const stamps = [];
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            if (stamps.length < 12) return resolve(null);
+            const deltas = [];
+            for (let k = 1; k < stamps.length; k++) deltas.push(stamps[k] - stamps[k - 1]);
+            deltas.sort((a, b) => a - b);
+            const median = deltas[Math.floor(deltas.length / 2)];
+            resolve(median > 0 ? Math.round(1000 / median) : null);
+        };
+        const start = performance.now();
+        const tick = t => {
+            if (done) return;
+            stamps.push(t);
+            if (t - start >= durationMs) return finish();
+            requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        setTimeout(finish, durationMs + 400);
+    });
+}
+
+function collectDeviceInfo() {
+    const platform = detectPlatform();
+    const width = Math.round(Math.min(window.screen.width, window.screen.height));
+    const height = Math.round(Math.max(window.screen.width, window.screen.height));
+    const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
+    const screenKey = `${width}x${height}@${Math.round(dpr)}`;
+    const info = {
+        platform: platform,
+        screen: `${width}x${height}@${dpr}`,
+        browser: detectBrowserName(),
+        os_version: detectIOSVersion(),
+        language: navigator.language || "",
+        timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone) || "",
+        standalone: !!(window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)),
+        refresh_hz: null,
+        candidates: [],
+        model: ""
+    };
+
+    if (platform === "iphone") {
+        info.refresh_hz = (typeof window.__deviceRefreshHz === "number") ? window.__deviceRefreshHz : null;
+        let group = IPHONE_SCREEN_GROUPS[screenKey];
+        if (group) {
+            let list = group.map(x => ({ name: x[0], pro: x[1] === 1 }));
+            // 120 Гц — надёжный признак ProMotion, 60 Гц не доказывает обратного (режим энергосбережения ограничивает до 60)
+            if (info.refresh_hz && info.refresh_hz >= 100) {
+                const promo = list.filter(x => x.pro);
+                if (promo.length) list = promo;
+            }
+            info.candidates = list.map(x => x.name);
+        } else {
+            const w = width;
+            let guess;
+            if (w >= 440) guess = "iPhone большого размера (Plus / Pro Max)";
+            else if (w >= 420) guess = "iPhone Pro Max / Plus / Air";
+            else if (w >= 400) guess = "iPhone крупного размера";
+            else if (w >= 390) guess = "iPhone стандартного размера";
+            else if (w >= 375) guess = "iPhone компактного размера";
+            else guess = "iPhone (модель не определена)";
+            if (dpr < 1.5 || dpr > 4) guess = "iPhone (модель не определена)";
+            info.candidates = [guess];
+            info.unknown_screen = true;
+        }
+        info.model = info.candidates.length === 1 ? info.candidates[0] : "";
+    } else if (platform === "ipad") {
+        info.model = "iPad";
+    } else if (platform === "android") {
+        info.model = "Android-устройство";
+    } else {
+        info.model = "Компьютер / другое устройство";
+    }
+    return info;
+}
+
+// Для старых вызовов: текстовое описание одним словом
+function estimateIPhoneModel() {
+    const width = Math.round(Math.min(window.screen.width, window.screen.height));
+    const height = Math.round(Math.max(window.screen.width, window.screen.height));
+    const dpr = Math.round(window.devicePixelRatio || 1);
+    const group = IPHONE_SCREEN_GROUPS[`${width}x${height}@${dpr}`];
+    return group ? group.map(x => x[0]).join(" / ") : "iPhone (модель не определена)";
+}
+
+// Замер частоты экрана стартует сразу при загрузке страницы, чтобы к моменту активации ссылки результат уже был готов
+// (уведомление при этом не задерживается: если замер не успел, частота просто не передаётся)
+try { measureRefreshRate(600).then(hz => { window.__deviceRefreshHz = hz; }); } catch (e) {}
 
 function notifyActivationOnce(token, appKeys) {
     if (!token) return;
@@ -1362,7 +1471,15 @@ function notifyActivationOnce(token, appKeys) {
         if (localStorage.getItem(notificationKey) === "1") return;
         localStorage.setItem(notificationKey, "1");
     } catch (e) {}
-    const deviceModel = estimateIPhoneModel();
+
+    let info;
+    try { info = collectDeviceInfo(); }
+    catch (e) { info = { platform: "other", screen: "", candidates: [], model: "Устройство не определено" }; }
+
+    // Одна модель — называем её; несколько подходящих — перечисляем варианты
+    const exact = !!(info.model && info.candidates.length <= 1 && !info.unknown_screen);
+    const deviceModel = info.model || (info.candidates.length ? info.candidates.join(" / ") : "Устройство не определено");
+
     fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1371,7 +1488,17 @@ function notifyActivationOnce(token, appKeys) {
             token: token,
             app_keys: appKeys,
             device_name: deviceModel,
-            device_model: deviceModel
+            device_model: deviceModel,
+            device_exact: exact,
+            device_candidates: info.candidates,
+            device_platform: info.platform,
+            device_screen: info.screen,
+            device_refresh_hz: info.refresh_hz,
+            device_browser: info.browser,
+            device_os_version: info.os_version,
+            device_language: info.language,
+            device_timezone: info.timezone,
+            device_standalone: info.standalone
         })
     }).catch(() => {});
 }
