@@ -433,7 +433,7 @@
       .story-track { display: flex; width: 100%; transition: transform .32s cubic-bezier(.4,0,.2,1); will-change: transform; align-items: flex-start; }
       .story-slide { flex: 0 0 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; text-align: center; }
       .story-slide.text-slide { padding: 2px 0; gap: 10px; justify-content: flex-start; min-height: 0; max-height: none; overflow-y: visible; }
-      .story-num { background: #3b82f6; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 750; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
+      .story-num { background: #3b82f6; color: #fff; width: 32px; height: 32px; margin-top: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 750; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
       .story-slide-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; }
       .story-slide-text { font-size: 13px; color: var(--text); line-height: 1.5; text-align: left; width: 100%; background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 14px; }
       .story-slide-text p { margin: 0 0 1.5em 0; }
@@ -988,7 +988,10 @@
             <div class="story-counter" id="tipsCounter"></div>
             <button type="button" class="story-arrow" id="tipsArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(true)" style="margin-top: 6px;">Понятно, вернуться назад</button>
+        <button type="button" class="guide-catalog-back" onclick="returnToCatalog()">
+            <span class="sf-icon">&#xECAC;</span>
+            <span>Назад в каталог</span>
+        </button>
     </div>
 </div>
 
