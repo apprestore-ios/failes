@@ -422,6 +422,8 @@
       #guideApp .auth-title { font-size: 17px; }
       #tipsApp .auth-box { padding: 12px 14px 14px; gap: 6px; }
       #tipsApp .auth-title { font-size: 17px; }
+      .tips-slide { gap: 10px; padding: 2px 0; }
+      .tips-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; text-align: center; width: 100%; }
       .tips-steps { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
       .tips-steps .step-card { margin-bottom: 0; }
       .story-bars { display: flex; gap: 4px; width: 100%; flex-shrink: 0; }
@@ -430,11 +432,11 @@
       .story-viewport { position: relative; width: 100%; overflow: hidden; border-radius: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; flex-shrink: 0; transition: height 0.3s cubic-bezier(.22,1,.36,1); }
       .story-track { display: flex; width: 100%; transition: transform .32s cubic-bezier(.4,0,.2,1); will-change: transform; align-items: flex-start; }
       .story-slide { flex: 0 0 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; text-align: center; }
-      .story-slide.text-slide { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 14px 14px; gap: 8px; justify-content: flex-start; min-height: 0; max-height: none; overflow-y: visible; }
+      .story-slide.text-slide { padding: 2px 0; gap: 10px; justify-content: flex-start; min-height: 0; max-height: none; overflow-y: visible; }
       .story-num { background: #3b82f6; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 750; box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
       .story-slide-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; }
-      .story-slide-text { font-size: 13px; color: var(--text); line-height: 1.5; text-align: left; width: 100%; }
-      .story-slide-text p { margin: 0 0 6px 0; }
+      .story-slide-text { font-size: 13px; color: var(--text); line-height: 1.5; text-align: left; width: 100%; background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 14px; }
+      .story-slide-text p { margin: 0 0 1.5em 0; }
       .story-slide-text p:last-child { margin-bottom: 0; }
       .story-slide-text b { color: #60a5fa; }
       .story-img-wrap { width: 100%; height: clamp(130px, calc(100dvh - 320px), 480px); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; overflow: hidden; position: relative; background: linear-gradient(100deg, rgba(30,41,59,0.6) 30%, rgba(71,85,105,0.5) 50%, rgba(30,41,59,0.6) 70%); background-size: 200% 100%; animation: storyShimmer 1.3s linear infinite; }
@@ -473,11 +475,12 @@
       .zoom-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; }
       .zoom-hint { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); pointer-events: none; }
       @media (max-height: 640px) {
-          .story-slide.text-slide { padding: 10px 10px; gap: 6px; }
+          .story-slide.text-slide { padding: 2px 0; gap: 6px; }
+          .story-slide-text { padding: 10px; }
           .story-slide-text { font-size: 11.5px; line-height: 1.35; }
-          .story-slide-text p { margin-bottom: 4px; }
+          .story-slide-text p { margin-bottom: 1.35em; }
           .story-slide-title { font-size: 14px; }
-          .story-num { display: none; }
+          .story-num { width: 26px; height: 26px; font-size: 13px; }
           .story-caption { font-size: 11.5px; }
       }
       .order-num-pill { display: inline-flex; align-items: center; gap: 6px; align-self: center; padding: 7px 14px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: var(--muted); font-size: 12.5px; font-weight: 600; user-select: text; -webkit-user-select: text; }
@@ -959,17 +962,17 @@
         <div class="story-bars" id="tipsBars"></div>
         <div class="story-viewport" id="tipsViewport">
             <div class="story-track" id="tipsTrack">
-                <div class="story-slide text-slide">
+                <div class="story-slide tips-slide">
                     <div class="story-num">1</div>
-                    <div class="story-slide-title">Отключите сгружение</div>
+                    <div class="tips-title">Отключите сгружение</div>
                     <div class="tips-steps">
                         <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
                         <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
                     </div>
                 </div>
-                <div class="story-slide text-slide">
+                <div class="story-slide tips-slide">
                     <div class="story-num">2</div>
-                    <div class="story-slide-title">Защита от удаления</div>
+                    <div class="tips-title">Защита от удаления</div>
                     <div class="tips-steps">
                         <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
                         <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
