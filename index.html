@@ -386,7 +386,8 @@
       .cat-item.active .cat-check { opacity: 1; }
       .cat-item.active .sf-icon { color: #60a5fa; }
       .menu-modal { position: fixed; inset: 0; background: rgba(5,7,12,0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
-      .menu-modal.active { display: flex; }
+      .menu-modal.active { display: flex; animation:menuFade .2s ease both; }
+      @keyframes menuFade { from{opacity:0} to{opacity:1} }
       .menu-sheet { width: 100%; max-width: 430px; background: var(--card-bg); backdrop-filter: blur(40px) saturate(170%); -webkit-backdrop-filter: blur(40px) saturate(170%); border: var(--card-border); border-bottom: none; border-radius: 28px 28px 0 0; padding: 20px 18px max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-height: 88dvh; overflow-y: auto; }
       .menu-sheet::-webkit-scrollbar { width: 4px; }
       .menu-sheet::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
@@ -549,6 +550,87 @@
         #singleTokenAppContainer .app-grid-card {
     min-height: 90px;
 }
+    
+      /* ===== AppRestore · Liquid Glass visual refresh ===== */
+      :root {
+          --bg: #070a10; --text: #f7f9fc; --muted: #9aa8bb;
+          --card-bg: rgba(17, 24, 39, .58);
+          --card-border: 1px solid rgba(255,255,255,.105);
+          --box-shadow: 0 14px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.035);
+          --input-bg: rgba(15,23,42,.68);
+          --btn-install-bg: rgba(59,130,246,.13); --btn-install-border: rgba(96,165,250,.35);
+          --btn-install-color: #b9d8ff; --nav-bg: rgba(7,10,16,.72);
+      }
+      body { background-color: #070a10; }
+      .aurora-bg { background-image: radial-gradient(ellipse at 50% 10%, rgba(37,99,235,.16), transparent 42%), linear-gradient(180deg, rgba(5,8,14,.46), rgba(5,8,14,.78)), url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png"); }
+      .top-navbar, .cart-fab-btn { background: rgba(10,15,25,.72); border-color: rgba(255,255,255,.13); box-shadow: 0 16px 42px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.09); }
+      .top-navbar { border-radius: 20px; }
+      .nav-logo { box-shadow: 0 0 0 1px rgba(96,165,250,.16), 0 5px 16px rgba(0,0,0,.4); }
+      .hero-section { position: relative; isolation: isolate; }
+      .hero-section::before { content:""; position:absolute; z-index:-1; width:240px; height:110px; left:50%; top:-25px; transform:translateX(-50%); background:radial-gradient(ellipse,rgba(37,99,235,.22),transparent 70%); filter:blur(12px); pointer-events:none; }
+      .hero-title { letter-spacing:-.75px; font-size:clamp(24px,6vw,28px); line-height:1.18; }
+      .hero-desc-box, .hero-link, .info-box, .apps-info, .catalog-header, .auth-box, .step-card, .story-slide-text, .legal-section-card { background:rgba(13,20,32,.68); border-color:rgba(255,255,255,.095); box-shadow:0 12px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035); }
+      .info-grid { gap:12px; }
+      .info-box { border-radius:20px; padding:15px 12px; }
+      .info-box-num { color:#dbeafe; text-shadow:0 0 18px rgba(59,130,246,.18); }
+      .wf-cards { column-gap:12px; row-gap:14px; grid-template-rows:repeat(2,minmax(92px,108px)); }
+      .wf-card { border:1px solid rgba(255,255,255,.095); background:linear-gradient(145deg,rgba(17,25,40,.9),rgba(8,13,22,.88)); box-shadow:0 12px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.055); }
+      .wf-ico, .wf-ico.c1, .wf-ico.c2, .wf-ico.c3, .wf-ico.c4, .wf-ico.c5, .wf-ico.c6 { background:rgba(59,130,246,.16); color:#93c5fd; box-shadow:inset 0 0 0 1px rgba(96,165,250,.2); }
+      .wf-num { color:#f8fbff; }
+      .icon-ticker { margin-top:2px; }
+      .ticker-item { border-color:rgba(255,255,255,.13); box-shadow:0 7px 20px rgba(0,0,0,.34),0 0 14px rgba(59,130,246,.08); }
+      .apps-info { border-radius:17px; }
+      .app-search { height:46px; border-radius:16px; background:rgba(12,19,31,.82); border:1px solid rgba(255,255,255,.12); box-shadow:inset 0 1px 0 rgba(255,255,255,.035); transition:border-color .2s,box-shadow .2s; }
+      .app-search:focus { border-color:rgba(96,165,250,.58); box-shadow:0 0 0 3px rgba(59,130,246,.11); }
+      .app-search::placeholder { color:#8290a4; }
+      .quick-categories { display:flex; gap:7px; width:100%; overflow-x:auto; padding:0 1px 11px; margin-top:-2px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+      .quick-categories::-webkit-scrollbar { display:none; }
+      .quick-category { flex:0 0 auto; padding:8px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.105); background:rgba(16,24,38,.72); color:#aab7c9; font:600 12px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif; transition:all .2s var(--spring); }
+      .quick-category.active { color:#eaf3ff; background:rgba(37,99,235,.22); border-color:rgba(96,165,250,.42); box-shadow:0 4px 14px rgba(37,99,235,.12); }
+      .quick-category:active { transform:scale(.96); }
+      .apps-grid-container { gap:11px; }
+      .app-grid-card { border:1px solid rgba(255,255,255,.095); border-radius:20px; padding:13px 11px; background:linear-gradient(150deg,rgba(19,28,43,.82),rgba(10,16,27,.78)); box-shadow:0 10px 25px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.035); transition:transform .22s var(--spring),border-color .22s,box-shadow .22s; }
+      .app-grid-card:active { transform:scale(.975); border-color:rgba(96,165,250,.28); }
+      .app-grid-icon { width:48px; height:48px; border-radius:14px; border-color:rgba(255,255,255,.12); box-shadow:0 5px 14px rgba(0,0,0,.32); }
+      .app-cart-btn { width:38px; height:38px; border-radius:13px; background:rgba(59,130,246,.13); border-color:rgba(96,165,250,.28); }
+      .app-cart-btn.in-cart { background:rgba(59,130,246,.2); border-color:rgba(96,165,250,.5); color:#bfdbfe; }
+      .app-new-badge { background:rgba(37,99,235,.92); border:1px solid rgba(191,219,254,.3); box-shadow:0 4px 12px rgba(37,99,235,.25); font-size:9px; letter-spacing:.35px; }
+      .app-price-tag, .app-price-tag.premium { color:#c7e0ff; background:rgba(59,130,246,.12); border-color:rgba(96,165,250,.25); }
+      .catalog-header { border-radius:16px; }
+      .cat-menu { background:rgba(10,16,27,.97); border-color:rgba(255,255,255,.13); }
+      .menu-sheet { background:rgba(10,16,27,.94); border-color:rgba(255,255,255,.12); }
+      .menu-item { background:rgba(255,255,255,.035); border-color:rgba(255,255,255,.075); }
+      .menu-icon-wrap { background:rgba(59,130,246,.14); color:#9cc8ff; }
+      .btn { min-height:50px; border-radius:17px; font-weight:700; letter-spacing:-.1px; }
+      .btn-primary { background:linear-gradient(180deg,#3985f6,#1760d4); border:1px solid rgba(191,219,254,.24); box-shadow:0 9px 24px rgba(37,99,235,.25),inset 0 1px 0 rgba(255,255,255,.2); }
+      .btn-secondary { background:rgba(255,255,255,.055); border-color:rgba(255,255,255,.11); }
+      .cart-fab-btn { min-height:68px; border-radius:23px; }
+      .cart-bar-action { background:linear-gradient(180deg,#3985f6,#1760d4); box-shadow:0 7px 18px rgba(37,99,235,.28),inset 0 1px 0 rgba(255,255,255,.2); }
+      .cart-summary-card { background:rgba(12,20,33,.82); border-color:rgba(96,165,250,.24); }
+      #orderWaitApp .auth-box, #orderApprovedApp .auth-box, #orderRejectedApp .auth-box { border:1px solid rgba(255,255,255,.1); background:rgba(12,19,31,.82); box-shadow:0 18px 46px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04); }
+      #paymentApp .requisites-card { background:rgba(12,20,34,.88); border:1px solid rgba(96,165,250,.22); border-radius:20px; box-shadow:0 14px 34px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045); padding:16px; }
+      #paymentApp .req-row { padding:11px 0; border-bottom:1px solid rgba(255,255,255,.065); }
+      #paymentApp .req-row:last-child { border-bottom:0; }
+      #paymentApp #paymentOrderNum { color:#dbeafe !important; font-size:17px; font-weight:800; }
+      #paymentApp #paymentTotalAmount { color:#dbeafe !important; font-size:23px !important; font-weight:850; letter-spacing:-.4px; text-shadow:0 0 20px rgba(59,130,246,.2); }
+      #paymentApp #btnConfirmPaid { background:linear-gradient(180deg,#3985f6,#1760d4); box-shadow:0 10px 24px rgba(37,99,235,.25),inset 0 1px 0 rgba(255,255,255,.18); }
+      #orderWaitApp .wait-spinner { width:48px; height:48px; border-width:3px; border-top-color:#93c5fd; }
+      #orderWaitApp .auth-title { letter-spacing:-.35px; }
+      #orderApprovedApp .auth-title { color:#dbeafe !important; }
+      #orderRejectedApp .auth-title { color:#f3f4f6 !important; }
+      .guide-catalog-back { border-color:rgba(255,255,255,.13) !important; background:rgba(255,255,255,.055) !important; }
+      .cart-item-row { background:rgba(17,26,41,.78); border-color:rgba(255,255,255,.08); }
+      .story-bar { height:3px; }
+      .story-bar.done, .story-bar.active { background:#60a5fa; }
+      .story-num, .step-icon { background:linear-gradient(180deg,#3985f6,#1760d4); box-shadow:0 4px 12px rgba(37,99,235,.22); }
+      .story-arrow { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.13); color:#dbeafe; }
+      .app-toast { position:fixed; z-index:1500; left:50%; bottom:calc(max(94px,env(safe-area-inset-bottom) + 82px)); transform:translate(-50%,12px); opacity:0; pointer-events:none; max-width:calc(100% - 36px); padding:11px 16px; border-radius:14px; color:#f8fbff; background:rgba(15,23,38,.94); border:1px solid rgba(255,255,255,.13); box-shadow:0 12px 32px rgba(0,0,0,.42); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); font-size:13px; font-weight:650; text-align:center; transition:opacity .22s,transform .22s var(--spring); }
+      .app-toast.visible { opacity:1; transform:translate(-50%,0); }
+      @keyframes cartPop { 0%{transform:scale(1)} 45%{transform:scale(1.025)} 100%{transform:scale(1)} }
+      .app-grid-card.cart-pop { animation:cartPop .28s var(--spring); }
+      .app-grid-card img { background:linear-gradient(110deg,rgba(255,255,255,.035) 8%,rgba(255,255,255,.09) 18%,rgba(255,255,255,.035) 33%); background-size:200% 100%; }
+      @media (max-width:360px) { .quick-category { padding:8px 11px; font-size:11.5px; } .app-grid-icon { width:44px; height:44px; } .app-grid-card { padding:11px 9px; } }
+      @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; transition-duration:.01ms !important; } }
     </style>
     <script>
         if ("fonts" in document) {
@@ -674,9 +756,18 @@
             <button type="button" class="cat-item" data-cat="other" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span><span class="cat-name">Другие</span><span class="cat-check">&#10003;</span></button>
         </div>
     </div>
+    <div class="quick-categories" id="quickCategories" aria-label="Быстрые категории">
+        <button type="button" class="quick-category active" data-cat="all" onclick="setCategory('all', this)">Все</button>
+        <button type="button" class="quick-category" data-cat="banks" onclick="setCategory('banks', this)">Банки</button>
+        <button type="button" class="quick-category" data-cat="social" onclick="setCategory('social', this)">Соцсети</button>
+        <button type="button" class="quick-category" data-cat="investments" onclick="setCategory('investments', this)">Инвестиции</button>
+        <button type="button" class="quick-category" data-cat="other" onclick="setCategory('other', this)">Другие</button>
+    </div>
     <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
 </div>
+
+<div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
 
 <div class="cart-fab-wrap">
     <button type="button" class="cart-fab-btn" id="cartFabBtn" onclick="openCartScreen()" aria-label="Открыть корзину">
@@ -1551,12 +1642,26 @@ function generateAppsGrid() {
     filterApps();
 }
 
+function showAppToast(message) {
+    const toast = document.getElementById("appToast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("visible");
+    clearTimeout(window.__appToastTimer);
+    window.__appToastTimer = setTimeout(() => toast.classList.remove("visible"), 1900);
+}
+
 function toggleCart(key) {
     if (!isAppVisible(key)) return;
-    if (cartItems.has(key)) cartItems.delete(key);
+    const wasInCart = cartItems.has(key);
+    if (wasInCart) cartItems.delete(key);
     else cartItems.add(key);
     saveCart();
     updateCartUI();
+    const app = appsData.find(item => item.key === key);
+    showAppToast(wasInCart ? "Удалено из корзины" : `${app ? app.name : "Приложение"} добавлено в корзину`);
+    const card = document.getElementById("appCard_" + key);
+    if (card) { card.classList.remove("cart-pop"); void card.offsetWidth; card.classList.add("cart-pop"); }
 }
 
 function removeFromCart(key) {
@@ -2552,7 +2657,7 @@ function installFromToken(key, appUrl) {
 
 function setCategory(cat, btn) {
     currentCategory = cat;
-    document.querySelectorAll(".cat-item").forEach(o => o.classList.toggle("active", o.dataset.cat === cat));
+    document.querySelectorAll(".cat-item, .quick-category").forEach(o => o.classList.toggle("active", o.dataset.cat === cat));
     document.getElementById("filterBtn")?.classList.toggle("has-filter", cat !== "all");
     closeCatMenu();
     filterApps();
