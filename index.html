@@ -549,7 +549,221 @@
         #singleTokenAppContainer .app-grid-card {
     min-height: 90px;
 }
-    </style>
+    
+
+/* ==========================================================
+   APPRESTORE IOS 2.0 — premium dark / liquid-glass redesign
+   Visual-only layer: original IDs, data and event handlers kept.
+   ========================================================== */
+:root {
+  --bg: #05070c;
+  --text: #f5f7fb;
+  --muted: #8e99aa;
+  --card-bg: rgba(17, 23, 34, .76);
+  --card-border: 1px solid rgba(255,255,255,.085);
+  --box-shadow: 0 18px 48px rgba(0,0,0,.34);
+  --input-bg: rgba(255,255,255,.045);
+  --btn-install-bg: rgba(73,151,255,.14);
+  --btn-install-border: rgba(86,165,255,.38);
+  --btn-install-color: #a9d2ff;
+  --nav-bg: rgba(9,13,21,.78);
+}
+html { background: #05070c; }
+body {
+  background: radial-gradient(ellipse at 50% -18%, rgba(45,94,158,.23), transparent 48%),
+              radial-gradient(ellipse at 100% 42%, rgba(41,65,105,.10), transparent 38%), #05070c;
+  letter-spacing: -.015em;
+  padding-top: calc(max(14px, env(safe-area-inset-top)) + 76px);
+}
+.aurora-bg {
+  opacity: .18;
+  filter: saturate(.55) brightness(.48);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.6) 42%, transparent 100%);
+}
+.top-navbar {
+  width: min(calc(100% - 28px), 440px);
+  padding: 9px 11px 9px 13px;
+  border-radius: 21px;
+  background: rgba(13,18,28,.76);
+  border: 1px solid rgba(255,255,255,.11);
+  box-shadow: 0 12px 38px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.075);
+  backdrop-filter: blur(34px) saturate(155%);
+  -webkit-backdrop-filter: blur(34px) saturate(155%);
+}
+.nav-logo { border-radius: 13px; border-color: rgba(255,255,255,.12); }
+.nav-title { letter-spacing: -.55px; }
+.back-btn, .burger-btn, .cart-back-btn, .story-arrow {
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055);
+}
+.container { width: min(calc(100% - 28px), 440px); }
+#welcomeApp { gap: 0; }
+.hero-section {
+  text-align: left;
+  align-items: flex-start;
+  padding: 27px 5px 18px;
+  gap: 13px;
+}
+.hero-kicker, .catalog-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #91a6c2; font-size: 9px; font-weight: 800;
+  letter-spacing: .17em; text-transform: uppercase;
+}
+.hero-kicker-dot { width: 6px; height: 6px; border-radius: 50%; background: #65b5ff; box-shadow: 0 0 12px rgba(101,181,255,.8); }
+.hero-title {
+  max-width: 390px; text-align: left;
+  font-size: clamp(35px, 9.5vw, 47px) !important;
+  line-height: 1.03 !important; letter-spacing: -.065em !important;
+  font-weight: 780 !important;
+}
+.hero-title span, .catalog-heading span {
+  background: linear-gradient(105deg,#f7fbff 8%,#a9cfff 52%,#6caeff 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-subtitle {
+  max-width: 340px; color: #9ba8ba; font-size: 13px;
+  line-height: 1.55; letter-spacing: -.01em;
+}
+.icon-ticker { margin: 8px 0 19px; opacity: .82; }
+.welcome-cta, .btn-primary {
+  min-height: 54px; border-radius: 17px !important;
+  background: linear-gradient(135deg,#67b7ff,#347ee9) !important;
+  border: 1px solid rgba(190,224,255,.30) !important;
+  color: #fff !important; font-weight: 760 !important;
+  letter-spacing: -.02em; box-shadow: 0 10px 28px rgba(36,117,225,.28), inset 0 1px 0 rgba(255,255,255,.28) !important;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), filter .2s ease;
+}
+.welcome-cta:active, .btn:active, .app-cart-btn:active { transform: scale(.975); filter: brightness(1.08); }
+.wf-cards { gap: 10px !important; margin-top: 19px !important; }
+.wf-card {
+  background: linear-gradient(145deg,rgba(22,30,44,.88),rgba(11,16,25,.88)) !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  border-radius: 19px !important; padding: 15px !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+.wf-num { letter-spacing: -.055em !important; }
+.wl-bar {
+  margin-top: 15px !important; padding: 7px !important;
+  background: rgba(17,23,34,.78) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 19px !important; backdrop-filter: blur(22px);
+}
+.wl-item { border-radius: 14px !important; padding: 10px 8px !important; }
+#mainApp { padding-top: 5px; }
+.catalog-intro { padding: 16px 5px 18px; }
+.catalog-heading {
+  margin-top: 10px; font-size: 35px; line-height: 1.02;
+  font-weight: 790; letter-spacing: -.065em;
+}
+.catalog-caption { margin-top: 8px; color: #8f9bad; font-size: 12px; }
+.bulk-banner {
+  border-radius: 18px !important; padding: 13px 15px !important;
+  background: linear-gradient(110deg,rgba(30,65,105,.40),rgba(17,27,43,.76)) !important;
+  border: 1px solid rgba(105,174,255,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.apps-info {
+  margin: 13px 0 10px !important; padding: 12px 14px !important;
+  border-radius: 16px !important; background: rgba(18,24,35,.66) !important;
+  border: 1px solid rgba(255,255,255,.065) !important;
+}
+.apps-info-title { font-size: 12px !important; color: #aab5c5 !important; }
+.apps-info-num { font-size: 18px !important; letter-spacing: -.04em; }
+.app-search-wrap {
+  background: rgba(17,24,36,.86) !important;
+  border: 1px solid rgba(255,255,255,.095) !important;
+  border-radius: 17px !important; padding: 5px 7px 5px 13px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+.app-search { color: #f5f7fb !important; font-size: 14px !important; }
+.app-search::placeholder { color: #718096 !important; }
+.app-search:focus, input:focus, textarea:focus, select:focus {
+  outline: none !important; border-color: rgba(94,169,255,.58) !important;
+  box-shadow: 0 0 0 3px rgba(61,145,255,.11) !important;
+}
+.filter-btn, .search-clear { border-radius: 12px !important; }
+.cat-menu {
+  background: rgba(13,19,29,.97) !important; border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 17px !important; box-shadow: 0 20px 50px rgba(0,0,0,.55) !important;
+  backdrop-filter: blur(28px);
+}
+.cat-item { border-radius: 12px !important; }
+.cat-item.active { background: rgba(63,139,232,.17) !important; color: #a9d2ff !important; }
+.apps-grid-container { gap: 11px !important; padding-top: 12px; }
+.app-grid-card {
+  min-height: 146px !important; padding: 13px 12px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(150deg,rgba(23,31,45,.91),rgba(12,17,26,.92)) !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.19), inset 0 1px 0 rgba(255,255,255,.045) !important;
+  transition: transform .22s ease, border-color .22s ease, background .22s ease !important;
+}
+.app-grid-card:active { transform: scale(.985); }
+.app-grid-icon { border-radius: 15px !important; box-shadow: 0 5px 14px rgba(0,0,0,.25); }
+.app-grid-name { font-size: 12.5px !important; font-weight: 760 !important; letter-spacing: -.025em; }
+.app-grid-subname { color: #a1aec0 !important; }
+.app-grid-version { color: #738198 !important; font-size: 9.5px !important; }
+.app-price-tag { font-size: 12px !important; font-weight: 750 !important; }
+.new-price-bold { color: #f2f6fc !important; }
+.app-cart-btn {
+  width: 35px !important; height: 35px !important; min-width: 35px !important;
+  border-radius: 12px !important; background: rgba(75,151,245,.14) !important;
+  border: 1px solid rgba(97,171,255,.25) !important; color: #a9d2ff !important;
+}
+.app-cart-btn.in-cart { background: linear-gradient(135deg,#5aaeff,#347ee9) !important; color: white !important; }
+.app-new-badge { border-radius: 8px !important; font-size: 8px !important; }
+.cart-fab-btn {
+  border-radius: 19px !important; padding: 12px 15px !important;
+  background: rgba(19,29,44,.91) !important;
+  border: 1px solid rgba(113,176,255,.28) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.09) !important;
+  backdrop-filter: blur(28px) saturate(160%) !important;
+}
+.cart-bar-action { background: linear-gradient(135deg,#67b7ff,#347ee9) !important; border-radius: 13px !important; }
+.auth-box, .menu-sheet, .requisites-card, .cart-summary-card, .info-card, .order-card, .legal-scroll-area {
+  background: linear-gradient(150deg,rgba(20,28,41,.94),rgba(10,15,23,.96)) !important;
+  border: 1px solid rgba(255,255,255,.085) !important;
+  border-radius: 23px !important;
+  box-shadow: 0 20px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+.auth-box { padding: 25px 19px !important; }
+.auth-title { font-size: 22px !important; letter-spacing: -.045em !important; font-weight: 780 !important; }
+.auth-description { color: #98a5b7 !important; line-height: 1.55 !important; }
+.btn { min-height: 49px; border-radius: 15px !important; font-weight: 720 !important; letter-spacing: -.015em; }
+.btn-secondary, .btn-danger-soft, .btn-telegram, .req-copy-btn, .cart-toggle-btn, .promo-toggle-link {
+  border-radius: 14px !important; border: 1px solid rgba(255,255,255,.09) !important;
+  background: rgba(255,255,255,.045) !important; color: #dce5f1 !important;
+}
+input, textarea, select, .form-control {
+  background: rgba(255,255,255,.045) !important; color: #f5f7fb !important;
+  border: 1px solid rgba(255,255,255,.09) !important; border-radius: 14px !important;
+}
+input::placeholder, textarea::placeholder { color: #718096 !important; }
+.cart-items-list > *, .cart-item, .req-row, .menu-item, .step-card, .tip-card {
+  border-color: rgba(255,255,255,.075) !important;
+}
+.menu-modal { background: rgba(0,0,0,.62) !important; backdrop-filter: blur(9px); }
+.menu-sheet { border-radius: 25px 25px 0 0 !important; }
+.menu-item { border-radius: 14px !important; background: rgba(255,255,255,.025) !important; }
+.story-arrow, .guide-catalog-back { border-radius: 14px !important; }
+.wait-spinner { border-color: rgba(255,255,255,.12) !important; border-top-color: #65b5ff !important; }
+/* Reduce motion for visitors who request it at OS level. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+@media (min-width: 520px) {
+  .container { max-width: 440px; }
+  .app-grid-card { min-height: 150px !important; }
+}
+@media (max-width: 360px) {
+  .hero-title { font-size: 34px !important; }
+  .catalog-heading { font-size: 31px; }
+  .app-grid-card { padding: 11px 9px !important; }
+}
+
+</style>
     <script>
         if ("fonts" in document) {
             document.fonts.load('1em "SFSymbols"').then(function() {
@@ -619,7 +833,9 @@
 
 <div class="container" id="welcomeApp">
     <div class="hero-section">
-        <div class="hero-title">Приложения для <span>iPhone</span> быстро и понятно</div>
+        <div class="hero-kicker"><span class="hero-kicker-dot"></span> APPRESTORE IOS · КАТАЛОГ ПРИЛОЖЕНИЙ</div>
+        <div class="hero-title">Ваши приложения.<br><span>Снова доступны.</span></div>
+        <div class="hero-subtitle">Подборка приложений для iPhone. Выберите нужное, оформите заказ и следуйте простой инструкции по установке.</div>
     </div>
     <div class="icon-ticker" aria-hidden="true">
         <div class="ticker-row"><div class="ticker-track" id="tickerTrack1"></div></div>
@@ -642,6 +858,11 @@
 </div>
 
 <div class="container" id="mainApp">
+    <div class="catalog-intro">
+        <div class="catalog-eyebrow">APPRESTORE IOS STORE</div>
+        <div class="catalog-heading">Найдите своё<br><span>приложение.</span></div>
+        <div class="catalog-caption">Каталог приложений для вашего iPhone</div>
+    </div>
     <div class="bulk-banner" id="bulkBanner">
         <div class="bulk-banner-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
