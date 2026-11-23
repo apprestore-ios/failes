@@ -452,17 +452,7 @@
       .story-arrow:active { transform: scale(0.9); }
       .story-arrow:disabled { opacity: 0.28; cursor: default; }
       .story-arrow svg { width: 16px; height: 16px; }
-      .guide-catalog-back {
-          width: 100%; min-height: 44px; margin-top: 18px; padding: 9px 14px;
-          display: flex; align-items: center; justify-content: center; gap: 9px;
-          border-radius: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8);
-          border: 1px solid rgba(96,165,250,0.35); color: #fff;
-          font-family: inherit; font-size: 13px; font-weight: 700;
-          box-shadow: 0 8px 20px rgba(37,99,235,0.3);
-          cursor: pointer; transition: transform .15s ease, background .2s ease;
-      }
-      .guide-catalog-back:active { transform: scale(.97); background: linear-gradient(135deg, #1d4ed8, #1e40af); }
-      .guide-catalog-back .sf-icon { font-size: 19px; color: #fff; }
+      .guide-catalog-back { gap: 0; }
       @media (max-height: 640px) {
           .story-slide.text-slide { padding: 2px 0; gap: 6px; }
           .story-slide-text { padding: 10px; }
@@ -933,10 +923,7 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="guide-catalog-back" onclick="goBackFromInfo(false)">
-            <span class="sf-icon">&#xECAC;</span>
-            <span>Назад</span>
-        </button>
+        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
     </div>
 </div>
 
@@ -972,10 +959,7 @@
             <div class="story-counter" id="tipsCounter"></div>
             <button type="button" class="story-arrow" id="tipsArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="guide-catalog-back" onclick="goBackFromInfo(false)">
-            <span class="sf-icon">&#xECAC;</span>
-            <span>Назад</span>
-        </button>
+        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
     </div>
 </div>
 
