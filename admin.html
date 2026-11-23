@@ -1075,12 +1075,193 @@
             else { showToast("Промокод удален"); loadPromoCodesList(); }
         }
 
+        /* ----- УМНЫЙ ПОИСК ПРИЛОЖЕНИЙ (как в каталоге) ----- */
+const SEARCH_ALIASES = [
+    ["т-банк", "тбанк", "тинькофф", "тинькоф", "тиньков", "tbank", "tinkoff", "tinkov", "t-bank", "тинек"],
+    ["сбер", "sber", "сбербанк", "sberbank", "сберонлайн", "sbol", "сбол", "|", "зеленый"],
+    ["втб", "vtb", "|", "внешторг"],
+    ["альфа", "alfa", "alpha", "альфабанк", "alfabank"],
+    ["газпром", "gazprom", "гпб", "gpb"],
+    ["совком", "sovcom", "sovkom", "sovkombank", "халва", "halva"],
+    ["вконтакте", "vk", "вк", "vkontakte", "|", "контакт", "соцсеть"],
+    ["одноклассники", "ok", "ок", "odnoklassniki", "|", "соцсеть"],
+    ["мтс", "mts", "эмтеэс"],
+    ["яндекс", "yandex", "яндекспэй", "yandexpay", "яндекспей"],
+    ["авито", "avito"],
+    ["почта", "mail", "майл", "мэйл", "мейл", "mailru", "облако", "oblako", "|", "cloud"],
+    ["лента", "lenta"],
+    ["купер", "kuper", "|", "доставка", "продукты"],
+    ["юла", "yula", "youla", "yla"],
+    ["2гис", "2gis", "дубльгис", "двагис", "|", "карты", "навигатор", "maps"],
+    ["точка", "tochka", "tochkabank"],
+    ["рокет", "rocket", "рокетбанк", "rocketbank", "блум", "blum"],
+    ["рсхб", "rshb", "россельхоз", "россельхозбанк"],
+    ["псб", "psb", "промсвязь", "промсвязьбанк"],
+    ["убрир", "ubrir"],
+    ["акбарс", "akbars", "барс"],
+    ["новиком", "novikom", "новикомбанк"],
+    ["домрф", "domrf", "дом.рф"],
+    ["мойдом", "moidom", "домру", "domru", "дом.ру", "|", "интернет"],
+    ["лукойл", "lukoil", "|", "азс", "заправка"],
+    ["газпромнефть", "gazpromneft", "гпн", "|", "азс", "заправка"],
+    ["йота", "yota"],
+    ["мобайл", "mobile", "mobail", "|", "сотовая", "связь", "оператор"],
+    ["сбермобайл", "sbermobile", "мобио", "mobio"],
+    ["чатгпт", "chatgpt", "gpt", "гпт", "openai", "|", "нейросеть", "ии", "ai"],
+    ["gemini", "гемини", "джемини", "google", "гугл", "|", "нейросеть", "ии", "ai"],
+    ["happ", "хапп", "хэпп", "|", "vpn", "впн", "прокси", "proxy"],
+    ["окко", "okko", "|", "кино", "фильмы", "сериалы"],
+    ["мовикс", "movix", "|", "кино", "кинотеатр"],
+    ["rutube", "рутуб", "рутьюб", "|", "видео", "video"],
+    ["алроса", "alrosa"],
+    ["инвестиции", "invest", "инвест", "|", "брокер", "биржа", "акции"],
+    ["банк", "bank", "|", "карты", "финансы"],
+    ["сбпэй", "sbpay", "сбпей", "|", "оплата", "pay"],
+    ["клипы", "clips", "клипс", "|", "reels", "shorts"],
+    ["музыка", "music", "|", "муз", "песни"],
+    ["мессенджер", "messenger", "massanger", "|", "чат", "общение"],
+    ["оригинал", "original", "|", "ориг"]
+];
+
+const LAYOUT_EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+const LAYOUT_RU = "йцукенгшщзхъфывапролджэячсмитьбюё";
+
+function searchNorm(str) {
+    return String(str || "").toLowerCase().replace(/ё/g, "е").replace(/й/g, "и");
+}
+function searchCompact(str) {
+    return searchNorm(str).replace(/[^a-zа-я0-9]+/g, "");
+}
+function searchTokens(str) {
+    return searchNorm(str).split(/[^a-zа-я0-9]+/).filter(Boolean);
+}
+function swapLayout(str) {
+    const low = String(str || "").toLowerCase();
+    const hasLat = /[a-z]/.test(low), hasCyr = /[а-яё]/.test(low);
+    if (hasLat === hasCyr) return "";
+    let out = "";
+    for (const ch of low) {
+        const idx = hasLat ? LAYOUT_EN.indexOf(ch) : LAYOUT_RU.indexOf(ch);
+        out += idx >= 0 ? (hasLat ? LAYOUT_RU[idx] : LAYOUT_EN[idx]) : ch;
+    }
+    return out;
+}
+function editDistance(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, k) => k);
+    for (let i = 1; i <= a.length; i++) {
+        const cur = [i];
+        let rowMin = i;
+        for (let j = 1; j <= b.length; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+            if (cur[j] < rowMin) rowMin = cur[j];
+        }
+        if (rowMin > max) return max + 1;
+        prev = cur;
+    }
+    return prev[b.length];
+}
+
+// Индекс приложения в админке: название, ключ и версия iOS.
+function buildAdminSearchIndex(app) {
+    const nameText = `${app.name || ""} ${app.key || ""} ${(app.ios || "").replace(/iOS/gi, "")}`.replace(/_/g, " ");
+    const nameWords = Array.from(new Set(searchTokens(nameText)));
+    const nameCompact = searchCompact(nameText);
+    const aliasSet = new Set();
+    SEARCH_ALIASES.forEach(group => {
+        const sep = group.indexOf("|");
+        const brand = sep === -1 ? group : group.slice(0, sep);
+        const hit = brand.some(term => {
+            const t = searchCompact(term);
+            if (!t) return false;
+            if (t.length <= 3) return nameWords.includes(t);
+            return nameWords.some(w => w.startsWith(t)) || nameCompact.startsWith(t);
+        });
+        if (hit) group.forEach(term => {
+            if (term === "|") return;
+            const c = searchCompact(term);
+            if (c) aliasSet.add(c);
+            searchTokens(term).forEach(w => aliasSet.add(w));
+        });
+    });
+    nameWords.forEach(w => aliasSet.delete(w));
+    return { nameWords, aliasWords: Array.from(aliasSet), nameCompact };
+}
+
+// Оценка совпадения одного слова запроса: 0 — нет совпадения, больше — лучше
+function scoreToken(tok, idx) {
+    if (!tok) return 0;
+    // однобуквенные слова ("т" в "т-банк") — только как отдельное слово
+    if (tok.length === 1) return idx.nameWords.includes(tok) ? 3 : 0;
+    // 1) начало слова в названии — лучшее совпадение
+    if (idx.nameWords.some(w => w === tok)) return 5;
+    if (idx.nameWords.some(w => w.startsWith(tok))) return 4;
+    // 2) начало слова-синонима ("тин" → тинькофф)
+    if (idx.aliasWords.some(w => w === tok)) return 4;
+    if (idx.aliasWords.some(w => w.startsWith(tok))) return 3;
+    // 3) середина составного слова ("банк" в "Сбербанк") — только от 4 букв
+    if (tok.length >= 4 && idx.nameWords.some(w => w.includes(tok))) return 2;
+    // 4) опечатки — только для слов от 5 букв, первая буква должна совпасть
+    if (tok.length >= 5) {
+        const max = tok.length >= 8 ? 2 : 1;
+        const all = idx.nameWords.concat(idx.aliasWords);
+        const typo = all.some(w => {
+            if (w.length < 4 || w[0] !== tok[0]) return false;
+            if (editDistance(tok, w, max) <= max) return true;
+            return w.length > tok.length && editDistance(tok, w.slice(0, tok.length), max) <= max;
+        });
+        if (typo) return 1;
+    }
+    return 0;
+}
+
+// Общая оценка карточки по запросу (0 — не подходит)
+function scoreCard(query, idx) {
+    const tokens = searchTokens(query);
+    if (tokens.length === 0) return 1;
+    let total = 0;
+    let ok = true;
+    for (const t of tokens) {
+        const sc = scoreToken(t, idx);
+        if (!sc) { ok = false; break; }
+        total += sc;
+    }
+    if (ok) return total / tokens.length;
+    // "т банк", "альфа-банк", "тбанк": склеенный запрос против начала слова или названия
+    const compactQ = searchCompact(query);
+    if (compactQ.length >= 2) {
+        if (idx.nameWords.some(w => w.startsWith(compactQ)) || idx.nameCompact.startsWith(compactQ)) return 4;
+        if (idx.aliasWords.some(w => w.startsWith(compactQ))) return 3;
+    }
+    return 0;
+}
+
+
+const adminSearchIndexCache = new WeakMap();
+function smartFilterAdminApps(query, source = appsData) {
+    const raw = String(query || "").trim();
+    if (!raw) return source.slice();
+    const indexed = source.map((app, order) => {
+        let idx = adminSearchIndexCache.get(app);
+        if (!idx) { idx = buildAdminSearchIndex(app); adminSearchIndexCache.set(app, idx); }
+        return { app, order, score: scoreCard(raw, idx) };
+    });
+    let matches = indexed.filter(x => x.score > 0);
+    if (!matches.length) {
+        const swapped = swapLayout(raw);
+        if (swapped) matches = indexed.map(x => ({ ...x, score: scoreCard(swapped, adminSearchIndexCache.get(x.app)) })).filter(x => x.score > 0);
+    }
+    return matches.sort((a, b) => b.score - a.score || a.order - b.order).map(x => x.app);
+}
+
+
         /* ----- ЛОГИКА АКЦИЙ И СКИДОК ----- */
         function renderPromoList() {
             const list = document.getElementById('list-promo');
             if (!list) return;
-            const query = (document.getElementById('promo-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+            const query = document.getElementById('promo-search')?.value || '';
+            list.innerHTML = smartFilterAdminApps(query).map(app => {
                 const isVisible = globalData.state.visibility[app.key] !== false;
                 const isChecked = selectedAppsForPromo.has(app.key);
                 const currentPrice = getAdminAppPrice(app.key);
@@ -1106,8 +1287,8 @@
         }
 
         function selectAllPromo() {
-            const query = (document.getElementById('promo-search')?.value || '').trim().toLowerCase();
-            const visibleApps = appsData.filter(app => globalData.state.visibility[app.key] !== false && app.name.toLowerCase().includes(query));
+            const query = document.getElementById('promo-search')?.value || '';
+            const visibleApps = smartFilterAdminApps(query).filter(app => globalData.state.visibility[app.key] !== false);
             const allSelected = visibleApps.length > 0 && visibleApps.every(app => selectedAppsForPromo.has(app.key));
             if (allSelected) visibleApps.forEach(app => selectedAppsForPromo.delete(app.key));
             else visibleApps.forEach(app => selectedAppsForPromo.add(app.key));
@@ -1217,8 +1398,8 @@
         /* ----- ЛОГИКА СОЗДАНИЯ ССЫЛОК ----- */
         function renderCreateLinkList() {
             const list = document.getElementById('list-create-link');
-            const query = (document.getElementById('create-link-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+            const query = document.getElementById('create-link-search')?.value || '';
+            list.innerHTML = smartFilterAdminApps(query).map(app => {
                 const isVisible = globalData.state.visibility[app.key] !== false;
                 const isChecked = selectedAppsForLink.has(app.key);
                 return `
@@ -1306,8 +1487,8 @@
         function renderPricesList() {
             const list = document.getElementById('list-prices');
             if (!list) return;
-            const query = (document.getElementById('prices-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+            const query = document.getElementById('prices-search')?.value || '';
+            list.innerHTML = smartFilterAdminApps(query).map(app => {
                 const price = getAdminAppPrice(app.key);
                 const isPrem = price >= 500;
                 return `
@@ -1354,8 +1535,8 @@
         function renderVisibilityList() {
             const list = document.getElementById('list-visibility');
             if (!list) return;
-            const query = (document.getElementById('vis-search')?.value || '').trim().toLowerCase();
-            list.innerHTML = appsData.filter(app => app.name.toLowerCase().includes(query)).map(app => {
+            const query = document.getElementById('vis-search')?.value || '';
+            list.innerHTML = smartFilterAdminApps(query).map(app => {
                 const isVis = globalData.state.visibility[app.key] !== false;
                 const isNew = Boolean(globalData.state.newApps && globalData.state.newApps[app.key]);
                 return `
