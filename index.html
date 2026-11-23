@@ -455,14 +455,14 @@
       .guide-catalog-back {
           width: 100%; min-height: 44px; margin-top: 18px; padding: 9px 14px;
           display: flex; align-items: center; justify-content: center; gap: 9px;
-          border-radius: 13px; background: rgba(126, 74, 190, 0.22);
-          border: 1px solid rgba(192, 132, 252, 0.68); color: #e9d5ff;
+          border-radius: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8);
+          border: 1px solid rgba(96,165,250,0.35); color: #fff;
           font-family: inherit; font-size: 13px; font-weight: 700;
-          box-shadow: 0 5px 18px rgba(147,51,234,0.25), 0 0 0 2px rgba(192,132,252,0.08), inset 0 1px 0 rgba(255,255,255,0.12);
+          box-shadow: 0 8px 20px rgba(37,99,235,0.3);
           cursor: pointer; transition: transform .15s ease, background .2s ease;
       }
-      .guide-catalog-back:active { transform: scale(.97); background: rgba(147, 51, 234, 0.34); }
-      .guide-catalog-back .sf-icon { font-size: 21px; color: #d8b4fe; }
+      .guide-catalog-back:active { transform: scale(.97); background: linear-gradient(135deg, #1d4ed8, #1e40af); }
+      .guide-catalog-back .sf-icon { font-size: 19px; color: #fff; }
       @media (max-height: 640px) {
           .story-slide.text-slide { padding: 2px 0; gap: 6px; }
           .story-slide-text { padding: 10px; }
@@ -858,7 +858,7 @@
             <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
         </div>
 
-        <button type="button" class="btn btn-secondary" onclick="goBackFromInfo(false)" style="margin-top: 4px;">← Назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 4px;">← Назад</button>
     </div>
 </div>
 
