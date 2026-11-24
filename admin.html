@@ -106,35 +106,66 @@
             .menu-grid .menu-row-icon { width: 48px; height: 48px; margin-bottom: 8px; }
             .menu-grid .menu-row-icon svg { width: 24px; height: 24px; }
         }
-        /* Компактная главная: все карточки помещаются на экран без прокрутки */
-        #view-menu { padding: 10px 14px; gap: 0; }
-        #view-menu h2.page-title { font-size: 21px; margin-bottom: 10px; }
-        #view-menu .menu-grid { gap: 9px; }
-        #view-menu .menu-grid .menu-row { padding: 10px 8px 9px; border-radius: 21px; }
-        #view-menu .menu-grid .menu-row-icon { width: 42px; height: 42px; border-radius: 14px; margin-bottom: 6px; }
-        #view-menu .menu-grid .menu-row-icon svg { width: 23px; height: 23px; }
-        #view-menu .menu-grid .menu-row-title { font-size: 13.5px; margin-bottom: 3px; }
-        #view-menu .menu-grid .menu-row-sub { font-size: 10.5px; line-height: 1.2; min-height: 2.4em; }
-        #view-menu .menu-wide { margin-top: 9px; }
-        #view-menu .menu-wide .menu-row { padding: 7px 11px 7px 8px; gap: 10px; border-radius: 17px; }
-        #view-menu .menu-wide .menu-row-icon { width: 38px; height: 38px; border-radius: 12px; }
-        #view-menu .menu-wide .menu-row-icon svg { width: 21px; height: 21px; }
-        #view-menu .menu-wide .menu-row-title { font-size: 14px; }
-        #view-menu .menu-wide .menu-row-sub { font-size: 10.5px; margin-top: 1px; }
-        @media (max-height: 700px) {
-            #view-menu { padding-top: 7px; padding-bottom: 7px; }
-            #view-menu h2.page-title { font-size: 19px; margin-bottom: 7px; }
-            #view-menu .menu-grid { gap: 7px; }
-            #view-menu .menu-grid .menu-row { padding: 7px 7px 6px; }
-            #view-menu .menu-grid .menu-row-icon { width: 36px; height: 36px; margin-bottom: 4px; }
-            #view-menu .menu-grid .menu-row-icon svg { width: 20px; height: 20px; }
-            #view-menu .menu-grid .menu-row-title { font-size: 12.5px; }
-            #view-menu .menu-grid .menu-row-sub { font-size: 9.5px; }
-            #view-menu .menu-wide { margin-top: 7px; }
-            #view-menu .menu-wide .menu-row { padding-top: 5px; padding-bottom: 5px; }
-            #view-menu .menu-wide .menu-row-icon { width: 34px; height: 34px; }
+        /* Главное меню: заголовок сверху, исходный размер иконок и равномерные интервалы */
+        #view-menu {
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: max(18px, env(safe-area-inset-top)) 14px 18px;
+            gap: 0;
         }
-        .menu-wide { width: 100%; margin-top: 12px; }
+        #view-menu h2.page-title {
+            font-size: 24px;
+            margin: 0 0 18px;
+            flex: 0 0 auto;
+        }
+        #view-menu .menu-grid {
+            gap: 14px;
+            flex: 0 0 auto;
+        }
+        #view-menu .menu-grid .menu-row {
+            padding: 18px 12px 15px;
+            border-radius: 26px;
+        }
+        #view-menu .menu-grid .menu-row-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+        }
+        #view-menu .menu-grid .menu-row-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+        #view-menu .menu-grid .menu-row-title { font-size: 14.5px; margin-bottom: 4px; }
+        #view-menu .menu-grid .menu-row-sub { font-size: 11px; line-height: 1.3; min-height: 2.6em; }
+        #view-menu .menu-wide {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 14px;
+            width: 100%;
+        }
+        #view-menu .menu-wide .menu-row {
+            padding: 10px 14px 10px 10px;
+            gap: 14px;
+            border-radius: 20px;
+        }
+        #view-menu .menu-wide .menu-row-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+        }
+        #view-menu .menu-wide .menu-row-icon svg { width: 24px; height: 24px; }
+        #view-menu .menu-wide .menu-row-title { font-size: 15.5px; }
+        #view-menu .menu-wide .menu-row-sub { font-size: 12px; margin-top: 2px; }
+        @media (max-height: 740px) {
+            #view-menu { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 10px; }
+            #view-menu h2.page-title { margin-bottom: 12px; }
+            #view-menu .menu-grid { gap: 10px; }
+            #view-menu .menu-grid .menu-row { padding-top: 12px; padding-bottom: 11px; }
+            #view-menu .menu-grid .menu-row-icon { margin-bottom: 8px; }
+            #view-menu .menu-wide { margin-top: 10px; gap: 10px; }
+        }
         .menu-badge {
             position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px;
             border-radius: 99px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 800;
