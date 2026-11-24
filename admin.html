@@ -369,6 +369,34 @@
         .ui-icon { width:16px; height:16px; display:inline-block; vertical-align:-3px; margin-right:6px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
         .stats-refresh-btn .ui-icon { width:17px; height:17px; vertical-align:-4px; margin-right:7px; }
 
+        /* ===== Статистика: ровно, лаконично, по центру ===== */
+        #view-statistics .section-title { text-align:center; letter-spacing:-.2px; }
+        .stats-lifetime-summary, .stats-period-summary { gap:10px; }
+        .stats-lifetime-hero, .stats-lifetime-orders, .stats-metric {
+            align-items:center; justify-content:center; text-align:center;
+            min-height:104px; padding:16px 8px; gap:0; border-radius:20px;
+        }
+        .stats-hero-label, .stats-metric-label {
+            font-size:10.5px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+            color:#9fb8e6; white-space:nowrap; line-height:1.2;
+        }
+        .stats-hero-value, .stats-metric-value {
+            font-size:clamp(20px,6.6vw,28px); font-weight:800; letter-spacing:-.6px; line-height:1.1;
+            margin:9px 0 7px; white-space:nowrap; overflow-wrap:normal; word-break:keep-all;
+            font-variant-numeric:tabular-nums; text-align:center;
+        }
+        .stats-hero-note { font-size:11px; color:var(--muted); margin:0; white-space:nowrap; text-align:center; }
+        .stats-metric-label { color:var(--muted); }
+        .stats-period-tabs { gap:8px; margin-bottom:16px; }
+        .stats-period-tab { font-size:12.5px; padding:12px 4px; white-space:nowrap; text-align:center; }
+        .stats-section { padding:16px 16px 6px; border-radius:20px; }
+        .stats-section-title { text-align:center; font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .stats-app-row { padding:12px 0; }
+        .stats-app-row:last-child { padding-bottom:12px; }
+        .stats-app-name { font-size:13px; }
+        .stats-app-count { margin-top:5px; }
+        .stats-empty { text-align:center; font-size:12px; color:var(--muted); padding:10px 0 14px; }
+
     </style>
 </head>
 <body>
@@ -495,14 +523,14 @@
             <button class="btn stats-refresh-btn" style="margin-bottom:12px;padding:11px;font-size:13px;background:rgba(255,255,255,.08);box-shadow:none;" onclick="loadOrdersList(true)"><svg class="ui-icon refresh-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4"/><path d="M4 4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4"/><path d="M20 20v-4h-4"/></svg>Обновить статистику</button>
             <div class="stats-lifetime-summary">
                 <div id="statistics-lifetime-revenue" class="stats-lifetime-hero">
-                    <div class="stats-hero-label">Выручка · всё время</div>
+                    <div class="stats-hero-label">Выручка</div>
                     <div class="stats-hero-value">Загрузка…</div>
-                    <div class="stats-hero-note">Оплаченные заказы</div>
+                    <div class="stats-hero-note">за всё время</div>
                 </div>
                 <div id="statistics-lifetime-orders" class="stats-lifetime-orders">
-                    <div class="stats-hero-label">Заказов · всё время</div>
+                    <div class="stats-hero-label">Заказы</div>
                     <div class="stats-hero-value">—</div>
-                    <div class="stats-hero-note">Только оплаченные</div>
+                    <div class="stats-hero-note">оплаченные</div>
                 </div>
             </div>
             <div class="stats-period-tabs" id="statistics-period-tabs">
@@ -511,7 +539,7 @@
                 <button class="stats-period-tab" data-period="month" onclick="selectStatisticsPeriod('month')">За месяц</button>
             </div>
             <div id="full-statistics-content" class="stats-dashboard" aria-live="polite">
-                <div style="text-align:center;padding:24px;color:var(--muted);">Выберите период статистики</div>
+                
             </div>
         </div>
     </div>
@@ -870,7 +898,7 @@
         const ADMIN_TZ_OFFSET = 5 * 3600 * 1000;
 
         function formatRub(n) {
-            return Math.round(n).toLocaleString("ru-RU") + " ₽";
+            return Math.round(n).toLocaleString("ru-RU").replace(/\s/g,"\u00A0") + "\u00A0₽";
         }
 
         // Доход за сегодня, текущую неделю (с понедельника) и месяц — только по оплаченным заказам.
@@ -950,6 +978,10 @@
 
         function renderFullStatistics() {
             const box = document.getElementById("full-statistics-content");
+            if (box && !box.classList.contains("is-open")) {
+                box.classList.add("is-open");
+                document.querySelectorAll(".stats-period-tab").forEach(b => b.classList.toggle("active", b.dataset.period === activeStatisticsPeriod));
+            }
             const lifetimeBox = document.getElementById("statistics-lifetime-revenue");
             const lifetimeOrdersBox = document.getElementById("statistics-lifetime-orders");
             if (!box || !lifetimeBox || !lifetimeOrdersBox) return;
@@ -957,13 +989,13 @@
             const paidAllTime = allOrders.filter(o => o.status === "approved");
             const lifetimeRevenue = paidAllTime.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
             lifetimeBox.innerHTML = `
-                <div class="stats-hero-label">Выручка · всё время</div>
+                <div class="stats-hero-label">Выручка</div>
                 <div class="stats-hero-value">${formatRub(lifetimeRevenue)}</div>
-                <div class="stats-hero-note">Оплаченные заказы</div>`;
+                <div class="stats-hero-note">за всё время</div>`;
             lifetimeOrdersBox.innerHTML = `
-                <div class="stats-hero-label">Заказов · всё время</div>
+                <div class="stats-hero-label">Заказы</div>
                 <div class="stats-hero-value">${paidAllTime.length.toLocaleString("ru-RU")}</div>
-                <div class="stats-hero-note">Только оплаченные</div>`;
+                <div class="stats-hero-note">оплаченные</div>`;
 
             const paidOrders = getStatisticsPeriodOrders(allOrders, activeStatisticsPeriod);
             const revenue = paidOrders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
@@ -990,14 +1022,14 @@
                     ? `<img class="stats-app-icon" src="${escapeStatsHtml(item.info.icon)}" alt="" loading="lazy" decoding="async">`
                     : `<div class="stats-app-icon stats-app-fallback" aria-hidden="true">${escapeStatsHtml((item.info.name || "П").slice(0,1))}</div>`;
                 return `<div class="stats-app-row"><div class="stats-app-rank">${index+1}</div>${icon}<div class="stats-app-info"><div class="stats-app-name">${name}</div><div class="stats-app-count">${count} ${count === 1 ? "заказ" : count >= 2 && count <= 4 ? "заказа" : "заказов"}</div></div></div>`;
-            }).join("") : '<div style="font-size:12px;color:var(--muted);padding:4px 0;">За выбранный период оплаченных заказов с приложениями пока нет</div>';
+            }).join("") : '<div class="stats-empty">Пока нет оплаченных заказов</div>';
             box.innerHTML = `
                 <div class="stats-period-summary">
-                    <div class="stats-metric"><div class="stats-metric-label">Общая выручка · ${periodLabels[activeStatisticsPeriod]}</div><div class="stats-metric-value">${formatRub(revenue)}</div></div>
-                    <div class="stats-metric"><div class="stats-metric-label">Количество заказов</div><div class="stats-metric-value">${paidOrders.length.toLocaleString("ru-RU")}</div></div>
+                    <div class="stats-metric"><div class="stats-metric-label">Выручка</div><div class="stats-metric-value">${formatRub(revenue)}</div><div class="stats-hero-note">${periodLabels[activeStatisticsPeriod]}</div></div>
+                    <div class="stats-metric"><div class="stats-metric-label">Заказы</div><div class="stats-metric-value">${paidOrders.length.toLocaleString("ru-RU")}</div><div class="stats-hero-note">${periodLabels[activeStatisticsPeriod]}</div></div>
                 </div>
                 <div class="stats-section">
-                    <div class="stats-section-title">Топ-5 популярных приложений · ${periodLabels[activeStatisticsPeriod]}</div>
+                    <div class="stats-section-title">Топ-5 приложений</div>
                     ${appRows}
                 </div>`;
         }
