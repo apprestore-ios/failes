@@ -839,7 +839,7 @@ function renderOrdersList() {
         let linkBadge = '';
         if (order.link_token) {
             const activated = linkStatusCache[String(order.link_token)] === true;
-            linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Активирована' : 'Не активирована'}</div>`;
+            linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Ссылка активирована' : 'Ссылка не активирована'}</div>`;
         }
         const del = `<div class="o-end">${linkBadge}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
         let acts = '';
@@ -942,6 +942,14 @@ async function loadPromoCodesList() {
         </div>`).join('');
 }
 
+// Открывает встроенное окно Telegram с выбором диалога для отправки (без перехода в браузер).
+// Параметр url у t.me/share/url обязателен, иначе Telegram открывает веб-версию, поэтому текст целиком кладём в url, если отдельного text нет.
+function shareViaTelegram(urlOrText, text) {
+    let shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(urlOrText);
+    if (text) shareUrl += '&text=' + encodeURIComponent(text);
+    tg.openTelegramLink(shareUrl);
+}
+
 function showResult(o) {
     const icon = $('res-icon');
     icon.style.cssText = `background:${o.bg};color:${o.color}`;
@@ -983,7 +991,7 @@ async function createPromoCode() {
         desc: `Скидка ${discount} ₽. Суммируется только со скидкой от 3 приложений. Сработает только 1 раз.`, value: promoText,
         onForward: () => {
             const text = `🎁 Промокод на скидку ${discount} ₽\n\nКод: ${promoText}\n\n• Работает при любом количестве приложений\n• Суммируется только со скидкой от 3 приложений\n• С другими акциями не работает\n• Одноразовый\n\nЗаказать со скидкой: ${CLIENT_SITE_URL}`;
-            tg.openTelegramLink(`https://t.me/share/url?text=${encodeURIComponent(text)}`);
+            shareViaTelegram(text);
         }
     });
 }
@@ -1245,7 +1253,7 @@ async function createLink() {
         onForward: () => {
             const appsFormatted = appNamesList.map(name => `• ${name}`).join("\n");
             const text = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Выбранные приложения:\n${appsFormatted}\n\n⏳ После открытия ссылка действует ${ttlText} и предназначена только для одного устройства!`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(linkUrl)}&text=${encodeURIComponent(text)}`);
+            shareViaTelegram(linkUrl, text);
         }
     });
 }
