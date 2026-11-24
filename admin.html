@@ -421,6 +421,42 @@
         @keyframes shimmer{to{background-position:-200% 0}}
         @media(max-height:700px){.view{padding-top:calc(env(safe-area-inset-top) + 8px)}.revenue-card{padding:16px}.revenue-value{font-size:29px}}
 
+
+        /* Финальная унификация экранов и вертикального ритма */
+        .view{box-sizing:border-box}
+        .view > .card{
+            width:100%; min-width:0; height:auto; min-height:0; max-height:100%;
+            margin:0; padding:20px 18px 22px; box-sizing:border-box;
+            justify-content:flex-start!important; align-items:stretch!important;
+            gap:14px; overflow-y:auto; overflow-x:hidden;
+            -webkit-overflow-scrolling:touch;
+        }
+        .view > .card > *{flex-shrink:0}
+        .view > .card .section-title{margin:0 0 6px;text-align:left}
+        .view > .card .btn,.view > .card button.btn{min-height:48px;border-radius:15px}
+        .view > .card input,.view > .card select,.view > .card textarea{min-height:48px;box-sizing:border-box}
+        #view-statistics > .card{height:100%;max-height:100%;overflow-y:auto;gap:14px}
+        #view-statistics .stats-dashboard{width:100%;min-width:0}
+        #view-statistics .stats-period-tabs{position:sticky;top:0;z-index:3;background:#141B27;padding:5px 0}
+        #view-settings > .card,#view-price-detail > .card{justify-content:flex-start!important}
+        .analytics-preview-button{width:100%;text-align:left;cursor:pointer;appearance:none;font:inherit}
+        .analytics-preview-button strong{display:flex;align-items:center;justify-content:space-between}
+        .analytics-preview-button i{font-style:normal;color:#7FB4FF;font-size:17px}
+        .home-data-error{padding:14px;border:1px solid #56323B;background:#281D26;border-radius:14px;color:#F0A0A8;font-size:12px;line-height:1.45}
+        .home-data-error button{display:block;margin-top:8px;border:0;background:transparent;color:#8DBBFF;font-weight:700;padding:4px 0}
+        .metric-card{min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+        .metric-card span{min-height:30px}
+        .metric-card strong{font-size:clamp(18px,5vw,22px);line-height:1.1}
+        .recent-order{min-height:62px}
+        .hub-row{min-height:76px}
+        .view .card,.view .hub-list,.view .home-scroll{scrollbar-width:thin;scrollbar-color:#34445B transparent}
+        @media(max-width:360px){
+            .view > .card{padding:17px 14px 20px}
+            .home-metrics{gap:7px}
+            .metric-card{padding:11px 7px}
+            .metric-card span{font-size:9px}
+        }
+
     </style>
 </head>
 <body>
@@ -444,14 +480,14 @@
         <div class="home-metrics">
           <div class="metric-card"><span>Заказы сегодня</span><strong id="home-orders-today">—</strong></div>
           <div class="metric-card"><span>Ждут проверки</span><strong id="home-pending">—</strong></div>
-          <div class="metric-card"><span>Средний чек</span><strong id="home-average">— ₽</strong></div>
+          <div class="metric-card"><span>Оплачено сегодня</span><strong id="home-paid-today">—</strong></div>
         </div>
         <button class="urgent-banner" id="home-urgent" onclick="openView('view-orders')" style="display:none">Заказы ждут проверки <span>›</span></button>
         <div class="home-section-head"><h3>Последние заказы</h3><button onclick="openView('view-orders')">Все заказы →</button></div>
         <div id="home-recent-orders" class="home-recent"><div class="skeleton"></div><div class="skeleton"></div></div>
         <div class="quick-actions"><button onclick="openView('view-create-link')">＋ Создать ссылку</button><button onclick="openView('view-create-promo-code')">＋ Промокод</button></div>
         <div class="home-section-head"><h3>Аналитика</h3><button onclick="openView('view-statistics')">Подробнее →</button></div>
-        <div class="analytics-preview"><span>Статистика оплаченных заказов</span><strong>Сегодня · Неделя · Месяц</strong></div>
+        <button type="button" class="analytics-preview analytics-preview-button" onclick="openView('view-statistics')" aria-label="Открыть полную аналитику"><span>Статистика оплаченных заказов</span><strong>Сегодня · Неделя · Месяц <i>→</i></strong></button>
       </div>
     </div>
 
@@ -757,6 +793,8 @@
         let currentView = 'view-menu';
         let currentOrderFilter = 'all';
         let allOrdersCache = [];
+        let ordersLoaded = false;
+        let ordersLoading = false;
 
         tg.BackButton.onClick(() => {
             if (currentView === 'view-price-detail') openView('view-prices');
@@ -1047,7 +1085,7 @@
             set('home-compare',prev?(diff>=0?'▲ +':'▼ ')+Math.abs(diff)+'% к вчера · '+prev.toLocaleString('ru-RU')+' ₽':'Сравнение со вчера недоступно');
             set('home-orders-today',today.length);
             set('home-pending',pending);
-            set('home-average',paidToday.length?Math.round(revenue/paidToday.length).toLocaleString('ru-RU')+' ₽':'— ₽');
+            set('home-paid-today',paidToday.length);
             const urgent=document.getElementById('home-urgent');
             if(urgent){urgent.style.display=pending?'flex':'none';urgent.innerHTML=pending+' '+(pending===1?'заказ ждёт':pending<5?'заказа ждут':'заказов ждут')+' проверки <span>›</span>';}
             const recent=document.getElementById('home-recent-orders');
@@ -1071,6 +1109,7 @@
                 renderAllViews();
                 updatePendingOrdersBadge();
                 updateHomeDashboard();
+                loadOrdersList(true);
             } else {
                 tg.BackButton.show();
                 if (id === 'view-create-promo-code') loadPromoCodesList();
@@ -1099,20 +1138,33 @@
         }
 
         async function loadOrdersList(silent = false) {
+            if (ordersLoading) return;
+            ordersLoading = true;
             const container = document.getElementById('orders-container');
+            const recent = document.getElementById('home-recent-orders');
+            if (!ordersLoaded && recent) recent.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
             if (!silent && container) {
-                container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Загрузка заказов…</div>';
             }
-            const res = await sbFetch("orders?select=*&order=created_at.desc");
-            if (res === null) {
-                if (!silent && container) container.innerHTML = '<div style="text-align:center; padding: 20px; color: #fca5a5;">Ошибка загрузки заказов</div>';
-                return;
+            try {
+                const res = await sbFetch("orders?select=*&order=created_at.desc");
+                if (res === null || !Array.isArray(res)) {
+                    if (!silent && container) container.innerHTML = '<div style="text-align:center;padding:20px;color:#fca5a5;">Ошибка загрузки заказов</div>';
+                    if (!ordersLoaded && recent) recent.innerHTML = '<div class="home-data-error">Не удалось загрузить данные. <button onclick="loadOrdersList(true)">Повторить</button></div>';
+                    return;
+                }
+                allOrdersCache = res;
+                ordersLoaded = true;
+                renderOrderStats();
+                renderFullStatistics();
+                updatePendingOrdersBadge();
+                renderOrdersList();
+                updateHomeDashboard();
+            } catch (e) {
+                if (!ordersLoaded && recent) recent.innerHTML = '<div class="home-data-error">Не удалось загрузить данные. <button onclick="loadOrdersList(true)">Повторить</button></div>';
+            } finally {
+                ordersLoading = false;
             }
-            allOrdersCache = res;
-            renderOrderStats();
-            renderFullStatistics();
-            updatePendingOrdersBadge();
-            renderOrdersList();
         }
 
         function renderOrdersList() {
@@ -1969,6 +2021,7 @@ function smartFilterAdminApps(query, source = appsData) {
         }
 
         loadData();
+        loadOrdersList(true);
     </script>
 </body>
 </html>
