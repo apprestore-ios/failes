@@ -326,6 +326,9 @@
         #toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 650; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 14px 36px rgba(0,0,0,0.6); z-index: 9999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; backdrop-filter: blur(20px); }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
 
+        .stats-period-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin:0 0 10px; }
+        .stats-period-tab { min-width:0; border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 4px; background:rgba(255,255,255,.045); color:var(--muted); font:650 11px inherit; cursor:pointer; transition:background .18s,border-color .18s,color .18s; }
+        .stats-period-tab.active { color:#fff; background:rgba(59,130,246,.22); border-color:rgba(96,165,250,.55); box-shadow:inset 0 0 0 1px rgba(96,165,250,.08); }
         .stats-dashboard { width:100%; display:flex; flex-direction:column; gap:10px; min-height:0; flex:1; overflow-y:auto; padding:2px 2px 4px; }
         .stats-hero { padding:18px; border-radius:20px; background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(99,102,241,.10)); border:1px solid rgba(96,165,250,.28); }
         .stats-hero-label { color:#bfdbfe; font-size:12px; font-weight:650; letter-spacing:.35px; text-transform:uppercase; }
@@ -468,6 +471,12 @@
         <div class="card">
             <h3 class="section-title">Полная статистика</h3>
             <button class="btn" style="margin-bottom:10px;padding:11px;font-size:13px;background:rgba(255,255,255,.08);box-shadow:none;" onclick="loadOrdersList(true)"> <svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 2 5M20 4v7h-7"/></svg>Обновить статистику</button>
+            <div class="stats-period-tabs" id="statistics-period-tabs">
+                <button class="stats-period-tab active" data-period="day" onclick="selectStatisticsPeriod('day')">За сегодня</button>
+                <button class="stats-period-tab" data-period="week" onclick="selectStatisticsPeriod('week')">За неделю</button>
+                <button class="stats-period-tab" data-period="month" onclick="selectStatisticsPeriod('month')">За месяц</button>
+                <button class="stats-period-tab" data-period="all" onclick="selectStatisticsPeriod('all')">За всё время</button>
+            </div>
             <div id="full-statistics-content" class="stats-dashboard">
                 <div style="text-align:center;padding:24px;color:var(--muted);">Загрузка статистики...</div>
             </div>
@@ -865,16 +874,34 @@
             box.innerHTML = tile("Сегодня", stats.day) + tile("Неделя", stats.week) + tile("Месяц", stats.month);
         }
 
+        let activeStatisticsPeriod = "day";
+
+        function selectStatisticsPeriod(period) {
+            activeStatisticsPeriod = ["day", "week", "month", "all"].includes(period) ? period : "day";
+            document.querySelectorAll(".stats-period-tab").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.period === activeStatisticsPeriod);
+            });
+            renderFullStatistics();
+        }
+
+        function getStatisticsPeriodOrders(orders, period) {
+            if (period === "all") return orders;
+            const stats = calcOrderStats(orders);
+            const from = stats[period] ? stats[period].from : stats.day.from;
+            return orders.filter(o => {
+                const time = new Date(o.created_at).getTime();
+                return Number.isFinite(time) && time >= from;
+            });
+        }
+
         function renderFullStatistics() {
             const box = document.getElementById("full-statistics-content");
             if (!box) return;
-            const orders = Array.isArray(allOrdersCache) ? allOrdersCache : [];
+            const allOrders = Array.isArray(allOrdersCache) ? allOrdersCache : [];
+            const orders = getStatisticsPeriodOrders(allOrders, activeStatisticsPeriod);
             const approved = orders.filter(o => o.status === "approved");
-            const pending = orders.filter(o => o.status === "pending");
             const rejected = orders.filter(o => o.status === "rejected");
             const revenue = approved.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
-            const average = approved.length ? revenue / approved.length : 0;
-            const stats = calcOrderStats(orders);
             const decided = approved.length + rejected.length;
             const conversion = decided ? Math.round(approved.length / decided * 100) : 0;
             const appCounts = {};
@@ -883,39 +910,25 @@
                 names.forEach(name => { const key = String(name); appCounts[key] = (appCounts[key] || 0) + 1; });
             });
             const topApps = Object.entries(appCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+            const periodLabels = { day: "Сегодня", week: "За неделю", month: "За месяц", all: "За всё время" };
             const line = (label, value) => `<div class="stats-line"><span>${label}</span><strong>${value}</strong></div>`;
             box.innerHTML = `
                 <div class="stats-hero">
-                    <div class="stats-hero-label">Общая выручка</div>
+                    <div class="stats-hero-label">Общая выручка · ${periodLabels[activeStatisticsPeriod]}</div>
                     <div class="stats-hero-value">${formatRub(revenue)}</div>
-                    <div class="stats-hero-note">По всем подтверждённым заказам в загруженной истории</div>
+                    <div class="stats-hero-note">Только подтверждённые и оплаченные заказы за выбранный период</div>
                 </div>
                 <div class="stats-grid">
                     <div class="stats-metric"><div class="stats-metric-label">Всего заказов</div><div class="stats-metric-value">${orders.length.toLocaleString("ru-RU")}</div></div>
-                    <div class="stats-metric"><div class="stats-metric-label">Средний чек</div><div class="stats-metric-value">${formatRub(average)}</div></div>
                     <div class="stats-metric"><div class="stats-metric-label">Оплачено</div><div class="stats-metric-value" style="color:#6ee7b7">${approved.length}</div></div>
-                    <div class="stats-metric"><div class="stats-metric-label">Ожидают оплаты</div><div class="stats-metric-value" style="color:#fde68a">${pending.length}</div></div>
                     <div class="stats-metric"><div class="stats-metric-label">Отклонено</div><div class="stats-metric-value" style="color:#fca5a5">${rejected.length}</div></div>
                     <div class="stats-metric"><div class="stats-metric-label">Доля успешных</div><div class="stats-metric-value">${conversion}%</div></div>
                 </div>
                 <div class="stats-section">
-                    <div class="stats-section-title">Выручка по периодам</div>
-                    ${line("Сегодня", formatRub(stats.day.sum))}
-                    ${line("С начала недели", formatRub(stats.week.sum))}
-                    ${line("С начала месяца", formatRub(stats.month.sum))}
+                    <div class="stats-section-title">Популярные приложения · ${periodLabels[activeStatisticsPeriod]}</div>
+                    ${topApps.length ? topApps.map(([name,count]) => line(name, count + " заказ." )).join("") : '<div style="font-size:12px;color:var(--muted);">За выбранный период пока нет подтверждённых заказов с данными о приложениях</div>'}
                 </div>
-                <div class="stats-section">
-                    <div class="stats-section-title">Статусы заказов</div>
-                    ${line("Всего", orders.length)}
-                    ${line("Оплачено", approved.length)}
-                    ${line("Ожидают", pending.length)}
-                    ${line("Отклонено", rejected.length)}
-                </div>
-                <div class="stats-section">
-                    <div class="stats-section-title">Популярные приложения</div>
-                    ${topApps.length ? topApps.map(([name,count]) => line(name,count + " заказ.") ).join("") : '<div style="font-size:12px;color:var(--muted);">Пока нет подтверждённых заказов с данными о приложениях</div>'}
-                </div>
-                <div style="font-size:10.5px;color:var(--muted);text-align:center;padding:2px 8px 6px;">Расчёты выполнены по заказам, доступным в истории Supabase.</div>`;
+                <div style="font-size:10.5px;color:var(--muted);text-align:center;padding:2px 8px 6px;">Данные рассчитаны по заказам, доступным в истории Supabase.</div>`;
         }
 
         async function updatePendingOrdersBadge() {
