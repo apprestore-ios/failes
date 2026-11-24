@@ -1348,7 +1348,35 @@ function updateBulkProgress() {
     if (statusEl) statusEl.textContent = left <= 0 ? "Активна ✓" : "ещё " + left;
 }
 
+// Промокод работает при любом количестве приложений. Суммируется только со скидкой от 3 приложений
+// (она применяется сама), а с другими акциями (сниженная цена приложения) не работает.
+// Возвращает текст причины, почему промокод сейчас недоступен, или null, если всё ок.
+function getPromoBlockReason() {
+    let hasOtherSale = false;
+    cartItems.forEach(k => { if (isAppVisible(k) && getAppPrice(k) < 290) hasOtherSale = true; });
+    if (hasOtherSale) {
+        return "Промокод не работает с другими акциями";
+    }
+    return null;
+}
+
+// Если условия перестали выполняться (убрали приложение, на приложение началась акция) — снимаем промокод.
+function syncPromoWithCart() {
+    if (!currentPromoCode) return;
+    const reason = getPromoBlockReason();
+    if (!reason) return;
+    currentPromoCode = null;
+    currentPromoDiscount = 0;
+    const msgEl = document.getElementById("promoMessage");
+    if (msgEl) {
+        msgEl.style.display = "block";
+        msgEl.style.color = "#fca5a5";
+        msgEl.textContent = reason + ". Промокод снят";
+    }
+}
+
 function getCartFinalTotal() {
+    syncPromoWithCart();
     let total = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
     let finalTotal = total - getCartBulkDiscount() - currentPromoDiscount;
@@ -1609,7 +1637,18 @@ async function applyPromoCode() {
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Проверка...";
 
-    const res = await sbFetch(`promo_codes?code=eq.${code}&select=*`);
+    // Сначала проверяем условия корзины: в корзине не должно быть приложений по акции
+    const blockReason = getPromoBlockReason();
+    if (blockReason) {
+        msgEl.style.color = "#fca5a5";
+        msgEl.textContent = blockReason;
+        currentPromoCode = null;
+        currentPromoDiscount = 0;
+        renderCartScreen();
+        return;
+    }
+
+    const res = await sbFetch(`promo_codes?code=eq.${encodeURIComponent(code)}&select=*`);
     if (res && Array.isArray(res) && res.length > 0) {
         const promo = res[0];
         if (promo.is_used) {
@@ -1711,6 +1750,8 @@ function renderCartScreen() {
         if (currentScreenId === "cartApp") returnToCatalogFromCart();
         return;
     }
+
+    syncPromoWithCart();
 
     if (!currentOrderNumber) currentOrderNumber = "#" + Math.floor(10000 + Math.random() * 90000);
 
