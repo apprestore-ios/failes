@@ -326,13 +326,17 @@
         #toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -100px); background: rgba(17, 24, 39, 0.95); color: #fff; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 650; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 14px 36px rgba(0,0,0,0.6); z-index: 9999; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; pointer-events: none; opacity: 0; backdrop-filter: blur(20px); }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-        .stats-period-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:0 0 2px; }
-        .stats-period-tab { min-width:0; border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 4px; background:rgba(255,255,255,.045); color:var(--muted); font:650 11px inherit; cursor:pointer; transition:background .18s,border-color .18s,color .18s; }
+        .stats-period-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; margin:0 0 18px; width:100%; flex-shrink:0; }
+        .stats-period-tab { min-width:0; min-height:48px; border:1px solid rgba(255,255,255,.12); border-radius:15px; padding:12px 5px; background:rgba(255,255,255,.05); color:var(--muted); font:650 12px inherit; cursor:pointer; transition:background .18s,border-color .18s,color .18s; }
         .stats-period-tab.active { color:#fff; background:rgba(59,130,246,.22); border-color:rgba(96,165,250,.55); box-shadow:inset 0 0 0 1px rgba(96,165,250,.08); }
-        .stats-dashboard { width:100%; display:flex; flex-direction:column; gap:10px; min-height:0; flex:1; overflow-y:auto; padding:2px 2px 4px; }
-        .stats-lifetime-hero { flex:0 0 auto; margin-bottom:2px; }
-        .stats-period-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-        .stats-app-row { display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+        .stats-dashboard { width:100%; display:none; flex-direction:column; gap:18px; min-height:0; flex:0 0 auto; overflow:visible; padding:2px 3px 10px; }
+        .stats-dashboard.is-open { display:flex; }
+        #view-statistics .card { max-height:calc(100dvh - 28px); overflow-y:auto; overflow-x:hidden; justify-content:flex-start; gap:0; padding:22px 18px 26px; -webkit-overflow-scrolling:touch; }
+        #view-statistics .section-title { margin-bottom:22px; }
+        #view-statistics .stats-refresh-btn { margin-bottom:20px !important; min-height:48px; flex-shrink:0; }
+        .stats-lifetime-hero { flex:0 0 auto; margin-bottom:22px; padding:23px 20px; }
+        .stats-period-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+        .stats-app-row { display:flex; align-items:center; gap:13px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.07); }
         .stats-app-row:last-child { border-bottom:0; padding-bottom:0; }
         .stats-app-icon { width:38px; height:38px; flex:0 0 38px; border-radius:11px; object-fit:cover; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.10); }
         .stats-app-fallback { display:flex; align-items:center; justify-content:center; color:#bfdbfe; font-size:15px; font-weight:800; }
@@ -340,15 +344,15 @@
         .stats-app-name { font-size:12.5px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .stats-app-count { font-size:11px; color:var(--muted); margin-top:3px; }
         .stats-app-rank { color:rgba(255,255,255,.38); font-size:11px; font-weight:700; width:15px; text-align:center; }
-        .stats-hero { padding:18px; border-radius:20px; background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(99,102,241,.10)); border:1px solid rgba(96,165,250,.28); }
+        .stats-hero { padding:22px 20px; border-radius:22px; background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(99,102,241,.10)); border:1px solid rgba(96,165,250,.28); }
         .stats-hero-label { color:#bfdbfe; font-size:12px; font-weight:650; letter-spacing:.35px; text-transform:uppercase; }
         .stats-hero-value { font-size:30px; font-weight:850; letter-spacing:-1px; margin-top:5px; font-variant-numeric:tabular-nums; }
         .stats-hero-note { color:var(--muted); font-size:11px; margin-top:4px; }
         .stats-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-        .stats-metric { padding:13px 12px; border-radius:16px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.09); min-width:0; }
+        .stats-metric { padding:17px 14px; border-radius:16px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.09); min-width:0; }
         .stats-metric-label { color:var(--muted); font-size:11px; font-weight:600; }
         .stats-metric-value { font-size:19px; font-weight:800; margin-top:5px; letter-spacing:-.4px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
-        .stats-section { padding:14px; border-radius:17px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); }
+        .stats-section { padding:18px; border-radius:17px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); }
         .stats-section-title { font-size:13px; font-weight:750; margin-bottom:10px; }
         .stats-line { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.07); font-size:12px; }
         .stats-line:last-child { border-bottom:0; padding-bottom:0; }
@@ -488,12 +492,12 @@
                 <div class="stats-hero-note">Только оплаченные заказы</div>
             </div>
             <div class="stats-period-tabs" id="statistics-period-tabs">
-                <button class="stats-period-tab active" data-period="day" onclick="selectStatisticsPeriod('day')">За сегодня</button>
+                <button class="stats-period-tab" data-period="day" onclick="selectStatisticsPeriod('day')">За сегодня</button>
                 <button class="stats-period-tab" data-period="week" onclick="selectStatisticsPeriod('week')">За неделю</button>
                 <button class="stats-period-tab" data-period="month" onclick="selectStatisticsPeriod('month')">За месяц</button>
             </div>
-            <div id="full-statistics-content" class="stats-dashboard">
-                <div style="text-align:center;padding:24px;color:var(--muted);">Загрузка статистики...</div>
+            <div id="full-statistics-content" class="stats-dashboard" aria-live="polite">
+                <div style="text-align:center;padding:24px;color:var(--muted);">Выберите период статистики</div>
             </div>
         </div>
     </div>
@@ -896,7 +900,10 @@
             document.querySelectorAll(".stats-period-tab").forEach(btn => {
                 btn.classList.toggle("active", btn.dataset.period === activeStatisticsPeriod);
             });
+            const panel = document.getElementById("full-statistics-content");
+            if (panel) panel.classList.add("is-open");
             renderFullStatistics();
+            if (panel) requestAnimationFrame(() => panel.scrollIntoView({ behavior: "smooth", block: "nearest" }));
         }
 
         function getStatisticsPeriodOrders(orders, period) {
