@@ -82,6 +82,8 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .ob:active{transform:scale(.96)}
 .ob.ok{background:linear-gradient(135deg,#16a34a,#15803d);flex:1.6}
 .ob.no{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.35)}
+.o-foot{display:flex;align-items:center;gap:8px}
+.o-foot .ob.del{margin-left:auto}
 .ob.del{flex:0 0 44px;background:rgba(255,255,255,.05);color:var(--muted);border-color:var(--line)}
 .field{width:100%;padding:13px 15px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.42);color:#fff;font:inherit;font-size:15px;outline:0;margin-bottom:10px;user-select:text;-webkit-user-select:text}
 .field:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
@@ -114,6 +116,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .cb{width:24px;height:24px;border-radius:8px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;font-size:15px;transition:.15s}
 .cb.on{background:#3b82f6;border-color:#3b82f6;color:#fff;box-shadow:0 4px 10px rgba(59,130,246,.4)}
 .price{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:800;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
+.price.sale{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fde047}
 .price.prem{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.4);color:#d8b4fe}
 .newb{padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted)}
 .newb.active{background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(236,72,153,.4)}
@@ -238,7 +241,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
   </div>
   <div id="tool-promo" class="hide">
     <div class="card">
-      <div class="label">Промокод даёт скидку на всю сумму заказа и сгорает после использования.</div>
+      <div class="label">Одноразовый. Действует при заказе 1 приложения или от 3 приложений (суммируется со скидкой за установку от 3 приложений), на акционные приложения не действует.</div>
       <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="field" placeholder="Скидка в рублях, например 100">
       <button class="btn green" id="btn-generate-promo-code" onclick="createPromoCode()"><svg class="ic"><use href="#i-gift"/></svg>Сгенерировать</button>
     </div>
@@ -572,7 +575,8 @@ const $ = id => document.getElementById(id);
 const ic = (n, c = '') => `<svg class="ic ${c}" viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
 const ADMIN_TZ_OFFSET = 5 * 3600 * 1000;
 
-let globalData = { state: { prices: {}, visibility: {}, newApps: {} }, siteEnabled: true, bulkDiscountEnabled: true };
+let globalData = { state: { prices: {}, visibility: {}, newApps: {} }, siteEnabled: true, bulkDiscountEnabled: true, saleApps: [] };
+let linkStatus = {};
 let selectedAppsForLink = new Set();
 let selectedAppsForPromo = new Set();
 let selectedTtlMinutes = 5;
@@ -654,6 +658,8 @@ function formatMinWord(mins) {
                 const vCache = localStorage.getItem("apprestore_visibility_cache");
                 const nCache = localStorage.getItem("apprestore_new_apps_cache");
                 const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+                const aCache = localStorage.getItem("apprestore_sale_apps_cache");
+                if (aCache) globalData.saleApps = JSON.parse(aCache);
                 if (pCache) globalData.state.prices = JSON.parse(pCache);
                 if (vCache) globalData.state.visibility = JSON.parse(vCache);
                 if (nCache) globalData.state.newApps = JSON.parse(nCache);
@@ -689,10 +695,15 @@ function formatMinWord(mins) {
                 if (s) siteEnabled = s.value === "true";
                 const bulkDiscountSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
                 const bulkDiscountEnabled = bulkDiscountSetting ? bulkDiscountSetting.value === "true" : true;
+                const saleSetting = settingsRes.find(x => x.key === "sale_apps");
+                let saleApps = [];
+                try { saleApps = saleSetting ? JSON.parse(saleSetting.value) : []; } catch(e) {}
+                if (!Array.isArray(saleApps)) saleApps = [];
 
                 globalData.state = { prices, visibility, newApps };
                 globalData.siteEnabled = siteEnabled;
                 globalData.bulkDiscountEnabled = bulkDiscountEnabled;
+                globalData.saleApps = saleApps;
                 
                 try {
                     localStorage.setItem("apprestore_prices_cache", JSON.stringify(prices));
@@ -700,6 +711,7 @@ function formatMinWord(mins) {
                     localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(newApps));
                     localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
                     localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
+                    localStorage.setItem("apprestore_sale_apps_cache", JSON.stringify(saleApps));
                 } catch(e) {}
 
                 renderAllViews();
@@ -793,10 +805,21 @@ async function loadOrdersList(silent = false) {
         return;
     }
     allOrdersCache = res;
+    if (tab === 'orders') await loadLinkStatuses();
     renderOrderStats();
     renderStats();
     updatePendingOrdersBadge();
     renderOrdersList();
+}
+
+async function loadLinkStatuses() {
+    const tokens = [...new Set(allOrdersCache.map(o => o.link_token).filter(Boolean).map(String))];
+    for (let i = 0; i < tokens.length; i += 40) {
+        const chunk = tokens.slice(i, i + 40);
+        const res = await sbFetch(`app_links?token=in.(${chunk.map(encodeURIComponent).join(',')})&select=token,is_used,activated_at,device_id`);
+        if (!Array.isArray(res)) continue;
+        res.forEach(r => { linkStatus[String(r.token)] = Boolean(r.is_used || Number(r.activated_at) > 0 || r.device_id); });
+    }
 }
 
 function renderOrdersList() {
@@ -814,15 +837,17 @@ function renderOrdersList() {
         const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
         const link = linkUrl ? `<div class="o-link" onclick="copyText('${linkUrl}')">${ic('link')}<span>${linkUrl}</span>${ic('copy')}</div>` : "";
         const del = `<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button>`;
-        let acts = '';
-        if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>${del}`;
-        else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>${del}`;
-        else acts = del;
+        let btns = '';
+        if (order.status === "pending") btns = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>`;
+        else if (order.status === "rejected") btns = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>`;
+        const known = order.link_token && linkStatus[order.link_token] !== undefined;
+        const stat = known ? (linkStatus[order.link_token] ? `<div class="st approved">${ic('check')}Ссылка активирована</div>` : `<div class="st pending">${ic('clock')}Ссылка не активирована</div>`) : '';
+        const acts = (btns && !stat) ? `<div class="o-act">${btns}${del}</div>` : (btns ? `<div class="o-act">${btns}</div>` : '') + `<div class="o-foot">${stat}${del}</div>`;
         return `<div class="order">
             <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
             <div class="o-apps">${appsNames}</div>
             <div class="o-meta">${promo}<div class="o-price">${order.total_price || 0} ₽</div></div>
-            ${link}<div class="o-act">${acts}</div></div>`;
+            ${link}${acts}</div>`;
     }).join('');
 }
 
@@ -952,9 +977,9 @@ async function createPromoCode() {
     loadPromoCodesList();
     showResult({
         icon: 'gift', bg: 'rgba(52,211,153,.18)', color: '#4ade80', title: 'Промокод создан',
-        desc: `Скидка ${discount} ₽ на всю сумму заказа. Сработает только 1 раз.`, value: promoText,
+        desc: `Скидка ${discount} ₽. Одноразовый: действует при заказе 1 приложения или от 3 приложений, на акционные не действует.`, value: promoText,
         onForward: () => {
-            const text = `🎁 Дарю промокод на скидку ${discount} ₽!\n\nПромокод: ${promoText}\n\nКод можно использовать только один раз при оформлении через корзину сайта!`;
+            const text = `🎁 Дарю промокод на скидку ${discount} ₽!\n\nПромокод: ${promoText}\n\nКод одноразовый и действует при заказе 1 приложения или от 3 приложений (суммируется со скидкой за установку от 3 приложений). На приложения по акции не действует.\n\nПрименить код можно в корзине на сайте.`;
             tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(CLIENT_SITE_URL)}&text=${encodeURIComponent(text)}`);
         }
     });
@@ -978,6 +1003,7 @@ function renderAppsList() {
     else if (appsMode === 'vis') renderVisibilityList();
     else renderPromoList();
 }
+const isSaleApp = k => (globalData.saleApps || []).includes(k);
 function appsQuery() { return $('apps-search') ? $('apps-search').value : ''; }
 const naBadge = '<span class="bad">Недоступно</span>';
 
@@ -985,14 +1011,15 @@ function renderPricesList() {
     if (appsMode !== 'prices') return;
     $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
         const price = getAdminAppPrice(app.key);
-        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="price ${price >= 500 ? 'prem' : ''}">${price} ₽</div>` });
+        const sale = isSaleApp(app.key);
+        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios + (sale ? ' · <span style="color:var(--amber);font-weight:700">Акция</span>' : ''), right: `<div class="price ${sale ? 'sale' : price >= 500 ? 'prem' : ''}">${price} ₽</div>` });
     }).join('');
 }
 function renderPromoList() {
     if (appsMode !== 'promo') return;
     $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
         const vis = globalData.state.visibility[app.key] !== false;
-        return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' : naBadge });
+        return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' + (isSaleApp(app.key) ? ' · <span style="color:var(--amber);font-weight:700">Акция</span>' : '') : naBadge });
     }).join('');
 }
 function renderVisibilityList() {
@@ -1028,7 +1055,19 @@ function updatePromoButton() {
     $('btn-reset-promo')?.classList.toggle('off', n === 0);
 }
 
-async function savePricesBulk(updates, okMsg) {
+async function saveSaleApps(keys, add) {
+    const set = new Set(globalData.saleApps || []);
+    keys.forEach(k => add ? set.add(k) : set.delete(k));
+    globalData.saleApps = Array.from(set);
+    try { localStorage.setItem("apprestore_sale_apps_cache", JSON.stringify(globalData.saleApps)); } catch(e) {}
+    const res = await sbFetch("site_settings?on_conflict=key", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ key: "sale_apps", value: JSON.stringify(globalData.saleApps) })
+    });
+    if (res === null) showToast("Цены обновлены, но пометку акции сохранить не удалось");
+}
+async function savePricesBulk(updates, okMsg, saleMode) {
     try {
         const res = await sbFetch("app_prices?on_conflict=app_key", {
             method: "POST",
@@ -1038,6 +1077,7 @@ async function savePricesBulk(updates, okMsg) {
         if (res !== null) {
             try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
             showToast(okMsg);
+            if (saleMode) await saveSaleApps(updates.map(u => u.app_key), saleMode === 'add');
             selectedAppsForPromo.clear();
             renderPromoList();
         } else showToast("Ошибка при обновлении цен в БД");
@@ -1056,13 +1096,13 @@ async function applyPromo() {
         globalData.state.prices[key] = String(newPrice);
     });
     discountInput.value = '';
-    await savePricesBulk(updates, "Цены успешно обновлены!");
+    await savePricesBulk(updates, "Цены успешно обновлены!", discount > 0 ? 'add' : null);
 }
 async function resetPromo() {
     if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
     const updates = [];
     selectedAppsForPromo.forEach(key => { updates.push({ app_key: key, price: 290 }); globalData.state.prices[key] = "290"; });
-    await savePricesBulk(updates, "Цены сброшены до базовых!");
+    await savePricesBulk(updates, "Цены сброшены до базовых!", 'remove');
 }
 
 function openPriceDetail(key) {
