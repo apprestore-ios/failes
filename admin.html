@@ -75,9 +75,10 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .o-app{display:flex;align-items:center;gap:8px;min-width:0}
 .o-app img{width:22px;height:22px;border-radius:6px;object-fit:cover;flex:none;background:rgba(255,255,255,.08)}
 .o-app span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.o-end{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;flex:0 0 auto;max-width:100%}
-.o-end .st{flex:0 0 auto;white-space:nowrap;font-size:11.5px;padding:6px 10px}
-.o-end .st .ic{flex:none}
+.o-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.o-foot .st{flex:0 1 auto;min-width:0;white-space:nowrap;font-size:11.5px;padding:6px 10px}
+.o-foot .st .ic{flex:none}
+.o-foot .ob.del{margin-left:auto}
 .o-act .ob:not(.del){flex:1 1 auto;white-space:nowrap}
 .o-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .o-promo{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--green);font-weight:700}
@@ -844,16 +845,16 @@ function renderOrdersList() {
             const activated = linkStatusCache[String(order.link_token)] === true;
             linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Ссылка активирована' : 'Ссылка не активирована'}</div>`;
         }
-        const del = `<div class="o-end">${linkBadge}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
+        const foot = `<div class="o-foot">${linkBadge}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
         let acts = '';
-        if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>${del}`;
-        else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>${del}`;
-        else acts = del;
+        if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>`;
+        else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>`;
+        else acts = '';
         return `<div class="order">
             <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
             <div class="o-apps">${appsNames}</div>
             <div class="o-meta">${promo}<div class="o-price">${order.total_price || 0} ₽</div></div>
-            ${link}<div class="o-act">${acts}</div></div>`;
+            ${link}${acts ? `<div class="o-act">${acts}</div>` : ''}${foot}</div>`;
     }).join('');
 }
 
