@@ -334,7 +334,10 @@
         #view-statistics .card { max-height:calc(100dvh - 28px); overflow-y:auto; overflow-x:hidden; justify-content:flex-start; gap:0; padding:22px 18px 26px; -webkit-overflow-scrolling:touch; }
         #view-statistics .section-title { margin-bottom:22px; }
         #view-statistics .stats-refresh-btn { margin-bottom:20px !important; min-height:48px; flex-shrink:0; }
-        .stats-lifetime-hero { flex:0 0 auto; margin-bottom:22px; padding:23px 20px; }
+        .stats-lifetime-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%; margin:0 0 22px; }
+        .stats-lifetime-hero, .stats-lifetime-orders { min-width:0; min-height:112px; padding:18px 15px; border-radius:21px; display:flex; flex-direction:column; justify-content:center; background:linear-gradient(145deg,rgba(53,91,151,.42),rgba(45,55,83,.48)); border:1px solid rgba(130,166,220,.30); box-shadow:inset 0 1px 0 rgba(255,255,255,.045); }
+        .stats-lifetime-hero { margin:0; }
+        .stats-lifetime-orders { background:linear-gradient(145deg,rgba(58,67,88,.58),rgba(37,44,61,.72)); border-color:rgba(160,174,198,.20); }
         .stats-period-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
         .stats-app-row { display:flex; flex-direction:row; align-items:center; gap:13px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.07); min-width:0; }
         .stats-app-row > .stats-app-icon, .stats-app-row > img.stats-app-icon { display:block; }
@@ -345,14 +348,14 @@
         .stats-app-fallback { display:flex; align-items:center; justify-content:center; color:#bfdbfe; font-size:15px; font-weight:800; }
         .stats-app-info { flex:1; min-width:0; }
         .stats-app-name { font-size:12.5px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .stats-app-count { font-size:11px; color:var(--muted); margin-top:3px; }
+        .stats-app-count { display:inline-flex; align-self:flex-start; align-items:center; margin-top:7px; padding:5px 10px; border-radius:999px; font-size:11px; line-height:1; font-weight:650; color:#d7e5ff; background:rgba(86,132,198,.20); border:1px solid rgba(125,166,224,.20); }
         .stats-app-rank { color:rgba(255,255,255,.38); font-size:11px; font-weight:700; width:15px; text-align:center; }
         .stats-hero { padding:22px 20px; border-radius:22px; background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(99,102,241,.10)); border:1px solid rgba(96,165,250,.28); }
         .stats-hero-label { color:#bfdbfe; font-size:12px; font-weight:650; letter-spacing:.35px; text-transform:uppercase; }
         .stats-hero-value { font-size:30px; font-weight:850; letter-spacing:-1px; margin-top:5px; font-variant-numeric:tabular-nums; }
         .stats-hero-note { color:var(--muted); font-size:11px; margin-top:4px; }
         .stats-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-        .stats-metric { padding:17px 14px; border-radius:16px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.09); min-width:0; }
+        .stats-metric { padding:18px 15px; border-radius:21px; background:linear-gradient(145deg,rgba(57,68,91,.58),rgba(34,42,58,.72)); border:1px solid rgba(148,163,184,.19); min-width:0; min-height:104px; display:flex; flex-direction:column; justify-content:center; }
         .stats-metric-label { color:var(--muted); font-size:11px; font-weight:600; }
         .stats-metric-value { font-size:19px; font-weight:800; margin-top:5px; letter-spacing:-.4px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
         .stats-section { padding:18px; border-radius:17px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); }
@@ -361,6 +364,7 @@
         .stats-line:last-child { border-bottom:0; padding-bottom:0; }
         .stats-line span:first-child { color:var(--muted); }
         .stats-line strong { text-align:right; font-variant-numeric:tabular-nums; }
+        @media (max-width:360px) { .stats-lifetime-summary { gap:8px; } .stats-lifetime-hero,.stats-lifetime-orders { padding:15px 11px; min-height:104px; } .stats-hero-value { font-size:25px; } }
         .menu-row.stats-entry { background:linear-gradient(110deg,rgba(37,99,235,.19),rgba(17,24,39,.82)); border-color:rgba(96,165,250,.28); }
         .ui-icon { width:16px; height:16px; display:inline-block; vertical-align:-3px; margin-right:6px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
         .stats-refresh-btn .ui-icon { width:17px; height:17px; vertical-align:-4px; margin-right:7px; }
@@ -489,10 +493,17 @@
         <div class="card">
             <h3 class="section-title">Полная статистика</h3>
             <button class="btn stats-refresh-btn" style="margin-bottom:12px;padding:11px;font-size:13px;background:rgba(255,255,255,.08);box-shadow:none;" onclick="loadOrdersList(true)"><svg class="ui-icon refresh-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4"/><path d="M4 4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4"/><path d="M20 20v-4h-4"/></svg>Обновить статистику</button>
-            <div id="statistics-lifetime-revenue" class="stats-hero stats-lifetime-hero">
-                <div class="stats-hero-label">Общая выручка · за всё время</div>
-                <div class="stats-hero-value">Загрузка…</div>
-                <div class="stats-hero-note">Только оплаченные заказы</div>
+            <div class="stats-lifetime-summary">
+                <div id="statistics-lifetime-revenue" class="stats-lifetime-hero">
+                    <div class="stats-hero-label">Выручка · всё время</div>
+                    <div class="stats-hero-value">Загрузка…</div>
+                    <div class="stats-hero-note">Оплаченные заказы</div>
+                </div>
+                <div id="statistics-lifetime-orders" class="stats-lifetime-orders">
+                    <div class="stats-hero-label">Заказов · всё время</div>
+                    <div class="stats-hero-value">—</div>
+                    <div class="stats-hero-note">Только оплаченные</div>
+                </div>
             </div>
             <div class="stats-period-tabs" id="statistics-period-tabs">
                 <button class="stats-period-tab" data-period="day" onclick="selectStatisticsPeriod('day')">За сегодня</button>
@@ -940,14 +951,19 @@
         function renderFullStatistics() {
             const box = document.getElementById("full-statistics-content");
             const lifetimeBox = document.getElementById("statistics-lifetime-revenue");
-            if (!box || !lifetimeBox) return;
+            const lifetimeOrdersBox = document.getElementById("statistics-lifetime-orders");
+            if (!box || !lifetimeBox || !lifetimeOrdersBox) return;
             const allOrders = Array.isArray(allOrdersCache) ? allOrdersCache : [];
             const paidAllTime = allOrders.filter(o => o.status === "approved");
             const lifetimeRevenue = paidAllTime.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
             lifetimeBox.innerHTML = `
-                <div class="stats-hero-label">Общая выручка · за всё время</div>
+                <div class="stats-hero-label">Выручка · всё время</div>
                 <div class="stats-hero-value">${formatRub(lifetimeRevenue)}</div>
-                <div class="stats-hero-note">Только оплаченные заказы</div>`;
+                <div class="stats-hero-note">Оплаченные заказы</div>`;
+            lifetimeOrdersBox.innerHTML = `
+                <div class="stats-hero-label">Заказов · всё время</div>
+                <div class="stats-hero-value">${paidAllTime.length.toLocaleString("ru-RU")}</div>
+                <div class="stats-hero-note">Только оплаченные</div>`;
 
             const paidOrders = getStatisticsPeriodOrders(allOrders, activeStatisticsPeriod);
             const revenue = paidOrders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
