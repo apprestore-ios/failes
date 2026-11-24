@@ -28,21 +28,7 @@
           --btn-install-color: #93c5fd; --nav-bg: rgba(11, 15, 23, 0.4);
           --spring: cubic-bezier(.22,1,.36,1);
       }
-      @font-face {
-          font-family: "SFSymbols";
-          src: url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff2") format("woff2"),
-               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.woff") format("woff"),
-               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.ttf") format("truetype"),
-               url("https://github.com/apprestore-ios/failes/releases/download/Шрифты/SFSYMBOLS.otf") format("opentype");
-          font-weight: normal; font-style: normal; font-display: block;
-      }
-      .sf-icon {
-          font-family: "SFSymbols", sans-serif !important; font-kerning: none; -webkit-font-kerning: none;
-          font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-variant-numeric: tabular-nums;
-          text-rendering: optimizeSpeed; letter-spacing: 0; display: inline-block; line-height: 1;
-          vertical-align: middle; margin: 0; padding: 0; opacity: 0; transition: opacity 0.2s ease-in-out;
-      }
-      html.fonts-loaded .sf-icon { opacity: 1; }
+      .sf-icon { display: inline-block; width: 1em; height: 1em; flex-shrink: 0; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       body, button, input, select, textarea { font-weight: 500; }
       html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; overscroll-behavior-y: none; }
@@ -356,19 +342,19 @@
       .catalog-notice-text { font-size: 12px; color: #ffffff; line-height: 1.4; text-align: center; padding: 0 34px; width: 100%; }
       .catalog-notice-text b { color: var(--text); font-weight: 650; }
       .top-row { display: flex; gap: 10px; width: 100%; margin-bottom: 12px; }
-      .apps-info, .reviews-link { flex: 1 1 0; min-width: 0; padding: 7px 9px 7px 7px; border-radius: 14px; display: flex; align-items: center; gap: 6px; box-shadow: var(--box-shadow); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+      .apps-info, .reviews-link { flex: 1 1 0; min-width: 0; height: 42px; padding: 0 9px 0 7px; border-radius: 14px; display: flex; align-items: center; gap: 7px; box-shadow: var(--box-shadow); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
       .apps-info { background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(99, 102, 241, 0.12)); border: 1.5px solid rgba(96, 165, 250, 0.35); }
       .reviews-link { background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(249, 115, 22, 0.12)); border: 1.5px solid rgba(251, 191, 36, 0.35); text-decoration: none; color: var(--text); -webkit-tap-highlight-color: transparent; transition: transform 0.15s ease, opacity 0.15s ease; }
       .reviews-link:active { transform: scale(0.97); opacity: 0.85; }
-      .apps-info-icon, .reviews-link-icon { width: 22px; height: 22px; flex-shrink: 0; border-radius: 7px; color: #fff; display: flex; align-items: center; justify-content: center; }
+      .apps-info-icon, .reviews-link-icon { width: 28px; height: 28px; flex-shrink: 0; border-radius: 9px; color: #fff; display: flex; align-items: center; justify-content: center; }
       .apps-info-icon { background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4); }
       .reviews-link-icon { background: linear-gradient(135deg, #f59e0b, #f97316); box-shadow: 0 3px 8px rgba(245, 158, 11, 0.4); }
-      .apps-info-icon svg, .reviews-link-icon svg { width: 13px; height: 13px; }
-      .apps-info-text, .reviews-link-text { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 700; color: var(--text); line-height: 1.2; white-space: nowrap; overflow: visible; }
-      .reviews-link-arrow { width: 15px; height: 15px; flex-shrink: 0; color: #fcd34d; }
+      .apps-info-icon svg, .reviews-link-icon svg { width: 16px; height: 16px; }
+      .apps-info-text, .reviews-link-text { flex: 1; min-width: 0; font-size: clamp(11px, 3.1vw, 12.5px); font-weight: 700; color: var(--text); line-height: 1.2; white-space: nowrap; overflow: visible; }
+      .reviews-link-arrow { width: 16px; height: 16px; flex-shrink: 0; color: #fcd34d; }
       .apps-info-num.bump { animation: numBump 0.28s ease; }
       @keyframes numBump { 0% { transform: scale(0.85); opacity: 0.5; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
-      .apps-info-num { min-width: 26px; padding: 3px 7px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(147, 197, 253, 0.5); color: #fff; font-size: 14px; font-weight: 800; text-align: center; line-height: 1.1; font-variant-numeric: tabular-nums; }
+      .apps-info-num { min-width: 28px; padding: 4px 7px; border-radius: 9px; background: linear-gradient(135deg, #3b82f6, #6366f1); border: 1px solid rgba(147, 197, 253, 0.5); color: #fff; font-size: 14.5px; font-weight: 800; text-align: center; line-height: 1.1; font-variant-numeric: tabular-nums; }
       .app-search-wrap { position: relative; margin-bottom: 12px; width: 100%; }
       .app-search { width: 100%; height: 42px; padding: 0 84px 0 38px; border-radius: 14px; border: 1.5px solid rgba(148,163,184,0.25); outline: none; background: var(--input-bg); color: var(--text); font-size: 13.5px; }
       .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
@@ -543,19 +529,29 @@
     min-height: 90px;
 }
     </style>
-    <script>
-        if ("fonts" in document) {
-            document.fonts.load('1em "SFSymbols"').then(function() {
-                document.documentElement.classList.add("fonts-loaded");
-            }).catch(function() {
-                document.documentElement.classList.add("fonts-loaded");
-            });
-        } else {
-            document.documentElement.classList.add("fonts-loaded");
-        }
-    </script>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="i-fwd" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="i-orders" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+<symbol id="i-guide" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-tips" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-1.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></symbol>
+<symbol id="i-policy" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8"/><path d="M9.5 10v8"/><path d="M14.5 10v8"/><path d="M19 10v8"/><path d="M3 21h18"/></symbol>
+<symbol id="i-tg" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-support" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2z"/><path d="M20 14a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/><path d="M20 18c0 2-2 3-5 3h-2"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="i-clear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></symbol>
+<symbol id="i-all" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
+<symbol id="i-social" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-invest" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+<symbol id="i-other" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></symbol>
+</defs></svg>
+
 
 <div class="aurora-bg"></div>
 
@@ -565,7 +561,7 @@
         <span class="nav-title">AppRestore IOS</span>
     </div>
     <div class="nav-right-actions">
-        <a href="#" class="back-btn" id="navBackBtn" onclick="handleNavBack(event)" title="Назад"><span class="sf-icon">&#xECAC;</span></a>
+        <a href="#" class="back-btn" id="navBackBtn" onclick="handleNavBack(event)" title="Назад"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg></a>
         <button class="burger-btn" onclick="toggleBurgerMenu()" aria-label="Меню" id="navBurgerBtn">
             <div class="burger-line"></div>
         </button>
@@ -575,29 +571,29 @@
 <div class="menu-modal" id="burgerMenuModal" onclick="toggleBurgerMenu()">
     <div class="menu-sheet" onclick="event.stopPropagation()">
         <div class="menu-header">
-            <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><span class="sf-icon">&#xECAC;</span></button>
+            <button type="button" class="back-btn visible" onclick="toggleBurgerMenu()" title="Назад"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg></button>
             <span style="font-size: 15px; font-weight: 700; color: var(--text);">Навигация</span>
         </div>
         <button class="menu-item" onclick="showMyOrdersScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x0157;</span></div><span>Мои заказы</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-orders"/></svg></div><span>Мои заказы</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showGuideScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xDD;</span></div><span>Инструкция</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-guide"/></svg></div><span>Инструкция</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showTipsScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF87C;</span></div><span>Полезные советы</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-tips"/></svg></div><span>Полезные советы</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showPolicyScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xED3C;</span></div><span>Политика использования</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-policy"/></svg></div><span>Политика использования</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showOfferScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF889;</span></div><span>Публичная оферта</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-doc"/></svg></div><span>Публичная оферта</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <a href="https://t.me/apprestore_ios" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#x01AF;</span></div><span>AppRestore IOS в Telegram!</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-tg"/></svg></div><span>AppRestore IOS в Telegram!</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </a>
         <a href="https://t.me/dizabled" target="_blank" class="menu-item">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><span class="sf-icon">&#xF9E8;</span></div><span>Поддержка проекта</span></div><span class="sf-icon">&#xECA2;</span>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg></div><span>Поддержка проекта</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </a>
     </div>
 </div>
@@ -628,9 +624,9 @@
         <div class="wf-card" style="--ac: #818cf8;"><div class="wf-head"><span class="wf-ico c6"><svg viewBox="0 0 24 24"><path d="M12 2.8 4.5 5.8v5.7c0 4.6 3.1 8.2 7.5 9.7 4.4-1.5 7.5-5.1 7.5-9.7V5.8z"/><polyline points="8.8 12 11 14.2 15.2 9.8"/></svg></span><div class="wf-num">100%</div></div><div class="wf-label">безопасно для iOS: не нужен пароль от учетной записи Apple ID</div></div>
     </div>
     <div class="wl-bar">
-        <a href="https://t.me/apprestore_ios" target="_blank" class="wl-item"><span class="wl-ico tg"><span class="sf-icon">&#x01AF;</span></span><span class="wl-text"><b>Мы в Telegram</b><small>наш канал</small></span></a>
+        <a href="https://t.me/apprestore_ios" target="_blank" class="wl-item"><span class="wl-ico tg"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-tg"/></svg></span><span class="wl-text"><b>Мы в Telegram</b><small>наш канал</small></span></a>
         <div class="wl-div"></div>
-        <a href="https://t.me/dizabled" target="_blank" class="wl-item"><span class="wl-ico sp"><span class="sf-icon">&#xF9E8;</span></span><span class="wl-text"><b>Поддержка</b><small>написать нам</small></span></a>
+        <a href="https://t.me/dizabled" target="_blank" class="wl-item"><span class="wl-ico sp"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg></span><span class="wl-text"><b>Поддержка</b><small>написать нам</small></span></a>
     </div>
 </div>
 
@@ -659,22 +655,22 @@
     </a>
     </div>
     <div class="app-search-wrap">
-        <span class="search-icon"><span class="sf-icon">&#xFCA6;</span></span>
+        <span class="search-icon"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-search"/></svg></span>
         <input type="text" id="appSearchInput" class="app-search" placeholder="Найти приложение..." autocomplete="off" oninput="filterApps()">
-        <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><span class="sf-icon">&#xECD2;</span></button>
+        <button type="button" id="searchClear" class="search-clear" onclick="clearAppSearch()"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-clear"/></svg></button>
         <button type="button" id="filterBtn" class="filter-btn" onclick="toggleCatMenu(event)" aria-label="Категории" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
             <span class="filter-dot"></span>
         </button>
         <div class="cat-menu" id="catMenu">
-            <button type="button" class="cat-item active" data-cat="all" onclick="setCategory('all', this)"><span class="sf-icon">&#xFC05;</span><span class="cat-name">Все</span><span class="cat-check">&#10003;</span></button>
-            <button type="button" class="cat-item" data-cat="banks" onclick="setCategory('banks', this)"><span class="sf-icon">&#xF889;</span><span class="cat-name">Банки</span><span class="cat-check">&#10003;</span></button>
-            <button type="button" class="cat-item" data-cat="social" onclick="setCategory('social', this)"><span class="sf-icon">&#x0068;</span><span class="cat-name">Соцсети</span><span class="cat-check">&#10003;</span></button>
-            <button type="button" class="cat-item" data-cat="investments" onclick="setCategory('investments', this)"><span class="sf-icon">&#xEE6C;</span><span class="cat-name">Инвестиции</span><span class="cat-check">&#10003;</span></button>
-            <button type="button" class="cat-item" data-cat="other" onclick="setCategory('other', this)"><span class="sf-icon">&#xF945;</span><span class="cat-name">Другие</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item active" data-cat="all" onclick="setCategory('all', this)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-all"/></svg><span class="cat-name">Все</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="banks" onclick="setCategory('banks', this)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-bank"/></svg><span class="cat-name">Банки</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="social" onclick="setCategory('social', this)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-social"/></svg><span class="cat-name">Соцсети</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="investments" onclick="setCategory('investments', this)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-invest"/></svg><span class="cat-name">Инвестиции</span><span class="cat-check">&#10003;</span></button>
+            <button type="button" class="cat-item" data-cat="other" onclick="setCategory('other', this)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-other"/></svg><span class="cat-name">Другие</span><span class="cat-check">&#10003;</span></button>
         </div>
     </div>
-    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><span class="sf-icon">􀊫</span> Ничего не найдено</div>
+    <div id="searchEmpty" style="display:none; text-align:center; color:var(--muted); font-size:13px; padding:30px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-search"/></svg> Ничего не найдено</div>
     <div class="apps-grid-container" id="appListContainer"></div>
 </div>
 
@@ -691,7 +687,7 @@
 <div class="container" id="cartApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
-            <button class="cart-back-btn" id="cartBackToCatalogBtn" onclick="switchScreen('mainApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <button class="cart-back-btn" id="cartBackToCatalogBtn" onclick="switchScreen('mainApp')"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg></button>
             <div class="auth-title" id="cartScreenTitle" style="font-size: 20px; margin: 0;">Ваша корзина</div>
         </div>
         <div class="auth-description" id="cartScreenSubtitle" style="text-align: center; font-size: 12.5px; margin-top: -6px;">Проверьте выбранные приложения перед оформлением заказа</div>
@@ -708,7 +704,7 @@
 
         <button type="button" class="cart-toggle-btn" id="cartToggleListBtn" onclick="toggleCartList()">
             <span id="cartToggleListText">Выбранные приложения (0)</span>
-            <span class="sf-icon">&#xECA2;</span>
+            <svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
 
         <div class="cart-items-list" id="cartItemsList"></div>
@@ -716,7 +712,7 @@
         <button type="button" class="promo-toggle-link" id="promoToggleLink" onclick="openPromoInput()">У меня есть промокод</button>
         <div class="app-search-wrap" id="promoInputWrap" style="display: none; margin-top: 6px; margin-bottom: 0; gap: 6px;">
             <input type="text" id="promoCodeInput" class="app-search" style="flex: 1; height: 36px; padding: 0 12px; border-radius: 12px; font-size: 13px; text-transform: uppercase;" placeholder="Промокод">
-            <button type="button" class="btn btn-primary promo-apply-btn" onclick="applyPromoCode()" aria-label="Применить" style="width: 36px; min-height: 36px; padding: 0; border-radius: 12px; flex-shrink: 0;"><span class="sf-icon" style="font-size: 18px;">&#xECC2;</span></button>
+            <button type="button" class="btn btn-primary promo-apply-btn" onclick="applyPromoCode()" aria-label="Применить" style="width: 36px; min-height: 36px; padding: 0; border-radius: 12px; flex-shrink: 0;"><svg class="sf-icon" style="font-size: 18px;" viewBox="0 0 24 24"><use href="#i-check"/></svg></button>
         </div>
         <div id="promoMessage" style="font-size: 12px; font-weight: 600; text-align: left; margin-top: 4px; display: none; padding-left: 4px;"></div>
 
@@ -744,7 +740,7 @@
         </div>
 
         <button type="button" class="btn btn-primary" id="cartCheckoutBtn" onclick="checkoutCart()" style="margin-top: 2px;">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xEA40;</span> Оплатить
+            <svg class="sf-icon" style="margin-right: 6px; font-size: 18px;" viewBox="0 0 24 24"><use href="#i-card"/></svg> Оплатить
         </button>
         <button type="button" class="btn btn-danger-soft" id="cartClearAllBtn" onclick="clearCart()">Очистить корзину</button>
     </div>
@@ -753,7 +749,7 @@
 <div class="container" id="paymentApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
-            <button class="cart-back-btn" onclick="switchScreen('cartApp')"><span class="sf-icon">&#xECAC;</span></button>
+            <button class="cart-back-btn" onclick="switchScreen('cartApp')"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg></button>
             <div class="auth-title" style="font-size: 20px; margin: 0;">Оплата заказа</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">
@@ -795,10 +791,10 @@
         </div>
 
         <button type="button" class="btn btn-success" id="btnConfirmPaid" onclick="confirmOrderPaid()">
-            <span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> Я оплатил
+            <svg class="sf-icon" style="margin-right: 6px; font-size: 18px;" viewBox="0 0 24 24"><use href="#i-check"/></svg> Я оплатил
         </button>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram">
-            <span class="sf-icon">&#xF9E8;</span> Поддержка
+            <svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg> Поддержка
         </a>
     </div>
 </div>
@@ -812,7 +808,7 @@
             Пожалуйста, <b>не закрывайте эту страницу</b> — как только оплата будет подтверждена, здесь автоматически появится ваша персональная ссылка для установки.
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
-            <span class="sf-icon">&#xF9E8;</span> Поддержка
+            <svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg> Поддержка
         </a>
     </div>
 </div>
@@ -841,7 +837,7 @@
             Платеж по вашей заявке не поступил. Если вы уже совершили перевод, пожалуйста, свяжитесь с поддержкой и отправьте чек об оплате.
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 4px;">
-            <span class="sf-icon">&#xF9E8;</span> Поддержка
+            <svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg> Поддержка
         </a>
         <button type="button" class="btn btn-secondary" onclick="backToPaymentFromRejected()">
             Вернуться к реквизитам
@@ -852,7 +848,7 @@
 <div class="container" id="myOrdersApp">
     <div class="auth-box" style="padding: 24px 18px;">
         <div class="cart-header-row">
-            <button class="cart-back-btn" onclick="goBackFromInfo(false)"><span class="sf-icon">&#xECAC;</span></button>
+            <button class="cart-back-btn" onclick="goBackFromInfo(false)"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg></button>
             <div class="auth-title" style="font-size: 20px; margin: 0;">Мои заказы</div>
         </div>
         <div class="auth-description" style="text-align: center; font-size: 12.5px; margin-top: -6px;">История ваших заказов на этом устройстве</div>
@@ -861,7 +857,7 @@
             <div style="text-align:center; padding: 20px; color: var(--muted);">Загрузка...</div>
         </div>
 
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 4px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 4px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
 </div>
 
@@ -881,7 +877,7 @@
             <div class="info-box-label">осталось до сгорания ссылки</div>
         </div>
         <a href="https://t.me/dizabled" target="_blank" class="info-box" style="text-decoration: none;">
-            <div class="info-box-num" style="color: #a78bfa; font-size: 22px;"><span class="sf-icon">&#xF9E8;</span></div>
+            <div class="info-box-num" style="color: #a78bfa; font-size: 22px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg></div>
             <div class="info-box-label">поддержка и активация</div>
         </a>
     </div>
@@ -895,7 +891,7 @@
     <div class="auth-box">
         <div class="auth-title" style="color: #fca5a5;">Установка недоступна</div>
         <div class="auth-description" style="text-align: center;">Срок действия ссылки истёк или она уже была использована на другом устройстве. Пожалуйста, обратитесь к продавцу для решения проблемы.</div>
-        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 6px;"><span class="sf-icon">&#xF9E8;</span> Написать продавцу</a>
+        <a href="https://t.me/dizabled" target="_blank" class="btn btn-telegram" style="margin-top: 6px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg> Написать продавцу</a>
     </div>
 </div>
 
@@ -936,7 +932,7 @@
             <div class="story-counter" id="storyCounter"></div>
             <button type="button" class="story-arrow" id="storyArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
+        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
 </div>
 
@@ -972,7 +968,7 @@
             <div class="story-counter" id="tipsCounter"></div>
             <button type="button" class="story-arrow" id="tipsArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
         </div>
-        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
+        <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
 </div>
 
@@ -983,7 +979,7 @@
         <div class="legal-scroll-area" id="policyContent">
             <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
         </div>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 2px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 2px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
 </div>
 
@@ -994,7 +990,7 @@
         <div class="legal-scroll-area" id="offerContent">
             <div style="text-align:center; padding: 20px;">Загрузка данных...</div>
         </div>
-        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 2px;"><span class="sf-icon">&#xECAC;</span> Назад</button>
+        <button type="button" class="btn btn-primary" onclick="goBackFromInfo(false)" style="margin-top: 2px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
 </div>
 
@@ -1894,7 +1890,7 @@ async function confirmOrderPaid() {
     const btn = document.getElementById("btnConfirmPaid");
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> ⏳ Отправка...';
+        btn.innerHTML = '<svg class="sf-icon" style="margin-right: 6px; font-size: 18px;" viewBox="0 0 24 24"><use href="#i-check"/></svg> ⏳ Отправка...';
     }
 
     const appKeysArr = Array.from(cartItems);
@@ -2012,7 +2008,7 @@ async function confirmOrderPaid() {
     } catch (e) {} finally {
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<span class="sf-icon" style="margin-right: 6px; font-size: 18px;">&#xECC2;</span> Я оплатил';
+            btn.innerHTML = '<svg class="sf-icon" style="margin-right: 6px; font-size: 18px;" viewBox="0 0 24 24"><use href="#i-check"/></svg> Я оплатил';
         }
     }
 }
