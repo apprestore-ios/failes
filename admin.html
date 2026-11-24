@@ -369,129 +369,106 @@
         .ui-icon { width:16px; height:16px; display:inline-block; vertical-align:-3px; margin-right:6px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
         .stats-refresh-btn .ui-icon { width:17px; height:17px; vertical-align:-4px; margin-right:7px; }
 
-        /* ===== Статистика: ровно, лаконично, по центру ===== */
-        #view-statistics .section-title { text-align:center; letter-spacing:-.2px; }
-        .stats-lifetime-summary, .stats-period-summary { gap:10px; }
-        .stats-lifetime-hero, .stats-lifetime-orders, .stats-metric {
-            align-items:center; justify-content:center; text-align:center;
-            min-height:104px; padding:16px 8px; gap:0; border-radius:20px;
-        }
-        .stats-hero-label, .stats-metric-label {
-            font-size:10.5px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
-            color:#9fb8e6; white-space:nowrap; line-height:1.2;
-        }
-        .stats-hero-value, .stats-metric-value {
-            font-size:clamp(20px,6.6vw,28px); font-weight:800; letter-spacing:-.6px; line-height:1.1;
-            margin:9px 0 7px; white-space:nowrap; overflow-wrap:normal; word-break:keep-all;
-            font-variant-numeric:tabular-nums; text-align:center;
-        }
-        .stats-hero-note { font-size:11px; color:var(--muted); margin:0; white-space:nowrap; text-align:center; }
-        .stats-metric-label { color:var(--muted); }
-        .stats-period-tabs { gap:8px; margin-bottom:16px; }
-        .stats-period-tab { font-size:12.5px; padding:12px 4px; white-space:nowrap; text-align:center; }
-        .stats-section { padding:16px 16px 6px; border-radius:20px; }
-        .stats-section-title { text-align:center; font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .stats-app-row { padding:12px 0; }
-        .stats-app-row:last-child { padding-bottom:12px; }
-        .stats-app-name { font-size:13px; }
-        .stats-app-count { margin-top:5px; }
-        .stats-empty { text-align:center; font-size:12px; color:var(--muted); padding:10px 0 14px; }
+
+        :root{--text:#F4F7FC;--muted:#8793A5;--card-bg:#141B27;--accent:#3987F7;--radius-card:20px;--radius-item:16px}
+        html,body{background:#0B0F17!important}
+        body{background:#0B0F17!important;justify-content:flex-start}
+        .aurora-bg{display:none!important}
+        .view{max-width:430px;left:50%;transform:translateX(-50%);padding:calc(env(safe-area-inset-top) + 14px) 16px calc(88px + env(safe-area-inset-bottom));justify-content:flex-start;align-items:stretch;animation:none;overflow:hidden}
+        .view.active{display:flex}
+        .card{background:#141B27;border:1px solid #202B3A;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:20px;max-height:100%;height:100%;padding:16px}
+        h2.page-title{font-size:23px;text-align:left;text-shadow:none;margin:0;font-weight:750}
+        h3.section-title{text-align:left;font-size:19px;margin-bottom:14px}
+        .bottom-nav{position:fixed;z-index:1000;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));display:flex;gap:4px;background:rgba(15,21,31,.97);border-top:1px solid #253144}
+        .nav-tab{flex:1;min-width:0;border:0;background:transparent;color:#8290A3;border-radius:13px;min-height:54px;font:600 10px -apple-system,BlinkMacSystemFont,sans-serif;display:flex;align-items:center;justify-content:center;gap:3px;flex-direction:column}
+        .nav-tab span{font-size:21px;line-height:22px}.nav-tab.active{color:#69A8FF;background:#1A2A40}
+        .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-shrink:0}
+        .eyebrow{font-size:10px;letter-spacing:1.5px;color:#718198;font-weight:800;margin-bottom:5px}
+        .settings-gear{width:44px;height:44px;border-radius:14px;border:1px solid #293649;background:#151E2B;color:#C5D1E0;font-size:21px}
+        .home-scroll{overflow-y:auto;min-height:0;padding-bottom:12px;-webkit-overflow-scrolling:touch}
+        .revenue-card{padding:21px;border-radius:20px;background:#182A43;border:1px solid #29466B;margin-bottom:12px}
+        .metric-label,.metric-card span{font-size:12px;color:#A2B0C3;font-weight:600}
+        .revenue-value{font-size:34px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;margin:8px 0 4px}
+        .revenue-compare{font-size:12px;color:#9DBCE5}
+        .home-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:12px}
+        .metric-card{padding:13px 9px;border-radius:16px;background:#141B27;border:1px solid #202B3A;min-width:0}
+        .metric-card span{display:block;font-size:10px;line-height:1.3;min-height:27px}
+        .metric-card strong{display:block;font-size:21px;margin-top:5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+        .urgent-banner{width:100%;min-height:48px;border-radius:15px;border:1px solid #6B5525;background:#342B18;color:#F4CB68;padding:12px 15px;text-align:left;font-weight:700;margin-bottom:17px;display:flex;justify-content:space-between}
+        .home-section-head{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px}
+        .home-section-head h3{font-size:15px;margin:0}.home-section-head button{border:0;background:none;color:#70A9F7;font-size:12px;font-weight:650}
+        .home-recent{display:flex;flex-direction:column;gap:8px}
+        .recent-order{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border-radius:15px;background:#141B27;border:1px solid #202B3A}
+        .recent-order b{font-size:13px;display:block}.recent-order small{font-size:11px;color:var(--muted);display:block;margin-top:3px}
+        .recent-order strong{font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+        .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+        .quick-actions button{min-height:48px;border-radius:15px;border:1px solid #2B4565;background:#17263A;color:#A9CCFF;font-weight:700;font-size:12px}
+        .analytics-preview{padding:15px;border-radius:16px;background:#141B27;border:1px solid #202B3A;display:flex;flex-direction:column;gap:7px;color:#9AA8BA;font-size:12px}
+        .analytics-preview strong{color:#D9E4F2;font-size:13px}
+        .hub-header{margin:5px 0 20px}.hub-list{display:flex;flex-direction:column;gap:10px}
+        .hub-row{width:100%;min-height:76px;padding:12px;display:flex;align-items:center;gap:13px;text-align:left;border-radius:18px;background:#141B27;border:1px solid #202B3A;color:var(--text)}
+        .hub-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:#1D3552;color:#82B8FF;font-size:22px;font-weight:700;flex-shrink:0}
+        .hub-row span:nth-child(2){flex:1}.hub-row b{display:block;font-size:14px}.hub-row small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.hub-row i{font-style:normal;color:#718198;font-size:24px}
+        .app-item,.order-card,.promo-item{background:#192230;border:1px solid #263346;box-shadow:none}
+        .order-badge.pending{background:#392F19;color:#F5D16E;border-color:#675326}.order-badge.approved{background:#163629;color:#65D9A0;border-color:#285D46}.order-badge.rejected{background:#3B2228;color:#F08C98;border-color:#6A343E}
+        .order-btn{min-height:48px}.btn{min-height:48px;border-radius:15px;box-shadow:none}
+        .text-input{background:#0F1621;border-color:#293649;border-radius:14px;min-height:48px}
+        .stats-hero,.stats-metric,.stats-lifetime-hero,.stats-lifetime-orders{background:#19283B;border:1px solid #2B405A;box-shadow:none}
+        .stats-section,.stat-tile{background:#192230;border:1px solid #263346}
+        .stats-hero-value,.stats-metric-value,.stats-app-count,.stat-sum{font-variant-numeric:tabular-nums}
+        .admin-scroll-list{overscroll-behavior:contain}
+        .skeleton{height:55px;border-radius:14px;background:linear-gradient(90deg,#17202D 25%,#202C3B 45%,#17202D 65%);background-size:200% 100%;animation:shimmer 1.3s infinite}
+        @keyframes shimmer{to{background-position:-200% 0}}
+        @media(max-height:700px){.view{padding-top:calc(env(safe-area-inset-top) + 8px)}.revenue-card{padding:16px}.revenue-value{font-size:29px}}
 
     </style>
 </head>
 <body>
     <div class="aurora-bg"></div>
     <div id="toast"></div>
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="nav-tab active" data-view="view-menu" onclick="switchMainTab('view-menu',this)"><span>⌂</span>Главная</button>
+      <button class="nav-tab" data-view="view-orders" onclick="switchMainTab('view-orders',this)"><span>▤</span>Заказы</button>
+      <button class="nav-tab" data-view="view-catalog" onclick="switchMainTab('view-catalog',this)"><span>▦</span>Каталог</button>
+      <button class="nav-tab" data-view="view-marketing" onclick="switchMainTab('view-marketing',this)"><span>◇</span>Маркетинг</button>
+    </nav>
 
-    <!-- Главное меню в виде премиальной сетки -->
+    <!-- Главная: командный центр -->
     <div id="view-menu" class="view active">
-        <h2 class="page-title">Панель управления</h2>
-        <div class="menu-grid">
-            <div class="menu-row" onclick="openView('view-orders')">
-                <div class="menu-row-icon" style="color: #60a5fa; background: rgba(59,130,246,0.18);">
-                    <svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
-                    <span class="menu-badge" id="pending-orders-badge">0</span>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Заказы</div>
-                    <div class="menu-row-sub">Проверка оплаты и выдача</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-create-link')">
-                <div class="menu-row-icon" style="color: #c084fc; background: rgba(168,85,247,0.18);">
-                    <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Создать ссылку</div>
-                    <div class="menu-row-sub">Выбор приложений и таймера</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-create-promo-code')">
-                <div class="menu-row-icon" style="color: #34d399; background: rgba(16,185,129,0.18);">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Промокоды</div>
-                    <div class="menu-row-sub">Генерация и список скидок</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-promo')">
-                <div class="menu-row-icon" style="color: #fbbf24; background: rgba(234,179,8,0.18);">
-                    <svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Массовые акции</div>
-                    <div class="menu-row-sub">Глобальное изменение цен</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-prices')">
-                <div class="menu-row-icon" style="color: #f472b6; background: rgba(236,72,153,0.18);">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 17V7h3.2a2.8 2.8 0 0 1 0 5.6H8.5"/><path d="M8.5 15h5"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Цены</div>
-                    <div class="menu-row-sub">Стоимость приложений</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-visibility')">
-                <div class="menu-row-icon" style="color: #22d3ee; background: rgba(6,182,212,0.18);">
-                    <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Видимость</div>
-                    <div class="menu-row-sub">Скрыть или показать в каталоге</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
+      <header class="topbar"><div><div class="eyebrow">APPRESTORE IOS</div><h2 class="page-title">Командный центр</h2></div><button class="settings-gear" onclick="openView('view-settings')" aria-label="Настройки">⚙</button></header>
+      <div class="home-scroll">
+        <section class="revenue-card">
+          <div class="metric-label">Выручка сегодня</div><div class="revenue-value" id="home-revenue">— ₽</div>
+          <div class="revenue-compare" id="home-compare">Сравнение со вчера</div>
+        </section>
+        <div class="home-metrics">
+          <div class="metric-card"><span>Заказы сегодня</span><strong id="home-orders-today">—</strong></div>
+          <div class="metric-card"><span>Ждут проверки</span><strong id="home-pending">—</strong></div>
+          <div class="metric-card"><span>Средний чек</span><strong id="home-average">— ₽</strong></div>
         </div>
+        <button class="urgent-banner" id="home-urgent" onclick="openView('view-orders')" style="display:none">Заказы ждут проверки <span>›</span></button>
+        <div class="home-section-head"><h3>Последние заказы</h3><button onclick="openView('view-orders')">Все заказы →</button></div>
+        <div id="home-recent-orders" class="home-recent"><div class="skeleton"></div><div class="skeleton"></div></div>
+        <div class="quick-actions"><button onclick="openView('view-create-link')">＋ Создать ссылку</button><button onclick="openView('view-create-promo-code')">＋ Промокод</button></div>
+        <div class="home-section-head"><h3>Аналитика</h3><button onclick="openView('view-statistics')">Подробнее →</button></div>
+        <div class="analytics-preview"><span>Статистика оплаченных заказов</span><strong>Сегодня · Неделя · Месяц</strong></div>
+      </div>
+    </div>
 
-        <div class="menu-wide">
-            <div class="menu-row stats-entry" onclick="openView('view-statistics')">
-                <div class="menu-row-icon" style="color:#93c5fd; background:rgba(59,130,246,.20);">
-                    <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="M8 15v-4M13 15V7M18 15V3"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Статистика</div>
-                    <div class="menu-row-sub">Подробная аналитика заказов и выручки</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-            <div class="menu-row" onclick="openView('view-settings')">
-                <div class="menu-row-icon" style="color: #fb923c; background: rgba(249,115,22,0.18);">
-                    <svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
-                </div>
-                <div class="menu-row-text">
-                    <div class="menu-row-title">Настройки системы</div>
-                    <div class="menu-row-sub">Статус работы сайта и скидки</div>
-                </div>
-                <div class="menu-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
-            </div>
-        </div>
+    <div id="view-catalog" class="view">
+      <div class="hub-header"><div class="eyebrow">УПРАВЛЕНИЕ</div><h2 class="page-title">Каталог</h2></div>
+      <div class="hub-list">
+        <button class="hub-row" onclick="openView('view-prices')"><span class="hub-icon">₽</span><span><b>Цены приложений</b><small>Изменение стоимости установки</small></span><i>›</i></button>
+        <button class="hub-row" onclick="openView('view-visibility')"><span class="hub-icon">◉</span><span><b>Видимость каталога</b><small>Показывать или скрывать приложения</small></span><i>›</i></button>
+        <button class="hub-row" onclick="openView('view-promo')"><span class="hub-icon">％</span><span><b>Массовая акция</b><small>Скидки и возврат базовых цен</small></span><i>›</i></button>
+      </div>
+    </div>
+    <div id="view-marketing" class="view">
+      <div class="hub-header"><div class="eyebrow">ПРОДВИЖЕНИЕ</div><h2 class="page-title">Маркетинг</h2></div>
+      <div class="hub-list">
+        <button class="hub-row" onclick="openView('view-create-link')"><span class="hub-icon">↗</span><span><b>Создать ссылку</b><small>Разовая ссылка на установку</small></span><i>›</i></button>
+        <button class="hub-row" onclick="openView('view-create-promo-code')"><span class="hub-icon">◇</span><span><b>Промокоды</b><small>Создание и управление скидками</small></span><i>›</i></button>
+      </div>
     </div>
 
     <!-- Управление заказами -->
@@ -523,14 +500,14 @@
             <button class="btn stats-refresh-btn" style="margin-bottom:12px;padding:11px;font-size:13px;background:rgba(255,255,255,.08);box-shadow:none;" onclick="loadOrdersList(true)"><svg class="ui-icon refresh-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4"/><path d="M4 4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4"/><path d="M20 20v-4h-4"/></svg>Обновить статистику</button>
             <div class="stats-lifetime-summary">
                 <div id="statistics-lifetime-revenue" class="stats-lifetime-hero">
-                    <div class="stats-hero-label">Выручка</div>
+                    <div class="stats-hero-label">Выручка · всё время</div>
                     <div class="stats-hero-value">Загрузка…</div>
-                    <div class="stats-hero-note">за всё время</div>
+                    <div class="stats-hero-note">Оплаченные заказы</div>
                 </div>
                 <div id="statistics-lifetime-orders" class="stats-lifetime-orders">
-                    <div class="stats-hero-label">Заказы</div>
+                    <div class="stats-hero-label">Заказов · всё время</div>
                     <div class="stats-hero-value">—</div>
-                    <div class="stats-hero-note">оплаченные</div>
+                    <div class="stats-hero-note">Только оплаченные</div>
                 </div>
             </div>
             <div class="stats-period-tabs" id="statistics-period-tabs">
@@ -539,7 +516,7 @@
                 <button class="stats-period-tab" data-period="month" onclick="selectStatisticsPeriod('month')">За месяц</button>
             </div>
             <div id="full-statistics-content" class="stats-dashboard" aria-live="polite">
-                
+                <div style="text-align:center;padding:24px;color:var(--muted);">Выберите период статистики</div>
             </div>
         </div>
     </div>
@@ -898,7 +875,7 @@
         const ADMIN_TZ_OFFSET = 5 * 3600 * 1000;
 
         function formatRub(n) {
-            return Math.round(n).toLocaleString("ru-RU").replace(/\s/g,"\u00A0") + "\u00A0₽";
+            return Math.round(n).toLocaleString("ru-RU") + " ₽";
         }
 
         // Доход за сегодня, текущую неделю (с понедельника) и месяц — только по оплаченным заказам.
@@ -978,10 +955,6 @@
 
         function renderFullStatistics() {
             const box = document.getElementById("full-statistics-content");
-            if (box && !box.classList.contains("is-open")) {
-                box.classList.add("is-open");
-                document.querySelectorAll(".stats-period-tab").forEach(b => b.classList.toggle("active", b.dataset.period === activeStatisticsPeriod));
-            }
             const lifetimeBox = document.getElementById("statistics-lifetime-revenue");
             const lifetimeOrdersBox = document.getElementById("statistics-lifetime-orders");
             if (!box || !lifetimeBox || !lifetimeOrdersBox) return;
@@ -989,13 +962,13 @@
             const paidAllTime = allOrders.filter(o => o.status === "approved");
             const lifetimeRevenue = paidAllTime.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
             lifetimeBox.innerHTML = `
-                <div class="stats-hero-label">Выручка</div>
+                <div class="stats-hero-label">Выручка · всё время</div>
                 <div class="stats-hero-value">${formatRub(lifetimeRevenue)}</div>
-                <div class="stats-hero-note">за всё время</div>`;
+                <div class="stats-hero-note">Оплаченные заказы</div>`;
             lifetimeOrdersBox.innerHTML = `
-                <div class="stats-hero-label">Заказы</div>
+                <div class="stats-hero-label">Заказов · всё время</div>
                 <div class="stats-hero-value">${paidAllTime.length.toLocaleString("ru-RU")}</div>
-                <div class="stats-hero-note">оплаченные</div>`;
+                <div class="stats-hero-note">Только оплаченные</div>`;
 
             const paidOrders = getStatisticsPeriodOrders(allOrders, activeStatisticsPeriod);
             const revenue = paidOrders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
@@ -1022,14 +995,14 @@
                     ? `<img class="stats-app-icon" src="${escapeStatsHtml(item.info.icon)}" alt="" loading="lazy" decoding="async">`
                     : `<div class="stats-app-icon stats-app-fallback" aria-hidden="true">${escapeStatsHtml((item.info.name || "П").slice(0,1))}</div>`;
                 return `<div class="stats-app-row"><div class="stats-app-rank">${index+1}</div>${icon}<div class="stats-app-info"><div class="stats-app-name">${name}</div><div class="stats-app-count">${count} ${count === 1 ? "заказ" : count >= 2 && count <= 4 ? "заказа" : "заказов"}</div></div></div>`;
-            }).join("") : '<div class="stats-empty">Пока нет оплаченных заказов</div>';
+            }).join("") : '<div style="font-size:12px;color:var(--muted);padding:4px 0;">За выбранный период оплаченных заказов с приложениями пока нет</div>';
             box.innerHTML = `
                 <div class="stats-period-summary">
-                    <div class="stats-metric"><div class="stats-metric-label">Выручка</div><div class="stats-metric-value">${formatRub(revenue)}</div><div class="stats-hero-note">${periodLabels[activeStatisticsPeriod]}</div></div>
-                    <div class="stats-metric"><div class="stats-metric-label">Заказы</div><div class="stats-metric-value">${paidOrders.length.toLocaleString("ru-RU")}</div><div class="stats-hero-note">${periodLabels[activeStatisticsPeriod]}</div></div>
+                    <div class="stats-metric"><div class="stats-metric-label">Общая выручка · ${periodLabels[activeStatisticsPeriod]}</div><div class="stats-metric-value">${formatRub(revenue)}</div></div>
+                    <div class="stats-metric"><div class="stats-metric-label">Количество заказов</div><div class="stats-metric-value">${paidOrders.length.toLocaleString("ru-RU")}</div></div>
                 </div>
                 <div class="stats-section">
-                    <div class="stats-section-title">Топ-5 приложений</div>
+                    <div class="stats-section-title">Топ-5 популярных приложений · ${periodLabels[activeStatisticsPeriod]}</div>
                     ${appRows}
                 </div>`;
         }
@@ -1051,10 +1024,43 @@
             if (currentView === 'view-orders' || currentView === 'view-statistics') loadOrdersList(true);
         }, 5000);
 
+
+        function switchMainTab(id, el) {
+            openView(id);
+            document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+            if(el) el.classList.add('active');
+        }
+        function updateHomeDashboard(){
+            const orders = Array.isArray(allOrdersCache) ? allOrdersCache : [];
+            const now = new Date();
+            const dayKey = d => new Date(d).toLocaleDateString('ru-RU',{timeZone:'Asia/Yekaterinburg'});
+            const today = orders.filter(o=>o.created_at && dayKey(o.created_at)===dayKey(now));
+            const yesterdayDate = new Date(now); yesterdayDate.setDate(now.getDate()-1);
+            const yesterday = orders.filter(o=>o.created_at && dayKey(o.created_at)===dayKey(yesterdayDate));
+            const paidToday = today.filter(o=>o.status==='approved');
+            const paidYesterday = yesterday.filter(o=>o.status==='approved');
+            const sum = a=>a.reduce((n,o)=>n+(Number(o.total_price)||0),0);
+            const revenue=sum(paidToday), prev=sum(paidYesterday), pending=orders.filter(o=>o.status==='pending').length;
+            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+            set('home-revenue',revenue.toLocaleString('ru-RU')+' ₽');
+            const diff=prev?Math.round((revenue-prev)/prev*100):null;
+            set('home-compare',prev?(diff>=0?'▲ +':'▼ ')+Math.abs(diff)+'% к вчера · '+prev.toLocaleString('ru-RU')+' ₽':'Сравнение со вчера недоступно');
+            set('home-orders-today',today.length);
+            set('home-pending',pending);
+            set('home-average',paidToday.length?Math.round(revenue/paidToday.length).toLocaleString('ru-RU')+' ₽':'— ₽');
+            const urgent=document.getElementById('home-urgent');
+            if(urgent){urgent.style.display=pending?'flex':'none';urgent.innerHTML=pending+' '+(pending===1?'заказ ждёт':pending<5?'заказа ждут':'заказов ждут')+' проверки <span>›</span>';}
+            const recent=document.getElementById('home-recent-orders');
+            if(recent){const latest=orders.slice(0,5);recent.innerHTML=latest.length?latest.map(o=>`<div class="recent-order"><div><b>Заказ ${o.order_number||('#'+o.id)}</b><small>${o.status==='approved'?'Оплачен':o.status==='rejected'?'Отклонён':'Ожидает'} · ${o.created_at?new Date(o.created_at).toLocaleString('ru-RU',{timeZone:'Asia/Yekaterinburg',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</small></div><strong>${(Number(o.total_price)||0).toLocaleString('ru-RU')} ₽</strong></div>`).join(''):'<div class="analytics-preview">Заказов пока нет</div>';}
+        }
+
         function openView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             currentView = id;
+            const nav = document.getElementById('bottom-nav');
+            if(nav) nav.style.display = ['view-menu','view-orders','view-catalog','view-marketing'].includes(id) ? 'flex' : 'none';
+            document.querySelectorAll('.nav-tab').forEach(x=>x.classList.toggle('active',x.dataset.view===id));
             window.scrollTo(0, 0);
             if (id === 'view-menu') {
                 tg.BackButton.hide();
@@ -1064,6 +1070,7 @@
                 updatePromoButton();
                 renderAllViews();
                 updatePendingOrdersBadge();
+                updateHomeDashboard();
             } else {
                 tg.BackButton.show();
                 if (id === 'view-create-promo-code') loadPromoCodesList();
@@ -1185,6 +1192,7 @@
                     ${actionsBlock}
                 </div>`;
             }).join('');
+            updateHomeDashboard();
         }
 
         async function approveOrderFromAdmin(orderId) {
