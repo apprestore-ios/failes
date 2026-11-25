@@ -578,6 +578,12 @@ function smartFilterAdminApps(query, source = appsData) {
 }
 
 const $ = id => document.getElementById(id);
+/* Обновляет innerHTML только если разметка реально изменилась — иначе <img> пересоздаются и иконки моргают */
+function setHTML(el, html) {
+    if (!el || el._lastHTML === html) return;
+    el.innerHTML = html;
+    el._lastHTML = html;
+}
 const ic = (n, c = '') => `<svg class="ic ${c}" viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
 const ADMIN_TZ_OFFSET = 5 * 3600 * 1000;
 
@@ -741,7 +747,7 @@ function renderOrderStats() {
     if (!box) return;
     const paid = allOrdersCache.filter(o => o.status === 'approved' && !isNaN(ordTime(o)));
     const sum = p => formatRub(paid.filter(o => ordTime(o) >= periodStart(p)).reduce((s, o) => s + orderSum(o), 0));
-    box.innerHTML = `<div><span>Сегодня</span><b>${sum('day')}</b></div><div><span>Неделя</span><b>${sum('week')}</b></div><div><span>Месяц</span><b>${sum('month')}</b></div>`;
+    setHTML(box, `<div><span>Сегодня</span><b>${sum('day')}</b></div><div><span>Неделя</span><b>${sum('week')}</b></div><div><span>Месяц</span><b>${sum('month')}</b></div>`);
 }
 
 function renderStats() {
@@ -764,10 +770,10 @@ function renderStats() {
     const cnt = {};
     paid.forEach(o => (o.app_keys || []).forEach(k => { cnt[k] = (cnt[k] || 0) + 1; }));
     const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    $('st-top').innerHTML = top.length ? top.map(([k, n]) => {
+    setHTML($('st-top'), top.length ? top.map(([k, n]) => {
         const a = appsData.find(x => x.key === k);
         return `<div class="top-row"><img src="${a ? a.icon : ''}"><div class="nm"><div>${a ? a.name : k}</div><div class="bar"><i style="width:${Math.round(n / top[0][1] * 100)}%"></i></div></div><div class="n">${n}</div></div>`;
-    }).join('') : '<div class="empty">Нет оплаченных заказов за период</div>';
+    }).join('') : '<div class="empty">Нет оплаченных заказов за период</div>');
 }
 
 /* ----- Заказы ----- */
@@ -796,10 +802,10 @@ function setOrderFilterByKey(f) {
 
 async function loadOrdersList(silent = false) {
     const container = $('orders-container');
-    if (!silent && container) container.innerHTML = '<div class="empty">Загрузка...</div>';
+    if (!silent && container) setHTML(container, '<div class="empty">Загрузка...</div>');
     const res = await sbFetch("orders?select=*&order=created_at.desc");
     if (res === null) {
-        if (!silent && container) container.innerHTML = '<div class="empty" style="color:#fca5a5">Ошибка загрузки заказов</div>';
+        if (!silent && container) setHTML(container, '<div class="empty" style="color:#fca5a5">Ошибка загрузки заказов</div>');
         return;
     }
     allOrdersCache = res;
@@ -820,9 +826,9 @@ function renderOrdersList() {
     const container = $('orders-container');
     if (!container) return;
     const filtered = allOrdersCache.filter(o => currentOrderFilter === 'all' || o.status === currentOrderFilter);
-    if (filtered.length === 0) { container.innerHTML = '<div class="empty">Заказов в этой категории нет</div>'; return; }
+    if (filtered.length === 0) { setHTML(container, '<div class="empty">Заказов в этой категории нет</div>'); return; }
     const ST = { pending: ['clock', 'Ожидает'], approved: ['check', 'Оплачен'], rejected: ['x', 'Отклонён'] };
-    container.innerHTML = filtered.map(order => {
+    setHTML(container, filtered.map(order => {
         const [sIcon, sText] = ST[order.status] || ST.pending;
         const sClass = ST[order.status] ? order.status : 'pending';
         const dateStr = order.created_at ? new Date(order.created_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
@@ -856,7 +862,7 @@ function renderOrdersList() {
             <div class="o-apps">${appsNames}</div>
             <div class="o-meta">${promo}<div class="o-price">${order.total_price || 0} ₽</div></div>
             ${link}${acts ? `<div class="o-act">${acts}</div>` : ''}${foot}</div>`;
-    }).join('');
+    }).join(''));
 }
 
 async function approveOrderFromAdmin(orderId) {
