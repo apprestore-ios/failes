@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>AppRestore Admin</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(function(){const tg=window.Telegram&&window.Telegram.WebApp;if(!tg||!tg.initData){window.location.replace("https://apprestore-ios.ru");}})();
+</script>
+<style>
+:root{--text:#f8fafc;--muted:rgba(255,255,255,.55);--card:rgba(17,24,39,.72);--line:rgba(255,255,255,.1);--green:#34d399;--blue:#60a5fa;--amber:#fbbf24;--red:#f87171;--violet:#a78bfa;--pink:#f472b6;--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100dvh;overflow:hidden;background:#070a0f}
+body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;user-select:none;-webkit-user-select:none;position:fixed;inset:0}
+.aurora{position:fixed;inset:-50px;z-index:-1;background:linear-gradient(135deg,rgba(7,10,15,.6),rgba(17,24,39,.85)),url("https://github.com/apprestore-ios/failes/releases/download/Логотипы/fon_saita.png") top center/cover no-repeat #070a0f}
+.ic{width:1em;height:1em;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;overflow:visible}
+#app{position:fixed;inset:0;max-width:430px;margin:0 auto}
+.page{position:absolute;inset:0;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--st) + 14px) 16px calc(92px + var(--sb))}
+.page.active{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page::-webkit-scrollbar{display:none}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
+.pill{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:12px;font-weight:700;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot.off{background:var(--red);box-shadow:0 0 8px var(--red)}
+.iconbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:18px}
+.iconbtn:active{transform:scale(.94)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.card-h{font-size:12px;font-weight:750;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;border-radius:15px;background:rgba(0,0,0,.4);border:1px solid var(--line);margin-bottom:12px}
+.seg button{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:700;padding:9px 4px;border-radius:11px;transition:.2s}
+.seg button.active{background:rgba(96,165,250,.22);color:#fff;box-shadow:0 0 0 1px rgba(96,165,250,.45)}
+.hero{border-radius:24px;padding:18px 16px 14px;margin-bottom:12px;background:linear-gradient(135deg,rgba(52,211,153,.2),rgba(59,130,246,.16));border:1.5px solid rgba(52,211,153,.35);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.hero-label{font-size:12px;font-weight:750;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.65)}
+.hero-sum{font-size:38px;font-weight:850;letter-spacing:-1.2px;margin:4px 0 2px;font-variant-numeric:tabular-nums;color:#fff}
+.hero-sub{font-size:12.5px;color:var(--muted);font-weight:550;min-height:16px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+.kpi{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:14px;padding:9px 8px;text-align:center;min-width:0}
+.kpi b{display:block;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi span{font-size:10.5px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.grid2 .card{margin:0}
+.big{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.act{display:flex;align-items:center;gap:10px;padding:12px;border-radius:18px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:13.5px;font-weight:750;text-align:left;width:100%}
+.act:active{transform:scale(.97)}
+.ibox{width:36px;height:36px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px}
+.top-row{display:flex;align-items:center;gap:10px;padding:7px 0}
+.top-row img{width:34px;height:34px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.top-row .nm{flex:1;min-width:0}
+.top-row .nm div:first-child{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#34d399,#60a5fa)}
+.top-row .n{font-size:14px;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+.empty{text-align:center;padding:22px;color:var(--muted);font-size:13.5px;font-weight:550}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stats3 div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 6px;text-align:center}
+.stats3 span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.stats3 b{display:block;font-size:15px;font-weight:800;color:var(--green);margin-top:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip-f{padding:9px 6px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);font:inherit;font-size:13px;font-weight:700}
+.chip-f.active{background:rgba(96,165,250,.22);border-color:#3b82f6;color:#fff}
+.order{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:13px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px}
+.o-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.o-num{font-size:15.5px;font-weight:800}
+.o-time{font-size:11.5px;color:var(--muted);font-weight:550;margin-top:1px}
+.st{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:99px;font-size:11.5px;font-weight:750;border:1px solid}
+.st.pending{background:rgba(251,191,36,.14);color:#fde047;border-color:rgba(251,191,36,.35)}
+.st.approved{background:rgba(52,211,153,.14);color:#6ee7b7;border-color:rgba(52,211,153,.35)}
+.st.none{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--line)}
+.st.rejected{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.35)}
+.o-apps{display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.3;color:#e2e8f0;background:rgba(0,0,0,.28);padding:9px 11px;border-radius:12px;font-weight:550}
+.o-app{display:flex;align-items:center;gap:8px;min-width:0}
+.o-app img{width:22px;height:22px;border-radius:6px;object-fit:cover;flex:none;background:rgba(255,255,255,.08)}
+.o-app span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.o-foot{padding-top:2px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.o-foot .st{flex:0 1 auto;min-width:0;white-space:nowrap;font-size:11.5px;padding:6px 10px}
+.o-foot .st .ic{flex:none}
+.o-foot .ob.del{margin-left:auto}
+.o-act .ob:not(.del){flex:1 1 auto;white-space:nowrap}
+.o-meta{display:flex;flex-direction:column;gap:9px;padding:11px 13px;border-radius:14px;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.04));border:1px solid rgba(96,165,250,.22)}
+.o-sum{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.o-price{font-size:22px;line-height:1;font-weight:900;color:#93c5fd;font-variant-numeric:tabular-nums;letter-spacing:-.01em;text-shadow:0 0 18px rgba(96,165,250,.45)}
+.o-sum small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8}
+.o-tags{display:flex;flex-direction:column;gap:4px;padding-top:9px;border-top:1px solid rgba(96,165,250,.18)}
+.o-tag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--green)}
+.o-tag svg{width:13px;height:13px;flex:none}
+.o-link{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:12px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);font-size:12px;color:#bfdbfe;font-weight:600}
+.o-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.o-act{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ob{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;border-radius:13px;border:1px solid transparent;font:inherit;font-size:12.5px;font-weight:750;color:#fff}
+.ob:active{transform:scale(.96)}
+.ob.ok{background:linear-gradient(135deg,#16a34a,#15803d);flex:1.6}
+.ob.no{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.35)}
+.ob.del{flex:0 0 44px;background:rgba(255,255,255,.05);color:var(--muted);border-color:var(--line)}
+.field{width:100%;padding:13px 15px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.42);color:#fff;font:inherit;font-size:15px;outline:0;margin-bottom:10px;user-select:text;-webkit-user-select:text}
+.field:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.sbox{position:relative}
+.sbox .ic{position:absolute;left:14px;top:14px;font-size:17px;color:var(--muted)}
+.sbox .field{padding-left:40px}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;border:1px solid transparent;font:inherit;font-size:15px;font-weight:750;color:#fff;background:#3b82f6;box-shadow:0 8px 20px rgba(59,130,246,.3)}
+.btn:active{transform:scale(.97)}
+.btn:disabled,.btn.off{opacity:.45;pointer-events:none}
+.btn.violet{background:linear-gradient(135deg,#9333ea,#7e22ce);box-shadow:0 10px 24px rgba(147,51,234,.35)}
+.btn.green{background:linear-gradient(135deg,#059669,#047857);box-shadow:0 8px 20px rgba(5,150,105,.3)}
+.btn.amber{background:linear-gradient(135deg,#ca8a04,#a16207);box-shadow:0 8px 20px rgba(202,138,4,.3)}
+.btn.ghost{background:rgba(255,255,255,.07);box-shadow:none;border-color:var(--line)}
+.btn.danger{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.35);box-shadow:none}
+.btn.small{padding:10px;font-size:13px;border-radius:14px}
+.sticky{position:sticky;bottom:-4px;padding:10px 0 4px;z-index:5;background:linear-gradient(transparent,rgba(7,10,15,.92) 35%)}
+.ttl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.ttl div{padding:10px 4px;border-radius:14px;text-align:center;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:700}
+.ttl div.active{background:rgba(96,165,250,.22);border-color:#3b82f6;color:#fff}
+.label{font-size:12.5px;color:var(--muted);font-weight:650;margin:0 0 8px}
+.app{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:8px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.app:active{background:rgba(255,255,255,.11)}
+.app.na{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.05)}
+.app.na>*{opacity:.5}
+.app img{width:42px;height:42px;border-radius:12px;object-fit:cover;border:1px solid var(--line);flex-shrink:0}
+.ai{flex:1;min-width:0}
+.an{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.as{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.bad{background:rgba(248,113,113,.15);color:#fca5a5;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700}
+.cb{width:24px;height:24px;border-radius:8px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;font-size:15px;transition:.15s}
+.cb.on{background:#3b82f6;border-color:#3b82f6;color:#fff;box-shadow:0 4px 10px rgba(59,130,246,.4)}
+.price{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:800;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
+.price.prem{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.4);color:#d8b4fe}
+.newb{padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted)}
+.newb.active{background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(236,72,153,.4)}
+.switch{position:relative;width:50px;height:30px;border-radius:15px;background:rgba(255,255,255,.13);flex-shrink:0;transition:.25s}
+.switch.on{background:#34c759;box-shadow:0 0 10px rgba(52,199,89,.4)}
+.switch::after{content:"";position:absolute;width:26px;height:26px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.25s cubic-bezier(.175,.885,.32,1.275)}
+.switch.on::after{transform:translateX(20px)}
+.promo{display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:8px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.pc{flex:1;min-width:0}
+.pc b{display:block;font-size:15.5px;font-weight:800;letter-spacing:.8px;color:var(--green)}
+.pc span{font-size:12px;color:var(--muted);font-weight:550}
+.row{display:flex;align-items:center;gap:12px}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:15px;font-weight:750}
+.row .t span{font-size:12px;color:var(--muted);font-weight:500;line-height:1.35;display:block;margin-top:2px}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + var(--sb));background:rgba(10,14,22,.82);border-top:1px solid var(--line);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);z-index:20}
+.tab{position:relative;border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font:inherit;font-size:10.5px;font-weight:700;border-radius:14px;transition:.2s}
+.tab .ic{font-size:22px}
+.tab.active{color:#fff}
+.tab.active .ic{color:var(--blue);filter:drop-shadow(0 0 8px rgba(96,165,250,.6))}
+.tbadge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#ef4444;color:#fff;font-size:10.5px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #0a0e16}
+.tbadge.show{display:flex}
+.sheet-wrap{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.sheet-wrap.open{display:flex}
+.sheet{width:100%;max-width:430px;background:#0e131c;border:1px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;padding:10px 18px calc(20px + var(--sb));text-align:center;animation:up .3s cubic-bezier(.16,1,.3,1);max-height:90dvh;overflow-y:auto}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.grab{width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.25);margin:0 auto 14px}
+.sheet h2{margin:8px 0 4px;font-size:20px;font-weight:800}
+.sheet p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.4;font-weight:500}
+.bigic{width:62px;height:62px;border-radius:20px;margin:6px auto 4px;display:flex;align-items:center;justify-content:center;font-size:30px}
+#toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translate(-50%,-120px);z-index:99;background:rgba(17,24,39,.96);color:#fff;padding:11px 20px;border-radius:99px;font-size:14px;font-weight:650;border:1px solid var(--line);transition:.3s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+.hide{display:none!important}
+.prev{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.prev img{width:34px;height:34px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.sheet.tall{height:86dvh;display:flex;flex-direction:column;text-align:left}
+.sheet.tall .sl{flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20v-7"/><path d="M12 20V5"/><path d="M19 20v-10"/><path d="M3 20h18"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4l2-2"/><path d="M20 20v-5h-5"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+<symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 17V7h3.2a2.8 2.8 0 0 1 0 5.6H8.5"/><path d="M8.5 15h5"/></symbol>
+</defs></svg>
+<div id="toast"></div>
+
+<main id="app">
+<!-- СТАТИСТИКА -->
+<section class="page active" id="page-home">
+  <div class="top"><div><h1>Статистика</h1></div>
+    <button class="iconbtn" onclick="goTab('system')"><svg class="ic"><use href="#i-sliders"/></svg></button></div>
+  <div class="seg" id="stat-seg">
+    <button data-p="day" class="active" onclick="setStatPeriod('day')">Сегодня</button><button data-p="week" onclick="setStatPeriod('week')">Неделя</button><button data-p="month" onclick="setStatPeriod('month')">Месяц</button><button data-p="all" onclick="setStatPeriod('all')">Всё время</button>
+  </div>
+  <div class="hero"><div class="hero-label">Доход</div><div class="hero-sum" id="st-sum">–</div><div class="hero-sub" id="st-sub"></div>
+    <div class="kpis"><div class="kpi"><b id="st-paid">–</b><span>Оплачено</span></div><div class="kpi" onclick="goTab('orders');setOrderFilterByKey('pending')"><b id="st-pending">–</b><span>Ожидают</span></div></div></div>
+  <div class="grid2">
+    <div class="card"><div class="card-h">Применено скидок</div><div class="big" id="st-disc" style="color:var(--amber)">–</div></div>
+    <div class="card"><div class="card-h">С промокодом</div><div class="big" id="st-promo" style="color:var(--violet)">–</div></div>
+  </div>
+  <div class="card"><div class="card-h">Топ приложений</div><div id="st-top"></div></div>
+</section>
+
+<!-- ЗАКАЗЫ -->
+<section class="page" id="page-orders">
+  <div class="top"><div><h1>Заказы</h1></div><button class="iconbtn" onclick="loadOrdersList()"><svg class="ic"><use href="#i-refresh"/></svg></button></div>
+  <div class="stats3" id="orders-stats"><div><span>Сегодня</span><b>–</b></div><div><span>Неделя</span><b>–</b></div><div><span>Месяц</span><b>–</b></div></div>
+  <div class="chips" id="order-chips">
+    <button class="chip-f active" onclick="setOrderFilter('all',this)">Все</button><button class="chip-f" onclick="setOrderFilter('pending',this)">Ожидают</button><button class="chip-f" onclick="setOrderFilter('rejected',this)">Отклонены</button>
+  </div>
+  <div id="orders-container"><div class="empty">Загрузка...</div></div>
+</section>
+
+<!-- ПРИЛОЖЕНИЯ -->
+<section class="page" id="page-apps">
+  <div class="top"><div><h1>Каталог</h1></div></div>
+  <div class="seg" id="apps-seg"><button class="active" onclick="setAppsMode('prices',this)">Цены</button><button onclick="setAppsMode('vis',this)">Видимость</button><button onclick="setAppsMode('promo',this)">Акции</button></div>
+  <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input type="search" id="apps-search" class="field" placeholder="Поиск приложения..." oninput="renderAppsList()"></div>
+  <div id="mass-panel" class="card hide">
+    <div class="label">Скидка в рублях применится к выбранным приложениям. Для возврата используйте базовые цены.</div>
+    <input type="tel" inputmode="numeric" id="promo-discount-input" class="field" placeholder="Скидка, например 50">
+    <div class="row" style="gap:8px"><button class="btn ghost small" onclick="selectAllPromo()">Выбрать все</button><button class="btn amber small" id="btn-apply-promo" onclick="applyPromo()"><svg class="ic"><use href="#i-tag"/></svg>Изменить (<span id="cnt-apply">0</span>)</button></div>
+    <button class="btn danger small" id="btn-reset-promo" style="margin-top:8px" onclick="resetPromo()"><svg class="ic"><use href="#i-refresh"/></svg>Вернуть базовые (<span id="cnt-reset">0</span>)</button>
+  </div>
+  <div id="list-apps"></div>
+</section>
+
+<!-- ВЫДАЧА -->
+<section class="page" id="page-tools">
+  <div class="top"><div><h1>Для клиентов</h1></div></div>
+  <div class="seg" id="tools-seg"><button class="active" onclick="setToolMode('link')">Ссылка</button><button onclick="setToolMode('promo')">Промокоды</button></div>
+  <div id="tool-link">
+    <div class="card">
+      <div class="label">Время работы после открытия клиентом</div>
+      <div class="ttl" id="ttl-pills"><div class="active" onclick="selectTtl(5,this)">5 мин</div><div onclick="selectTtl(10,this)">10 мин</div><div onclick="selectTtl(15,this)">15 мин</div><div onclick="selectTtl(30,this)">30 мин</div></div>
+      <button class="btn ghost" style="margin-bottom:10px" onclick="openSheet('sheet-apps')"><svg class="ic"><use href="#i-grid"/></svg>Выбрать приложения (<span id="cnt-link">0</span>)</button>
+      <div id="link-chosen" class="prev hide"></div>
+      <button class="btn violet off" id="btn-generate-main" onclick="createLink()"><svg class="ic"><use href="#i-link"/></svg>Сгенерировать ссылку</button>
+    </div>
+  </div>
+  <div id="tool-promo" class="hide">
+    <div class="card">
+      <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="field" placeholder="Скидка в рублях, например 100">
+      <button class="btn green" id="btn-generate-promo-code" onclick="createPromoCode()"><svg class="ic"><use href="#i-gift"/></svg>Сгенерировать</button>
+    </div>
+    <div class="card-h" style="margin:4px 4px 8px">Список промокодов</div>
+    <div id="promo-codes-container"></div>
+  </div>
+</section>
+
+<!-- НАСТРОЙКИ -->
+<section class="page" id="page-system">
+  <div class="top"><div><h1>Настройки</h1></div></div>
+  <div class="card"><div class="row" onclick="toggleSite()"><span class="ibox" style="background:rgba(52,211,153,.18);color:var(--green)"><svg class="ic"><use href="#i-power"/></svg></span><div class="t"><b>Сайт</b><span id="site-state">Работает</span></div><div class="switch" id="sw-site"></div></div></div>
+  <div class="card"><div class="row" onclick="toggleBulk()"><span class="ibox" style="background:rgba(251,191,36,.18);color:var(--amber)"><svg class="ic"><use href="#i-percent"/></svg></span><div class="t"><b>Скидка от 3 приложений</b><span id="bulk-state">Включена</span></div><div class="switch" id="sw-bulk"></div></div></div>
+</section>
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-t="home" onclick="goTab('home')"><svg class="ic"><use href="#i-chart"/></svg>Статистика</button>
+  <button class="tab" data-t="orders" onclick="goTab('orders')"><svg class="ic"><use href="#i-bag"/></svg>Заказы<span class="tbadge" id="pending-orders-badge">0</span></button>
+  <button class="tab" data-t="apps" onclick="goTab('apps')"><svg class="ic"><use href="#i-grid"/></svg>Каталог</button>
+  <button class="tab" data-t="tools" onclick="goTab('tools')"><svg class="ic"><use href="#i-link"/></svg>Выдача</button>
+</nav>
+
+<!-- Шторки -->
+<div class="sheet-wrap" id="sheet-price" onclick="if(event.target===this)closeSheets()"><div class="sheet">
+  <div class="grab"></div>
+  <img id="detail-price-icon" src="" style="width:72px;height:72px;border-radius:20px;object-fit:cover;border:1px solid var(--line);margin-top:4px">
+  <h2 id="detail-price-name"></h2><p>Стоимость установки в рублях</p>
+  <input type="tel" inputmode="numeric" id="detail-price-input" class="field" placeholder="Цена" style="font-size:20px;font-weight:800;text-align:center">
+  <button class="btn" id="btn-save-price"><svg class="ic"><use href="#i-check"/></svg>Сохранить цену</button>
+</div></div>
+<div class="sheet-wrap" id="sheet-apps" onclick="if(event.target===this)closeSheets()"><div class="sheet tall">
+  <div class="grab"></div>
+  <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input type="search" id="create-link-search" class="field" placeholder="Поиск приложения..." oninput="renderCreateLinkList()"></div>
+  <div class="sl" id="list-create-link"></div>
+  <button class="btn" style="margin-top:10px" onclick="closeSheets()"><svg class="ic"><use href="#i-check"/></svg>Готово (<span id="cnt-link2">0</span>)</button>
+</div></div>
+<div class="sheet-wrap" id="sheet-result" onclick="if(event.target===this)closeSheets()"><div class="sheet">
+  <div class="grab"></div>
+  <div class="bigic" id="res-icon"></div>
+  <h2 id="res-title"></h2><p id="res-desc"></p>
+  <div id="res-apps" style="display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto;margin-bottom:12px;text-align:left"></div>
+  <input type="text" id="res-input" class="field" readonly style="font-weight:750;text-align:center" onclick="copyText(this.value)">
+  <button class="btn" id="res-forward"><svg class="ic"><use href="#i-send"/></svg>Переслать покупателю</button>
+  <button class="btn ghost" style="margin-top:8px" onclick="copyText($('res-input').value)"><svg class="ic"><use href="#i-copy"/></svg>Копировать</button>
+</div></div>
+
+<script>
+        const SUPABASE_URL = "https://gwypxcdnefxlhwvtkvkc.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg";
+        const CLIENT_SITE_URL = "https://apprestore-ios.ru";
+
+        async function sbFetch(path, options = {}) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+                    ...options,
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        ...(options.headers || {})
+                    }
+                });
+                if (!res.ok) return null;
+                const text = await res.text();
+                return text ? JSON.parse(text) : { success: true };
+            } catch (e) { return null; }
+        }
+
+        document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturestart', e => e.preventDefault());
+
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        try {
+            if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+            tg.setHeaderColor('#070a0f');
+            tg.setBackgroundColor('#070a0f');
+        } catch (e) {}
+
+        const L_BASE = "https://github.com/apprestore-ios/failes/releases/download/Логотипы/";
+        const appsData = [
+          { key: "vk", name: "ВКонтакте", category: "social", url: "/manifests/vk.plist", icon: L_BASE + "vk.png", ios: "iOS 17.6+" },
+          { key: "max", name: "MAX", category: "social", url: "/manifests/max.plist", icon: L_BASE + "max.png", ios: "iOS 15.5+" },
+          { key: "max2", name: "MAX (Yaqin Messenger)", category: "social", url: "/manifests/max2.plist", icon: L_BASE + "max2.png", ios: "iOS 15.5+" },
+          { key: "vk_clips", name: "VK Клипы", category: "social", url: "/manifests/vk_clips.plist", icon: L_BASE + "vkclips.png", ios: "iOS 17.6+" },
+          { key: "vk_massanger", name: "VK Me", category: "social", url: "/manifests/vk_massanger.plist", icon: L_BASE + "vkmessenger.png", ios: "iOS 17.6+" },
+          { key: "vtb_sirius", name: "ВТБ Банк (Сириус)", category: "banks", url: "/manifests/vtb_sirius.plist", icon: L_BASE + "vtb_sirius.png", ios: "iOS 16.0+" },
+          { key: "vk_video", name: "VK Видео", category: "social", url: "/manifests/vk_video.plist", icon: L_BASE + "vkvideo.png", ios: "iOS 17.6+" },
+          { key: "vk_music", name: "VK Музыка (Аудиотропа)", category: "social", url: "/manifests/vk_music.plist", icon: L_BASE + "vkmusic_tropa.png", ios: "iOS 16.6+" },
+          { key: "incy", name: "INCY", category: "other", url: "/manifests/incy.plist", icon: L_BASE + "incy.png", ios: "iOS 15.0+" },  
+          { key: "mailru", name: "Почта Mail", category: "other", url: "/manifests/mailru.plist", icon: L_BASE + "mailru.png", ios: "iOS 16.0+" },
+          { key: "oblakomail", name: "Облако Mail", category: "other", url: "/manifests/oblakomail.plist", icon: L_BASE + "oblakomail.png", ios: "iOS 15.0+" },
+          { key: "okru", name: "Одноклассники", category: "social", url: "/manifests/okru.plist", icon: L_BASE + "okru.png", ios: "iOS 15.6+" },
+          { key: "vkmusic_original", name: "VK Музыка (Оригинал)", category: "social", url: "/manifests/vkmusic_original.plist", icon: L_BASE + "vkmusic_original.png", ios: "iOS 17.6+" },
+          { key: "okko", name: "Okko", category: "other", url: "/manifests/okko.plist", icon: L_BASE + "okko.png", ios: "iOS 16.0+" },
+          { key: "gazprombank_seif", name: "ГазпромБанк (Цифровой Сейф)", category: "banks", url: "/manifests/gazprombank_seif.plist", icon: L_BASE + "gazprombank_seif.png", ios: "iOS 16.0+" },
+          { key: "sberfinansy", name: "СберБанк (Финансы Онлайн)", category: "banks", url: "/manifests/sberfinansy.plist", icon: L_BASE + "sber.png", ios: "iOS 15.0+" },
+          { key: "alfabank", name: "Альфа Банк (Апгрейд)", category: "banks", url: "/manifests/alfabank.plist", icon: L_BASE + "alfabank.png", ios: "iOS 16.0" },
+          { key: "premier_zoodelivery", name: "PREMIER (ZooDelivery)", category: "other", url: "/manifests/premier_zoodelivery.plist", icon: L_BASE + "premier_zoodelivery.png", ios: "iOS 16.0+" },
+          { key: "avito", name: "Авито", category: "other", url: "/manifests/avito.plist", icon: L_BASE + "avito.png", ios: "iOS 15.2+" },
+          { key: "sovkombank_vsekarty", name: "Совкомбанк (Все карты MDS)", category: "banks", url: "/manifests/sovkombank_vsekarty.plist", icon: L_BASE + "vsekarty.png", ios: "iOS 16.0+" },
+          { key: "tbank_8pro", name: "Т-Банк (8PRO)", category: "banks", url: "/manifests/tbank_8pro.plist", icon: L_BASE + "tbank_8pro.png", ios: "iOS 16.0+" },
+          { key: "sovkombank_sinoptik", name: "Совкомбанк (Синоптик+)", category: "banks", url: "/manifests/sovkombank_sinoptik.plist", icon: L_BASE + "sinoptik.png", ios: "iOS 17.0+" },
+          { key: "avito_patrolkit", name: "Авито (PatrolKit)", category: "other", url: "/manifests/avito_patrolkit.plist", icon: L_BASE + "avito_patrolkit.png", ios: "iOS 16.0+" },
+          { key: "tbank_spotluna", name: "Т-Банк (Spotluna)", category: "banks", url: "/manifests/tbank_spotluna.plist", icon: L_BASE + "tbank.png", ios: "iOS 16.0+" },
+          { key: "lenta_original", name: "Лента", category: "other", url: "/manifests/lenta_original.plist", icon: L_BASE + "lenta.png", ios: "iOS 14.4+" },
+          { key: "yandex_pay", name: "Яндекс Пэй", category: "banks", url: "/manifests/yandex_pay.plist", icon: L_BASE + "yandexpay.png", ios: "iOS 15.0+" },
+          { key: "2gis", name: "2ГИС", category: "other", url: "/manifests/2gis.plist", icon: L_BASE + "2gis.png", ios: "iOS 16.0+" },
+          { key: "yla", name: "Юла", category: "other", url: "/manifests/yla.plist", icon: L_BASE + "youla.png", ios: "iOS 15.6+" },
+          { key: "psb", name: "ПСБ (Чайная Церемония)", category: "banks", url: "/manifests/psb.plist", icon: L_BASE + "psb.png", ios: "iOS 15.0+" },
+          { key: "sberbiznes", name: "СберБизнес (Al dente)", category: "other", url: "/manifests/sberbiznes.plist", icon: L_BASE + "sberbiznes.png", ios: "iOS 15.0+" },
+          { key: "mobilecheck", name: "СовкомБизнес (MobileCheck)", category: "other", url: "/manifests/mobilecheck.plist", icon: L_BASE + "mobilecheck.png", ios: "iOS 15.0+" },
+          { key: "kuper", name: "Купер", category: "other", url: "/manifests/kuper.plist", icon: L_BASE + "kuper.png", ios: "iOS 15.0+" },
+          { key: "rutube", name: "Rutube (SlicingDices)", category: "other", url: "/manifests/rutube.plist", icon: L_BASE + "rutube.png", ios: "iOS 16.0+" },
+          { key: "mobio", name: "СберМобайл (Мобио)", category: "other", url: "/manifests/mobio.plist", icon: L_BASE + "sbermobail_mobio.png", ios: "iOS 16.6+" },
+          { key: "tmobail", name: "Т-Мобайл (TIMOB)", category: "other", url: "/manifests/tmobail.plist", icon: L_BASE + "tmobile.png", ios: "iOS 16.0+" },
+          { key: "azslukoil", name: "АЗС Лукойл", category: "other", url: "/manifests/azslukoil.plist", icon: L_BASE + "azslukoil.png", ios: "iOS 14.0+" },
+          { key: "ubrir_rubli", name: "УБРиР (РУбли)", category: "banks", url: "/manifests/ubrir_rubli.plist", icon: L_BASE + "ubrir_rybli.png", ios: "iOS 15.0+" },
+          { key: "sberkids", name: "СберKids (SpeakaBoo)", category: "banks", url: "/manifests/sberkids.plist", icon: L_BASE + "sberkids.png", ios: "iOS 15.0+" },
+          { key: "lenta_bystro", name: "Лента (Быстро Продукты)", category: "other", url: "/manifests/lenta_bystro.plist", icon: L_BASE + "lenta_bistropodukti.png", ios: "iOS 16.0+" },
+          { key: "avito_anero", name: "Авито (Anero)", category: "other", url: "/manifests/avito_anero.png", icon: L_BASE + "avito_anero.png", ios: "iOS 16.0+" },
+          { key: "craftersy", name: "Т-Банк (Craftersy)", category: "banks", url: "/manifests/craftersy.plist", icon: L_BASE + "tbank_craftersy.png", ios: "iOS 16.0+" },
+          { key: "scbnotes", name: "СовкомБанк (SCB Notes)", category: "banks", url: "/manifests/scbnotes.plist", icon: L_BASE + "scbnotes.png", ios: "iOS 17.0+" },
+          { key: "akbarsbank_vseychteno", name: "АК Барс (Всё Учтено)", category: "banks", url: "/manifests/akbarsbank_vseychteno.plist", icon: L_BASE + "akbarsbank_vseychteno.png", ios: "iOS 15.0+" },
+          { key: "blum", name: "РокетБанк (Блум)", category: "banks", url: "/manifests/blum.plist", icon: L_BASE + "rocketbank_blum.png", ios: "iOS 15.0+" },
+          { key: "happ_proxy", name: "Happ Proxy", category: "other", url: "/manifests/happ_proxy.plist", icon: L_BASE + "happ.png", ios: "iOS 15.0+" },
+          { key: "chatgpt", name: "ChatGPT", category: "other", url: "/manifests/chatgpt.plist", icon: L_BASE + "chatgpt.png", ios: "iOS 16.0+" },
+          { key: "gemini", name: "Google Gemini", category: "other", url: "/manifests/gemini.plist", icon: L_BASE + "gemini.png", ios: "iOS 14.0+" },
+          { key: "lenta_lychsheonlain", name: "Лента (Лучше Онлайн)", category: "other", url: "/manifests/lenta_lychsheonlain.plist", icon: L_BASE + "lenta_lychsheonlain.png", ios: "iOS 15.1+" },
+          { key: "sberinvest", name: "СберИнвестиции (Сияние)", category: "investments", url: "/manifests/sberinvest.plist", icon: L_BASE + "sberinvest.png", ios: "iOS 16.0+" },
+          { key: "vtbinvest", name: "ВТБ Инвестиции (Kafario)", category: "investments", url: "/manifests/vtbinvest.plist", icon: L_BASE + "vtbinvest_kafario.png", ios: "iOS 17.6+" },
+          { key: "alfa_invest", name: "Альфа Инвестиции (Ход вверх)", category: "investments", url: "/manifests/alfa_invest.plist", icon: L_BASE + "alfainvest_hodvverh.png", ios: "iOS 16.0+" },
+          { key: "gazprominvest_billfo", name: "ГазпромИнвестиции (BillFO)", category: "investments", url: "/manifests/gazprominvest_billfo.plist", icon: L_BASE + "gazprominvest.png", ios: "iOS 15.0+" },
+          { key: "sbpay", name: "СБПэй", category: "other", url: "/manifests/sbpay.plist", icon: L_BASE + "sbpay.png", ios: "iOS 13.0+" },
+          { key: "yota_atoy", name: "YOTA (Atoy)", category: "other", url: "/manifests/yota_atoy.plist", icon: L_BASE + "yota.png", ios: "iOS 15.0+" },
+          { key: "gazpromneft", name: "Газпромнефть (Бак+Бонус)", category: "other", url: "/manifests/gazpromneft.plist", icon: L_BASE + "gazpromneft_bak+bonus.png", ios: "iOS 15.0+" },
+          { key: "novikombank", name: "Новикомбанк (Ночной код)", category: "banks", url: "/manifests/novikombank.plist", icon: L_BASE + "novikombank.png", ios: "iOS 12.0+" },
+          { key: "rshb_gysi", name: "РСХБ (Любовь и гуси)", category: "banks", url: "/manifests/rshb_gysi.plist", icon: L_BASE + "rshb.png", ios: "iOS 15.5+" },
+          { key: "mtsdengi", name: "МТС Деньги", category: "banks", url: "/manifests/mtsdengi.plist", icon: L_BASE + "mtsbank.png", ios: "iOS 14.0+" },
+          { key: "domrf_roomassist", name: "Дом.РФ (RoomAssist)", category: "banks", url: "/manifests/domrf_roomassist.plist", icon: L_BASE + "domrf_roomassist.png", ios: "iOS 16.0+" },
+          { key: "moidomru_proskorost", name: "Мой дом.ру (ПРОскорость)", category: "other", url: "/manifests/moidomru_proskorost.plist", icon: L_BASE + "moidomru_proskorost.png", ios: "iOS 18.0+" },
+          { key: "movix_kinodom", name: "Movix (КиноДом)", category: "other", url: "/manifests/movix_kinodom.plist", icon: L_BASE + "movix_kinodom.png", ios: "iOS 16.0+" },
+          { key: "mibank_avkgid", name: "Металлинвест (Банк)", category: "banks", url: "/manifests/mibank_avkgid.plist", icon: L_BASE + "mibank_avkgid.png", ios: "iOS 15.0+" },
+          { key: "alrosa_almaznayamila", name: "АЛРОСА (Алмазная Миля)", category: "other", url: "/manifests/alrosa_almaznayamila.plist", icon: L_BASE + "alrosa.png", ios: "iOS 15.0+" },
+          { key: "tochkabank_breathio", name: "Точка Банк (Breathio)", category: "banks", url: "/manifests/tochkabank_breathio.plist", icon: L_BASE + "tochkabank_breathio.png", ios: "iOS 17.0+" }
+        ];
+
+/* ----- УМНЫЙ ПОИСК ПРИЛОЖЕНИЙ (как в каталоге) ----- */
+const SEARCH_ALIASES = [
+    ["т-банк", "тбанк", "тинькофф", "тинькоф", "тиньков", "tbank", "tinkoff", "tinkov", "t-bank", "тинек"],
+    ["сбер", "sber", "сбербанк", "sberbank", "сберонлайн", "sbol", "сбол", "|", "зеленый"],
+    ["втб", "vtb", "|", "внешторг"],
+    ["альфа", "alfa", "alpha", "альфабанк", "alfabank"],
+    ["газпром", "gazprom", "гпб", "gpb"],
+    ["совком", "sovcom", "sovkom", "sovkombank", "халва", "halva"],
+    ["вконтакте", "vk", "вк", "vkontakte", "|", "контакт", "соцсеть"],
+    ["одноклассники", "ok", "ок", "odnoklassniki", "|", "соцсеть"],
+    ["мтс", "mts", "эмтеэс"],
+    ["яндекс", "yandex", "яндекспэй", "yandexpay", "яндекспей"],
+    ["авито", "avito"],
+    ["почта", "mail", "майл", "мэйл", "мейл", "mailru", "облако", "oblako", "|", "cloud"],
+    ["лента", "lenta"],
+    ["купер", "kuper", "|", "доставка", "продукты"],
+    ["юла", "yula", "youla", "yla"],
+    ["2гис", "2gis", "дубльгис", "двагис", "|", "карты", "навигатор", "maps"],
+    ["точка", "tochka", "tochkabank"],
+    ["рокет", "rocket", "рокетбанк", "rocketbank", "блум", "blum"],
+    ["рсхб", "rshb", "россельхоз", "россельхозбанк"],
+    ["псб", "psb", "промсвязь", "промсвязьбанк"],
+    ["убрир", "ubrir"],
+    ["акбарс", "akbars", "барс"],
+    ["новиком", "novikom", "новикомбанк"],
+    ["домрф", "domrf", "дом.рф"],
+    ["мойдом", "moidom", "домру", "domru", "дом.ру", "|", "интернет"],
+    ["лукойл", "lukoil", "|", "азс", "заправка"],
+    ["газпромнефть", "gazpromneft", "гпн", "|", "азс", "заправка"],
+    ["йота", "yota"],
+    ["мобайл", "mobile", "mobail", "|", "сотовая", "связь", "оператор"],
+    ["сбермобайл", "sbermobile", "мобио", "mobio"],
+    ["чатгпт", "chatgpt", "gpt", "гпт", "openai", "|", "нейросеть", "ии", "ai"],
+    ["gemini", "гемини", "джемини", "google", "гугл", "|", "нейросеть", "ии", "ai"],
+    ["happ", "хапп", "хэпп", "|", "vpn", "впн", "прокси", "proxy"],
+    ["окко", "okko", "|", "кино", "фильмы", "сериалы"],
+    ["мовикс", "movix", "|", "кино", "кинотеатр"],
+    ["rutube", "рутуб", "рутьюб", "|", "видео", "video"],
+    ["алроса", "alrosa"],
+    ["инвестиции", "invest", "инвест", "|", "брокер", "биржа", "акции"],
+    ["банк", "bank", "|", "карты", "финансы"],
+    ["сбпэй", "sbpay", "сбпей", "|", "оплата", "pay"],
+    ["клипы", "clips", "клипс", "|", "reels", "shorts"],
+    ["музыка", "music", "|", "муз", "песни"],
+    ["мессенджер", "messenger", "massanger", "|", "чат", "общение"],
+    ["оригинал", "original", "|", "ориг"]
+];
+
+const LAYOUT_EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+const LAYOUT_RU = "йцукенгшщзхъфывапролджэячсмитьбюё";
+
+function searchNorm(str) {
+    return String(str || "").toLowerCase().replace(/ё/g, "е").replace(/й/g, "и");
+}
+function searchCompact(str) {
+    return searchNorm(str).replace(/[^a-zа-я0-9]+/g, "");
+}
+function searchTokens(str) {
+    return searchNorm(str).split(/[^a-zа-я0-9]+/).filter(Boolean);
+}
+function swapLayout(str) {
+    const low = String(str || "").toLowerCase();
+    const hasLat = /[a-z]/.test(low), hasCyr = /[а-яё]/.test(low);
+    if (hasLat === hasCyr) return "";
+    let out = "";
+    for (const ch of low) {
+        const idx = hasLat ? LAYOUT_EN.indexOf(ch) : LAYOUT_RU.indexOf(ch);
+        out += idx >= 0 ? (hasLat ? LAYOUT_RU[idx] : LAYOUT_EN[idx]) : ch;
+    }
+    return out;
+}
+function editDistance(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, k) => k);
+    for (let i = 1; i <= a.length; i++) {
+        const cur = [i];
+        let rowMin = i;
+        for (let j = 1; j <= b.length; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+            if (cur[j] < rowMin) rowMin = cur[j];
+        }
+        if (rowMin > max) return max + 1;
+        prev = cur;
+    }
+    return prev[b.length];
+}
+
+// Индекс приложения в админке: название, ключ и версия iOS.
+function buildAdminSearchIndex(app) {
+    const nameText = `${app.name || ""} ${app.key || ""} ${(app.ios || "").replace(/iOS/gi, "")}`.replace(/_/g, " ");
+    const nameWords = Array.from(new Set(searchTokens(nameText)));
+    const nameCompact = searchCompact(nameText);
+    const aliasSet = new Set();
+    SEARCH_ALIASES.forEach(group => {
+        const sep = group.indexOf("|");
+        const brand = sep === -1 ? group : group.slice(0, sep);
+        const hit = brand.some(term => {
+            const t = searchCompact(term);
+            if (!t) return false;
+            if (t.length <= 3) return nameWords.includes(t);
+            return nameWords.some(w => w.startsWith(t)) || nameCompact.startsWith(t);
+        });
+        if (hit) group.forEach(term => {
+            if (term === "|") return;
+            const c = searchCompact(term);
+            if (c) aliasSet.add(c);
+            searchTokens(term).forEach(w => aliasSet.add(w));
+        });
+    });
+    nameWords.forEach(w => aliasSet.delete(w));
+    return { nameWords, aliasWords: Array.from(aliasSet), nameCompact };
+}
+
+// Оценка совпадения одного слова запроса: 0 — нет совпадения, больше — лучше
+function scoreToken(tok, idx) {
+    if (!tok) return 0;
+    // однобуквенные слова ("т" в "т-банк") — только как отдельное слово
+    if (tok.length === 1) return idx.nameWords.includes(tok) ? 3 : 0;
+    // 1) начало слова в названии — лучшее совпадение
+    if (idx.nameWords.some(w => w === tok)) return 5;
+    if (idx.nameWords.some(w => w.startsWith(tok))) return 4;
+    // 2) начало слова-синонима ("тин" → тинькофф)
+    if (idx.aliasWords.some(w => w === tok)) return 4;
+    if (idx.aliasWords.some(w => w.startsWith(tok))) return 3;
+    // 3) середина составного слова ("банк" в "Сбербанк") — только от 4 букв
+    if (tok.length >= 4 && idx.nameWords.some(w => w.includes(tok))) return 2;
+    // 4) опечатки — только для слов от 5 букв, первая буква должна совпасть
+    if (tok.length >= 5) {
+        const max = tok.length >= 8 ? 2 : 1;
+        const all = idx.nameWords.concat(idx.aliasWords);
+        const typo = all.some(w => {
+            if (w.length < 4 || w[0] !== tok[0]) return false;
+            if (editDistance(tok, w, max) <= max) return true;
+            return w.length > tok.length && editDistance(tok, w.slice(0, tok.length), max) <= max;
+        });
+        if (typo) return 1;
+    }
+    return 0;
+}
+
+// Общая оценка карточки по запросу (0 — не подходит)
+function scoreCard(query, idx) {
+    const tokens = searchTokens(query);
+    if (tokens.length === 0) return 1;
+    let total = 0;
+    let ok = true;
+    for (const t of tokens) {
+        const sc = scoreToken(t, idx);
+        if (!sc) { ok = false; break; }
+        total += sc;
+    }
+    if (ok) return total / tokens.length;
+    // "т банк", "альфа-банк", "тбанк": склеенный запрос против начала слова или названия
+    const compactQ = searchCompact(query);
+    if (compactQ.length >= 2) {
+        if (idx.nameWords.some(w => w.startsWith(compactQ)) || idx.nameCompact.startsWith(compactQ)) return 4;
+        if (idx.aliasWords.some(w => w.startsWith(compactQ))) return 3;
+    }
+    return 0;
+}
+
+
+const adminSearchIndexCache = new WeakMap();
+function smartFilterAdminApps(query, source = appsData) {
+    const raw = String(query || "").trim();
+    if (!raw) return source.slice();
+    const indexed = source.map((app, order) => {
+        let idx = adminSearchIndexCache.get(app);
+        if (!idx) { idx = buildAdminSearchIndex(app); adminSearchIndexCache.set(app, idx); }
+        return { app, order, score: scoreCard(raw, idx) };
+    });
+    let matches = indexed.filter(x => x.score > 0);
+    if (!matches.length) {
+        const swapped = swapLayout(raw);
+        if (swapped) matches = indexed.map(x => ({ ...x, score: scoreCard(swapped, adminSearchIndexCache.get(x.app)) })).filter(x => x.score > 0);
+    }
+    return matches.sort((a, b) => b.score - a.score || a.order - b.order).map(x => x.app);
+}
+
+const $ = id => document.getElementById(id);
+/* Обновляет innerHTML только если разметка реально изменилась — иначе <img> пересоздаются и иконки моргают */
+function setHTML(el, html) {
+    if (!el || el._lastHTML === html) return;
+    el.innerHTML = html;
+    el._lastHTML = html;
+}
+const ic = (n, c = '') => `<svg class="ic ${c}" viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
+const ADMIN_TZ_OFFSET = 5 * 3600 * 1000;
+
+let globalData = { state: { prices: {}, visibility: {}, newApps: {} }, siteEnabled: true, bulkDiscountEnabled: true };
+let selectedAppsForLink = new Set();
+let selectedAppsForPromo = new Set();
+let selectedTtlMinutes = 5;
+let toastTimeout, tab = 'home', appsMode = 'prices', toolMode = 'link', statPeriod = 'day';
+let currentOrderFilter = 'all';
+let allOrdersCache = [];
+let linkStatusCache = {};
+
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());
+
+/* ----- Навигация ----- */
+function goTab(t) {
+    closeSheets();
+    tab = t;
+    try { localStorage.setItem('apprestore_admin_tab', t); } catch (e) {}
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + t));
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+    $('page-' + t).scrollTop = 0;
+    if (t === 'orders') loadOrdersList();
+    if (t === 'home') renderStats();
+    if (t === 'tools' && toolMode === 'promo') loadPromoCodesList();
+    tg.HapticFeedback.selectionChanged();
+}
+function openSheet(id) { closeSheets(false); $(id).classList.add('open'); tg.BackButton.show(); }
+function closeSheets(hide = true) {
+    document.querySelectorAll('.sheet-wrap.open').forEach(s => s.classList.remove('open'));
+    if (hide) tg.BackButton.hide();
+}
+tg.BackButton.onClick(() => closeSheets());
+
+function setSeg(id, btn) { document.querySelectorAll('#' + id + ' button').forEach(b => b.classList.toggle('active', b === btn)); }
+function setAppsMode(m, btn) { appsMode = m; setSeg('apps-seg', btn); $('mass-panel').classList.toggle('hide', m !== 'promo'); renderAppsList(); }
+function setToolMode(m) {
+    toolMode = m;
+    document.querySelectorAll('#tools-seg button').forEach((b, i) => b.classList.toggle('active', (i === 0) === (m === 'link')));
+    $('tool-link').classList.toggle('hide', m !== 'link');
+    $('tool-promo').classList.toggle('hide', m !== 'promo');
+    if (m === 'promo') loadPromoCodesList();
+}
+function setStatPeriod(p) {
+    statPeriod = p;
+    document.querySelectorAll('#stat-seg button').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+    renderStats();
+    tg.HapticFeedback.selectionChanged();
+}
+
+function showToast(msg) {
+    const t = $('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    tg.HapticFeedback.notificationOccurred('success');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => showToast("Скопировано!")).catch(() => showToast("Ошибка копирования"));
+}
+function selectTtl(mins, el) {
+    selectedTtlMinutes = mins;
+    document.querySelectorAll('#ttl-pills div').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    tg.HapticFeedback.selectionChanged();
+}
+function formatMinWord(mins) {
+    if (mins === 1) return "1 минуту";
+    if (mins >= 2 && mins <= 4) return mins + " минуты";
+    return mins + " минут";
+}
+
+        function getAdminAppPrice(key) {
+            if (globalData.state && globalData.state.prices && globalData.state.prices[key] !== undefined) {
+                return Number(globalData.state.prices[key]);
+            }
+            return 290;
+        }
+
+        async function loadData() {
+            try {
+                const pCache = localStorage.getItem("apprestore_prices_cache");
+                const vCache = localStorage.getItem("apprestore_visibility_cache");
+                const nCache = localStorage.getItem("apprestore_new_apps_cache");
+                const sCache = localStorage.getItem("apprestore_site_enabled_cache");
+                if (pCache) globalData.state.prices = JSON.parse(pCache);
+                if (vCache) globalData.state.visibility = JSON.parse(vCache);
+                if (nCache) globalData.state.newApps = JSON.parse(nCache);
+                if (sCache !== null) globalData.siteEnabled = sCache === "true";
+            } catch(e) {}
+
+            renderAllViews();
+
+            try {
+                const [pricesRes, visRes, settingsRes] = await Promise.all([
+                    sbFetch("app_prices?select=*"),
+                    sbFetch("app_visibility?select=*"),
+                    sbFetch("site_settings?select=*")
+                ]);
+
+                if (!Array.isArray(pricesRes) || !Array.isArray(visRes) || !Array.isArray(settingsRes)) {
+                    showToast("Не удалось обновить данные Supabase");
+                    return;
+                }
+
+                const prices = {};
+                pricesRes.forEach(row => { prices[row.app_key] = String(row.price); });
+                
+                const visibility = {};
+                const newApps = {};
+                visRes.forEach(row => { 
+                    visibility[row.app_key] = row.is_visible; 
+                    newApps[row.app_key] = Boolean(row.is_new);
+                });
+
+                let siteEnabled = true;
+                const s = settingsRes.find(x => x.key === "site_enabled");
+                if (s) siteEnabled = s.value === "true";
+                const bulkDiscountSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
+                const bulkDiscountEnabled = bulkDiscountSetting ? bulkDiscountSetting.value === "true" : true;
+
+                globalData.state = { prices, visibility, newApps };
+                globalData.siteEnabled = siteEnabled;
+                globalData.bulkDiscountEnabled = bulkDiscountEnabled;
+                
+                try {
+                    localStorage.setItem("apprestore_prices_cache", JSON.stringify(prices));
+                    localStorage.setItem("apprestore_visibility_cache", JSON.stringify(visibility));
+                    localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(newApps));
+                    localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
+                    localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
+                } catch(e) {}
+
+                renderAllViews();
+                updatePendingOrdersBadge();
+            } catch (e) {}
+        }
+
+function renderAllViews() {
+    renderStats();
+    renderAppsList();
+    renderCreateLinkList();
+    renderSettings();
+    updateGenerateButton();
+    updatePromoButton();
+}
+
+/* ----- Статистика ----- */
+function pluralOrders(n) {
+    const m10 = n % 10, m100 = n % 100;
+    const w = (m10 === 1 && m100 !== 11) ? 'заказ' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'заказа' : 'заказов';
+    return n + ' ' + w;
+}
+function formatRub(n) { return Math.round(n).toLocaleString("ru-RU") + " ₽"; }
+function periodStart(p) {
+    const s = new Date(Date.now() + ADMIN_TZ_OFFSET), y = s.getUTCFullYear(), m = s.getUTCMonth(), d = s.getUTCDate();
+    const ds = Date.UTC(y, m, d) - ADMIN_TZ_OFFSET, dow = (s.getUTCDay() + 6) % 7;
+    return p === 'day' ? ds : p === 'week' ? ds - dow * 864e5 : p === 'month' ? Date.UTC(y, m, 1) - ADMIN_TZ_OFFSET : 0;
+}
+const ordTime = o => new Date(o.created_at).getTime();
+const orderSum = o => Number(o.total_price) || 0;
+
+function renderOrderStats() {
+    const box = $('orders-stats');
+    if (!box) return;
+    const paid = allOrdersCache.filter(o => o.status === 'approved' && !isNaN(ordTime(o)));
+    const sum = p => formatRub(paid.filter(o => ordTime(o) >= periodStart(p)).reduce((s, o) => s + orderSum(o), 0));
+    setHTML(box, `<div><span>Сегодня</span><b>${sum('day')}</b></div><div><span>Неделя</span><b>${sum('week')}</b></div><div><span>Месяц</span><b>${sum('month')}</b></div>`);
+}
+
+function renderStats() {
+    if (!$('st-sum')) return;
+    const from = periodStart(statPeriod);
+    const all = allOrdersCache || [];
+    const inP = all.filter(o => ordTime(o) >= from);
+    const paid = inP.filter(o => o.status === 'approved');
+    const sum = paid.reduce((s, o) => s + orderSum(o), 0);
+    const pending = all.filter(o => o.status === 'pending').length;
+    $('st-sum').textContent = formatRub(sum);
+    $('st-sub').textContent = inP.length ? `Оплачено ${paid.length} из ${inP.length} заказов` : 'Заказов за период нет';
+    $('st-paid').textContent = paid.length;
+    $('st-pending').textContent = pending;
+    $('st-disc').textContent = formatRub(paid.reduce((s, o) => s + (Number(o.discount) || 0), 0));
+    $('st-promo').textContent = pluralOrders(paid.filter(o => o.promo_code).length);
+
+
+    // топ приложений
+    const cnt = {};
+    paid.forEach(o => (o.app_keys || []).forEach(k => { cnt[k] = (cnt[k] || 0) + 1; }));
+    const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    setHTML($('st-top'), top.length ? top.map(([k, n]) => {
+        const a = appsData.find(x => x.key === k);
+        return `<div class="top-row"><img src="${a ? a.icon : ''}"><div class="nm"><div>${a ? a.name : k}</div><div class="bar"><i style="width:${Math.round(n / top[0][1] * 100)}%"></i></div></div><div class="n">${n}</div></div>`;
+    }).join('') : '<div class="empty">Нет оплаченных заказов за период</div>');
+}
+
+/* ----- Заказы ----- */
+async function updatePendingOrdersBadge() {
+    const res = await sbFetch("orders?status=eq.pending&select=id");
+    const badge = $("pending-orders-badge");
+    if (!badge) return;
+    if (Array.isArray(res) && res.length > 0) { badge.textContent = res.length; badge.classList.add("show"); }
+    else badge.classList.remove("show");
+}
+setInterval(() => {
+    updatePendingOrdersBadge();
+    if (tab === 'orders' || tab === 'home') loadOrdersList(true);
+}, 5000);
+
+function setOrderFilter(filter, el) {
+    currentOrderFilter = filter;
+    document.querySelectorAll('#order-chips .chip-f').forEach(p => p.classList.toggle('active', p === el));
+    tg.HapticFeedback.selectionChanged();
+    renderOrdersList();
+}
+function setOrderFilterByKey(f) {
+    const idx = ['all', 'pending', 'rejected'].indexOf(f);
+    setOrderFilter(f, document.querySelectorAll('#order-chips .chip-f')[idx]);
+}
+
+async function loadOrdersList(silent = false) {
+    const container = $('orders-container');
+    if (!silent && container) setHTML(container, '<div class="empty">Загрузка...</div>');
+    const res = await sbFetch("orders?select=*&order=created_at.desc");
+    if (res === null) {
+        if (!silent && container) setHTML(container, '<div class="empty" style="color:#fca5a5">Ошибка загрузки заказов</div>');
+        return;
+    }
+    allOrdersCache = res;
+    try {
+        const linksRes = await sbFetch("app_links?select=token,is_used,activated_at");
+        if (Array.isArray(linksRes)) {
+            linkStatusCache = {};
+            linksRes.forEach(l => { linkStatusCache[String(l.token)] = !!l.is_used && Number(l.activated_at) > 0; });
+        }
+    } catch (e) {}
+    renderOrderStats();
+    renderStats();
+    updatePendingOrdersBadge();
+    renderOrdersList();
+}
+
+function renderOrdersList() {
+    const container = $('orders-container');
+    if (!container) return;
+    const filtered = allOrdersCache.filter(o => currentOrderFilter === 'all' || o.status === currentOrderFilter);
+    if (filtered.length === 0) { setHTML(container, '<div class="empty">Заказов в этой категории нет</div>'); return; }
+    const ST = { pending: ['clock', 'Ожидает'], approved: ['check', 'Оплачен'], rejected: ['x', 'Отклонён'] };
+    setHTML(container, filtered.map(order => {
+        const [sIcon, sText] = ST[order.status] || ST.pending;
+        const sClass = ST[order.status] ? order.status : 'pending';
+        const dateStr = order.created_at ? new Date(order.created_at).toLocaleString("ru-RU", { timeZone: "Asia/Yekaterinburg", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+        const orderKeys = Array.isArray(order.app_keys) ? order.app_keys : [];
+        const orderNames = Array.isArray(order.app_names) ? order.app_names : [];
+        const rowsCount = Math.max(orderKeys.length, orderNames.length);
+        let appsNames = '<div class="o-app"><span>Не указаны</span></div>';
+        if (rowsCount > 0) {
+            appsNames = Array.from({ length: rowsCount }, (_, i) => {
+                const appInfo = appsData.find(a => a.key === orderKeys[i]);
+                const nm = orderNames[i] || (appInfo ? appInfo.name : orderKeys[i]);
+                const img = appInfo ? `<img src="${appInfo.icon}" alt="" loading="lazy">` : '';
+                return `<div class="o-app">${img}<span>${nm}</span></div>`;
+            }).join('');
+        }
+        const disc = Number(order.discount) || 0;
+        const total = Number(order.total_price) || 0;
+        const BULK_PER_APP = 40;
+        const bulkAmount = rowsCount >= 3 ? BULK_PER_APP * rowsCount : 0;
+        const hasBulk = disc > 0 && bulkAmount > 0 && disc >= bulkAmount;
+        const promoAmount = order.promo_code ? Math.max(0, disc - (hasBulk ? bulkAmount : 0)) : 0;
+        const tags = (hasBulk ? `<div class="o-tag">${ic('tag')}Скидка от 3 приложений −${bulkAmount} ₽</div>` : '')
+            + (order.promo_code ? `<div class="o-tag">${ic('tag')}Промокод ${order.promo_code}${promoAmount > 0 ? ` −${promoAmount} ₽` : ''}</div>` : '')
+            + (!hasBulk && !order.promo_code && disc > 0 ? `<div class="o-tag">${ic('tag')}Скидка −${disc} ₽</div>` : '');
+        const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
+        const link = linkUrl ? `<div class="o-link" onclick="copyText('${linkUrl}')">${ic('link')}<span>${linkUrl}</span>${ic('copy')}</div>` : "";
+        let linkBadge = `<div class="st none">${ic('link')}Ссылка не создана</div>`;
+        if (order.link_token) {
+            const activated = linkStatusCache[String(order.link_token)] === true;
+            linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Ссылка активирована' : 'Ссылка не активирована'}</div>`;
+        }
+        const foot = `<div class="o-foot">${linkBadge}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
+        let acts = '';
+        if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>`;
+        else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>`;
+        else acts = '';
+        return `<div class="order">
+            <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
+            <div class="o-apps">${appsNames}</div>
+            <div class="o-meta"><div class="o-sum"><small>Сумма заказа</small><div class="o-price">${total} ₽</div></div>${tags ? `<div class="o-tags">${tags}</div>` : ''}</div>
+            ${link}${acts ? `<div class="o-act">${acts}</div>` : ''}${foot}</div>`;
+    }).join(''));
+}
+
+async function approveOrderFromAdmin(orderId) {
+            const order = allOrdersCache.find(o => o.id === orderId);
+            if (!order) return;
+
+            let token = order.link_token;
+            if (!token) {
+                const array = new Uint32Array(1);
+                crypto.getRandomValues(array);
+                token = String(10000000 + (array[0] % 90000000));
+
+                const linkRecord = {
+                    token: token,
+                    app_keys: order.app_keys || [],
+                    ttl_minutes: 15,
+                    is_used: false,
+                    activated_at: 0,
+                    device_id: null,
+                    created_at: Date.now()
+                };
+
+                await sbFetch("app_links", {
+                    method: "POST",
+                    headers: { "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify(linkRecord)
+                });
+            }
+
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "approved",
+                    link_token: token,
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Оплата подтверждена! Ссылка выдана.");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
+        }
+
+        async function rejectOrderFromAdmin(orderId) {
+            const res = await sbFetch(`orders?id=eq.${orderId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: "rejected",
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (res !== null) {
+                showToast("Заказ отмечен как неоплаченный");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при обновлении заказа");
+            }
+        }
+
+        async function deleteOrderFromAdmin(orderId) {
+            tg.HapticFeedback.impactOccurred('medium');
+            if (!confirm("Удалить этот заказ из истории?")) return;
+            const res = await sbFetch(`orders?id=eq.${orderId}`, { method: "DELETE" });
+            if (res !== null) {
+                showToast("Заказ удален");
+                loadOrdersList(true);
+            } else {
+                showToast("Ошибка при удалении заказа");
+            }
+        }
+
+/* ----- Промокоды ----- */
+async function loadPromoCodesList() {
+    const c = $('promo-codes-container');
+    c.innerHTML = '<div class="empty">Загрузка...</div>';
+    const res = await sbFetch("promo_codes?select=*&order=created_at.desc");
+    if (res === null) { c.innerHTML = '<div class="empty" style="color:#fca5a5">Ошибка загрузки</div>'; return; }
+    if (res.length === 0) { c.innerHTML = '<div class="empty">Промокодов пока нет</div>'; return; }
+    c.innerHTML = res.map(p => `
+        <div class="promo">
+            <div class="pc" onclick="copyText('${p.code}')"><b>${p.code}</b><span>Скидка ${p.discount} ₽</span></div>
+            <div class="st ${p.is_used ? 'rejected' : 'approved'}">${p.is_used ? 'Использован' : 'Активен'}</div>
+            <button class="ob del" onclick="deletePromoCode(${p.id})">${ic('trash')}</button>
+        </div>`).join('');
+}
+
+// Открывает встроенное окно Telegram с выбором диалога для отправки (без перехода в браузер).
+// Параметр url у t.me/share/url обязателен, иначе Telegram открывает веб-версию, поэтому текст целиком кладём в url, если отдельного text нет.
+function shareViaTelegram(urlOrText, text) {
+    let shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(urlOrText);
+    if (text) shareUrl += '&text=' + encodeURIComponent(text);
+    tg.openTelegramLink(shareUrl);
+}
+
+function showResult(o) {
+    const icon = $('res-icon');
+    icon.style.cssText = `background:${o.bg};color:${o.color}`;
+    icon.innerHTML = ic(o.icon);
+    $('res-title').textContent = o.title;
+    $('res-desc').textContent = o.desc;
+    $('res-apps').innerHTML = o.appsHtml || '';
+    $('res-apps').classList.toggle('hide', !o.appsHtml);
+    $('res-input').value = o.value;
+    $('res-input').style.color = o.color;
+    $('res-forward').onclick = o.onForward;
+    openSheet('sheet-result');
+}
+
+async function createPromoCode() {
+    const discount = parseInt($('promo-code-discount-input').value.trim(), 10);
+    if (isNaN(discount) || discount <= 0) { showToast("Введите корректную сумму скидки!"); tg.HapticFeedback.notificationOccurred('error'); return; }
+    const btn = $('btn-generate-promo-code');
+    btn.disabled = true;
+
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let promoText = "PROMO-";
+    const array = new Uint32Array(5);
+    crypto.getRandomValues(array);
+    for (let i = 0; i < 5; i++) promoText += charset[array[i] % charset.length];
+
+    const res = await sbFetch("promo_codes", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates" },
+        body: JSON.stringify({ code: promoText, discount: discount, is_used: false })
+    });
+    btn.disabled = false;
+    if (res === null) { showToast("Ошибка при создании промокода в БД!"); return; }
+
+    $('promo-code-discount-input').value = '';
+    loadPromoCodesList();
+    showResult({
+        icon: 'gift', bg: 'rgba(52,211,153,.18)', color: '#4ade80', title: 'Промокод создан',
+        desc: `Скидка ${discount} ₽`, value: promoText,
+        onForward: () => {
+            const text = `🎁 Промокод на скидку ${discount} ₽\n\nКод: ${promoText}\n\n• Работает при любом количестве приложений\n• Суммируется только со скидкой от 3 приложений\n• С другими акциями не работает\n• Одноразовый\n\nЗаказать со скидкой: ${CLIENT_SITE_URL}`;
+            shareViaTelegram(text);
+        }
+    });
+}
+
+async function deletePromoCode(id) {
+    tg.HapticFeedback.impactOccurred('medium');
+    if (!confirm("Удалить этот промокод?")) return;
+    const res = await sbFetch(`promo_codes?id=eq.${id}`, { method: "DELETE" });
+    if (res === null) showToast("Ошибка при удалении промокода");
+    else { showToast("Промокод удален"); loadPromoCodesList(); }
+}
+
+/* ----- Каталог: цены / видимость / акции ----- */
+function appRow(app, o) {
+    const isVisible = globalData.state.visibility[app.key] !== false;
+    return `<div class="app ${o.na && !isVisible ? 'na' : ''}" data-key="${app.key}" onclick="${o.click}">${o.left || ''}<img src="${app.icon}"><div class="ai"><div class="an">${app.name}</div><div class="as" ${o.sid ? `id="${o.sid}"` : ''}>${o.sub}</div></div>${o.right || ''}</div>`;
+}
+function renderAppsList() {
+    if (appsMode === 'prices') renderPricesList();
+    else if (appsMode === 'vis') renderVisibilityList();
+    else renderPromoList();
+}
+function appsQuery() { return $('apps-search') ? $('apps-search').value : ''; }
+const naBadge = '<span class="bad">Недоступно</span>';
+
+function renderPricesList() {
+    if (appsMode !== 'prices') return;
+    $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
+        const price = getAdminAppPrice(app.key);
+        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="price ${price >= 500 ? 'prem' : ''}">${price} ₽</div>` });
+    }).join('');
+}
+function renderPromoList() {
+    if (appsMode !== 'promo') return;
+    $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
+        const vis = globalData.state.visibility[app.key] !== false;
+        return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' : naBadge });
+    }).join('');
+}
+function renderVisibilityList() {
+    if (appsMode !== 'vis') return;
+    $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
+        const isVis = globalData.state.visibility[app.key] !== false;
+        const isNew = Boolean(globalData.state.newApps && globalData.state.newApps[app.key]);
+        return appRow(app, { click: `toggleVisibility('${app.key}')`, sid: 'vis-status-' + app.key, sub: isVis ? 'Показано в каталоге' : 'Скрыто из каталога',
+            right: `<div class="newb ${isNew ? 'active' : ''}" id="new-badge-${app.key}" onclick="toggleNewBadge('${app.key}', event)">NEW</div><div class="switch ${isVis ? 'on' : ''}" id="vis-switch-${app.key}"></div>` });
+    }).join('');
+}
+
+function toggleAppForPromo(key) {
+    if (globalData.state.visibility[key] === false) return;
+    if (selectedAppsForPromo.has(key)) selectedAppsForPromo.delete(key); else selectedAppsForPromo.add(key);
+    $('check-promo-' + key)?.classList.toggle('on', selectedAppsForPromo.has(key));
+    updatePromoButton();
+    tg.HapticFeedback.selectionChanged();
+}
+function selectAllPromo() {
+    const visibleApps = smartFilterAdminApps(appsQuery()).filter(app => globalData.state.visibility[app.key] !== false);
+    const allSelected = visibleApps.length > 0 && visibleApps.every(app => selectedAppsForPromo.has(app.key));
+    visibleApps.forEach(app => allSelected ? selectedAppsForPromo.delete(app.key) : selectedAppsForPromo.add(app.key));
+    renderPromoList();
+    updatePromoButton();
+    tg.HapticFeedback.selectionChanged();
+}
+function updatePromoButton() {
+    const n = selectedAppsForPromo.size;
+    if ($('cnt-apply')) $('cnt-apply').textContent = n;
+    if ($('cnt-reset')) $('cnt-reset').textContent = n;
+    $('btn-apply-promo')?.classList.toggle('off', n === 0);
+    $('btn-reset-promo')?.classList.toggle('off', n === 0);
+}
+
+async function savePricesBulk(updates, okMsg) {
+    try {
+        const res = await sbFetch("app_prices?on_conflict=app_key", {
+            method: "POST",
+            headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+            body: JSON.stringify(updates)
+        });
+        if (res !== null) {
+            try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
+            showToast(okMsg);
+            selectedAppsForPromo.clear();
+            renderPromoList();
+        } else showToast("Ошибка при обновлении цен в БД");
+    } catch (e) { showToast("Ошибка сети"); }
+    finally { updatePromoButton(); }
+}
+async function applyPromo() {
+    if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
+    const discountInput = $('promo-discount-input');
+    const discount = parseInt(discountInput.value.trim(), 10);
+    if (isNaN(discount) || discount === 0) { showToast("Введите сумму изменения"); tg.HapticFeedback.notificationOccurred('error'); return; }
+    const updates = [];
+    selectedAppsForPromo.forEach(key => {
+        const newPrice = Math.max(0, getAdminAppPrice(key) - discount);
+        updates.push({ app_key: key, price: newPrice });
+        globalData.state.prices[key] = String(newPrice);
+    });
+    discountInput.value = '';
+    await savePricesBulk(updates, "Цены успешно обновлены!");
+}
+async function resetPromo() {
+    if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
+    const updates = [];
+    selectedAppsForPromo.forEach(key => { updates.push({ app_key: key, price: 290 }); globalData.state.prices[key] = "290"; });
+    await savePricesBulk(updates, "Цены сброшены до базовых!");
+}
+
+function openPriceDetail(key) {
+    const app = appsData.find(a => a.key === key);
+    $('detail-price-name').innerText = app.name;
+    $('detail-price-icon').src = app.icon;
+    const priceInput = $('detail-price-input');
+    priceInput.value = getAdminAppPrice(key);
+    $('btn-save-price').onclick = () => {
+        const numPrice = parseInt(priceInput.value, 10);
+        const validPrice = (!isNaN(numPrice) && numPrice >= 0) ? numPrice : 290;
+        globalData.state.prices[key] = String(validPrice);
+        try { localStorage.setItem("apprestore_prices_cache", JSON.stringify(globalData.state.prices)); } catch(e) {}
+        renderPricesList();
+        showToast('Цена успешно сохранена');
+        closeSheets();
+        sbFetch("app_prices?on_conflict=app_key", {
+            method: "POST",
+            headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+            body: JSON.stringify({ app_key: key, price: validPrice })
+        }).then(result => { if (result === null) showToast("Ошибка сохранения цены в Supabase"); });
+    };
+    openSheet('sheet-price');
+}
+
+function toggleNewBadge(key, event) {
+            if (event) event.stopPropagation();
+            if (!globalData.state.newApps) globalData.state.newApps = {};
+
+            const isNowNew = !globalData.state.newApps[key];
+            globalData.state.newApps[key] = isNowNew;
+
+            document.getElementById('new-badge-' + key)?.classList.toggle('active', isNowNew);
+            tg.HapticFeedback.selectionChanged();
+
+            try {
+                localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(globalData.state.newApps));
+            } catch(e) {}
+
+            const isVis = globalData.state.visibility[key] !== false;
+
+            sbFetch("app_visibility?on_conflict=app_key", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                body: JSON.stringify({ 
+                    app_key: key, 
+                    is_visible: isVis,
+                    is_new: isNowNew 
+                })
+            }).then(result => {
+                if (result === null) {
+                    showToast("Ошибка сохранения статуса NEW в Supabase");
+                } else {
+                    showToast(isNowNew ? "Плашка NEW включена" : "Плашка NEW убрана");
+                }
+            });
+        }
+
+        function toggleVisibility(key) {
+            const makeVisible = !(globalData.state.visibility[key] !== false);
+            globalData.state.visibility[key] = makeVisible;
+
+            if (!makeVisible && selectedAppsForLink.has(key)) {
+                selectedAppsForLink.delete(key);
+                updateGenerateButton();
+            }
+            if (!makeVisible && selectedAppsForPromo.has(key)) {
+                selectedAppsForPromo.delete(key);
+                updatePromoButton();
+            }
+            document.getElementById('vis-switch-' + key)?.classList.toggle('on', makeVisible);
+            const st = document.getElementById('vis-status-' + key);
+            if (st) st.innerText = makeVisible ? 'Отображается в каталоге' : 'Скрыто из каталога';
+
+            try { localStorage.setItem("apprestore_visibility_cache", JSON.stringify(globalData.state.visibility)); } catch(e) {}
+            showToast(makeVisible ? "Приложение показано" : "Приложение скрыто");
+
+            const isNew = Boolean(globalData.state.newApps && globalData.state.newApps[key]);
+
+            sbFetch("app_visibility?on_conflict=app_key", {
+                method: "POST",
+                headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+                body: JSON.stringify({ 
+                    app_key: key, 
+                    is_visible: makeVisible,
+                    is_new: isNew
+                })
+            }).then(result => {
+                if (result === null) showToast("Ошибка сохранения видимости в Supabase");
+            });
+        }
+
+/* ----- Ссылки ----- */
+function renderCreateLinkList() {
+    const list = $('list-create-link');
+    if (!list) return;
+    const query = $('create-link-search')?.value || '';
+    list.innerHTML = smartFilterAdminApps(query).map(app => {
+        const vis = globalData.state.visibility[app.key] !== false;
+        return appRow(app, { na: true, click: vis ? 'toggleAppForLink(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForLink.has(app.key) ? 'on' : ''}" id="check-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? app.ios : naBadge });
+    }).join('');
+}
+function toggleAppForLink(key) {
+    if (globalData.state.visibility[key] === false) return;
+    if (selectedAppsForLink.has(key)) selectedAppsForLink.delete(key); else selectedAppsForLink.add(key);
+    $('check-' + key)?.classList.toggle('on', selectedAppsForLink.has(key));
+    updateGenerateButton();
+    tg.HapticFeedback.selectionChanged();
+}
+function updateGenerateButton() {
+    const btn = $('btn-generate-main');
+    if (!btn) return;
+    $('cnt-link').textContent = selectedAppsForLink.size;
+    if ($('cnt-link2')) $('cnt-link2').textContent = selectedAppsForLink.size;
+    btn.classList.toggle('off', selectedAppsForLink.size === 0);
+    const prev = $('link-chosen');
+    const items = Array.from(selectedAppsForLink).map(k => appsData.find(a => a.key === k)).filter(Boolean);
+    prev.innerHTML = items.map(a => `<img src="${a.icon}">`).join('');
+    prev.classList.toggle('hide', items.length === 0);
+}
+
+async function createLink() {
+    if (selectedAppsForLink.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
+    const btn = $('btn-generate-main');
+    btn.disabled = true;
+
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    const token = String(10000000 + (array[0] % 90000000));
+    const appKeysArr = Array.from(selectedAppsForLink);
+
+    await sbFetch("app_links", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates" },
+        body: JSON.stringify({ token: token, app_keys: appKeysArr, ttl_minutes: selectedTtlMinutes, is_used: false, activated_at: 0, device_id: null, created_at: Date.now() })
+    });
+    btn.disabled = false;
+
+    const linkUrl = CLIENT_SITE_URL + '/?' + token;
+    const ttlText = formatMinWord(selectedTtlMinutes);
+    const appNamesList = [];
+    const appsHtml = appKeysArr.map(key => {
+        const app = appsData.find(a => a.key === key);
+        if (!app) return '';
+        appNamesList.push(app.name);
+        return `<div class="top-row" style="background:rgba(255,255,255,.06);padding:7px 10px;border-radius:12px"><img style="width:26px;height:26px;border-radius:8px" src="${app.icon}"><div class="nm"><div style="font-size:13px">${app.name}</div></div></div>`;
+    }).join('');
+
+    showResult({
+        icon: 'check', bg: 'rgba(96,165,250,.18)', color: '#60a5fa', title: 'Ссылка создана',
+        desc: `Действует ${ttlText} с момента открытия и только на одном устройстве.`, value: linkUrl, appsHtml,
+        onForward: () => {
+            const appsFormatted = appNamesList.map(name => `• ${name}`).join("\n");
+            const text = `🔗 Ваша персональная ссылка для установки приложений готова!\n\n📱 Выбранные приложения:\n${appsFormatted}\n\n⏳ После открытия ссылка действует ${ttlText} и предназначена только для одного устройства!`;
+            shareViaTelegram(linkUrl, text);
+        }
+    });
+}
+
+/* ----- Настройки ----- */
+function renderSettings() {
+    $('sw-site').classList.toggle('on', globalData.siteEnabled);
+    $('site-state').textContent = globalData.siteEnabled ? 'Работает' : 'Выключен для клиентов';
+    $('sw-bulk').classList.toggle('on', globalData.bulkDiscountEnabled);
+    $('bulk-state').textContent = globalData.bulkDiscountEnabled ? 'Включена' : 'Выключена';
+}
+function toggleSite() {
+    const newState = !globalData.siteEnabled;
+    globalData.siteEnabled = newState;
+    try { localStorage.setItem("apprestore_site_enabled_cache", String(newState)); } catch(e) {}
+    renderSettings();
+    showToast(newState ? "Сайт включен" : "Сайт выключен");
+    sbFetch("site_settings?on_conflict=key", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ key: "site_enabled", value: String(newState) })
+    }).then(result => { if (result === null) showToast("Ошибка сохранения статуса сайта в Supabase"); });
+}
+async function toggleBulk() {
+    const newState = !globalData.bulkDiscountEnabled, prev = globalData.bulkDiscountEnabled;
+    globalData.bulkDiscountEnabled = newState;
+    renderSettings();
+    const result = await sbFetch("site_settings?on_conflict=key", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ key: "bulk_discount_enabled", value: String(newState) })
+    });
+    if (result === null) { globalData.bulkDiscountEnabled = prev; showToast("Не удалось сохранить настройку скидки"); }
+    else {
+        try { localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(newState)); } catch(e) {}
+        showToast(newState ? "Скидка от 3 приложений включена" : "Скидка от 3 приложений выключена");
+    }
+    renderSettings();
+}
+
+loadData();
+loadOrdersList(true);
+try {
+    const savedTab = localStorage.getItem('apprestore_admin_tab');
+    if (savedTab && savedTab !== 'home' && document.getElementById('page-' + savedTab)) goTab(savedTab);
+} catch (e) {}
+</script>
+</body>
+</html>
