@@ -81,7 +81,14 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .o-foot .st .ic{flex:none}
 .o-foot .ob.del{margin-left:auto}
 .o-act .ob:not(.del){flex:1 1 auto;white-space:nowrap}
-.o-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.o-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border-radius:14px;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.04));border:1px solid rgba(96,165,250,.22)}
+.o-meta-l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.o-meta-l small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8}
+.o-meta-r{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.o-old{font-size:12px;font-weight:600;color:#64748b;text-decoration:line-through;font-variant-numeric:tabular-nums}
+.o-chips{display:flex;flex-wrap:wrap;gap:6px}
+.o-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:var(--green)}
+.o-chip svg{width:13px;height:13px}
 .o-promo{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--green);font-weight:700}
 .o-price{font-size:18px;font-weight:850;color:var(--blue);font-variant-numeric:tabular-nums}
 .o-link{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:12px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);font-size:12px;color:#bfdbfe;font-weight:600}
@@ -849,7 +856,16 @@ function renderOrdersList() {
                 return `<div class="o-app">${img}<span>${nm}</span></div>`;
             }).join('');
         }
-        const promo = order.promo_code ? `<div class="o-promo">${ic('tag')}${order.promo_code} (−${order.discount || 0} ₽)</div>` : '<div></div>';
+        const disc = Number(order.discount) || 0;
+        const total = Number(order.total_price) || 0;
+        const BULK_PER_APP = 40;
+        const bulkAmount = rowsCount >= 3 ? BULK_PER_APP * rowsCount : 0;
+        const hasBulk = disc > 0 && bulkAmount > 0 && disc >= bulkAmount;
+        const promoAmount = order.promo_code ? Math.max(0, disc - (hasBulk ? bulkAmount : 0)) : 0;
+        const chips = (hasBulk ? `<span class="o-chip">${ic('tag')}Скидка от 3 приложений −${bulkAmount} ₽</span>` : '')
+            + (order.promo_code ? `<span class="o-chip">${ic('tag')}Промокод ${order.promo_code}${promoAmount > 0 ? ` −${promoAmount} ₽` : ''}</span>` : '')
+            + (!hasBulk && !order.promo_code && disc > 0 ? `<span class="o-chip">Скидка −${disc} ₽</span>` : '');
+        const promo = chips ? `<div class="o-chips">${chips}</div>` : '';
         const linkUrl = order.link_token ? `${CLIENT_SITE_URL}/?${order.link_token}` : "";
         const link = linkUrl ? `<div class="o-link" onclick="copyText('${linkUrl}')">${ic('link')}<span>${linkUrl}</span>${ic('copy')}</div>` : "";
         let linkBadge = `<div class="st none">${ic('link')}Ссылка не создана</div>`;
@@ -865,7 +881,8 @@ function renderOrdersList() {
         return `<div class="order">
             <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
             <div class="o-apps">${appsNames}</div>
-            <div class="o-meta">${promo}<div class="o-price">${order.total_price || 0} ₽</div></div>
+            ${promo}
+            <div class="o-meta"><div class="o-meta-l"><small>Сумма заказа</small></div><div class="o-meta-r">${disc > 0 ? `<div class="o-old">${total + disc} ₽</div>` : ''}<div class="o-price">${total} ₽</div></div></div>
             ${link}${acts ? `<div class="o-act">${acts}</div>` : ''}${foot}</div>`;
     }).join(''));
 }
