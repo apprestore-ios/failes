@@ -83,7 +83,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .o-act .ob:not(.del){flex:1 1 auto;white-space:nowrap}
 .o-meta{display:flex;flex-direction:column;gap:9px;padding:11px 13px;border-radius:14px;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.04));border:1px solid rgba(96,165,250,.22)}
 .o-sum{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.o-price{font-size:22px;line-height:1;font-weight:900;color:#93c5fd;font-variant-numeric:tabular-nums;letter-spacing:-.01em;text-shadow:0 0 18px rgba(96,165,250,.45)}
+.o-price{font-size:28px;line-height:1;font-weight:900;color:#93c5fd;font-variant-numeric:tabular-nums;letter-spacing:-.01em;text-shadow:0 0 18px rgba(96,165,250,.45)}
 .o-sum small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8}
 .o-tags{display:flex;flex-direction:column;gap:4px;padding-top:9px;border-top:1px solid rgba(96,165,250,.18)}
 .o-tag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--green)}
@@ -194,7 +194,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 <main id="app">
 <!-- СТАТИСТИКА -->
 <section class="page active" id="page-home">
-  <div class="top"><div><div class="eyebrow">AppRestore</div><h1>Статистика</h1></div>
+  <div class="top"><div><h1>Статистика</h1></div>
     <button class="iconbtn" onclick="goTab('system')"><svg class="ic"><use href="#i-sliders"/></svg></button></div>
   <div class="seg" id="stat-seg">
     <button data-p="day" onclick="setStatPeriod('day')">Сегодня</button><button data-p="week" class="active" onclick="setStatPeriod('week')">Неделя</button><button data-p="month" onclick="setStatPeriod('month')">Месяц</button><button data-p="all" onclick="setStatPeriod('all')">Всё время</button>
@@ -214,7 +214,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 
 <!-- ЗАКАЗЫ -->
 <section class="page" id="page-orders">
-  <div class="top"><div><div class="eyebrow">История</div><h1>Заказы</h1></div><button class="iconbtn" onclick="loadOrdersList()"><svg class="ic"><use href="#i-refresh"/></svg></button></div>
+  <div class="top"><div><h1>Заказы</h1></div><button class="iconbtn" onclick="loadOrdersList()"><svg class="ic"><use href="#i-refresh"/></svg></button></div>
   <div class="stats3" id="orders-stats"><div><span>Сегодня</span><b>–</b></div><div><span>Неделя</span><b>–</b></div><div><span>Месяц</span><b>–</b></div></div>
   <div class="chips" id="order-chips">
     <button class="chip-f active" onclick="setOrderFilter('all',this)">Все</button><button class="chip-f" onclick="setOrderFilter('pending',this)">Ожидают</button><button class="chip-f" onclick="setOrderFilter('rejected',this)">Отклонены</button>
@@ -224,7 +224,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 
 <!-- ПРИЛОЖЕНИЯ -->
 <section class="page" id="page-apps">
-  <div class="top"><div><div class="eyebrow">Каталог</div><h1>Приложения</h1></div></div>
+  <div class="top"><div><h1>Каталог</h1></div></div>
   <div class="seg" id="apps-seg"><button class="active" onclick="setAppsMode('prices',this)">Цены</button><button onclick="setAppsMode('vis',this)">Видимость</button><button onclick="setAppsMode('promo',this)">Акции</button></div>
   <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input type="search" id="apps-search" class="field" placeholder="Поиск приложения..." oninput="renderAppsList()"></div>
   <div id="mass-panel" class="card hide">
@@ -238,7 +238,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 
 <!-- ВЫДАЧА -->
 <section class="page" id="page-tools">
-  <div class="top"><div><div class="eyebrow">Для клиентов</div><h1>Выдача</h1></div></div>
+  <div class="top"><div><h1>Для клиентов</h1></div></div>
   <div class="seg" id="tools-seg"><button class="active" onclick="setToolMode('link')">Ссылка</button><button onclick="setToolMode('promo')">Промокоды</button></div>
   <div id="tool-link">
     <div class="card">
@@ -251,7 +251,6 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
   </div>
   <div id="tool-promo" class="hide">
     <div class="card">
-      <div class="label">Промокод работает при любом количестве приложений. Суммируется только со скидкой от 3 приложений, с другими акциями не работает. Сгорает после использования.</div>
       <input type="tel" inputmode="numeric" id="promo-code-discount-input" class="field" placeholder="Скидка в рублях, например 100">
       <button class="btn green" id="btn-generate-promo-code" onclick="createPromoCode()"><svg class="ic"><use href="#i-gift"/></svg>Сгенерировать</button>
     </div>
@@ -262,7 +261,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 
 <!-- НАСТРОЙКИ -->
 <section class="page" id="page-system">
-  <div class="top"><div><div class="eyebrow">Система</div><h1>Настройки</h1></div></div>
+  <div class="top"><div><h1>Настройки</h1></div></div>
   <div class="card"><div class="row" onclick="toggleSite()"><span class="ibox" style="background:rgba(52,211,153,.18);color:var(--green)"><svg class="ic"><use href="#i-power"/></svg></span><div class="t"><b>Сайт</b><span id="site-state">Работает</span></div><div class="switch" id="sw-site"></div></div></div>
   <div class="card"><div class="row" onclick="toggleBulk()"><span class="ibox" style="background:rgba(251,191,36,.18);color:var(--amber)"><svg class="ic"><use href="#i-percent"/></svg></span><div class="t"><b>Скидка от 3 приложений</b><span id="bulk-state">40 ₽ за каждое приложение. Промокоды суммируются только с этой скидкой.</span></div><div class="switch" id="sw-bulk"></div></div></div>
 </section>
@@ -1016,7 +1015,7 @@ async function createPromoCode() {
     loadPromoCodesList();
     showResult({
         icon: 'gift', bg: 'rgba(52,211,153,.18)', color: '#4ade80', title: 'Промокод создан',
-        desc: `Скидка ${discount} ₽. Суммируется только со скидкой от 3 приложений. Сработает только 1 раз.`, value: promoText,
+        desc: `Скидка ${discount} ₽`, value: promoText,
         onForward: () => {
             const text = `🎁 Промокод на скидку ${discount} ₽\n\nКод: ${promoText}\n\n• Работает при любом количестве приложений\n• Суммируется только со скидкой от 3 приложений\n• С другими акциями не работает\n• Одноразовый\n\nЗаказать со скидкой: ${CLIENT_SITE_URL}`;
             shareViaTelegram(text);
