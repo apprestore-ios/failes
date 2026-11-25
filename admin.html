@@ -733,6 +733,11 @@ function renderAllViews() {
 }
 
 /* ----- Статистика ----- */
+function pluralOrders(n) {
+    const m10 = n % 10, m100 = n % 100;
+    const w = (m10 === 1 && m100 !== 11) ? 'заказ' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'заказа' : 'заказов';
+    return n + ' ' + w;
+}
 function formatRub(n) { return Math.round(n).toLocaleString("ru-RU") + " ₽"; }
 function periodStart(p) {
     const s = new Date(Date.now() + ADMIN_TZ_OFFSET), y = s.getUTCFullYear(), m = s.getUTCMonth(), d = s.getUTCDate();
@@ -763,7 +768,7 @@ function renderStats() {
     $('st-paid').textContent = paid.length;
     $('st-pending').textContent = pending;
     $('st-disc').textContent = formatRub(paid.reduce((s, o) => s + (Number(o.discount) || 0), 0));
-    $('st-promo').textContent = paid.filter(o => o.promo_code).length + ' зак.';
+    $('st-promo').textContent = pluralOrders(paid.filter(o => o.promo_code).length);
 
 
     // топ приложений
