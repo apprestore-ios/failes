@@ -206,10 +206,6 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
     <div class="card"><div class="card-h">С промокодом</div><div class="big" id="st-promo" style="color:var(--violet)">–</div></div>
   </div>
   <div class="card"><div class="card-h">Топ приложений</div><div id="st-top"></div></div>
-  <div class="grid2">
-    <button class="act" onclick="goTab('tools');setToolMode('link')"><span class="ibox" style="background:rgba(167,139,250,.18);color:var(--violet)"><svg class="ic"><use href="#i-link"/></svg></span>Новая ссылка</button>
-    <button class="act" onclick="goTab('tools');setToolMode('promo')"><span class="ibox" style="background:rgba(52,211,153,.18);color:var(--green)"><svg class="ic"><use href="#i-gift"/></svg></span>Промокод</button>
-  </div>
 </section>
 
 <!-- ЗАКАЗЫ -->
@@ -263,7 +259,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 <section class="page" id="page-system">
   <div class="top"><div><h1>Настройки</h1></div></div>
   <div class="card"><div class="row" onclick="toggleSite()"><span class="ibox" style="background:rgba(52,211,153,.18);color:var(--green)"><svg class="ic"><use href="#i-power"/></svg></span><div class="t"><b>Сайт</b><span id="site-state">Работает</span></div><div class="switch" id="sw-site"></div></div></div>
-  <div class="card"><div class="row" onclick="toggleBulk()"><span class="ibox" style="background:rgba(251,191,36,.18);color:var(--amber)"><svg class="ic"><use href="#i-percent"/></svg></span><div class="t"><b>Скидка от 3 приложений</b><span id="bulk-state">40 ₽ за каждое приложение. Промокоды суммируются только с этой скидкой.</span></div><div class="switch" id="sw-bulk"></div></div></div>
+  <div class="card"><div class="row" onclick="toggleBulk()"><span class="ibox" style="background:rgba(251,191,36,.18);color:var(--amber)"><svg class="ic"><use href="#i-percent"/></svg></span><div class="t"><b>Скидка от 3 приложений</b><span id="bulk-state">Включена</span></div><div class="switch" id="sw-bulk"></div></div></div>
 </section>
 </main>
 
@@ -1291,6 +1287,7 @@ function renderSettings() {
     $('sw-site').classList.toggle('on', globalData.siteEnabled);
     $('site-state').textContent = globalData.siteEnabled ? 'Работает' : 'Выключен для клиентов';
     $('sw-bulk').classList.toggle('on', globalData.bulkDiscountEnabled);
+    $('bulk-state').textContent = globalData.bulkDiscountEnabled ? 'Включена' : 'Выключена';
 }
 function toggleSite() {
     const newState = !globalData.siteEnabled;
