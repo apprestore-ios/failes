@@ -160,8 +160,10 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 #toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translate(-50%,-120px);z-index:99;background:rgba(17,24,39,.96);color:#fff;padding:11px 20px;border-radius:99px;font-size:14px;font-weight:650;border:1px solid var(--line);transition:.3s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
 #toast.show{transform:translate(-50%,0)}
 .hide{display:none!important}
-.prev{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.prev img{width:34px;height:34px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.prev{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.prev-row{display:flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;border-radius:12px;background:rgba(0,0,0,.28);font-size:14px;font-weight:600;color:#e2e8f0;min-width:0}
+.prev-row img{width:34px;height:34px;flex:none;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.prev-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sheet.tall{height:86dvh;display:flex;flex-direction:column;text-align:left}
 .sheet.tall .sl{flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px}
 </style>
@@ -240,7 +242,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
     <div class="card">
       <div class="label">Время работы после открытия клиентом</div>
       <div class="ttl" id="ttl-pills"><div class="active" onclick="selectTtl(5,this)">5 мин</div><div onclick="selectTtl(10,this)">10 мин</div><div onclick="selectTtl(15,this)">15 мин</div><div onclick="selectTtl(30,this)">30 мин</div></div>
-      <button class="btn ghost" style="margin-bottom:10px" onclick="openSheet('sheet-apps')"><svg class="ic"><use href="#i-grid"/></svg>Выбрать приложения (<span id="cnt-link">0</span>)</button>
+      <button class="btn ghost" style="margin-bottom:10px" onclick="openSheet('sheet-apps')"><svg class="ic"><use href="#i-grid"/></svg><span id="link-btn-label">Выбрать приложения</span></button>
       <div id="link-chosen" class="prev hide"></div>
       <button class="btn violet off" id="btn-generate-main" onclick="createLink()"><svg class="ic"><use href="#i-link"/></svg>Сгенерировать ссылку</button>
     </div>
@@ -1235,12 +1237,12 @@ function toggleAppForLink(key) {
 function updateGenerateButton() {
     const btn = $('btn-generate-main');
     if (!btn) return;
-    $('cnt-link').textContent = selectedAppsForLink.size;
+    $('link-btn-label').textContent = selectedAppsForLink.size ? `Выбрано приложений: ${selectedAppsForLink.size}` : 'Выбрать приложения';
     if ($('cnt-link2')) $('cnt-link2').textContent = selectedAppsForLink.size;
     btn.classList.toggle('off', selectedAppsForLink.size === 0);
     const prev = $('link-chosen');
     const items = Array.from(selectedAppsForLink).map(k => appsData.find(a => a.key === k)).filter(Boolean);
-    prev.innerHTML = items.map(a => `<img src="${a.icon}">`).join('');
+    prev.innerHTML = items.map(a => `<div class="prev-row"><img src="${a.icon}" alt=""><span>${a.name}</span></div>`).join('');
     prev.classList.toggle('hide', items.length === 0);
 }
 
