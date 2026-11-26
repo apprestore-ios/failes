@@ -128,6 +128,10 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .cb.on{background:#3b82f6;border-color:#3b82f6;color:#fff;box-shadow:0 4px 10px rgba(59,130,246,.4)}
 .price{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:800;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
 .sale-b{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.6px;line-height:1.4;background:linear-gradient(135deg,#fb7185,#f43f5e);color:#fff;box-shadow:0 0 10px rgba(244,63,94,.35)}
+.sale-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sale-count{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text,#fff)}
+.sale-count b{font-weight:800}
+.sale-head .chip-f{padding:7px 12px;font-size:12.5px;white-space:nowrap}
 .prr{display:flex;align-items:center;gap:8px}
 .newb{padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted)}
 .newb.active{background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(236,72,153,.4)}
@@ -228,10 +232,15 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
   <div class="seg" id="apps-seg"><button class="active" onclick="setAppsMode('prices',this)">Цены</button><button onclick="setAppsMode('vis',this)">Видимость</button><button onclick="setAppsMode('promo',this)">Акции</button></div>
   <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input type="search" id="apps-search" class="field" placeholder="Поиск приложения..." oninput="renderAppsList()"></div>
   <div id="mass-panel" class="card hide">
+    <div class="sale-head">
+      <div class="sale-count"><span class="sale-b">SALE</span><span>В акции: <b id="sale-count">0</b></span></div>
+      <button class="chip-f" id="sale-filter-btn" onclick="toggleSaleFilter()">Только акционные</button>
+    </div>
     <div class="label">Скидка в рублях применится к выбранным приложениям. Для возврата используйте базовые цены.</div>
     <input type="tel" inputmode="numeric" id="promo-discount-input" class="field" placeholder="Скидка, например 50">
     <div class="row" style="gap:8px"><button class="btn ghost small" onclick="selectAllPromo()">Выбрать все</button><button class="btn amber small" id="btn-apply-promo" onclick="applyPromo()"><svg class="ic"><use href="#i-tag"/></svg>Изменить (<span id="cnt-apply">0</span>)</button></div>
     <button class="btn danger small" id="btn-reset-promo" style="margin-top:8px" onclick="resetPromo()"><svg class="ic"><use href="#i-refresh"/></svg>Вернуть базовые (<span id="cnt-reset">0</span>)</button>
+    <button class="btn danger small" id="btn-clear-sales" style="margin-top:8px" onclick="clearAllSales()"><svg class="ic"><use href="#i-x"/></svg>Снять все акции</button>
   </div>
   <div id="list-apps"></div>
 </section>
@@ -1058,9 +1067,32 @@ function renderPricesList() {
         return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="prr">${isSaleApp(app.key) ? '<span class="sale-b">SALE</span>' : ''}<div class="price">${price} ₽</div></div>` });
     }).join('');
 }
+let saleOnlyFilter = false;
+function saleCount() { return appsData.filter(a => isSaleApp(a.key)).length; }
+function updateSaleUI() {
+    if ($('sale-count')) $('sale-count').textContent = saleCount();
+    $('sale-filter-btn')?.classList.toggle('active', saleOnlyFilter);
+    $('btn-clear-sales')?.classList.toggle('off', saleCount() === 0);
+}
+function toggleSaleFilter() {
+    saleOnlyFilter = !saleOnlyFilter;
+    renderPromoList();
+    tg.HapticFeedback.selectionChanged();
+}
+async function clearAllSales() {
+    const keys = appsData.filter(a => isSaleApp(a.key)).map(a => a.key);
+    if (keys.length === 0) { showToast("Акционных приложений нет"); return; }
+    if (!confirm("Снять все акции (" + keys.length + ")? Цены вернутся к 290 ₽.")) return;
+    const updates = keys.map(key => { globalData.state.prices[key] = "290"; return { app_key: key, price: 290 }; });
+    await savePricesBulk(updates, "Все акции сняты");
+    await saveSaleApps([]);
+}
 function renderPromoList() {
+    updateSaleUI();
     if (appsMode !== 'promo') return;
-    $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
+    const promoApps = smartFilterAdminApps(appsQuery()).filter(app => !saleOnlyFilter || isSaleApp(app.key));
+    if (promoApps.length === 0) { $('list-apps').innerHTML = '<div class="empty">' + (saleOnlyFilter ? 'Акционных приложений нет' : 'Ничего не найдено') + '</div>'; return; }
+    $('list-apps').innerHTML = promoApps.map(app => {
         const vis = globalData.state.visibility[app.key] !== false;
         return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' + (isSaleApp(app.key) ? ' <span class="sale-b" style="margin-left:6px">SALE</span>' : '') : naBadge });
     }).join('');
@@ -1123,7 +1155,8 @@ async function saveSaleApps(list) {
         headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify({ key: "promo_sale_apps", value: JSON.stringify(list) })
     });
-    if (res === null) { globalData.saleApps = prev; showToast("Не удалось сохранить список акционных приложений"); return false; }
+    if (res === null) { globalData.saleApps = prev; showToast("Не удалось сохранить список акционных приложений"); renderAppsList(); return false; }
+    renderAppsList();
     return true;
 }
 async function applyPromo() {
