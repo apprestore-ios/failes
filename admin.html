@@ -76,7 +76,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .o-app{display:flex;align-items:center;gap:8px;min-width:0}
 .o-app img{width:22px;height:22px;border-radius:6px;object-fit:cover;flex:none;background:rgba(255,255,255,.08)}
 .o-app span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.o-foot{padding-top:2px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.o-foot{padding-top:2px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
 .o-foot .st{flex:0 1 auto;min-width:0;white-space:nowrap;font-size:11.5px;padding:6px 10px}
 .o-foot .st .ic{flex:none}
 .o-foot .ob.del{margin-left:auto}
@@ -191,6 +191,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M16 7l3 3"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
@@ -295,6 +296,19 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
   <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input type="search" id="create-link-search" class="field" placeholder="Поиск приложения..." oninput="renderCreateLinkList()"></div>
   <div class="sl" id="list-create-link"></div>
   <button class="btn" style="margin-top:10px" onclick="closeSheets()"><svg class="ic"><use href="#i-check"/></svg>Готово (<span id="cnt-link2">0</span>)</button>
+</div></div>
+<div class="sheet-wrap" id="sheet-cred" onclick="if(event.target===this)closeSheets()"><div class="sheet">
+  <div class="grab"></div>
+  <div class="bigic" style="background:rgba(96,165,250,.16);color:var(--blue)"><svg class="ic" viewBox="0 0 24 24"><use href="#i-key"/></svg></div>
+  <h2 id="cred-title">Аккаунт для заказа</h2>
+  <p>Покупатель увидит данные на своей странице сам, без пересылки</p>
+  <div class="st pending hide" id="cred-req" style="justify-content:center;margin:0 auto 12px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-clock"/></svg>Покупатель ждёт код</div>
+  <input type="text" id="cred-login" class="field" placeholder="Логин" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <input type="text" id="cred-password" class="field" placeholder="Пароль" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <button class="btn" id="btn-cred-save" onclick="saveCredentials()"><svg class="ic" viewBox="0 0 24 24"><use href="#i-check"/></svg>Выдать логин и пароль</button>
+  <div class="card-h" style="margin:18px 4px 8px;text-align:left">Код подтверждения</div>
+  <input type="text" id="cred-code" class="field" placeholder="Код из SMS" inputmode="numeric" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="font-size:20px;font-weight:800;letter-spacing:3px;text-align:center">
+  <button class="btn green" id="btn-cred-code" onclick="sendCredCode()"><svg class="ic" viewBox="0 0 24 24"><use href="#i-send"/></svg>Отправить код покупателю</button>
 </div></div>
 <div class="sheet-wrap" id="sheet-result" onclick="if(event.target===this)closeSheets()"><div class="sheet">
   <div class="grab"></div>
@@ -607,6 +621,9 @@ let toastTimeout, tab = 'home', appsMode = 'prices', toolMode = 'link', statPeri
 let currentOrderFilter = 'all';
 let allOrdersCache = [];
 let linkStatusCache = {};
+let credStatusCache = {};
+let credOrderId = null;
+let issueHandled = false;
 
 document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
 document.addEventListener('gesturestart', e => e.preventDefault());
@@ -799,6 +816,109 @@ function renderStats() {
     }).join('') : '<div class="empty">Нет оплаченных заказов за период</div>');
 }
 
+/* ----- Аккаунт и код ----- */
+const FN_URL = `${SUPABASE_URL}/functions/v1/telegram-bot`;
+async function adminCall(action, payload = {}) {
+    try {
+        const res = await fetch(FN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, init_data: tg.initData, ...payload })
+        });
+        if (res.status === 401) { showToast('Переоткройте админку из бота'); return { success: false, error: 'unauthorized' }; }
+        return (await res.json().catch(() => null)) || { success: false, error: 'bad_response' };
+    } catch (e) { return { success: false, error: 'network' }; }
+}
+
+async function loadCredStatus() {
+    const r = await adminCall('admin_credentials_list');
+    if (r && r.success && Array.isArray(r.items)) {
+        credStatusCache = {};
+        r.items.forEach(i => { credStatusCache[String(i.order_id)] = i; });
+    }
+}
+
+function credBadge(order) {
+    const c = credStatusCache[String(order.id)];
+    if (!c || !c.has_login) return `<div class="st none">${ic('key')}Аккаунт не выдан</div>`;
+    if (c.code_state === 'requested') return `<div class="st pending">${ic('clock')}Ждёт код</div>`;
+    if (c.code_state === 'ready') return `<div class="st approved">${ic('check')}Код выдан</div>`;
+    return `<div class="st approved">${ic('key')}Логин выдан</div>`;
+}
+
+function updateCredBanner() {
+    const c = credStatusCache[String(credOrderId)];
+    $('cred-req').classList.toggle('hide', !(c && c.has_login && c.code_state === 'requested'));
+}
+
+async function openCredSheet(orderId) {
+    const order = allOrdersCache.find(o => o.id === orderId);
+    if (!order) return;
+    credOrderId = orderId;
+    $('cred-title').textContent = 'Заказ ' + (order.order_number || ('#' + order.id));
+    $('cred-login').value = '';
+    $('cred-password').value = '';
+    $('cred-code').value = '';
+    updateCredBanner();
+    openSheet('sheet-cred');
+    const r = await adminCall('admin_get_credentials', { order_id: String(orderId) });
+    if (credOrderId !== orderId || !r || !r.success) return;
+    $('cred-login').value = r.login || '';
+    $('cred-password').value = r.password || '';
+    $('cred-code').value = r.code || '';
+}
+
+async function saveCredentials() {
+    const login = $('cred-login').value.trim();
+    const password = $('cred-password').value.trim();
+    if (!login || !password) { showToast('Введите логин и пароль'); return; }
+    const btn = $('btn-cred-save');
+    btn.classList.add('off');
+    const r = await adminCall('admin_set_credentials', { order_id: String(credOrderId), login, password });
+    btn.classList.remove('off');
+    if (r && r.success) {
+        $('cred-code').value = '';
+        showToast('Логин и пароль выданы');
+        await loadCredStatus();
+        updateCredBanner();
+        renderOrdersList();
+        $('cred-code').focus();
+    } else if (!r || r.error !== 'unauthorized') {
+        showToast('Не удалось сохранить');
+    }
+}
+
+async function sendCredCode() {
+    const code = $('cred-code').value.trim();
+    const c = credStatusCache[String(credOrderId)];
+    if (!code) { showToast('Введите код'); return; }
+    if (!(c && c.has_login)) { showToast('Сначала выдайте логин и пароль'); return; }
+    const btn = $('btn-cred-code');
+    btn.classList.add('off');
+    const r = await adminCall('admin_set_code', { order_id: String(credOrderId), code });
+    btn.classList.remove('off');
+    if (r && r.success) {
+        showToast('Код отправлен покупателю');
+        await loadCredStatus();
+        updateCredBanner();
+        renderOrdersList();
+    } else if (!r || r.error !== 'unauthorized') {
+        showToast('Не удалось отправить код');
+    }
+}
+
+// Ссылка из уведомления бота: admin.html?issue=ТОКЕН открывает окно нужного заказа
+function handleIssueDeepLink() {
+    if (issueHandled) return;
+    const t = new URLSearchParams(location.search).get('issue');
+    issueHandled = true;
+    if (!t) return;
+    const o = allOrdersCache.find(x => String(x.link_token) === t);
+    if (!o) return;
+    goTab('orders');
+    openCredSheet(o.id);
+}
+
 /* ----- Заказы ----- */
 async function updatePendingOrdersBadge() {
     const res = await sbFetch("orders?status=eq.pending&select=id");
@@ -839,10 +959,13 @@ async function loadOrdersList(silent = false) {
             linksRes.forEach(l => { linkStatusCache[String(l.token)] = !!l.is_used && Number(l.activated_at) > 0; });
         }
     } catch (e) {}
+    try { await loadCredStatus(); } catch (e) {}
     renderOrderStats();
     renderStats();
     updatePendingOrdersBadge();
     renderOrdersList();
+    if ($('sheet-cred').classList.contains('open')) updateCredBanner();
+    handleIssueDeepLink();
 }
 
 function renderOrdersList() {
@@ -883,10 +1006,11 @@ function renderOrdersList() {
             const activated = linkStatusCache[String(order.link_token)] === true;
             linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Ссылка активирована' : 'Ссылка не активирована'}</div>`;
         }
-        const foot = `<div class="o-foot">${linkBadge}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
+        const foot = `<div class="o-foot">${linkBadge}${order.link_token ? credBadge(order) : ''}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
         let acts = '';
         if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>`;
         else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>`;
+        else if (order.link_token) acts = `<button class="ob ok" onclick="openCredSheet(${order.id})">${ic('key')}Аккаунт и код</button>`;
         else acts = '';
         return `<div class="order">
             <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
