@@ -1111,6 +1111,7 @@ const appsData = [
 let siteState = { prices: {}, visibility: {}, newApps: {} };
 let siteEnabled = true;
 let bulkDiscountEnabled = true;
+let saleApps = new Set(); // приложения с ценой, изменённой через раздел «Акции» (промокоды на них не работают)
 let currentCategory = "all";
 let isFromToken = false;
 let isTokenExpired = false;
@@ -1182,6 +1183,7 @@ function loadFromLocalStorageCache() {
         if (vCache) siteState.visibility = JSON.parse(vCache);
         if (nCache) siteState.newApps = JSON.parse(nCache);
         if (bCache !== null) bulkDiscountEnabled = bCache === "true";
+        try { const saCache = JSON.parse(localStorage.getItem("apprestore_sale_apps_cache") || "[]"); if (Array.isArray(saCache)) saleApps = new Set(saCache); } catch (e) {}
         if (sCache !== null) {
             siteEnabled = sCache === "true";
             const alertEl = document.getElementById("top-toast-alert");
@@ -1236,6 +1238,17 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
         }
 
         if (Array.isArray(settingsRes)) {
+            const saleSetting = settingsRes.find(x => x.key === "promo_sale_apps");
+            let newSaleList = [];
+            if (saleSetting) {
+                try { const parsed = JSON.parse(saleSetting.value); if (Array.isArray(parsed)) newSaleList = parsed; } catch (e) {}
+            }
+            const newSaleSet = new Set(newSaleList);
+            if (newSaleSet.size !== saleApps.size || newSaleList.some(k => !saleApps.has(k))) {
+                saleApps = newSaleSet;
+                hasChanges = true;
+            }
+
             const bulkSetting = settingsRes.find(x => x.key === "bulk_discount_enabled");
             if (bulkSetting) {
                 const newBulkDiscountEnabled = bulkSetting.value === "true";
@@ -1271,6 +1284,7 @@ async function fetchSiteDataFromSupabase(forceUpdateUI = false) {
             localStorage.setItem("apprestore_new_apps_cache", JSON.stringify(siteState.newApps));
             localStorage.setItem("apprestore_site_enabled_cache", String(siteEnabled));
             localStorage.setItem("apprestore_bulk_discount_enabled_cache", String(bulkDiscountEnabled));
+            localStorage.setItem("apprestore_sale_apps_cache", JSON.stringify(Array.from(saleApps)));
         } catch(e) {}
 
         if (hasChanges || forceUpdateUI) {
@@ -1348,7 +1362,33 @@ function updateBulkProgress() {
     if (statusEl) statusEl.textContent = left <= 0 ? "Активна ✓" : "ещё " + left;
 }
 
+// Есть ли в корзине приложения с ценой из раздела «Акции»
+function cartHasSaleItems() {
+    let has = false;
+    cartItems.forEach(k => { if (isAppVisible(k) && saleApps.has(k)) has = true; });
+    return has;
+}
+
+const PROMO_SALE_BLOCK_TEXT = "Промокод не действует на приложения по акции";
+
+// Если в корзине появились акционные приложения — снимаем уже применённый промокод
+function revalidatePromo() {
+    if (currentPromoCode && cartHasSaleItems()) {
+        currentPromoCode = null;
+        currentPromoDiscount = 0;
+        const pm = document.getElementById("promoMessage");
+        if (pm) {
+            pm.style.display = "block";
+            pm.style.color = "#fca5a5";
+            pm.textContent = PROMO_SALE_BLOCK_TEXT;
+        }
+        return true;
+    }
+    return false;
+}
+
 function getCartFinalTotal() {
+    revalidatePromo();
     let total = 0;
     cartItems.forEach(k => { if (isAppVisible(k)) total += getAppPrice(k); });
     let finalTotal = total - getCartBulkDiscount() - currentPromoDiscount;
@@ -1605,6 +1645,15 @@ async function applyPromoCode() {
         msgEl.textContent = "Введите промокод";
         return;
     }
+    if (cartHasSaleItems()) {
+        msgEl.style.display = "block";
+        msgEl.style.color = "#fca5a5";
+        msgEl.textContent = PROMO_SALE_BLOCK_TEXT;
+        currentPromoCode = null;
+        currentPromoDiscount = 0;
+        renderCartScreen();
+        return;
+    }
     msgEl.style.display = "block";
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Проверка...";
@@ -1694,6 +1743,7 @@ function renderCartScreen() {
 
     cartItems.forEach(k => { if (!isAppVisible(k)) cartItems.delete(k); });
     saveCart();
+    revalidatePromo();
 
     if (cartItems.size === 0) {
         if (titleEl) titleEl.textContent = "Корзина пуста";
@@ -1887,6 +1937,11 @@ function checkoutCart() {
 
 async function confirmOrderPaid() {
     if (cartItems.size === 0 && !activeOrderId) return;
+    if (revalidatePromo()) {
+        renderCartScreen();
+        switchScreen("cartApp", false);
+        return;
+    }
     const btn = document.getElementById("btnConfirmPaid");
     if (btn) {
         btn.disabled = true;
