@@ -242,7 +242,6 @@
       .app-grid-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
       
       .app-price-tag { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; margin-top: auto; }
-      .app-price-tag.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
 
       .new-price-bold { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-weight: 800; }
       
@@ -267,7 +266,18 @@
       .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
       
       .cart-item-price { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 15px; font-weight: 750; color: #4ade80; background: var(--btn-install-bg); border: 1px solid var(--btn-install-border); padding: 2px 8px; border-radius: 9px; display: inline-block; white-space: nowrap; }
-      .cart-item-price.premium { color: #4ade80; background: var(--btn-install-bg); border-color: var(--btn-install-border); }
+      .app-sale-badge {
+          position: absolute; top: -6px; left: -6px; z-index: 5; pointer-events: none; display: none;
+          background: linear-gradient(135deg, #fb7185, #f43f5e); color: #fff;
+          font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 99px; letter-spacing: 0.5px;
+          box-shadow: 0 4px 10px rgba(244, 63, 94, 0.45); border: 1.5px solid #0b0f17;
+      }
+      .app-sale-badge.visible { display: inline-block; }
+      .cart-sale-badge {
+          display: inline-block; vertical-align: middle; margin-right: 6px; padding: 2px 6px; border-radius: 6px;
+          font-size: 10px; font-weight: 800; letter-spacing: 0.5px; line-height: 1.4; color: #fff;
+          background: linear-gradient(135deg, #fb7185, #f43f5e);
+      }
       
       .diagonal-strike {
           position: relative;
@@ -1535,7 +1545,6 @@ function generateAppsGrid() {
     let html = "";
     appsData.forEach(app => {
         const price = getAppPrice(app.key);
-        const isPrem = price >= 500;
         const isInCart = cartItems.has(app.key);
         const isVisible = isAppVisible(app.key);
         const isNew = isAppNew(app.key);
@@ -1554,6 +1563,7 @@ function generateAppsGrid() {
         
         html += `
         <div class="app-grid-card ${isVisible ? '' : 'app-unavailable'}" id="appCard_${app.key}" data-key="${app.key}" data-category="${app.category}">
+            <span class="app-sale-badge ${price < 290 ? 'visible' : ''}" id="gridSale_${app.key}">SALE</span>
             <span class="app-new-badge ${isNew ? 'visible' : ''}" id="gridNew_${app.key}">NEW</span>
             <div style="display: flex; flex-direction: row; align-items: stretch; gap: 10px; width: 100%; flex: 1;">
                 <img loading="lazy" src="${app.icon}" class="app-grid-icon" alt="${app.name}">
@@ -1564,7 +1574,7 @@ function generateAppsGrid() {
                 </div>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px;">
-                <div class="app-price-tag ${isPrem ? 'premium' : ''}" id="gridPrice_${app.key}" style="margin-top: 0;">${priceHtml}</div>
+                <div class="app-price-tag" id="gridPrice_${app.key}" style="margin-top: 0;">${priceHtml}</div>
                 <button type="button" class="app-cart-btn ${isInCart ? 'in-cart' : ''}" id="gridBtn_${app.key}" onclick="toggleCart('${app.key}', this)">
                     ${isInCart 
                         ? '<span style="font-size: 16px; font-weight: 800;">✓</span>' 
@@ -1781,11 +1791,9 @@ function renderCartScreen() {
         const app = appsData.find(a => a.key === k);
         if (!app) return;
         const p = getAppPrice(k);
-        const isPrem = p >= 500;
-        
         let priceHtml = `<span class="new-price-bold">${p} ₽</span>`;
         if (p < 290) {
-            priceHtml = `<span class="diagonal-strike">290</span> <span class="new-price-bold">${p} ₽</span>`;
+            priceHtml = `<span class="cart-sale-badge">SALE</span><span class="diagonal-strike">290</span> <span class="new-price-bold">${p} ₽</span>`;
         }
         
         total += p;
@@ -1799,7 +1807,7 @@ function renderCartScreen() {
                 </div>
             </div>
             <div class="cart-item-right">
-                <div class="cart-item-price ${isPrem ? 'premium' : ''}">${priceHtml}</div>
+                <div class="cart-item-price">${priceHtml}</div>
                 <button type="button" class="cart-item-remove" onclick="removeFromCart('${app.key}')" title="Убрать"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             </div>
         </div>`;
@@ -1872,8 +1880,9 @@ function updateCartUI() {
             }
             if (priceTag.innerHTML !== expectedPriceHtml) {
                 priceTag.innerHTML = expectedPriceHtml;
-                priceTag.classList.toggle("premium", p >= 500);
             }
+            const saleBadge = document.getElementById("gridSale_" + app.key);
+            if (saleBadge) saleBadge.classList.toggle("visible", p < 290);
         }
         
         if (btn) {
