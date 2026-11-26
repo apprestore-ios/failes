@@ -129,7 +129,6 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .price{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:800;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
 .sale-b{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.6px;line-height:1.4;background:linear-gradient(135deg,#fb7185,#f43f5e);color:#fff;box-shadow:0 0 10px rgba(244,63,94,.35)}
 .prr{display:flex;align-items:center;gap:8px}
-.price.prem{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.4);color:#d8b4fe}
 .newb{padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted)}
 .newb.active{background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(236,72,153,.4)}
 .switch{position:relative;width:50px;height:30px;border-radius:15px;background:rgba(255,255,255,.13);flex-shrink:0;transition:.25s}
@@ -1056,7 +1055,7 @@ function renderPricesList() {
     if (appsMode !== 'prices') return;
     $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
         const price = getAdminAppPrice(app.key);
-        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="prr">${isSaleApp(app.key) ? '<span class="sale-b">SALE</span>' : ''}<div class="price ${price >= 500 ? 'prem' : ''}">${price} ₽</div></div>` });
+        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="prr">${isSaleApp(app.key) ? '<span class="sale-b">SALE</span>' : ''}<div class="price">${price} ₽</div></div>` });
     }).join('');
 }
 function renderPromoList() {
