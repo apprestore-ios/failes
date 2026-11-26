@@ -79,7 +79,9 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .o-foot{padding-top:2px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
 .o-foot .st{flex:0 1 auto;min-width:0;white-space:nowrap;font-size:11.5px;padding:6px 10px}
 .o-foot .st .ic{flex:none}
-.o-foot .ob.del{margin-left:auto}
+.o-top-r{display:flex;align-items:center;gap:8px;flex:none}
+.ob.del-top{flex:0 0 36px;width:36px;height:36px;padding:0;border-radius:11px;background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.4)}
+.ob.del-top .ic{width:17px;height:17px}
 .o-act .ob:not(.del){flex:1 1 auto;white-space:nowrap}
 .o-meta{display:flex;flex-direction:column;gap:9px;padding:11px 13px;border-radius:14px;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.04));border:1px solid rgba(96,165,250,.22)}
 .o-sum{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1006,14 +1008,14 @@ function renderOrdersList() {
             const activated = linkStatusCache[String(order.link_token)] === true;
             linkBadge = `<div class="st ${activated ? 'approved' : 'pending'}">${ic(activated ? 'check' : 'clock')}${activated ? 'Ссылка активирована' : 'Ссылка не активирована'}</div>`;
         }
-        const foot = `<div class="o-foot">${linkBadge}${order.link_token ? credBadge(order) : ''}<button class="ob del" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div>`;
+        const foot = `<div class="o-foot">${linkBadge}${order.link_token ? credBadge(order) : ''}</div>`;
         let acts = '';
         if (order.status === "pending") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить</button><button class="ob no" onclick="rejectOrderFromAdmin(${order.id})">${ic('x')}Не поступила</button>`;
         else if (order.status === "rejected") acts = `<button class="ob ok" onclick="approveOrderFromAdmin(${order.id})">${ic('check')}Подтвердить оплату</button>`;
         else if (order.link_token) acts = `<button class="ob ok" onclick="openCredSheet(${order.id})">${ic('key')}Аккаунт и код</button>`;
         else acts = '';
         return `<div class="order">
-            <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="st ${sClass}">${ic(sIcon)}${sText}</div></div>
+            <div class="o-top"><div><div class="o-num">Заказ ${order.order_number || ('#' + order.id)}</div><div class="o-time">${dateStr} (Екб)</div></div><div class="o-top-r"><div class="st ${sClass}">${ic(sIcon)}${sText}</div><button class="ob del-top" onclick="deleteOrderFromAdmin(${order.id})">${ic('trash')}</button></div></div>
             <div class="o-apps">${appsNames}</div>
             <div class="o-meta"><div class="o-sum"><small>Сумма заказа</small><div class="o-price">${total} ₽</div></div>${tags ? `<div class="o-tags">${tags}</div>` : ''}</div>
             ${link}${acts ? `<div class="o-act">${acts}</div>` : ''}${foot}</div>`;
