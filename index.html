@@ -476,6 +476,9 @@
       }
       .order-num-pill { display: inline-flex; align-items: center; gap: 6px; align-self: center; padding: 7px 14px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.45); color: var(--muted); font-size: 12.5px; font-weight: 600; user-select: text; -webkit-user-select: text; }
       .order-num-pill b { color: #fff; font-size: 14px; font-weight: 750; letter-spacing: .3px; }
+      .cred-hidden { display: none !important; }
+      .cred-code-big { font-size: 28px; font-weight: 800; letter-spacing: 5px; color: #4ade80; user-select: text; -webkit-user-select: text; }
+      .cred-hint { font-size: 12.5px; color: var(--muted); line-height: 1.45; text-align: center; margin: 0; }
 
       /* ===== Главная: бегущие строки, панель преимуществ, ссылки ===== */
       #welcomeApp { justify-content: flex-start; gap: clamp(10px, 1.8dvh, 16px); margin-bottom: -28px; overflow: hidden; max-height: calc(100dvh - 84px); overscroll-behavior: none; touch-action: none; }
@@ -910,6 +913,49 @@
             <div class="info-box-num" style="color: #a78bfa; font-size: 22px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-support"/></svg></div>
             <div class="info-box-label">поддержка и активация</div>
         </a>
+    </div>
+    <div class="requisites-card cred-hidden" id="tokenCredCard" style="margin-top: 14px; gap: 12px;">
+        <div class="catalog-title" style="text-align: center;">Данные для входа в аккаунт</div>
+        <div id="credWait" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div class="wait-spinner" style="width: 36px; height: 36px; margin: 2px auto;"></div>
+            <p class="cred-hint">Администратор готовит данные. Они появятся здесь автоматически, страницу обновлять не нужно.</p>
+        </div>
+        <div id="credReady" class="cred-hidden" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="req-row">
+                <div class="req-label">Логин</div>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="credLogin" style="word-break: break-all;">—</span>
+                    <button type="button" class="req-copy-btn" id="credCopyLogin" onclick="copyCredValue('credLogin', 'credCopyLogin')">Скопировать</button>
+                </div>
+            </div>
+            <div class="req-row">
+                <div class="req-label">Пароль</div>
+                <div class="req-value-wrap">
+                    <span class="req-value" id="credPassword" style="word-break: break-all;">—</span>
+                    <button type="button" class="req-copy-btn" id="credCopyPassword" onclick="copyCredValue('credPassword', 'credCopyPassword')">Скопировать</button>
+                </div>
+            </div>
+            <div class="req-row" style="gap: 8px;">
+                <div class="req-label">Код подтверждения</div>
+                <div id="credCodeIdle" style="display: flex; flex-direction: column; gap: 8px;">
+                    <p class="cred-hint" style="text-align: left;">Когда система попросит код, нажмите кнопку ниже. Администратор получит запрос и пришлёт код сюда.</p>
+                    <button type="button" class="btn btn-primary" id="credAskBtn" onclick="requestCredCode()" style="min-height: 44px; font-size: 14px; margin: 0;">Запросить код</button>
+                </div>
+                <div id="credCodeWaiting" class="cred-hidden" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div class="wait-spinner" style="width: 30px; height: 30px; margin: 2px auto;"></div>
+                    <p class="cred-hint">Запрос отправлен. Код появится здесь, как только администратор его пришлёт.</p>
+                    <button type="button" class="btn btn-secondary" onclick="requestCredCode()" style="min-height: 40px; font-size: 13px; margin: 0;">Запросить ещё раз</button>
+                </div>
+                <div id="credCodeReady" class="cred-hidden" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div class="req-value-wrap" style="width: 100%; justify-content: center; gap: 12px;">
+                        <span class="cred-code-big" id="credCode">—</span>
+                        <button type="button" class="req-copy-btn" id="credCopyCode" onclick="copyCredValue('credCode', 'credCopyCode')">Скопировать</button>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="requestCredCode()" style="min-height: 40px; font-size: 13px; margin: 0;">Нужен новый код</button>
+                </div>
+            </div>
+            <p class="cred-hint cred-hidden" id="credError" style="color: #fca5a5;">Не удалось отправить запрос. Попробуйте ещё раз.</p>
+        </div>
     </div>
     <div class="catalog-header" style="margin-top: 14px;">
         <div class="catalog-title">Выбранные приложения:</div>
@@ -1558,6 +1604,7 @@ function startTokenCountdown(expiresAtTimestamp) {
         if (diff <= 0) {
             clearInterval(tokenCountdownInterval);
             isTokenExpired = true;
+            stopCredentialsPolling();
             display.textContent = "ИСТЕКЛО";
             display.style.color = "#ef4444";
             switchScreen("tokenErrorApp");
@@ -2391,6 +2438,94 @@ async function loadTokenOrderNumber(token, knownNum) {
     } catch (e) {}
 }
 
+// ===== Аккаунт и код от администратора (страница разовой ссылки) =====
+let credPollTimer = null;
+let credToken = "";
+let credAskBusy = false;
+
+function credCall(action) {
+    return fetch(`${SUPABASE_URL}/functions/v1/telegram-bot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: action, token: credToken, device_id: getOrCreateDeviceId() })
+    }).then(r => r.json());
+}
+
+function credShow(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("cred-hidden", !show);
+}
+
+function credSetText(id, value) {
+    const el = document.getElementById(id);
+    if (el && el.textContent !== value) el.textContent = value;
+}
+
+function renderCredentials(d) {
+    credShow("tokenCredCard", true);
+    credShow("credWait", !d.ready);
+    credShow("credReady", !!d.ready);
+    if (!d.ready) return;
+    credSetText("credLogin", d.login || "");
+    credSetText("credPassword", d.password || "");
+    const st = d.code_state || "none";
+    credShow("credCodeIdle", st === "none");
+    credShow("credCodeWaiting", st === "requested");
+    credShow("credCodeReady", st === "ready");
+    if (st === "ready") credSetText("credCode", d.code || "");
+}
+
+async function pollCredentials() {
+    if (isTokenExpired || !credToken) { stopCredentialsPolling(); return; }
+    try {
+        const d = await credCall("get_credentials");
+        if (d && d.success) {
+            renderCredentials(d);
+        } else if (d && (d.reason === "no_order" || d.reason === "invalid" || d.reason === "expired")) {
+            credShow("tokenCredCard", false);
+            stopCredentialsPolling();
+        }
+    } catch (e) {}
+}
+
+function startCredentialsPolling(token) {
+    credToken = token;
+    stopCredentialsPolling();
+    pollCredentials();
+    credPollTimer = setInterval(pollCredentials, 3000);
+}
+
+function stopCredentialsPolling() {
+    if (credPollTimer) { clearInterval(credPollTimer); credPollTimer = null; }
+}
+
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && credPollTimer) pollCredentials();
+});
+
+async function requestCredCode() {
+    if (credAskBusy) return;
+    credAskBusy = true;
+    const askBtn = document.getElementById("credAskBtn");
+    if (askBtn) askBtn.disabled = true;
+    credShow("credError", false);
+    try {
+        const d = await credCall("request_code");
+        if (!d || !d.success) credShow("credError", true);
+    } catch (e) {
+        credShow("credError", true);
+    } finally {
+        credAskBusy = false;
+        if (askBtn) askBtn.disabled = false;
+    }
+    pollCredentials();
+}
+
+function copyCredValue(elId, btnId) {
+    const el = document.getElementById(elId);
+    if (el) copyRequisite(el.textContent, btnId);
+}
+
 const GUIDE_IMG_BASE = "https://github.com/apprestore-ios/failes/releases/download/Инструкция/";
 const GUIDE_IMAGES = [
     { file: "inc1.png", caption: "Откройте <b>«Настройки»</b> и нажмите на своё имя в самом верху." },
@@ -3023,6 +3158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderTokenAppsList(sessionAppKeys);
             startTokenCountdown(sessionExpiresAt);
             loadTokenOrderNumber(token, sessionOrderNum);
+            startCredentialsPolling(token);
             switchScreen("tokenApp");
             return;
         }
