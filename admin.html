@@ -236,11 +236,10 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
       <div class="sale-count"><span class="sale-b">SALE</span><span>В акции: <b id="sale-count">0</b></span></div>
       <button class="chip-f" id="sale-filter-btn" onclick="toggleSaleFilter()">Только акционные</button>
     </div>
-    <div class="label">Скидка в рублях применится к выбранным приложениям. Для возврата используйте базовые цены.</div>
+    <div class="label">Скидка в рублях применится к выбранным приложениям. Чтобы вернуть обычные цены, используйте «Отменить все акции».</div>
     <input type="tel" inputmode="numeric" id="promo-discount-input" class="field" placeholder="Скидка, например 50">
     <div class="row" style="gap:8px"><button class="btn ghost small" onclick="selectAllPromo()">Выбрать все</button><button class="btn amber small" id="btn-apply-promo" onclick="applyPromo()"><svg class="ic"><use href="#i-tag"/></svg>Изменить (<span id="cnt-apply">0</span>)</button></div>
-    <button class="btn danger small" id="btn-reset-promo" style="margin-top:8px" onclick="resetPromo()"><svg class="ic"><use href="#i-refresh"/></svg>Вернуть базовые (<span id="cnt-reset">0</span>)</button>
-    <button class="btn danger small" id="btn-clear-sales" style="margin-top:8px" onclick="clearAllSales()"><svg class="ic"><use href="#i-x"/></svg>Снять все акции</button>
+    <button class="btn danger small" id="btn-clear-sales" style="margin-top:8px" onclick="clearAllSales()"><svg class="ic"><use href="#i-x"/></svg>Отменить все акции</button>
   </div>
   <div id="list-apps"></div>
 </section>
@@ -1082,9 +1081,8 @@ function toggleSaleFilter() {
 async function clearAllSales() {
     const keys = appsData.filter(a => isSaleApp(a.key)).map(a => a.key);
     if (keys.length === 0) { showToast("Акционных приложений нет"); return; }
-    if (!confirm("Снять все акции (" + keys.length + ")? Цены вернутся к 290 ₽.")) return;
     const updates = keys.map(key => { globalData.state.prices[key] = "290"; return { app_key: key, price: 290 }; });
-    await savePricesBulk(updates, "Все акции сняты");
+    await savePricesBulk(updates, "Все акции отменены");
     await saveSaleApps([]);
 }
 function renderPromoList() {
@@ -1125,9 +1123,7 @@ function selectAllPromo() {
 function updatePromoButton() {
     const n = selectedAppsForPromo.size;
     if ($('cnt-apply')) $('cnt-apply').textContent = n;
-    if ($('cnt-reset')) $('cnt-reset').textContent = n;
     $('btn-apply-promo')?.classList.toggle('off', n === 0);
-    $('btn-reset-promo')?.classList.toggle('off', n === 0);
 }
 
 async function savePricesBulk(updates, okMsg) {
@@ -1176,15 +1172,6 @@ async function applyPromo() {
     selectedAppsForPromo.forEach(key => saleSet.add(key));
     await saveSaleApps(Array.from(saleSet));
     await savePricesBulk(updates, "Цены успешно обновлены!");
-}
-async function resetPromo() {
-    if (selectedAppsForPromo.size === 0) { tg.HapticFeedback.notificationOccurred('error'); return; }
-    const updates = [];
-    const resetKeys = Array.from(selectedAppsForPromo);
-    selectedAppsForPromo.forEach(key => { updates.push({ app_key: key, price: 290 }); globalData.state.prices[key] = "290"; });
-    await savePricesBulk(updates, "Цены сброшены до базовых!");
-    // Цены вернулись — снимаем пометку «акция», промокоды снова работают
-    await saveSaleApps((globalData.saleApps || []).filter(k => !resetKeys.includes(k)));
 }
 
 function openPriceDetail(key) {
