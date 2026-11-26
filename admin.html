@@ -127,6 +127,8 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 .cb{width:24px;height:24px;border-radius:8px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;font-size:15px;transition:.15s}
 .cb.on{background:#3b82f6;border-color:#3b82f6;color:#fff;box-shadow:0 4px 10px rgba(59,130,246,.4)}
 .price{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:800;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
+.sale-b{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.6px;line-height:1.4;background:linear-gradient(135deg,#fb7185,#f43f5e);color:#fff;box-shadow:0 0 10px rgba(244,63,94,.35)}
+.prr{display:flex;align-items:center;gap:8px}
 .price.prem{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.4);color:#d8b4fe}
 .newb{padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted)}
 .newb.active{background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(236,72,153,.4)}
@@ -175,6 +177,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
 <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
@@ -197,7 +200,7 @@ h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.6px}
 <!-- СТАТИСТИКА -->
 <section class="page active" id="page-home">
   <div class="top"><div><h1>Статистика</h1></div>
-    <button class="iconbtn" onclick="goTab('system')"><svg class="ic"><use href="#i-sliders"/></svg></button></div>
+    <button class="iconbtn" onclick="goTab('system')"><svg class="ic"><use href="#i-gear"/></svg></button></div>
   <div class="seg" id="stat-seg">
     <button data-p="day" class="active" onclick="setStatPeriod('day')">Сегодня</button><button data-p="week" onclick="setStatPeriod('week')">Неделя</button><button data-p="month" onclick="setStatPeriod('month')">Месяц</button><button data-p="all" onclick="setStatPeriod('all')">Всё время</button>
   </div>
@@ -1048,18 +1051,19 @@ function renderAppsList() {
 function appsQuery() { return $('apps-search') ? $('apps-search').value : ''; }
 const naBadge = '<span class="bad">Недоступно</span>';
 
+function isSaleApp(key) { return (globalData.saleApps || []).includes(key); }
 function renderPricesList() {
     if (appsMode !== 'prices') return;
     $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
         const price = getAdminAppPrice(app.key);
-        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="price ${price >= 500 ? 'prem' : ''}">${price} ₽</div>` });
+        return appRow(app, { click: `openPriceDetail('${app.key}')`, sub: app.ios, right: `<div class="prr">${isSaleApp(app.key) ? '<span class="sale-b">SALE</span>' : ''}<div class="price ${price >= 500 ? 'prem' : ''}">${price} ₽</div></div>` });
     }).join('');
 }
 function renderPromoList() {
     if (appsMode !== 'promo') return;
     $('list-apps').innerHTML = smartFilterAdminApps(appsQuery()).map(app => {
         const vis = globalData.state.visibility[app.key] !== false;
-        return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' + ((globalData.saleApps || []).includes(app.key) ? ' · акция (без промокодов)' : '') : naBadge });
+        return appRow(app, { na: true, click: vis ? 'toggleAppForPromo(this.dataset.key)' : '', left: `<div class="cb ${selectedAppsForPromo.has(app.key) ? 'on' : ''}" id="check-promo-${app.key}" style="${vis ? '' : 'display:none'}">${ic('check')}</div>`, sub: vis ? 'Текущая цена: ' + getAdminAppPrice(app.key) + ' ₽' + (isSaleApp(app.key) ? ' <span class="sale-b" style="margin-left:6px">SALE</span>' : '') : naBadge });
     }).join('');
 }
 function renderVisibilityList() {
