@@ -182,6 +182,8 @@
       }
       .container.active-screen { display: flex; opacity: 1; transform: translateY(0) scale(1); }
       #welcomeApp, #maintenanceApp, #tokenErrorApp, #authApp, #cartApp, #paymentApp, #orderWaitApp, #orderApprovedApp, #orderRejectedApp, #myOrdersApp, #guideApp, #tipsApp, #policyApp, #offerApp { justify-content: center; align-items: center; text-align: center; }
+      #cartApp { justify-content: flex-start; }
+      #cartApp > .auth-box { margin-top: auto; margin-bottom: auto; flex-shrink: 0; }
       #tokenApp { justify-content: flex-start; align-items: center; text-align: center; }
       .hero-section { text-align: center; margin-bottom: 14px; margin-top: 2px; width: 100%; }
       .hero-title { font-size: 23px; font-weight: 750; line-height: 1.25; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 20%, var(--muted) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -2255,7 +2257,7 @@ function switchScreen(id, pushHistory = true) {
     currentScreenId = id;
     sessionStorage.setItem("currentScreenId", currentScreenId);
 
-    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "cartApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
+    if (["welcomeApp", "maintenanceApp", "tokenErrorApp", "paymentApp", "orderWaitApp", "orderApprovedApp", "orderRejectedApp", "myOrdersApp", "guideApp", "tipsApp", "policyApp", "offerApp"].includes(id)) {
         document.body.style.overflow = "hidden";
         window.scrollTo(0, 0);
     } else {
