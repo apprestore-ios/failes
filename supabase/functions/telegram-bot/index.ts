@@ -7,6 +7,7 @@ const ADMIN_CHAT_ID = Deno.env.get('ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_AD
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || "https://gwypxcdnefxlhwvtkvkc.supabase.co"
 const SUPABASE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || "sb_publishable_x-5_3tc8EOyJDb06MH5XWg_bsGu1qfg"
 const CLIENT_SITE_URL = "https://apprestore-ios.ru"
+const ADMIN_URL = `${CLIENT_SITE_URL}/admin.html`
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,6 +55,105 @@ function parseDeviceName(ua: string): string {
   return "Мобильное устройство";
 }
 
+
+// ================= Аккаунт и код: вспомогательные функции =================
+const enc = new TextEncoder()
+
+function jsonRes(obj: unknown, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
+  })
+}
+
+async function hmacSha256(key: Uint8Array, msg: string): Promise<Uint8Array> {
+  const k = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  return new Uint8Array(await crypto.subtle.sign('HMAC', k, enc.encode(msg)))
+}
+
+function toHex(bytes: Uint8Array): string {
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Проверяет подпись Telegram WebApp (initData) и что открыл админ-панель именно администратор
+async function verifyAdminInitData(initData: unknown): Promise<boolean> {
+  if (typeof initData !== 'string' || !initData || !TELEGRAM_BOT_TOKEN || !ADMIN_CHAT_ID) return false
+  const params = new URLSearchParams(initData)
+  const hash = params.get('hash')
+  if (!hash) return false
+  params.delete('hash')
+  const dataCheckString = Array.from(params.entries())
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([k, v]) => `${k}=${v}`)
+    .join('\n')
+  const secret = await hmacSha256(enc.encode('WebAppData'), TELEGRAM_BOT_TOKEN)
+  const calc = toHex(await hmacSha256(secret, dataCheckString))
+  if (calc !== hash) return false
+  const authDate = Number(params.get('auth_date') || 0)
+  if (!authDate || Date.now() / 1000 - authDate > 3 * 86400) return false
+  try {
+    const user = JSON.parse(params.get('user') || '{}')
+    return String(user.id) === String(ADMIN_CHAT_ID)
+  } catch (_e) {
+    return false
+  }
+}
+
+// Находит заказ покупателя по активированной разовой ссылке (то же устройство, срок не истёк, заказ оплачен)
+type ActiveOrder = { ok: boolean; reason?: string; token?: string; orderId?: string; orderNumber?: string }
+
+async function resolveActiveOrder(token: unknown, deviceId: unknown): Promise<ActiveOrder> {
+  const t = String(token || '').trim()
+  const d = String(deviceId || '').trim()
+  if (!/^[A-Za-z0-9_-]{4,32}$/.test(t) || !d || d.length > 120) return { ok: false, reason: 'invalid' }
+
+  const links = await sbFetch(`app_links?token=eq.${encodeURIComponent(t)}&select=*`)
+  if (!Array.isArray(links) || links.length === 0) return { ok: false, reason: 'invalid' }
+  const link = links[0]
+  const activatedAt = Number(link.activated_at) || 0
+  const ttlMs = (Number(link.ttl_minutes) || 15) * 60 * 1000
+  if (!link.is_used || !activatedAt || link.device_id !== d) return { ok: false, reason: 'invalid' }
+  if (Date.now() >= activatedAt + ttlMs) return { ok: false, reason: 'expired' }
+
+  const orders = await sbFetch(`orders?link_token=eq.${encodeURIComponent(t)}&select=id,order_number,status`)
+  if (!Array.isArray(orders) || orders.length === 0 || orders[0].status !== 'approved') {
+    return { ok: false, reason: 'no_order' }
+  }
+  return { ok: true, token: t, orderId: String(orders[0].id), orderNumber: String(orders[0].order_number || '') }
+}
+
+async function getCredRow(orderId: string) {
+  const rows = await sbFetch(`order_credentials?order_id=eq.${encodeURIComponent(orderId)}&select=*`)
+  if (rows === null) return null
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : {}
+}
+
+async function upsertCred(orderId: string, fields: Record<string, unknown>) {
+  return await sbFetch('order_credentials?on_conflict=order_id', {
+    method: 'POST',
+    headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ order_id: orderId, ...fields, updated_at: new Date().toISOString() })
+  })
+}
+
+function ts(v: unknown): number {
+  const n = v ? Date.parse(String(v)) : 0
+  return Number.isFinite(n) ? n : 0
+}
+
+// none — код не просили, requested — покупатель ждёт код, ready — код выдан
+function codeState(row: Record<string, unknown>): 'none' | 'requested' | 'ready' {
+  const req = ts(row.code_requested_at)
+  const upd = ts(row.code_updated_at)
+  if (row.acc_code && upd >= req) return 'ready'
+  if (req && req > upd) return 'requested'
+  return 'none'
+}
+
+function cleanStr(v: unknown, max: number): string {
+  return typeof v === 'string' ? v.trim().slice(0, max) : ''
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
@@ -66,6 +166,114 @@ serve(async (req) => {
     }
 
     const body = await req.json()
+
+    // ================= Аккаунт и код (ручная выдача через админку) =================
+    // Покупатель: получить логин, пароль и код своего заказа
+    if (body.action === 'get_credentials') {
+      const ctx = await resolveActiveOrder(body.token, body.device_id)
+      if (!ctx.ok) return jsonRes({ success: false, reason: ctx.reason })
+      const row = await getCredRow(ctx.orderId!)
+      if (row === null) return jsonRes({ success: false, reason: 'server' })
+      const state = codeState(row)
+      const ready = !!(row.acc_login && row.acc_password)
+      return jsonRes({
+        success: true,
+        ready,
+        login: ready ? row.acc_login : '',
+        password: ready ? row.acc_password : '',
+        code_state: ready ? state : 'none',
+        code: ready && state === 'ready' ? row.acc_code : ''
+      })
+    }
+
+    // Покупатель: нажал «Запросить код» — админу приходит уведомление
+    if (body.action === 'request_code') {
+      const ctx = await resolveActiveOrder(body.token, body.device_id)
+      if (!ctx.ok) return jsonRes({ success: false, reason: ctx.reason })
+      const row = await getCredRow(ctx.orderId!)
+      if (row === null || !row.acc_login) return jsonRes({ success: false, reason: 'no_credentials' })
+
+      const lastReq = ts(row.code_requested_at)
+      const pending = codeState(row) === 'requested'
+      if (pending && Date.now() - lastReq < 20000) return jsonRes({ success: true, throttled: true })
+
+      const saved = await upsertCred(ctx.orderId!, { code_requested_at: new Date().toISOString() })
+      if (saved === null) return jsonRes({ success: false, reason: 'server' })
+
+      if (ADMIN_CHAT_ID) {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            text: `🔐 Покупатель ждёт код\n\nЗаказ ${ctx.orderNumber}`,
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '⚙️ Ввести код', web_app: { url: `${ADMIN_URL}?issue=${ctx.token}` } }],
+                [{ text: '🗑 Удалить уведомление', callback_data: 'delete_msg' }]
+              ]
+            }
+          })
+        }).catch(() => {})
+      }
+      return jsonRes({ success: true })
+    }
+
+    // Админ: все действия ниже требуют подпись Telegram WebApp и совпадение ID администратора
+    if (typeof body.action === 'string' && body.action.startsWith('admin_')) {
+      if (!(await verifyAdminInitData(body.init_data))) {
+        return jsonRes({ success: false, error: 'unauthorized' }, 401)
+      }
+
+      // Список заказов с флагами (без паролей) — для значков в админке
+      if (body.action === 'admin_credentials_list') {
+        const rows = await sbFetch('order_credentials?select=order_id,acc_login,acc_code,code_requested_at,code_updated_at')
+        if (rows === null) return jsonRes({ success: false, error: 'server' }, 500)
+        const items = (Array.isArray(rows) ? rows : []).map((r: Record<string, unknown>) => ({
+          order_id: r.order_id,
+          has_login: !!r.acc_login,
+          code_state: codeState(r)
+        }))
+        return jsonRes({ success: true, items })
+      }
+
+      const orderId = cleanStr(String(body.order_id ?? ''), 40)
+      if (!/^\d{1,20}$/.test(orderId)) return jsonRes({ success: false, error: 'bad_order_id' }, 400)
+
+      // Данные одного заказа для окна выдачи
+      if (body.action === 'admin_get_credentials') {
+        const row = await getCredRow(orderId)
+        if (row === null) return jsonRes({ success: false, error: 'server' }, 500)
+        return jsonRes({
+          success: true,
+          login: row.acc_login || '',
+          password: row.acc_password || '',
+          code: row.acc_code || '',
+          code_state: codeState(row)
+        })
+      }
+
+      // Выдать логин и пароль (старый код при этом сбрасывается — аккаунт новый)
+      if (body.action === 'admin_set_credentials') {
+        const login = cleanStr(body.login, 200)
+        const password = cleanStr(body.password, 200)
+        if (!login || !password) return jsonRes({ success: false, error: 'empty' }, 400)
+        const saved = await upsertCred(orderId, { acc_login: login, acc_password: password, acc_code: null, code_updated_at: null })
+        if (saved === null) return jsonRes({ success: false, error: 'server' }, 500)
+        return jsonRes({ success: true })
+      }
+
+      // Отправить код покупателю
+      if (body.action === 'admin_set_code') {
+        const code = cleanStr(body.code, 64)
+        if (!code) return jsonRes({ success: false, error: 'empty' }, 400)
+        const saved = await upsertCred(orderId, { acc_code: code, code_updated_at: new Date().toISOString() })
+        if (saved === null) return jsonRes({ success: false, error: 'server' }, 500)
+        return jsonRes({ success: true })
+      }
+
+      return jsonRes({ success: false, error: 'unknown_action' }, 400)
+    }
 
     // 1. Уведомление об активации разовой ссылки
     if (body.action === 'notify_activation') {
@@ -85,11 +293,13 @@ serve(async (req) => {
 
       const text = `🔔 *Новая активация!*\n\n📦 Приложения: \`${appsList}\`\n\n🔑 Токен: \`${token || 'Не указан'}\`\n\n⏰ Время (Екб): \`${ekbTime}\`\n\n📱 Устройство: \`${deviceFormatted}\``
 
-      const replyMarkup = {
-        inline_keyboard: [
-          [{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }]
-        ]
-      };
+      const safeToken = typeof token === 'string' || typeof token === 'number' ? String(token) : ''
+      const activationRows: unknown[][] = []
+      if (/^[A-Za-z0-9_-]{1,32}$/.test(safeToken)) {
+        activationRows.push([{ text: "🔑 Выдать аккаунт", web_app: { url: `${ADMIN_URL}?issue=${safeToken}` } }])
+      }
+      activationRows.push([{ text: "🗑 Удалить уведомление", callback_data: "delete_msg" }])
+      const replyMarkup = { inline_keyboard: activationRows };
 
       if (!ADMIN_CHAT_ID) {
         return new Response(JSON.stringify({ success: false, error: 'ADMIN_CHAT_ID / TELEGRAM_ADMIN_ID не настроен' }), {
