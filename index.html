@@ -436,6 +436,19 @@
       .tips-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; text-align: center; width: 100%; }
       .tips-steps { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
       .tips-steps .step-card { margin-bottom: 0; }
+      .faq-list { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
+      .faq-item { background: rgba(30,41,59,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; transition: border-color .2s ease; }
+      .faq-item.open { border-color: rgba(96,165,250,0.45); }
+      .faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 14px; background: none; border: none; color: var(--text); font: inherit; font-size: 13.5px; font-weight: 650; line-height: 1.35; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+      .faq-chev { width: 18px; height: 18px; flex-shrink: 0; color: var(--muted); transition: transform .25s ease, color .2s ease; }
+      .faq-item.open .faq-chev { transform: rotate(90deg); color: #60a5fa; }
+      .faq-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+      .faq-item.open .faq-a { grid-template-rows: 1fr; }
+      .faq-a-inner { overflow: hidden; min-height: 0; padding: 0 12px; }
+      .faq-item.open .faq-a-inner { padding-bottom: 12px; }
+      .faq-a-inner .tips-steps { gap: 8px; }
+      .faq-text { font-size: 13px; color: var(--text); line-height: 1.5; padding: 0 2px; }
+      .faq-text b { color: #60a5fa; }
       .story-bars { display: flex; gap: 4px; width: 100%; flex-shrink: 0; }
       .story-bar { flex: 1; height: 3.5px; border-radius: 99px; background: rgba(148,163,184,0.28); transition: background .25s ease; cursor: pointer; }
       .story-bar.done, .story-bar.active { background: #3b82f6; }
@@ -602,7 +615,7 @@
             <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-guide"/></svg></div><span>Инструкция</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showTipsScreen()">
-            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-tips"/></svg></div><span>Полезные советы</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
+            <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-tips"/></svg></div><span>FAQ</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
         </button>
         <button class="menu-item" onclick="showPolicyScreen()">
             <div class="menu-item-left"><div class="menu-icon-wrap"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-policy"/></svg></div><span>Политика использования</span></div><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-fwd"/></svg>
@@ -969,35 +982,32 @@
 
 <div class="container" id="tipsApp">
     <div class="auth-box">
-        <div class="auth-title" style="text-align: center; margin: 0 0 2px; font-size: 18px; width: 100%;">Полезные советы</div>
-        <div class="story-bars" id="tipsBars"></div>
-        <div class="story-viewport" id="tipsViewport">
-            <div class="story-track" id="tipsTrack">
-                <div class="story-slide tips-slide">
-                    <div class="story-num">1</div>
-                    <div class="tips-title">Отключите сгружение</div>
-                    <div class="tips-steps">
-                        <div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div>
-                        <div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div>
-                    </div>
-                </div>
-                <div class="story-slide tips-slide">
-                    <div class="story-num">2</div>
-                    <div class="tips-title">Защита от удаления</div>
-                    <div class="tips-steps">
-                        <div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div>
-                        <div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div>
-                        <div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div>
-                    </div>
-                </div>
+        <div class="auth-title" style="text-align: center; margin: 0 0 2px; font-size: 18px; width: 100%;">FAQ</div>
+        <div class="faq-list" id="faqList">
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Как отключить сгружение?</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="tips-steps"><div class="step-card"><div class="step-icon">1</div><div class="step-text">Откройте <b>«Настройки»</b> ➝ <b>«App Store»</b>.</div></div><div class="step-card"><div class="step-icon">2</div><div class="step-text">Выключите тумблер <b>«Сгружать неиспользуемые»</b>.</div></div></div></div></div>
             </div>
-            <div class="story-tap left" id="tipsTapLeft"></div>
-            <div class="story-tap right" id="tipsTapRight"></div>
-        </div>
-        <div class="story-nav">
-            <button type="button" class="story-arrow" id="tipsArrowPrev" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"></polyline></svg></button>
-            <div class="story-counter" id="tipsCounter"></div>
-            <button type="button" class="story-arrow" id="tipsArrowNext" aria-label="Далее"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Как защитить приложение от удаления?</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="tips-steps"><div class="step-card"><div class="step-icon">1</div><div class="step-text"><b>«Настройки»</b> ➝ <b>«Экранное время»</b>.</div></div><div class="step-card"><div class="step-icon">2</div><div class="step-text"><b>«Контент и конфиденциальность»</b> ➝ <b>«Покупки в iTunes и App Store»</b>.</div></div><div class="step-card"><div class="step-icon">3</div><div class="step-text">Зайдите в <b>«Удаление приложений»</b> и выберите <b>«Нет»</b>.</div></div></div></div></div>
+            </div>
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Установка зависла или не начинается</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="tips-steps"><div class="step-card"><div class="step-icon">1</div><div class="step-text">Проверьте интернет и отключите <b>VPN</b>, если он включён.</div></div><div class="step-card"><div class="step-icon">2</div><div class="step-text">Убедитесь, что на устройстве достаточно свободной памяти.</div></div><div class="step-card"><div class="step-icon">3</div><div class="step-text">Перезагрузите iPhone и повторите установку из каталога.</div></div></div></div></div>
+            </div>
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Приложение вылетает?</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="faq-text">Обратитесь к <a href="https://t.me/dizabled" target="_blank" rel="noopener" class="legal-link">администратору</a> для активации.</div></div></div>
+            </div>
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Пропадут ли приложения после обновления iOS?</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="faq-text">Нет, приложения не пропадут. Обновление iOS не удаляет установленные приложения и их данные. Главное — не удаляйте их вручную и не сбрасывайте профили в настройках.</div></div></div>
+            </div>
+            <div class="faq-item">
+                <button type="button" class="faq-q" aria-expanded="false"><span>Как работает промокод?</span><svg class="sf-icon faq-chev" viewBox="0 0 24 24"><use href="#i-fwd"/></svg></button>
+                <div class="faq-a"><div class="faq-a-inner"><div class="faq-text">Промокод действует <b>один раз</b> и суммируется только с акцией при покупке <b>от 3 приложений</b>.</div></div></div>
+            </div>
         </div>
         <button type="button" class="btn btn-primary guide-catalog-back" onclick="goBackFromInfo(false)" style="margin-top: 18px;"><svg class="sf-icon" viewBox="0 0 24 24"><use href="#i-back"/></svg> Назад</button>
     </div>
@@ -2275,9 +2285,8 @@ function switchScreen(id, pushHistory = true) {
         renderMyOrdersList();
     }
     if (id === "tipsApp") {
-        initTips();
-        goToTip(0);
-        setTimeout(updateTipsHeight, 50);
+        initFaq();
+        resetFaq();
     }
     if (id === "guideApp") {
         // При восстановлении инструкции после перезагрузки экран может открыться
@@ -2592,81 +2601,30 @@ function returnFromActivationGuide() {
     window.scrollTo(0, 0);
 }
 
-// ===== Полезные советы в стиле историй (без фото) =====
-let tipIndex = 0;
-let tipTotal = 0;
-let tipsInited = false;
+// ===== FAQ (раскрывающийся список) =====
+let faqInited = false;
 
-function updateTipsHeight() {
-    const tr = document.getElementById("tipsTrack");
-    const vp = document.getElementById("tipsViewport");
-    if (tr && vp && tr.children[tipIndex]) vp.style.height = tr.children[tipIndex].offsetHeight + "px";
-}
-
-function initTips() {
-    if (tipsInited) return;
-    const track = document.getElementById("tipsTrack");
-    const bars = document.getElementById("tipsBars");
-    const vp = document.getElementById("tipsViewport");
-    if (!track || !bars || !vp) return;
-    tipsInited = true;
-
-    tipTotal = track.children.length;
-    bars.innerHTML = "";
-    for (let i = 0; i < tipTotal; i++) {
-        const b = document.createElement("div");
-        b.className = "story-bar";
-        b.addEventListener("click", () => goToTip(i));
-        bars.appendChild(b);
-    }
-
-    const bindArrow = (id, step) => {
-        const btn = document.getElementById(id);
-        if (!btn) return;
-        btn.addEventListener("click", () => goToTip(tipIndex + step));
-        btn.addEventListener("touchend", (e) => { e.preventDefault(); e.stopPropagation(); goToTip(tipIndex + step); }, { passive: false });
-    };
-    bindArrow("tipsArrowPrev", -1);
-    bindArrow("tipsArrowNext", 1);
-
-    document.getElementById("tipsTapLeft").addEventListener("click", () => goToTip(tipIndex - 1));
-    document.getElementById("tipsTapRight").addEventListener("click", () => goToTip(tipIndex + 1));
-
-    let sx = 0, sy = 0;
-    vp.addEventListener("touchstart", (e) => {
-        const t = e.touches[0];
-        sx = t.clientX; sy = t.clientY;
-    }, { passive: true });
-    vp.addEventListener("touchend", (e) => {
-        const t = e.changedTouches[0];
-        const dx = t.clientX - sx, dy = t.clientY - sy;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-            e.preventDefault();
-            goToTip(tipIndex + (dx < 0 ? 1 : -1));
-        }
-    }, { passive: false });
-
-    goToTip(0);
-}
-
-function goToTip(i) {
-    if (i < 0 || i >= tipTotal) return;
-    tipIndex = i;
-    const track = document.getElementById("tipsTrack");
-    const vp = document.getElementById("tipsViewport");
-    if (track) track.style.transform = `translateX(-${i * 100}%)`;
-    if (vp && track && track.children[i]) vp.style.height = track.children[i].offsetHeight + "px";
-    document.querySelectorAll("#tipsBars .story-bar").forEach((b, idx) => {
-        b.classList.toggle("done", idx < i);
-        b.classList.toggle("active", idx === i);
+function initFaq() {
+    if (faqInited) return;
+    const list = document.getElementById("faqList");
+    if (!list) return;
+    faqInited = true;
+    list.querySelectorAll(".faq-q").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item = btn.closest(".faq-item");
+            const open = !item.classList.contains("open");
+            item.classList.toggle("open", open);
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        });
     });
-    const c = document.getElementById("tipsCounter");
-    if (c) c.textContent = (i + 1) + " / " + tipTotal;
-    const pv = document.getElementById("tipsArrowPrev"), nx = document.getElementById("tipsArrowNext");
-    if (pv) pv.disabled = i === 0;
-    if (nx) nx.disabled = i === tipTotal - 1;
 }
 
+function resetFaq() {
+    document.querySelectorAll("#faqList .faq-item.open").forEach(i => {
+        i.classList.remove("open");
+        i.querySelector(".faq-q")?.setAttribute("aria-expanded", "false");
+    });
+}
 
 function showTipsScreen() {
     document.getElementById("burgerMenuModal")?.classList.remove("active");
