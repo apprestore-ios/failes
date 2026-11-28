@@ -79,9 +79,8 @@
           height: 38px;
           border-radius: 12px;
           object-fit: cover;
-          border: none;
-          transform: scale(1.18);
-          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28), 0 0 10px rgba(148, 163, 184, 0.25), 0 4px 12px rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
       }
       .nav-title {
           font-size: 16px;
@@ -549,84 +548,6 @@
         #singleTokenAppContainer .app-grid-card {
     min-height: 90px;
 }
-
-      /* ===== Каталог: обновлённый дизайн ===== */
-      /* 1. Иконки: тонкое кольцо как у логотипа */
-      .app-grid-icon {
-          width: 48px; height: 48px; border-radius: 13px; border: none;
-          box-shadow: 0 0 0 1px rgba(255,255,255,0.28), 0 0 10px rgba(148,163,184,0.2), 0 4px 12px rgba(0,0,0,0.4);
-      }
-      /* 9. Скелетон, пока иконка грузится */
-      .app-grid-icon:not(.ld) {
-          background: linear-gradient(100deg, rgba(51,65,85,0.5) 30%, rgba(148,163,184,0.28) 50%, rgba(51,65,85,0.5) 70%);
-          background-size: 220% 100%;
-          animation: iconSkeleton 1.3s linear infinite;
-      }
-      @keyframes iconSkeleton { from { background-position: 120% 0; } to { background-position: -120% 0; } }
-
-      /* 3. Стеклянные карточки */
-      #appListContainer .app-grid-card {
-          background: linear-gradient(180deg, rgba(51,65,85,0.5) 0%, rgba(30,41,59,0.38) 100%);
-          backdrop-filter: blur(18px) saturate(160%);
-          -webkit-backdrop-filter: blur(18px) saturate(160%);
-          box-shadow: var(--box-shadow), inset 0 1px 0 rgba(255,255,255,0.1);
-          transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-          -webkit-tap-highlight-color: transparent;
-      }
-      /* 2. Нажатие и наведение */
-      #appListContainer .app-grid-card:active { transform: scale(0.97); }
-      @media (hover: hover) {
-          #appListContainer .app-grid-card:hover {
-              border-color: rgba(96,165,250,0.5);
-              box-shadow: var(--box-shadow), 0 0 22px rgba(59,130,246,0.22), inset 0 1px 0 rgba(255,255,255,0.14);
-          }
-      }
-
-      /* 4. Ценник */
-      .app-price-tag {
-          background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.08));
-          box-shadow: 0 0 12px rgba(74,222,128,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
-      }
-
-      /* 5. Бейдж NEW: мягкий блик */
-      .app-new-badge { overflow: hidden; }
-      .app-new-badge::after {
-          content: ""; position: absolute; top: 0; left: -80%; width: 60%; height: 100%;
-          background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
-          transform: skewX(-20deg);
-          animation: badgeShine 3.6s ease-in-out infinite;
-      }
-      @keyframes badgeShine { 0%, 55% { left: -80%; } 100% { left: 140%; } }
-
-      /* 6. Плавное появление карточек */
-      #appListContainer .app-grid-card.rv { opacity: 0; transform: translateY(14px); }
-      #appListContainer .app-grid-card.rv.rv-in {
-          opacity: 1; transform: translateY(0);
-          transition: opacity 0.45s ease var(--rv-d, 0ms), transform 0.45s cubic-bezier(.2,.8,.2,1) var(--rv-d, 0ms);
-      }
-
-      /* 7. Поиск и фильтр */
-      .app-search { transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
-      .app-search:focus {
-          border-color: rgba(96,165,250,0.7);
-          box-shadow: 0 0 0 3px rgba(59,130,246,0.18), 0 0 18px rgba(59,130,246,0.15);
-      }
-      .filter-btn {
-          background: rgba(148,163,184,0.2);
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
-          color: #cbd5e1;
-      }
-      .filter-btn:active { transform: translateY(-50%) scale(0.92); }
-
-      /* 8. Кнопка корзины: «прыжок» при добавлении */
-      .app-cart-btn:active { transform: scale(0.92); }
-      .app-cart-btn.pop { animation: cartPop 0.45s cubic-bezier(.3,1.6,.5,1); }
-      @keyframes cartPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.22) translateY(-3px); } 100% { transform: scale(1); } }
-
-      @media (prefers-reduced-motion: reduce) {
-          .app-grid-icon:not(.ld), .app-new-badge::after, .app-cart-btn.pop { animation: none !important; }
-          #appListContainer .app-grid-card.rv { opacity: 1; transform: none; }
-      }
     </style>
 </head>
 <body>
@@ -3181,56 +3102,6 @@ function renderIconTicker() {
     fill("tickerTrack2", appsData.slice(12, 24));
 }
 renderIconTicker();
-
-/* ===== Каталог: анимации и скелетоны ===== */
-(function () {
-    const box = document.getElementById("appListContainer");
-    if (!box) return;
-
-    // 9. Скелетон иконок: снимаем после загрузки
-    const markLoaded = img => img.classList.add("ld");
-    document.addEventListener("load", e => { if (e.target && e.target.classList && e.target.classList.contains("app-grid-icon")) markLoaded(e.target); }, true);
-    document.addEventListener("error", e => { if (e.target && e.target.classList && e.target.classList.contains("app-grid-icon")) markLoaded(e.target); }, true);
-
-    // 6. Появление карточек при прокрутке
-    const io = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
-        let n = 0;
-        entries.forEach(en => {
-            if (!en.isIntersecting) return;
-            en.target.style.setProperty("--rv-d", Math.min(n++, 8) * 30 + "ms");
-            en.target.classList.add("rv-in");
-            io.unobserve(en.target);
-        });
-    }, { threshold: 0.05 }) : null;
-
-    function prepare() {
-        box.querySelectorAll(".app-grid-card:not([data-rv])").forEach(card => {
-            card.setAttribute("data-rv", "1");
-            const img = card.querySelector(".app-grid-icon");
-            if (img && img.complete && img.naturalWidth) markLoaded(img);
-            if (io) { card.classList.add("rv"); io.observe(card); }
-        });
-    }
-    new MutationObserver(prepare).observe(box, { childList: true });
-    prepare();
-
-    // 8. Анимация кнопки корзины при добавлении
-    const origToggle = window.toggleCart;
-    if (typeof origToggle === "function") {
-        window.toggleCart = function (key, srcEl) {
-            const wasIn = typeof cartItems !== "undefined" && cartItems.has(key);
-            const r = origToggle.apply(this, arguments);
-            if (!wasIn) {
-                const b = document.getElementById("gridBtn_" + key);
-                if (b) {
-                    b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
-                    b.addEventListener("animationend", () => b.classList.remove("pop"), { once: true });
-                }
-            }
-            return r;
-        };
-    }
-})();
 </script>
 </body>
 </html>
