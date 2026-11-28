@@ -430,7 +430,17 @@
       /* ===== Инструкция в виде историй ===== */
       #guideApp .auth-box { padding: 12px 14px 14px; gap: 6px; }
       #guideApp .auth-title { font-size: 17px; }
-      #tipsApp .auth-box { padding: 12px 14px 14px; gap: 6px; }
+      #tipsApp {
+          justify-content: flex-start; align-items: stretch;
+          overflow-y: auto; overflow-x: hidden;
+          -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
+          touch-action: pan-y; padding-top: 12px;
+          padding-bottom: max(28px, env(safe-area-inset-bottom));
+      }
+      #tipsApp .auth-box {
+          padding: 12px 14px 14px; gap: 6px;
+          max-height: none; flex-shrink: 0; margin: 0;
+      }
       #tipsApp .auth-title { font-size: 17px; }
       .tips-slide { gap: 10px; padding: 2px 0; }
       .tips-title { font-size: 15px; font-weight: 750; color: var(--text); line-height: 1.3; text-align: center; width: 100%; }
